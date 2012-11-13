@@ -1,7 +1,6 @@
-Stanford CoreNLP  v1.3.3 - 2012-07-09
+Stanford CoreNLP v1.3.3 - 2012-07-09
 Stanford's Suite of NLP Tools
 -----------------------------
-
 Copyright (c) 2009-2012 The Board of Trustees of 
 The Leland Stanford Junior University. All Rights Reserved.
 
@@ -70,4 +69,3 @@ CHANGES
 2010-11-11    1.0.1     Add xml removal
 
 2010-10-07      1.0     Initial release
-
