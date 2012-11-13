@@ -1,0 +1,3 @@
+[submodule "stanford-core-nlp-ruby"]
+	path = stanford-core-nlp-ruby
+	url = git://github.com/louismullie/stanford-core-nlp.git
