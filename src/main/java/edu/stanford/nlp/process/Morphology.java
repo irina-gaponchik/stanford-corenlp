@@ -51,7 +51,7 @@ public class Morphology implements Function {
   private static final Logger LOGGER = Logger.getLogger(Morphology.class.getName());
 
   private static final boolean DEBUG = false;
-  private static Morpha staticLexer;
+  protected static Morpha staticLexer;
 
   private final Morpha lexer;
 

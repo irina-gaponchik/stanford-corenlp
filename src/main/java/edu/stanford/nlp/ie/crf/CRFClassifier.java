@@ -2340,7 +2340,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
 
 
   protected Minimizer getMinimizer() {
-    return getMinimizer(0, null);
+    return getMinimizer(0 );
   }
 
   protected Minimizer getMinimizer(int featurePruneIteration, Evaluator... evaluators) {
