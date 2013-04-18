@@ -75,7 +75,7 @@ public class RegexNERAnnotator implements Annotator {
         // check that the spans are the same, specially handling the case of
         // tokens with background named entity tags ("other")
         if ((NERStart == start || NERType.equals(classifier.flags.backgroundSymbol)) &&
-            (answerEnd == NEREnd || (NERType.equals(classifier.flags.backgroundSymbol) && NEREnd >= answerEnd))) {
+            (answerEnd == NEREnd || NERType.equals(classifier.flags.backgroundSymbol) && NEREnd >= answerEnd)) {
 
           // annotate each token in the span
           for (int i = start; i < answerEnd; i ++)

@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class GoldenSectionLineSearch implements LineSearcher {
 
   private static final double GOLDEN_RATIO = (1.0 + Math.sqrt(5.0)) / 2.0;
-  private static final double GOLDEN_SECTION = (GOLDEN_RATIO / (1.0 + GOLDEN_RATIO));
+  private static final double GOLDEN_SECTION = GOLDEN_RATIO / (1.0 + GOLDEN_RATIO);
   private static boolean VERBOSE = true;
 
   private Map<Double, Double> memory = Generics.newHashMap(); //remember where it was called and what were the values
@@ -35,7 +35,7 @@ public class GoldenSectionLineSearch implements LineSearcher {
   }
 
   public GoldenSectionLineSearch(boolean geometric) {
-    this(geometric, 1e-4, 1e-2, 10);
+    this(geometric, 1.0e-4, 1.0e-2, 10);
   }
 
   public GoldenSectionLineSearch(boolean geometric, double tol, double low, double high) {
@@ -79,7 +79,7 @@ public class GoldenSectionLineSearch implements LineSearcher {
     double fhigh = function.apply(high);
     if (VERBOSE) {
       System.err.println("Finding min between " + low + " (value: " +
-                flow + ") and " + high + " (value: " + fhigh + ")");
+                flow + ") and " + high + " (value: " + fhigh + ')');
     }
 
     double mid;
@@ -121,7 +121,7 @@ public class GoldenSectionLineSearch implements LineSearcher {
         oldY = bestVal;
         searchRight = mid < low + (high - low)/2.0;
         if (oldY < flow && oldY < fhigh) {
-          if (VERBOSE) System.err.println("Found a good mid point at (" + mid + ", " + oldY + ")");
+          if (VERBOSE) System.err.println("Found a good mid point at (" + mid + ", " + oldY + ')');
         } else {
           System.err.println("Warning: GoldenSectionLineSearch grid search couldn't find slope!!");
           // revert to initial positioning and pray
@@ -132,8 +132,8 @@ public class GoldenSectionLineSearch implements LineSearcher {
     }
 
     memory.put(mid, oldY);
-    while (geometric ? (high / low > 1 + tol) : high - low > tol) {
-      if (VERBOSE) System.err.println("Current low, mid, high: " + nf.format(low) + " " + nf.format(mid) + " " + nf.format(high));
+    while (geometric ? high / low > 1 + tol : high - low > tol) {
+      if (VERBOSE) System.err.println("Current low, mid, high: " + nf.format(low) + ' ' + nf.format(mid) + ' ' + nf.format(high));
       double newX = goldenMean(searchRight ? high : low, mid);
       double newY = function.apply(newX);
       memory.put(newX, newY);
@@ -172,7 +172,7 @@ public class GoldenSectionLineSearch implements LineSearcher {
       double x = low + i * inc;
       double y = function.apply(x);
       memory.put(x, y);
-      System.err.println("for point " + x + "\t" + y);
+      System.err.println("for point " + x + '\t' + y);
     }
     dumpMemory();
   }
@@ -187,14 +187,10 @@ public class GoldenSectionLineSearch implements LineSearcher {
    * @return The GOLDEN_SECTION along the way from a to b.
    */
   private double goldenMean(double a, double b) {
-    if (geometric) {
-      return a * Math.pow(b / a, GOLDEN_SECTION);
-    } else {
-      return a + (b - a) * GOLDEN_SECTION;
-    }
+      return geometric ? a * Math.pow(b / a, GOLDEN_SECTION) : a + (b - a) * GOLDEN_SECTION;
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     GoldenSectionLineSearch min =
         new GoldenSectionLineSearch(true, 0.00001, 0.001, 121.0);
     Function<Double, Double> f1 = new Function<Double, Double>() {
@@ -211,7 +207,7 @@ public class GoldenSectionLineSearch implements LineSearcher {
          // this function used to fail in Galen's version; min should be 0.2
          // return - x * (2 * x - 1) * (x - 0.8);
          // this function fails if you don't find an initial bracketing
-         return x < 0.1 ? 0.0: (x > 0.2 ? 0.0: (x - 0.1) * (x - 0.2));
+         return x < 0.1 ? 0.0: x > 0.2 ? 0.0: (x - 0.1) * (x - 0.2);
          // return - Math.sin(x * Math.PI);
          // return -(3 + 6 * x - 4 * x * x);
        }

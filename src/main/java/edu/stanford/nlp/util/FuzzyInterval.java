@@ -35,11 +35,7 @@ public class FuzzyInterval<E extends FuzzyInterval.FuzzyComparable<E>> extends I
 
   public static <E extends FuzzyComparable<E>> FuzzyInterval<E> toInterval(E a, E b, int flags) {
     int comp = a.compareTo(b);
-    if (comp <= 0) {
-      return new FuzzyInterval<E>(a,b, flags);
-    } else {
-      return null;
-    }
+      return comp <= 0 ? new FuzzyInterval<>(a, b, flags) : null;
   }
 
   public static <E extends FuzzyComparable<E>> FuzzyInterval<E> toValidInterval(E a, E b) {
@@ -48,11 +44,7 @@ public class FuzzyInterval<E extends FuzzyInterval.FuzzyComparable<E>> extends I
 
   public static <E extends FuzzyComparable<E>> FuzzyInterval<E> toValidInterval(E a, E b, int flags) {
     int comp = a.compareTo(b);
-    if (comp <= 0) {
-      return new FuzzyInterval<E>(a,b,flags);
-    } else {
-      return new FuzzyInterval<E>(b,a,flags);
-    }
+      return comp <= 0 ? new FuzzyInterval<>(a, b, flags) : new FuzzyInterval<>(b, a, flags);
   }
 
   public int getRelationFlags(Interval<E> other)
@@ -96,7 +88,7 @@ public class FuzzyInterval<E extends FuzzyInterval.FuzzyComparable<E>> extends I
     return flags;
   }
 
-  private int restrictFlags(int flags) {
+  private static int restrictFlags(int flags) {
     // Eliminiate inconsistent choices in flags
     int f11 = extractRelationSubflags(flags, REL_FLAGS_SS_SHIFT);
     int f22 = extractRelationSubflags(flags, REL_FLAGS_EE_SHIFT);
@@ -138,8 +130,8 @@ public class FuzzyInterval<E extends FuzzyInterval.FuzzyComparable<E>> extends I
     } else if ((f22 & REL_FLAGS_AFTER) == 0) {
       f12 = f12 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE);
     }
-    return ((f11 << REL_FLAGS_SS_SHIFT) & (f12 << REL_FLAGS_SE_SHIFT)
-            & (f21 << REL_FLAGS_ES_SHIFT) & (f22 << REL_FLAGS_EE_SHIFT));
+    return f11 << REL_FLAGS_SS_SHIFT & f12 << REL_FLAGS_SE_SHIFT
+            & f21 << REL_FLAGS_ES_SHIFT & f22 << REL_FLAGS_EE_SHIFT;
   }
 
   public RelType getRelation(Interval<E> other)
@@ -158,11 +150,7 @@ public class FuzzyInterval<E extends FuzzyInterval.FuzzyComparable<E>> extends I
       return RelType.INSIDE;
     } else if ((flags & REL_FLAGS_INTERVAL_CONTAIN) != 0) {
       return RelType.CONTAIN;
-    } else if ((flags & REL_FLAGS_INTERVAL_OVERLAP) != 0) {
-      return RelType.OVERLAP;
-    } else {
-      return RelType.UNKNOWN;
-    }
+    } else return (flags & REL_FLAGS_INTERVAL_OVERLAP) != 0 ? RelType.OVERLAP : RelType.UNKNOWN;
   }
 
   private static final long serialVersionUID = 1;

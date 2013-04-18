@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Tokenizers break up text into individual Objects. These objects may be
  * Strings, Words, or other Objects.  A Tokenizer extends the Iterator
- * interface, but provides a lookahead operation <code>peek()</code>.  An
+ * interface, but provides a lookahead operation {@code peek()}.  An
  * implementation of this interface is expected to have a constructor that
  * takes a single argument, a Reader.
  *
@@ -26,7 +26,7 @@ public interface Tokenizer<T> extends Iterator<T> {
   public T next();
 
   /**
-   * Returns <code>true</code> if and only if this Tokenizer has more elements.
+   * Returns {@code true} if and only if this Tokenizer has more elements.
    */
   @Override
   public boolean hasNext();

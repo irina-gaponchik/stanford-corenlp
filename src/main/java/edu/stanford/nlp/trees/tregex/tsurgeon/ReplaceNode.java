@@ -9,7 +9,7 @@ import edu.stanford.nlp.trees.tregex.TregexMatcher;
 class ReplaceNode extends TsurgeonPattern {
 
   public ReplaceNode(TsurgeonPattern oldNode, TsurgeonPattern newNode) {
-    super("replace", new TsurgeonPattern[] { oldNode, newNode });
+    super("replace", oldNode, newNode);
   }
 
   public ReplaceNode(TsurgeonPattern oldNode, AuxiliaryTree t) {
@@ -20,7 +20,7 @@ class ReplaceNode extends TsurgeonPattern {
   public Tree evaluate(Tree t, TregexMatcher m) {
     Tree oldNode = children[0].evaluate(t,m);
     Tree newNode = children[1].evaluate(t,m);
-    if(oldNode==t)
+    if(oldNode.equals(t))
       return newNode;
     Tree parent = oldNode.parent(t);
     int i = parent.objectIndexOf(oldNode);

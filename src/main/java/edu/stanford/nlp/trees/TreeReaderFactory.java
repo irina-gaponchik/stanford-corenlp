@@ -3,18 +3,18 @@ package edu.stanford.nlp.trees;
 import java.io.Reader;
 
 /**
- * A <code>TreeReaderFactory</code> is a factory for creating objects of
- * class <code>TreeReader</code>, or some descendant class.
+ * A {@code TreeReaderFactory} is a factory for creating objects of
+ * class {@code TreeReader}, or some descendant class.
  *
  * @author Christopher Manning
  */
 public interface TreeReaderFactory {
 
   /**
-   * Create a new <code>TreeReader</code> using the provided
-   * <code>Reader</code>.
+   * Create a new {@code TreeReader} using the provided
+   * {@code Reader}.
    *
-   * @param in The <code>Reader</code> to build on
+   * @param in The {@code Reader} to build on
    * @return The new TreeReader
    */
   public TreeReader newTreeReader(Reader in);

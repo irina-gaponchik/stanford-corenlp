@@ -17,7 +17,7 @@ public class AceElement {
   public static void appendOffset(StringBuffer buffer,
 				  int offset) {
     for(int i = 0; i < offset; i ++){
-      buffer.append(" ");
+      buffer.append(' ');
     }
   }
 }

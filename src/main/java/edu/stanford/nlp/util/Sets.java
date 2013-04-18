@@ -18,13 +18,13 @@ public class Sets {
 
 
   /**
-   * Returns the set cross product of s1 and s2, as <code>Pair</code>s
+   * Returns the set cross product of s1 and s2, as {@code Pair}s
    */
   public static <E,F> Set<Pair<E,F>> cross(Set<E> s1, Set<F> s2) {
     Set<Pair<E,F>> s = Generics.newHashSet();
     for (E o1 : s1) {
       for (F o2 : s2) {
-        s.add(new Pair<E,F>(o1, o2));
+        s.add(new Pair<>(o1, o2));
       }
     }
     return s;
@@ -118,7 +118,7 @@ public class Sets {
     }
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Set<String> h = Generics.newHashSet();
     h.add("a");
     h.add("b");

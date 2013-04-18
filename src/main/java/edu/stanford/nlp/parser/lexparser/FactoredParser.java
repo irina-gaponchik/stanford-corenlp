@@ -85,7 +85,7 @@ public class FactoredParser {
  * tree4b is the best combo parse, binarized
  */
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Options op = new Options(new EnglishTreebankParserParams());
     // op.tlpParams may be changed to something else later, so don't use it till
     // after options are parsed.
@@ -97,22 +97,22 @@ public class FactoredParser {
     String serializeFile = null;
 
     int i = 0;
-    while (i < args.length && args[i].startsWith("-")) {
-      if (args[i].equalsIgnoreCase("-path") && (i + 1 < args.length)) {
+    while (i < args.length && !args[i].isEmpty() && args[i].charAt(0) == '-') {
+      if (args[i].equalsIgnoreCase("-path") && i + 1 < args.length) {
         path = args[i + 1];
         i += 2;
-      } else if (args[i].equalsIgnoreCase("-train") && (i + 2 < args.length)) {
+      } else if (args[i].equalsIgnoreCase("-train") && i + 2 < args.length) {
         trainLow = Integer.parseInt(args[i + 1]);
         trainHigh = Integer.parseInt(args[i + 2]);
         i += 3;
-      } else if (args[i].equalsIgnoreCase("-test") && (i + 2 < args.length)) {
+      } else if (args[i].equalsIgnoreCase("-test") && i + 2 < args.length) {
         testLow = Integer.parseInt(args[i + 1]);
         testHigh = Integer.parseInt(args[i + 2]);
         i += 3;
-      } else if (args[i].equalsIgnoreCase("-serialize") && (i + 1 < args.length)) {
+      } else if (args[i].equalsIgnoreCase("-serialize") && i + 1 < args.length) {
         serializeFile = args[i + 1];
         i += 2;
-      } else if (args[i].equalsIgnoreCase("-tLPP") && (i + 1 < args.length)) {
+      } else if (args[i].equalsIgnoreCase("-tLPP") && i + 1 < args.length) {
         try {
           op.tlpParams = (TreebankLangParserParams) Class.forName(args[i + 1]).newInstance();
         } catch (ClassNotFoundException e) {
@@ -166,23 +166,19 @@ public class FactoredParser {
 
     System.err.print("Binarizing trees...");
     TreeAnnotatorAndBinarizer binarizer;
-    if (!op.trainOptions.leftToRight) {
-      binarizer = new TreeAnnotatorAndBinarizer(op.tlpParams, op.forceCNF, !op.trainOptions.outsideFactor(), true, op);
-    } else {
-      binarizer = new TreeAnnotatorAndBinarizer(op.tlpParams.headFinder(), new LeftHeadFinder(), op.tlpParams, op.forceCNF, !op.trainOptions.outsideFactor(), true, op);
-    }
+      binarizer = !op.trainOptions.leftToRight ? new TreeAnnotatorAndBinarizer(op.tlpParams, op.forceCNF, !op.trainOptions.outsideFactor(), true, op) : new TreeAnnotatorAndBinarizer(op.tlpParams.headFinder(), new LeftHeadFinder(), op.tlpParams, op.forceCNF, !op.trainOptions.outsideFactor(), true, op);
 
     CollinsPuncTransformer collinsPuncTransformer = null;
     if (op.trainOptions.collinsPunc) {
       collinsPuncTransformer = new CollinsPuncTransformer(tlp);
     }
     TreeTransformer debinarizer = new Debinarizer(op.forceCNF);
-    List<Tree> binaryTrainTrees = new ArrayList<Tree>();
+    List<Tree> binaryTrainTrees = new ArrayList<>();
 
     if (op.trainOptions.selectiveSplit) {
       op.trainOptions.splitters = ParentAnnotationStats.getSplitCategories(trainTreebank, op.trainOptions.tagSelectiveSplit, 0, op.trainOptions.selectiveSplitCutOff, op.trainOptions.tagSelectiveSplitCutOff, op.tlpParams.treebankLanguagePack());
       if (op.trainOptions.deleteSplitters != null) {
-        List<String> deleted = new ArrayList<String>();
+        List<String> deleted = new ArrayList<>();
         for (String del : op.trainOptions.deleteSplitters) {
           String baseDel = tlp.basicCategory(del);
           boolean checkBasic = del.equals(baseDel);
@@ -229,7 +225,7 @@ public class FactoredParser {
       binarizer.dumpStats();
     }
 
-    List<Tree> binaryTestTrees = new ArrayList<Tree>();
+    List<Tree> binaryTestTrees = new ArrayList<>();
     for (Tree tree : testTreebank) {
       if (op.trainOptions.collinsPunc) {
         tree = collinsPuncTransformer.transformTree(tree);
@@ -243,7 +239,7 @@ public class FactoredParser {
     DependencyGrammar dg = null;
     // DependencyGrammar dgBLIPP = null;
     Lexicon lex = null;
-    Index<String> stateIndex = new HashIndex<String>();
+    Index<String> stateIndex = new HashIndex<>();
 
     // extract grammars
     Extractor<Pair<UnaryGrammar,BinaryGrammar>> bgExtractor = new BinaryGrammarExtractor(op, stateIndex);
@@ -256,7 +252,7 @@ public class FactoredParser {
       System.err.print("Extracting PCFG...");
       Pair<UnaryGrammar, BinaryGrammar> bgug = null;
       if (op.trainOptions.cheatPCFG) {
-        List<Tree> allTrees = new ArrayList<Tree>(binaryTrainTrees);
+        List<Tree> allTrees = new ArrayList<>(binaryTrainTrees);
         allTrees.addAll(binaryTestTrees);
         bgug = bgExtractor.extract(allTrees);
       } else {
@@ -269,8 +265,8 @@ public class FactoredParser {
       Timing.tick("done.");
     }
     System.err.print("Extracting Lexicon...");
-    Index<String> wordIndex = new HashIndex<String>();
-    Index<String> tagIndex = new HashIndex<String>();
+    Index<String> wordIndex = new HashIndex<>();
+    Index<String> tagIndex = new HashIndex<>();
     lex = op.tlpParams.lex(op, wordIndex, tagIndex);
     lex.initializeTraining(binaryTrainTrees.size());
     lex.train(binaryTrainTrees);
@@ -320,13 +316,13 @@ public class FactoredParser {
     }
 
 
-    ExhaustiveDependencyParser dparser = ((op.doDep && ! op.testOptions.useFastFactored) ? new ExhaustiveDependencyParser(dg, lex, op, wordIndex, tagIndex) : null);
+    ExhaustiveDependencyParser dparser = op.doDep && ! op.testOptions.useFastFactored ? new ExhaustiveDependencyParser(dg, lex, op, wordIndex, tagIndex) : null;
 
-    Scorer scorer = (op.doPCFG ? new TwinScorer(new ProjectionScorer(parser, gp, op), dparser) : null);
+    Scorer scorer = op.doPCFG ? new TwinScorer(new ProjectionScorer(parser, gp, op), dparser) : null;
     //Scorer scorer = parser;
     BiLexPCFGParser bparser = null;
     if (op.doPCFG && op.doDep) {
-      bparser = (op.testOptions.useN5) ? new BiLexPCFGParser.N5BiLexPCFGParser(scorer, parser, dparser, bg, ug, dg, lex, op, gp, stateIndex, wordIndex, tagIndex) : new BiLexPCFGParser(scorer, parser, dparser, bg, ug, dg, lex, op, gp, stateIndex, wordIndex, tagIndex);
+      bparser = op.testOptions.useN5 ? new BiLexPCFGParser.N5BiLexPCFGParser(scorer, parser, dparser, bg, ug, dg, lex, op, gp, stateIndex, wordIndex, tagIndex) : new BiLexPCFGParser(scorer, parser, dparser, bg, ug, dg, lex, op, gp, stateIndex, wordIndex, tagIndex);
     }
 
     Evalb pcfgPE = new Evalb("pcfg  PE", true);
@@ -356,7 +352,7 @@ public class FactoredParser {
     if (op.testOptions.preTag) {
       try {
         Class[] argsClass = { String.class };
-        Object[] arguments = new Object[]{op.testOptions.taggerSerializedFile};
+        Object[] arguments = {op.testOptions.taggerSerializedFile};
         tagger = (Function<List<? extends HasWord>,ArrayList<TaggedWord>>) Class.forName("edu.stanford.nlp.tagger.maxent.MaxentTagger").getConstructor(argsClass).newInstance(arguments);
       } catch (Exception e) {
         System.err.println(e);
@@ -414,7 +410,7 @@ public class FactoredParser {
       }
       long timeMil2 = System.currentTimeMillis();
       long elapsed = timeMil2 - timeMil1;
-      System.err.println("Time: " + ((int) (elapsed / 100)) / 10.00 + " sec.");
+      System.err.println("Time: " + (int) (elapsed / 100) / 10.00 + " sec.");
       //System.out.println("PCFG Best Parse:");
       Tree tree2b = null;
       Tree tree2 = null;
@@ -471,7 +467,7 @@ public class FactoredParser {
         pcfgCB.evaluate(tc.transformTree(tree2), tc.transformTree(tree), pw);
         Tree tree4b = null;
         if (op.doDep) {
-          comboDE.evaluate((bothPassed ? tree4 : tree3), binaryTree, pw);
+          comboDE.evaluate(bothPassed ? tree4 : tree3, binaryTree, pw);
           tree4b = tree4;
           tree4 = debinarizer.transformTree(tree4);
           if (op.nodePrune) {
@@ -552,17 +548,16 @@ public class FactoredParser {
 
   private static List<TaggedWord> cleanTags(List<TaggedWord> twList, TreebankLanguagePack tlp) {
     int sz = twList.size();
-    List<TaggedWord> l = new ArrayList<TaggedWord>(sz);
-    for (int i = 0; i < sz; i++) {
-      TaggedWord tw = twList.get(i);
-      TaggedWord tw2 = new TaggedWord(tw.word(), tlp.basicCategory(tw.tag()));
-      l.add(tw2);
-    }
+    List<TaggedWord> l = new ArrayList<>(sz);
+      for (TaggedWord tw : twList) {
+          TaggedWord tw2 = new TaggedWord(tw.word(), tlp.basicCategory(tw.tag()));
+          l.add(tw2);
+      }
     return l;
   }
 
   private static ArrayList<Word> wordify(List wList) {
-    ArrayList<Word> s = new ArrayList<Word>();
+    ArrayList<Word> s = new ArrayList<>();
     for (Object obj : wList) {
       s.add(new Word(obj.toString()));
     }
@@ -570,11 +565,11 @@ public class FactoredParser {
   }
 
   private static ArrayList<Word> cutLast(ArrayList<Word> s) {
-    return new ArrayList<Word>(s.subList(0, s.size() - 1));
+    return new ArrayList<>(s.subList(0, s.size() - 1));
   }
 
   private static ArrayList<Word> addLast(ArrayList<? extends Word> s) {
-    ArrayList<Word> s2 = new ArrayList<Word>(s);
+    ArrayList<Word> s2 = new ArrayList<>(s);
     //s2.add(new StringLabel(Lexicon.BOUNDARY));
     s2.add(new Word(Lexicon.BOUNDARY));
     return s2;

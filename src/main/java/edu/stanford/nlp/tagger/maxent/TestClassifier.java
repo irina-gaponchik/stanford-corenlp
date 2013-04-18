@@ -53,7 +53,7 @@ public class TestClassifier {
     fileRecord = TaggedFileRecord.createRecord(config, testFile);
 
     saveRoot = config.getDebugPrefix();
-    if (saveRoot == null || saveRoot.equals("")) {
+    if (saveRoot == null || saveRoot.isEmpty()) {
       saveRoot = fileRecord.filename();
     }
 
@@ -105,7 +105,7 @@ public class TestClassifier {
     boolean verboseResults = config.getVerboseResults();
 
     if (config.getNThreads() != 1) {
-      MulticoreWrapper<List<TaggedWord>, TestSentence> wrapper = new MulticoreWrapper<List<TaggedWord>, TestSentence>(config.getNThreads(), new TestSentenceProcessor(maxentTagger));
+      MulticoreWrapper<List<TaggedWord>, TestSentence> wrapper = new MulticoreWrapper<>(config.getNThreads(), new TestSentenceProcessor(maxentTagger));
       for (List<TaggedWord> taggedSentence : fileRecord.reader()) {
         wrapper.put(taggedSentence);
         while (wrapper.peek()) {
@@ -133,23 +133,19 @@ public class TestClassifier {
 
   String resultsString(MaxentTagger maxentTagger) {
     StringBuilder output = new StringBuilder();
-    output.append("Model " + maxentTagger.config.getModel() + " has xSize=" + maxentTagger.xSize +
-                  ", ySize=" + maxentTagger.ySize + ", and numFeatures=" +
-                  maxentTagger.prob.lambda.length + ".\n");
-    output.append("Results on " + numSentences + " sentences and " +
-                  (numRight + numWrong) + " words, of which " +
-                  unknownWords + " were unknown.\n");
+    output.append("Model ").append(maxentTagger.config.getModel()).append(" has xSize=").append(maxentTagger.xSize).append(", ySize=").append(maxentTagger.ySize).append(", and numFeatures=").append(maxentTagger.prob.lambda.length).append(".\n");
+    output.append("Results on ").append(numSentences).append(" sentences and ").append(numRight + numWrong).append(" words, of which ").append(unknownWords).append(" were unknown.\n");
     output.append(String.format("Total sentences right: %d (%f%%); wrong: %d (%f%%).\n",
                                 numCorrectSentences, numCorrectSentences * 100.0 / numSentences,
                                 numSentences - numCorrectSentences,
-                                (numSentences - numCorrectSentences) * 100.0 / (numSentences)));
+                                (numSentences - numCorrectSentences) * 100.0 / numSentences));
     output.append(String.format("Total tags right: %d (%f%%); wrong: %d (%f%%).\n",
                                 numRight, numRight * 100.0 / (numRight + numWrong), numWrong,
                                 numWrong * 100.0 / (numRight + numWrong)));
     if (unknownWords > 0) {
       output.append(String.format("Unknown words right: %d (%f%%); wrong: %d (%f%%).\n",
-                                  (unknownWords - numWrongUnknown),
-                                  100.0 - (numWrongUnknown * 100.0 / unknownWords),
+              unknownWords - numWrongUnknown,
+                                  100.0 - numWrongUnknown * 100.0 / unknownWords,
                                   numWrongUnknown, numWrongUnknown * 100.0 / unknownWords));
     }
     return output.toString();

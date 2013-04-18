@@ -25,9 +25,9 @@ public class SGDToQNMinimizer implements Minimizer<DiffFunction>, Serializable  
 
   // private int k;
   private final int bSize;
-  private boolean quiet = false;
+  private boolean quiet;
 
-  public boolean outputIterationsToFile = false;
+  public boolean outputIterationsToFile;
   // public int outputFrequency = 10;
   public double gain = 0.1;
   // private List<double[]> gradList = null;
@@ -70,7 +70,7 @@ public class SGDToQNMinimizer implements Minimizer<DiffFunction>, Serializable  
     return "SGD2QN" + bSize + "_g" + g;
   }
 
-  public double[] minimize(DiffFunction function, double functionTolerance, double[] initial) {
+  public double[] minimize(DiffFunction function, double functionTolerance, double... initial) {
     return minimize(function,functionTolerance,initial,-1);
   }
 

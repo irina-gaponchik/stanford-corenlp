@@ -12,20 +12,16 @@ import java.util.zip.GZIPOutputStream;
  * @author Galen Andrew
  */
 public class ResultStoringFloatMonitor implements FloatFunction {
-  int i = 0;
+  int i;
   final int outputFreq;
   final String filename;
 
   public ResultStoringFloatMonitor(int outputFreq, String filename) {
-    if (filename.lastIndexOf('.') >= 0) {
-      this.filename = filename.substring(0, filename.lastIndexOf('.')) + ".fdat";
-    } else {
-      this.filename = filename + ".fdat";
-    }
+      this.filename = filename.lastIndexOf('.') >= 0 ? filename.substring(0, filename.lastIndexOf('.')) + ".fdat" : filename + ".fdat";
     this.outputFreq = outputFreq;
   }
 
-  public float valueAt(float[] x) {
+  public float valueAt(float... x) {
     if (++i % outputFreq == 0) {
       System.err.print("Storing interim (float) weights to " + filename + " ... ");
       try {

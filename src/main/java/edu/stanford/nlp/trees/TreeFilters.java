@@ -29,7 +29,7 @@ public class TreeFilters {
       }
       for (Tree child : tree.children()) {
         Label label = child.label();
-        String value = (label == null) ? null : label.value();
+        String value = label == null ? null : label.value();
         if (value == null) {
           continue;
         }

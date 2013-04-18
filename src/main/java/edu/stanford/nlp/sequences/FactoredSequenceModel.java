@@ -19,8 +19,8 @@ public class FactoredSequenceModel implements SequenceModel {
   double model1Wt = 1.0;
   double model2Wt = 1.0;
   
-  SequenceModel[] models = null;
-  double[] wts = null; 
+  SequenceModel[] models;
+  double[] wts;
 
   /**
    * Computes the distribution over values of the element at position pos in the sequence,
@@ -40,8 +40,7 @@ public class FactoredSequenceModel implements SequenceModel {
           ArrayMath.expInPlace(distDebug);
           System.err.println("pos: " + pos);
           System.err.println("model 0:");
-          for (int j = 0; j < distDebug.length; j++)
-            System.err.println("\t" + distDebug[j]);
+            for (double aDistDebug : distDebug) System.err.println("\t" + aDistDebug);
           System.err.println();
         }
       }
@@ -51,12 +50,11 @@ public class FactoredSequenceModel implements SequenceModel {
 
         if (BisequenceEmpiricalNERPrior.DEBUG) {
           if (BisequenceEmpiricalNERPrior.debugIndices.indexOf(pos) != -1) { 
-            System.err.println("model " + i + ":");
+            System.err.println("model " + i + ':');
             double[] distDebug = Arrays.copyOf(dist_i, dist.length);
             ArrayMath.logNormalize(distDebug);
             ArrayMath.expInPlace(distDebug);
-            for (int j = 0; j < distDebug.length; j++)
-              System.err.println("\t" + distDebug[j]);
+              for (double aDistDebug : distDebug) System.err.println("\t" + aDistDebug);
             System.err.println();
           }
         }
@@ -85,7 +83,7 @@ public class FactoredSequenceModel implements SequenceModel {
    * @param sequence the sequence to compute a score for
    * @return the score for the sequence
    */
-  public double scoreOf(int[] sequence) {
+  public double scoreOf(int... sequence) {
     if(models != null){
       double score = 0;
       for(int i = 0; i < models.length; i++)
@@ -142,7 +140,7 @@ public class FactoredSequenceModel implements SequenceModel {
     this.model2 = model2;
   }
   
-  public FactoredSequenceModel(SequenceModel[] models, double[] weights){
+  public FactoredSequenceModel(SequenceModel[] models, double... weights){
     this.models = models;
     this.wts = weights;
     /*

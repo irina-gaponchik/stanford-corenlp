@@ -3,7 +3,7 @@ package edu.stanford.nlp.trees;
 import edu.stanford.nlp.ling.Label;
 
 /**
- * A <code>Span</code> is an optimized <code>SimpleConstituent</code> object.
+ * A {@code Span} is an optimized {@code SimpleConstituent} object.
  * It provides exactly the same functionality as a SimpleConstituent, but
  * by being final, and with its own implementation of Span equality,
  * it runs faster, so as to placate Dan Klein.  (With JDK1.3 client, it still
@@ -17,7 +17,7 @@ import edu.stanford.nlp.ling.Label;
 public final class Span extends SimpleConstituent {
 
   /**
-   * Create an empty <code>Span</code> object.
+   * Create an empty {@code Span} object.
    */
   public Span() {
     // implicitly super();
@@ -25,7 +25,7 @@ public final class Span extends SimpleConstituent {
 
 
   /**
-   * Create a <code>Span</code> object with given values.
+   * Create a {@code Span} object with given values.
    *
    * @param start start node of edge
    * @param end   end node of edge
@@ -43,7 +43,7 @@ public final class Span extends SimpleConstituent {
    * @return whether they have the same start and end
    * @see Constituent#equals(Object)
    */
-  public boolean equals(final Span sp) {
+  public boolean equals(Span sp) {
     return start() == sp.start() && end() == sp.end();
   }
 
@@ -51,12 +51,10 @@ public final class Span extends SimpleConstituent {
   // extra class guarantees correct lazy loading (Bloch p.194)
   private static class ConstituentFactoryHolder {
 
-    private ConstituentFactoryHolder() {}  // static holder class
 
-
-    /**
-     * A <code>SpanFactory</code> acts as a factory for creating objects
-     * of class <code>Span</code>.
+      /**
+     * A {@code SpanFactory} acts as a factory for creating objects
+     * of class {@code Span}.
      * An interface.
      */
     private static class SpanFactory implements ConstituentFactory {

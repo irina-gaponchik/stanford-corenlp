@@ -3,7 +3,7 @@ package edu.stanford.nlp.parser;
 /**
  * The interface for Viterbi parsers with options.  Viterbi parsers support
  * getBestParse, which returns a best parse of the input, or
- * <code>null</code> if no parse exists.
+ * {@code null} if no parse exists.
  *
  * @author Christopher Manning
  */

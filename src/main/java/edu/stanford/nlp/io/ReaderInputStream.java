@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.io.Reader;
 
 /**
- * Adapts a <code>Reader</code> as an <code>InputStream</code>.
+ * Adapts a {@code Reader} as an {@code InputStream}.
  * Adapted from <CODE>StringInputStream</CODE>.
  *
  */
@@ -40,7 +40,7 @@ public class ReaderInputStream extends InputStream {
    * Construct a <CODE>ReaderInputStream</CODE>
    * for the specified <CODE>Reader</CODE>.
    *
-   * @param reader   <CODE>Reader</CODE>.  Must not be <code>null</code>.
+   * @param reader   <CODE>Reader</CODE>.  Must not be {@code null}.
    */
   public ReaderInputStream(Reader reader) {
     in = reader;
@@ -68,7 +68,7 @@ public class ReaderInputStream extends InputStream {
    *
    * @return the value of the next character in the <CODE>Reader</CODE>.
    *
-   * @exception IOException if the original <code>Reader</code> fails to be read
+   * @exception IOException if the original {@code Reader} fails to be read
    */
   public synchronized int read() throws IOException {
     if (in == null) {
@@ -97,7 +97,7 @@ public class ReaderInputStream extends InputStream {
   }
 
   /**
-   * Reads from the <code>Reader</code> into a byte array
+   * Reads from the {@code Reader} into a byte array
    *
    * @param b  the byte array to read into
    * @param off the offset in the byte array
@@ -143,7 +143,7 @@ public class ReaderInputStream extends InputStream {
    * @param limit the maximum limit of bytes that can be read before the
    *              mark position becomes invalid
    */
-  public synchronized void mark(final int limit) {
+  public synchronized void mark(int limit) {
     try {
       in.mark(limit);
     } catch (IOException ioe) {
@@ -163,11 +163,7 @@ public class ReaderInputStream extends InputStream {
     if (slack != null) {
       return slack.length - begin;
     }
-    if (in.ready()) {
-      return 1;
-    } else {
-      return 0;
-    }
+      return in.ready() ? 1 : 0;
   }
 
   /**

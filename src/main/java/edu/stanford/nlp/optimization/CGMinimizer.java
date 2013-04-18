@@ -13,11 +13,11 @@ import java.text.NumberFormat;
  * The basic way to use the minimizer is with a null constructor, then
  * the simple minimize method:
  * <p/>
- * <p><code>Minimizer cgm = new CGMinimizer();</code>
- * <br><code>DiffFunction df = new SomeDiffFunction();</code>
- * <br><code>double tol = 1e-4;</code>
- * <br><code>double[] initial = getInitialGuess();</code>
- * <br><code>double[] minimum = cgm.minimize(df,tol,initial);</code>
+ * <p>{@code Minimizer cgm = new CGMinimizer();}
+ * <br>{@code DiffFunction df = new SomeDiffFunction();}
+ * <br>{@code double tol = 1e-4;}
+ * <br>{@code double[] initial = getInitialGuess();}
+ * <br>{@code double[] minimum = cgm.minimize(df,tol,initial);}
  *
  * @author <a href="mailto:klein@cs.stanford.edu">Dan Klein</a>
  * @version 1.0
@@ -40,11 +40,9 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
 
   private static final int resetFrequency = 10;
 
-  static double[] copyArray(double[] a) {
+  static double[] copyArray(double... a) {
     double[] result = new double[a.length];
-    for (int i = 0; i < a.length; i++) {
-      result[i] = a[i];
-    }
+      System.arraycopy(a, 0, result, 0, a.length);
     return result;
   }
 
@@ -66,7 +64,7 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
     if (num < x.length) {
       sb.append("...");
     }
-    sb.append(")");
+    sb.append(')');
     return sb.toString();
   }
 
@@ -167,7 +165,7 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
       return d;
     }
 
-    OneDimDiffFunction(DiffFunction function, double[] initial, double[] direction) {
+    OneDimDiffFunction(DiffFunction function, double[] initial, double... direction) {
       this.function = function;
       this.initial = copyArray(initial);
       this.direction = copyArray(direction);
@@ -258,16 +256,16 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
 
   private static double dbrent(OneDimDiffFunction function, double ax, double bx, double cx) {
     // constants
-    final boolean dbVerbose = false;
-    final int ITMAX = 100;
-    final double TOL = 1.0e-4;
+    boolean dbVerbose = false;
+    int ITMAX = 100;
+    double TOL = 1.0e-4;
 
     boolean ok1, ok2;
     double d = 0.0, d1, d2, du, e = 0.0;
     double fu, olde, tol1, tol2, u, u1, u2, xm;
 
-    double a = (ax < cx ? ax : cx);
-    double b = (ax > cx ? ax : cx);
+    double a = ax < cx ? ax : cx;
+    double b = ax > cx ? ax : cx;
     double x = bx;
     double v = bx;
     double w = bx;
@@ -282,9 +280,9 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
       xm = 0.5 * (a + b);
       tol1 = TOL * fabs(x); //+ZEPS (was 1e-10);
       tol2 = 2.0 * tol1;
-      if (fabs(x - xm) <= (tol2 - 0.5 * (b - a))) {
+      if (fabs(x - xm) <= tol2 - 0.5 * (b - a)) {
         if (dbVerbose) {
-          System.err.println("dbrent returning because min is cornered " + a + " (" + function.valueAt(a) + ") ~ " + x + " (" + fx + ") " + b + " (" + function.valueAt(b) + ")");
+          System.err.println("dbrent returning because min is cornered " + a + " (" + function.valueAt(a) + ") ~ " + x + " (" + fx + ") " + b + " (" + function.valueAt(b) + ')');
         }
         return x;
       }
@@ -299,33 +297,29 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
         }
         u1 = x + d1;
         u2 = x + d2;
-        ok1 = ((a - u1) * (u1 - b) > 0.0 && dx * d1 <= 0.0);
-        ok2 = ((a - u2) * (u2 - b) > 0.0 && dx * d2 <= 0.0);
+        ok1 = (a - u1) * (u1 - b) > 0.0 && dx * d1 <= 0.0;
+        ok2 = (a - u2) * (u2 - b) > 0.0 && dx * d2 <= 0.0;
         olde = e;
         e = d;
         if (ok1 || ok2) {
           if (ok1 && ok2) {
-            d = (fabs(d1) < fabs(d2) ? d1 : d2);
-          } else if (ok1) {
-            d = d1;
-          } else {
-            d = d2;
-          }
+            d = fabs(d1) < fabs(d2) ? d1 : d2;
+          } else d = ok1 ? d1 : d2;
           if (fabs(d) <= fabs(0.5 * olde)) {
             u = x + d;
             if (u - a < tol2 || b - u < tol2) {
               d = sign(tol1, xm - x);
             }
           } else {
-            e = (dx >= 0.0 ? a - x : b - x);
+            e = dx >= 0.0 ? a - x : b - x;
             d = 0.5 * e;
           }
         } else {
-          e = (dx >= 0.0 ? a - x : b - x);
+          e = dx >= 0.0 ? a - x : b - x;
           d = 0.5 * e;
         }
       } else {
-        e = (dx >= 0.0 ? a - x : b - x);
+        e = dx >= 0.0 ? a - x : b - x;
         d = 0.5 * e;
       }
       if (fabs(d) >= tol1) {
@@ -401,7 +395,7 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
   }
 
   //public double lastXx = 1.0;
-  double[] lineMinimize(DiffFunction function, double[] initial, double[] direction) {
+  double[] lineMinimize(DiffFunction function, double[] initial, double... direction) {
     // make a 1-dim function along the direction line
     // THIS IS A HACK (but it's the NRiC peoples' hack)
     OneDimDiffFunction oneDim = new OneDimDiffFunction(function, initial, direction);
@@ -428,8 +422,8 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
       System.err.println("Bad bracket order!");
     }
     if (verbose) {
-      System.err.println("Bracketing found: " + ax + " " + xx + " " + bx);
-      System.err.println("Bracketing found: " + oneDim.valueAt(ax) + " " + oneDim.valueAt(xx) + " " + oneDim.valueAt(bx));
+      System.err.println("Bracketing found: " + ax + ' ' + xx + ' ' + bx);
+      System.err.println("Bracketing found: " + oneDim.valueAt(ax) + ' ' + oneDim.valueAt(xx) + ' ' + oneDim.valueAt(bx));
       //System.err.println("Bracketing found: "+arrayToString(oneDim.vectorOf(ax),3)+" "+arrayToString(oneDim.vectorOf(xx),3)+" "+arrayToString(oneDim.vectorOf(bx),3));
     }
     // find the extreme pt
@@ -445,7 +439,7 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
     return oneDim.vectorOf(xmin);
   }
 
-  public double[] minimize(DiffFunction function, double functionTolerance, double[] initial) {
+  public double[] minimize(DiffFunction function, double functionTolerance, double... initial) {
     return minimize(function, functionTolerance, initial, ITMAX);
   }
 
@@ -482,7 +476,7 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
     for (int iterations = 1; iterations < maxIterations; iterations++) {
 
       if (!silent) {
-        System.err.print("Iter " + iterations + " ");
+        System.err.print("Iter " + iterations + ' ');
       }
       // do a line min along descent direction
       //System.err.println("Minimizing from ("+p[0]+","+p[1]+") along ("+xi[0]+","+xi[1]+")\n");
@@ -511,7 +505,7 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
       // check convergence
       if (2.0 * fabs(fp2 - fp) <= functionTolerance * (fabs(fp2) + fabs(fp) + EPS)) {
         // convergence
-        if (!checkSimpleGDConvergence || simpleGDStep || simpleGD) {
+        if (simpleGDStep) {
           return p2;
         }
         simpleGDStep = true;
@@ -531,7 +525,7 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
       xi = copyArray(dfunction.derivativeAt(p));
       //System.err.print("mx "+arrayMax(xi)+" mn "+arrayMin(xi));
 
-      if (!simpleGDStep && !simpleGD && (iterations % resetFrequency != 0)) {
+      if (!simpleGDStep && iterations % resetFrequency != 0) {
         // do the magic -- part i
         // (calculate some dot products we'll need)
         double dgg = 0.0;
@@ -591,10 +585,10 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
   }
 
   /**
-   * Pass in <code>false</code> to get per-iteration progress reports
+   * Pass in {@code false} to get per-iteration progress reports
    * (to stderr).
    *
-   * @param silent a <code>boolean</code> value
+   * @param silent a {@code boolean} value
    */
   public CGMinimizer(boolean silent) {
     this.silent = silent;
@@ -602,12 +596,12 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
 
   /**
    * Perform minimization with monitoring.  After each iteration,
-   * monitor.valueAt(x) gets called, with the double array <code>x</code>
-   * being that iteration's ending point.  A return <code>&lt;
-   * tol</code> forces convergence (terminates the CG procedure).
+   * monitor.valueAt(x) gets called, with the double array {@code x}
+   * being that iteration's ending point.  A return {@code &lt;
+   * tol} forces convergence (terminates the CG procedure).
    * Specially for Kristina.
    *
-   * @param monitor a <code>Function</code> value
+   * @param monitor a {@code Function} value
    */
   public CGMinimizer(Function monitor) {
     this();

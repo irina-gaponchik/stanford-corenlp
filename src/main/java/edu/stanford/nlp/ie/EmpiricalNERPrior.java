@@ -72,12 +72,12 @@ public class EmpiricalNERPrior<IN extends CoreMap> extends EntityCachingAbstract
   protected double p32 = -Math.log(3.0 / dem8);
   protected double p33 = -Math.log(365.0 / dem8);
 
-  public double scoreOf(int[] sequence) {
+  public double scoreOf(int... sequence) {
     double p = 0.0;
     for (int i = 0; i < entities.length; i++) {
       Entity entity = entities[i];
       //System.err.println(entity);
-      if ((i == 0 || entities[i-1] != entity) && entity != null) {
+      if ((i == 0 || !entities[i - 1].equals(entity)) && entity != null) {
         //System.err.println(1);
         int length = entity.words.size();
         String tag1 = classIndex.get(entity.type);
@@ -88,181 +88,183 @@ public class EmpiricalNERPrior<IN extends CoreMap> extends EntityCachingAbstract
         else if (tag1.equals(MISC)) { tag1 = MISC; }
 
         int[] other = entities[i].otherOccurrences;
-        for (int j = 0; j < other.length; j++) {
+          for (int anOther : other) {
 
-          Entity otherEntity = null;
-          for (int k = other[j]; k < other[j]+length && k < entities.length; k++) {
-            otherEntity = entities[k]; 
-            if (otherEntity != null) { 
+              Entity otherEntity = null;
+              for (int k = anOther; k < anOther + length && k < entities.length; k++) {
+                  otherEntity = entities[k];
+                  if (otherEntity != null) {
 //               if (k > other[j]) {
 //                 System.err.println(entity.words+" "+otherEntity.words);
 //               }
-              break;
-            }
-          }
-          // singleton + other instance null?
-          if (otherEntity == null) {
-            //p -= length * Math.log(0.1);
-            //if (entity.words.size() == 1) {
-              //p -= length * p1;
-            //}
-            continue;
-          }
+                      break;
+                  }
+              }
+              // singleton + other instance null?
+              if (otherEntity == null) {
+                  //p -= length * Math.log(0.1);
+                  //if (entity.words.size() == 1) {
+                  //p -= length * p1;
+                  //}
+                  continue;
+              }
 
-          int oLength = otherEntity.words.size();
-          String tag2 = classIndex.get(otherEntity.type);
+              int oLength = otherEntity.words.size();
+              String tag2 = classIndex.get(otherEntity.type);
 
-          if (tag2.equals(LOC)) { tag2 = LOC; }
-          else if (tag2.equals(ORG)) { tag2 = ORG; }
-          else if (tag2.equals(PER)) { tag2 = PER; }
-          else if (tag2.equals(MISC)) { tag2 = MISC; }
+              if (tag2.equals(LOC)) {
+                  tag2 = LOC;
+              } else if (tag2.equals(ORG)) {
+                  tag2 = ORG;
+              } else if (tag2.equals(PER)) {
+                  tag2 = PER;
+              } else if (tag2.equals(MISC)) {
+                  tag2 = MISC;
+              }
 
-          // exact match??
-          boolean exact = false;
-          int[] oOther = otherEntity.otherOccurrences;
-          for (int k = 0; k < oOther.length; k++) {
-            if (oOther[k] >= i && oOther[k] <= i+length-1) {
-              exact = true;
-              break;
-            }
-          }
+              // exact match??
+              boolean exact = false;
+              int[] oOther = otherEntity.otherOccurrences;
+              for (int anOOther : oOther) {
+                  if (anOOther >= i && anOOther <= i + length - 1) {
+                      exact = true;
+                      break;
+                  }
+              }
 
-          if (exact) {
-            // entity not complete
-            if (length != oLength) {
-              if (tag1 == (tag2)) {// || ((tag1 == LOC && tag2 == ORG) || (tag1 == ORG && tag2 == LOC))) { // ||
-                //p -= Math.abs(oLength - length) * Math.log(0.1);
-                p -= Math.abs(oLength - length) * p1;
-              } else if (!(tag1.equals(ORG) && tag2.equals(LOC)) &&
-                         !(tag2.equals(LOC) && tag1.equals(ORG))) {
-                // shorter
-                p -= (oLength + length) * p1;
+              if (exact) {
+                  // entity not complete
+                  if (length != oLength) {
+                      if (tag1.equals(tag2)) {// || ((tag1 == LOC && tag2 == ORG) || (tag1 == ORG && tag2 == LOC))) { // ||
+                          //p -= Math.abs(oLength - length) * Math.log(0.1);
+                          p -= Math.abs(oLength - length) * p1;
+                      } else if (!(tag1.equals(ORG) && tag2.equals(LOC)) &&
+                              !(tag2.equals(LOC) && tag1.equals(ORG))) {
+                          // shorter
+                          p -= (oLength + length) * p1;
+                      }
+                  }
+                  if (tag1.equals(LOC)) {
+                      if (tag2.equals(LOC)) {
+                          //p -= length * Math.log(6436.0 / dem);
+                          //p -= length * p2;
+                      } else if (tag2.equals(ORG)) {
+                          //p -= length * Math.log(188 / dem);
+                          p -= length * p3;
+                      } else if (tag2.equals(PER)) {
+                          //p -= length * Math.log(4 / dem);
+                          p -= length * p4;
+                      } else if (tag2.equals(MISC)) {
+                          //p -= length * Math.log(3 / dem);
+                          p -= length * p5;
+                      }
+                  } else if (tag1.equals(ORG)) {
+                      //double dem = 3169.0;
+                      if (tag2.equals(LOC)) {
+                          //p -= length * Math.log(188.0 / dem);
+                          p -= length * p6;
+                      } else if (tag2.equals(ORG)) {
+                          //p -= length * Math.log(2975 / dem);
+                          //p -= length * p7;
+                      } else if (tag2.equals(PER)) {
+                          //p -= length * Math.log(5 / dem);
+                          p -= length * p8;
+                      } else if (tag2.equals(MISC)) {
+                          //p -= length * Math.log(1 / dem);
+                          p -= length * p9;
+                      }
+                  } else if (tag1.equals(PER)) {
+                      //double dem = 3151.0;
+                      if (tag2.equals(LOC)) {
+                          //p -= length * Math.log(4.0 / dem);
+                          p -= length * p10;
+                      } else if (tag2.equals(ORG)) {
+                          //p -= length * Math.log(5 / dem);
+                          p -= length * p11;
+                      } else if (tag2.equals(PER)) {
+                          //p -= length * Math.log(3141 / dem);
+                          //p -= length * p12;
+                      } else if (tag2.equals(MISC)) {
+                          //p -= length * Math.log(1 / dem);
+                          p -= length * p13;
+                      }
+                  } else if (tag1.equals(MISC)) {
+                      //double dem = 2035.0;
+                      if (tag2.equals(LOC)) {
+                          //p -= length * Math.log(3.0 / dem);
+                          p -= length * p14;
+                      } else if (tag2.equals(ORG)) {
+                          //p -= length * Math.log(1 / dem);
+                          p -= length * p15;
+                      } else if (tag2.equals(PER)) {
+                          //p -= length * Math.log(1 / dem);
+                          p -= length * p16;
+                      } else if (tag2.equals(MISC)) {
+                          //p -= length * Math.log(2030 / dem);
+                          //p -= length * p17;
+                      }
+                  }
+              } else {
+                  if (tag1.equals(LOC)) {
+                      //double dem = 724.0;
+                      if (tag2.equals(LOC) || tag2.equals(ORG)) {
+                          //p -= length * Math.log(167.0 / dem);
+                          //p -= length * p18;
+                      } else if (tag2.equals(PER)) {
+                          //p -= length * Math.log(5.0 / dem);
+                          p -= length * p20;
+                      } else if (tag2.equals(MISC)) {
+                          //p -= length * Math.log(224.0 / dem);
+                          p -= length * p21;
+                      }
+                  } else if (tag1.equals(ORG)) {
+                      //double dem = 834.0;
+                      if (tag2.equals(LOC)) {
+                          //p -= length * Math.log(6.0 / dem);
+                          p -= length * p22;
+                      } else if (tag2.equals(ORG)) {
+                          //p -= length * Math.log(819.0 / dem);
+                          //p -= length * p23;
+                      } else if (tag2.equals(PER)) {
+                          //p -= length * Math.log(2.0 / dem);
+                          p -= length * p24;
+                      } else if (tag2.equals(MISC)) {
+                          //p -= length * Math.log(7.0 / dem);
+                          p -= length * p25;
+                      }
+                  } else if (tag1.equals(PER)) {
+                      //double dem = 1978.0;
+                      if (tag2.equals(LOC)) {
+                          //p -= length * Math.log(1.0 / dem);
+                          p -= length * p26;
+                      } else if (tag2.equals(ORG)) {
+                          //p -= length * Math.log(22.0 / dem);
+                          p -= length * p27;
+                      } else if (tag2.equals(PER)) {
+                          //p -= length * Math.log(1941.0 / dem);
+                          //p -= length * p28;
+                      } else if (tag2.equals(MISC)) {
+                          //p -= length * Math.log(14.0 / dem);
+                          p -= length * p29;
+                      }
+                  } else if (tag1.equals(MISC)) {
+                      //double dem = 622.0;
+                      if (tag2.equals(LOC)) {
+                          //p -= length * Math.log(63.0 / dem);
+                          p -= length * p30;
+                      } else if (tag2.equals(ORG)) {
+                          //p -= length * Math.log(191.0 / dem);
+                          p -= length * p31;
+                      } else if (tag2.equals(PER)) {
+                          //p -= length * Math.log(3.0 / dem);
+                          p -= length * p32;
+                      } else if (tag2.equals(MISC)) {
+                          //p -= length * Math.log(365.0 / dem);
+                          p -= length * p33;
+                      }
+                  }
               }
-            } 
-            if (tag1 == (LOC)) {
-              if (tag2 == (LOC)) {
-                //p -= length * Math.log(6436.0 / dem);
-                //p -= length * p2;
-              } else if (tag2 == (ORG)) {
-                //p -= length * Math.log(188 / dem);
-                p -= length * p3;
-              } else if (tag2 == (PER)) {
-                //p -= length * Math.log(4 / dem);
-                p -= length * p4;
-              } else if (tag2 == (MISC)) {
-                //p -= length * Math.log(3 / dem);
-                p -= length * p5;
-              } 
-            } else if (tag1 == (ORG)) {
-              //double dem = 3169.0;
-              if (tag2 == (LOC)) {
-                //p -= length * Math.log(188.0 / dem);
-                p -= length * p6;
-              } else if (tag2 == (ORG)) {
-                //p -= length * Math.log(2975 / dem);
-                //p -= length * p7;
-              } else if (tag2 == (PER)) {
-                //p -= length * Math.log(5 / dem);
-                p -= length * p8;
-              } else if (tag2 == (MISC)) {
-                //p -= length * Math.log(1 / dem);
-                p -= length * p9;
-              } 
-            } else if (tag1 == (PER)) {
-              //double dem = 3151.0;
-              if (tag2 == (LOC)) {
-                //p -= length * Math.log(4.0 / dem);
-                p -= length * p10;
-              } else if (tag2 == (ORG)) {
-                //p -= length * Math.log(5 / dem);
-                p -= length * p11;
-              } else if (tag2 == (PER)) {
-                //p -= length * Math.log(3141 / dem);
-                //p -= length * p12;
-              } else if (tag2 == (MISC)) {
-                //p -= length * Math.log(1 / dem);
-                p -= length * p13;
-              }
-            } else if (tag1 == (MISC)) {
-              //double dem = 2035.0;
-              if (tag2 == (LOC)) {
-                //p -= length * Math.log(3.0 / dem);
-                p -= length * p14;
-              } else if (tag2 == (ORG)) {
-                //p -= length * Math.log(1 / dem);
-                p -= length * p15;
-              } else if (tag2 == (PER)) {
-                //p -= length * Math.log(1 / dem);
-                p -= length * p16;
-              } else if (tag2 == (MISC)) {
-                //p -= length * Math.log(2030 / dem);
-                //p -= length * p17;
-              }
-            }
-          } else {
-            if (tag1 == (LOC)) {
-              //double dem = 724.0;
-              if (tag2 == (LOC)) {
-                //p -= length * Math.log(167.0 / dem);
-                //p -= length * p18;
-              } else if (tag2 == (ORG)) {
-                //p -= length * Math.log(328.0 / dem);
-                //p -= length * p19;
-              } else if (tag2 == (PER)) {
-                //p -= length * Math.log(5.0 / dem);
-                p -= length * p20;
-              } else if (tag2 == (MISC)) {
-                //p -= length * Math.log(224.0 / dem);
-                p -= length * p21;
-              } 
-            } else if (tag1 == (ORG)) {
-              //double dem = 834.0;
-              if (tag2 == (LOC)) {
-                //p -= length * Math.log(6.0 / dem);
-                p -= length * p22;
-              } else if (tag2 == (ORG)) {
-                //p -= length * Math.log(819.0 / dem);
-                //p -= length * p23;
-              } else if (tag2 == (PER)) {
-                //p -= length * Math.log(2.0 / dem);
-                p -= length * p24;
-              } else if (tag2 == (MISC)) {
-                //p -= length * Math.log(7.0 / dem);
-                p -= length * p25;
-              } 
-            } else if (tag1 == (PER)) {
-              //double dem = 1978.0;
-              if (tag2 == (LOC)) {
-                //p -= length * Math.log(1.0 / dem);
-                p -= length * p26;
-              } else if (tag2 == (ORG)) {
-                //p -= length * Math.log(22.0 / dem);
-                p -= length * p27;
-              } else if (tag2 == (PER)) {
-                //p -= length * Math.log(1941.0 / dem);
-                //p -= length * p28;
-              } else if (tag2 == (MISC)) {
-                //p -= length * Math.log(14.0 / dem);
-                p -= length * p29;
-              }
-            } else if (tag1 == (MISC)) {
-              //double dem = 622.0;
-              if (tag2 == (LOC)) {
-                //p -= length * Math.log(63.0 / dem);
-                p -= length * p30;
-              } else if (tag2 == (ORG)) {
-                //p -= length * Math.log(191.0 / dem);
-                p -= length * p31;
-              } else if (tag2 == (PER)) {
-                //p -= length * Math.log(3.0 / dem);
-                p -= length * p32;
-              } else if (tag2 == (MISC)) {
-                //p -= length * Math.log(365.0 / dem);
-                p -= length * p33;
-              }
-            }
-          }
-          
+
 //           if (tag1 == PER) {
 //             int personIndex = classIndex.indexOf(PER);
 //             String lastName = entity.words.get(entity.words.size()-1);
@@ -275,7 +277,7 @@ public class EmpiricalNERPrior<IN extends CoreMap> extends EntityCachingAbstract
 //               }
 //             }
 //           }
-        }
+          }
       }
     }
     return p;

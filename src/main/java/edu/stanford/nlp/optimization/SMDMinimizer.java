@@ -16,18 +16,18 @@ import edu.stanford.nlp.util.Pair;
  * The basic way to use the minimizer is with a null constructor, then
  * the simple minimize method:
  * <p/>
- * <p><code>Minimizer smd = new SMDMinimizer();</code>
- * <br><code>DiffFunction df = new SomeDiffFunction();</code>
- * <br><code>double tol = 1e-4;</code>
- * <br><code>double[] initial = getInitialGuess();</code>
+ * <p>{@code Minimizer smd = new SMDMinimizer();}
+ * <br>{@code DiffFunction df = new SomeDiffFunction();}
+ * <br>{@code double tol = 1e-4;}
+ * <br>{@code double[] initial = getInitialGuess();}
  * <br><code>int maxIterations = someSafeNumber;
- * <br><code>double[] minimum = qnm.minimize(df,tol,initial,maxIterations);</code>
+ * <br>{@code double[] minimum = qnm.minimize(df,tol,initial,maxIterations);}
  * <p/>
  * Constructing with a null constructor will use the default values of
  * <p>
- * <br><code>batchSize = 15;</code>
- * <br><code>initialGain = 0.1;</code>
- * <br><code>useAlgorithmicDifferentiation = true;</code>
+ * <br>{@code batchSize = 15;}
+ * <br>{@code initialGain = 0.1;}
+ * <br>{@code useAlgorithmicDifferentiation = true;}
  * <p/>
  * <p/>
  *
@@ -41,10 +41,10 @@ public class SMDMinimizer<T extends Function> extends StochasticMinimizer<T> {
 
   public double mu = 0.01;
   public double lam = 1.0;
-  public double cPosDef = 0.00;
+  public double cPosDef;
   public double meta;
   //DEBUG ONLY
-  public boolean printMinMax = false;
+  public boolean printMinMax;
   private double[] Hv,gains;
   StochasticCalculateMethods method; // = null;
 
@@ -75,7 +75,7 @@ public class SMDMinimizer<T extends Function> extends StochasticMinimizer<T> {
 
 
   @Override
-  public double[] minimize(Function function, double functionTolerance, double[] initial) {
+  public double[] minimize(Function function, double functionTolerance, double... initial) {
     return minimize(function, functionTolerance, initial, -1);
   }
 
@@ -121,14 +121,14 @@ public class SMDMinimizer<T extends Function> extends StochasticMinimizer<T> {
 
     this.quiet = true;
     this.lam = 0.9;
-    this.mu = tuneDouble(function,initial,msPerTest,new setMu(this),1e-8,1e-2);
+    this.mu = tuneDouble(function,initial,msPerTest,new setMu(this), 1.0e-8, 1.0e-2);
     this.lam = tuneDouble(function,initial,msPerTest,new setLam(this),0.1,1.0);
-    gain = tuneGain(function, initial, msPerTest, 1e-8,1.0);
+    gain = tuneGain(function, initial, msPerTest, 1.0e-8,1.0);
     bSize = tuneBatch(function,initial,msPerTest,1);
 
     System.err.println("Results:  gain: " + nf.format(gain) + "  batch " + bSize  + "   mu" + nf.format(this.mu) + "  lam" + nf.format(this.lam));
 
-    return new Pair<Integer,Double>(bSize, gain);
+    return new Pair<>(bSize, gain);
   }
 
 
@@ -141,11 +141,7 @@ public class SMDMinimizer<T extends Function> extends StochasticMinimizer<T> {
     //Update the weights
     for(int i = 0; i < x.length; i++){
       meta = 1-mu*grad[i]*v[i];
-      if(0.5 > meta){
-        gains[i] = gains[i]*0.5;
-      }else{
-        gains[i] = gains[i]*meta;
-      }
+        gains[i] = 0.5 > meta ? gains[i] * 0.5 : gains[i] * meta;
       //Update gain history
       v[i] = lam*(1+cPosDef*gains[i])*v[i] - gains[i]*(grad[i] + lam*Hv[i]);
       //Get the next X
@@ -171,27 +167,27 @@ public class SMDMinimizer<T extends Function> extends StochasticMinimizer<T> {
   }
 
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     // optimizes test function using doubles and floats
     // test function is (0.5 sum(x_i^2 * var_i)) ^ PI
     // where var is a vector of random nonnegative numbers
     // dimensionality is variable.
     final int dim = 500000;
-    final double maxVar = 5;
+    double maxVar = 5;
     final double[] var = new double[dim];
     double[] init = new double[dim];
 
     for (int i = 0; i < dim; i++) {
-      init[i] = ((i + 1) / (double) dim - 0.5);//init[i] = (Math.random() - 0.5);
+      init[i] = (i + 1) / (double) dim - 0.5;//init[i] = (Math.random() - 0.5);
       var[i] = maxVar * (i + 1) / dim;
     }
 
-    final DiffFunction f = new DiffFunction() {
+    DiffFunction f = new DiffFunction() {
 
       @Override
-      public double[] derivativeAt(double[] x) {
+      public double[] derivativeAt(double... x) {
         double val = Math.PI * valuePow(x, Math.PI - 1);
-        final double[] grads = new double[dim];
+        double[] grads = new double[dim];
         for (int i = 0; i < dim; i++) {
           grads[i] = x[i] * var[i] * val;
         }
@@ -199,7 +195,7 @@ public class SMDMinimizer<T extends Function> extends StochasticMinimizer<T> {
       }
 
       @Override
-      public double valueAt(double[] x) {
+      public double valueAt(double... x) {
         return 1.0 + valuePow(x, Math.PI);
       }
 
@@ -217,7 +213,7 @@ public class SMDMinimizer<T extends Function> extends StochasticMinimizer<T> {
       }
     };
 
-    SMDMinimizer<DiffFunction> min = new SMDMinimizer<DiffFunction>();
+    SMDMinimizer<DiffFunction> min = new SMDMinimizer<>();
 
     min.minimize(f, 1.0E-4, init);
   }

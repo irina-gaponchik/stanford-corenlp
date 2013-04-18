@@ -22,9 +22,9 @@ public class IterableIterator<E> implements Iterator<E>, Iterable<E> {
   
   public Iterator<E> iterator() { return this; }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
-    String[] strings = new String[] {
+    String[] strings = {
       "do", "re", "mi", "fa", "so", "la", "ti", "do", 
     };
 
@@ -33,7 +33,7 @@ public class IterableIterator<E> implements Iterator<E>, Iterable<E> {
     //   System.out.println(s);
     // }
 
-    IterableIterator<String> iterit = new IterableIterator<String>(it);
+    IterableIterator<String> iterit = new IterableIterator<>(it);
     for (String s : iterit) {           // YAY!!
       System.out.println(s);
     }

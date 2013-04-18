@@ -116,7 +116,7 @@ public class MentionExtractor {
   }
   private String treeToKey(Tree t){
     int idx = getHeadIndex(t);
-    String key = Integer.toString(idx) + ":" + t.toString();
+    String key = Integer.toString(idx) + ':' + t.toString();
     return key;
   }
 
@@ -156,7 +156,7 @@ public class MentionExtractor {
       List<List<Mention>> unorderedMentions,
       boolean doMergeLabels) throws Exception {
 
-    List<List<Mention>> orderedMentionsBySentence = new ArrayList<List<Mention>>();
+    List<List<Mention>> orderedMentionsBySentence = new ArrayList<>();
 
     //
     // traverse all sentences and process each individual one
@@ -177,7 +177,7 @@ public class MentionExtractor {
       for(Mention mention: mentions){
         mention.contextParseTree = tree;
         mention.sentenceWords = sentence;
-        mention.originalSpan = new ArrayList<CoreLabel>(mention.sentenceWords.subList(mention.startIndex, mention.endIndex));
+        mention.originalSpan = new ArrayList<>(mention.sentenceWords.subList(mention.startIndex, mention.endIndex));
         if(!((CoreLabel)tree.label()).has(CoreAnnotations.BeginIndexAnnotation.class)) tree.indexSpans(0);
         if(mention.headWord==null) {
           Tree headTree = ((RuleBasedCorefMentionFinder) mentionFinder).findSyntacticHead(mention, tree, sentence);
@@ -190,7 +190,7 @@ public class MentionExtractor {
           if (headTree == null) { throw new RuntimeException("Missing head tree for a mention!"); }
           Tree t = headTree;
           while ((t = t.parent(tree)) != null) {
-            if (t.headTerminal(headFinder) == headTree && t.value().equals("NP")) {
+            if (t.headTerminal(headFinder).equals(headTree) && t.value().equals("NP")) {
               mention.mentionSubTree = t;
             } else if(mention.mentionSubTree != null){
               break;
@@ -203,7 +203,7 @@ public class MentionExtractor {
 
         List<Mention> mentionsForTree = mentionsToTrees.get(treeToKey(mention.mentionSubTree));
         if(mentionsForTree == null){
-          mentionsForTree = new ArrayList<Mention>();
+          mentionsForTree = new ArrayList<>();
           mentionsToTrees.put(treeToKey(mention.mentionSubTree), mentionsForTree);
         }
         mentionsForTree.add(mention);
@@ -215,7 +215,7 @@ public class MentionExtractor {
       //
       // Order all mentions in tree-traversal order
       //
-      List<Mention> orderedMentions = new ArrayList<Mention>();
+      List<Mention> orderedMentions = new ArrayList<>();
       orderedMentionsBySentence.add(orderedMentions);
 
       // extract all mentions in tree traversal order (alternative: tree.postOrderNodeList())
@@ -232,7 +232,7 @@ public class MentionExtractor {
       // find appositions, predicate nominatives, relative pronouns in this sentence
       //
       findSyntacticRelations(tree, orderedMentions);
-      assert(mentions.size() == orderedMentions.size());
+      assert mentions.size() == orderedMentions.size();
     }
     return orderedMentionsBySentence;
   }
@@ -297,7 +297,7 @@ public class MentionExtractor {
     Tree head2 = np2.headTerminal(headFinder);
     int h1 = ((CoreMap) head1.label()).get(CoreAnnotations.IndexAnnotation.class) - 1;
     int h2 = ((CoreMap) head2.label()).get(CoreAnnotations.IndexAnnotation.class) - 1;
-    Pair<Integer, Integer> p = new Pair<Integer, Integer>(h1, h2);
+    Pair<Integer, Integer> p = new Pair<>(h1, h2);
     foundPairs.add(p);
   }
 
@@ -329,11 +329,20 @@ public class MentionExtractor {
     for(Mention m1 : orderedMentions){
       for(Mention m2 : orderedMentions){
         for(Pair<Integer, Integer> foundPair: foundPairs){
-          if((foundPair.first == m1.headIndex && foundPair.second == m2.headIndex)){
-            if(flag.equals("APPOSITION")) m2.addApposition(m1);
-            else if(flag.equals("PREDICATE_NOMINATIVE")) m2.addPredicateNominatives(m1);
-            else if(flag.equals("RELATIVE_PRONOUN")) m2.addRelativePronoun(m1);
-            else throw new RuntimeException("check flag in markMentionRelation (dcoref/MentionExtractor.java)");
+          if(foundPair.first == m1.headIndex && foundPair.second == m2.headIndex){
+              switch (flag) {
+                  case "APPOSITION":
+                      m2.addApposition(m1);
+                      break;
+                  case "PREDICATE_NOMINATIVE":
+                      m2.addPredicateNominatives(m1);
+                      break;
+                  case "RELATIVE_PRONOUN":
+                      m2.addRelativePronoun(m1);
+                      break;
+                  default:
+                      throw new RuntimeException("check flag in markMentionRelation (dcoref/MentionExtractor.java)");
+              }
           }
         }
       }
@@ -367,7 +376,7 @@ public class MentionExtractor {
 
     Properties pipelineProps = new Properties(props);
     StringBuilder annoSb = new StringBuilder("");
-    if (!Constants.USE_GOLD_POS && !replicateCoNLL)  {
+    if (!replicateCoNLL)  {
       annoSb.append("pos, lemma");
     } else {
       annoSb.append("lemma");
@@ -375,15 +384,15 @@ public class MentionExtractor {
     if(Constants.USE_TRUECASE) {
       annoSb.append(", truecase");
     }
-    if (!Constants.USE_GOLD_NE && !replicateCoNLL)  {
+    if (!replicateCoNLL)  {
       annoSb.append(", ner");
     }
-    if (!Constants.USE_GOLD_PARSES && !replicateCoNLL)  {
+    if (!replicateCoNLL)  {
       annoSb.append(", parse");
     }
     String annoStr = annoSb.toString();
     SieveCoreferenceSystem.logger.info("Ignoring specified annotators, using annotators=" + annoStr);
-    pipelineProps.put("annotators", annoStr);
+      pipelineProps.setProperty("annotators", annoStr);
     return new StanfordCoreNLP(pipelineProps, false);
   }
 

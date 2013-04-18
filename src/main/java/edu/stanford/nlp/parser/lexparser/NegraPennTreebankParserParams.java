@@ -33,13 +33,13 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
   private static final boolean DEBUG = false;
 
   //Features
-  private boolean markRC = false;
-  private boolean markZuVP = false;
-  private boolean markLP = false;
-  private boolean markColon = false;
-  private boolean markKonjParent = false;
-  private boolean markHDParent = false;
-  private boolean markContainsV = false;
+  private boolean markRC;
+  private boolean markZuVP;
+  private boolean markLP;
+  private boolean markColon;
+  private boolean markKonjParent;
+  private boolean markHDParent;
+  private boolean markContainsV;
 
   //Grammatical function parameters
   private static final boolean defaultLeaveGF = false;
@@ -54,9 +54,9 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
 
   private HeadFinder headFinder;
 
-  private boolean treeNormalizerInsertNPinPP = false;
+  private boolean treeNormalizerInsertNPinPP;
   //TODO: fix this so it really works
-  private boolean treeNormalizerLeaveGF = false;
+  private boolean treeNormalizerLeaveGF;
 
 
   public NegraPennTreebankParserParams() {
@@ -192,7 +192,7 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
     } else if (args[i].equalsIgnoreCase("-evalGF")) {
       this.setEvalGF(Boolean.parseBoolean(args[i + 1]));
       i+=2;
-    } else if (args[i].equalsIgnoreCase("-headFinder") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-headFinder") && i + 1 < args.length) {
       try {
         headFinder = (HeadFinder) Class.forName(args[i + 1]).newInstance();
       } catch (Exception e) {
@@ -230,7 +230,7 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
       return t;
     }
 
-    List<String> annotations = new ArrayList<String>();
+    List<String> annotations = new ArrayList<>();
 
     CoreLabel lab = (CoreLabel) t.label();
     String word = lab.word();
@@ -262,7 +262,7 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
       }
 
       // mark relative clause S's
-      if (markRC && (t.label() instanceof NegraLabel) && baseCat.equals("S") && ((NegraLabel) t.label()).getEdge() != null && ((NegraLabel) t.label()).getEdge().equals("RC")) {
+      if (markRC && t.label() instanceof NegraLabel && baseCat.equals("S") && ((NegraLabel) t.label()).getEdge() != null && ((NegraLabel) t.label()).getEdge().equals("RC")) {
         if (DEBUG) {
           System.out.println("annotating this guy as RC:");
           t.pennPrint();
@@ -341,7 +341,7 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
     while (!t.isLeaf()) {
       t = t.lastChild();
       String str = t.label().value();
-      if (str.startsWith("NP") || str.startsWith("PP") || str.startsWith("VP") || str.startsWith("S") || str.startsWith("Q") || str.startsWith("A")) {
+      if (str.startsWith("NP") || str.startsWith("PP") || str.startsWith("VP") || !str.isEmpty() && str.charAt(0) == 'S' || !str.isEmpty() && str.charAt(0) == 'Q' || !str.isEmpty() && str.charAt(0) == 'A') {
         return true;
       }
     }
@@ -350,7 +350,7 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
 
   private boolean containsVP(Tree t) {
     String cat = tlp.basicCategory(t.label().value());
-    if (cat.startsWith("V")) {
+    if (!cat.isEmpty() && cat.charAt(0) == 'V') {
       return true;
     } else {
       Tree[] kids = t.children();
@@ -365,10 +365,10 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
 
   private List<String> childBasicCats(Tree t) {
     Tree[] kids = t.children();
-    List<String> l = new ArrayList<String>();
-    for (int i = 0, n = kids.length; i < n; i++) {
-      l.add(basicCat(kids[i].label().value()));
-    }
+    List<String> l = new ArrayList<>();
+      for (Tree kid : kids) {
+          l.add(basicCat(kid.label().value()));
+      }
     return l;
   }
 

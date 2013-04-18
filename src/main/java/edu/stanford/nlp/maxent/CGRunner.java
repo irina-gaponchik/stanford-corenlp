@@ -35,7 +35,7 @@ public class CGRunner {
   private final double priorSigmaS;
   private final double[] sigmaSquareds; // = null;
 
-  private static final double DEFAULT_TOLERANCE = 1e-4;
+  private static final double DEFAULT_TOLERANCE = 1.0e-4;
   private static final double DEFAULT_SIGMASQUARED = 0.5;
 
 
@@ -99,7 +99,7 @@ public class CGRunner {
    *                         prior penalty. This array must have size the number of features.
    *                         If it is null, no regularization will be performed.
    */
-  public CGRunner(LambdaSolve prob, String filename, double tol, double[] sigmaSquareds) {
+  public CGRunner(LambdaSolve prob, String filename, double tol, double... sigmaSquareds) {
     this.prob = prob;
     this.filename = filename;
     this.tol = tol;
@@ -110,18 +110,18 @@ public class CGRunner {
 
 
   /**
-    * Solves the problem using QN.  The solution is stored in the
-    * <code>lambda</code> array of <code>prob</code>.
-    */
+   * Solves the problem using QN.  The solution is stored in the
+   * {@code lambda} array of {@code prob}.
+   */
   public void solve() {
     solveQN();
   }
 
 
    /**
-   * Solves the problem using QN.  The solution is stored in the
-   * <code>lambda</code> array of <code>prob</code>.
-   */
+    * Solves the problem using QN.  The solution is stored in the
+    * {@code lambda} array of {@code prob}.
+    */
   public void solveQN() {
     LikelihoodFunction df = new LikelihoodFunction(prob, tol, useGaussianPrior, priorSigmaS, sigmaSquareds);
     MonitorFunction monitor = new MonitorFunction(prob, df, filename);
@@ -150,7 +150,7 @@ public class CGRunner {
 
   /**
    * Solves the problem using CG.  The solution is stored in the
-   * <code>lambda</code> array of <code>prob</code>.
+   * {@code lambda} array of {@code prob}.
    */
   public void solveCG() {
     LikelihoodFunction df = new LikelihoodFunction(prob, tol, useGaussianPrior, priorSigmaS, sigmaSquareds);
@@ -166,7 +166,7 @@ public class CGRunner {
 
   /**
    * Solves the problem using OWLQN.  The solution is stored in the
-   * <code>lambda</code> array of <code>prob</code>.  Note that the
+   * {@code lambda} array of {@code prob}.  Note that the
    * likelihood function will be a penalized L2 likelihood function unless you
    * have turned this off via setting the priorSigmaS to 0.0.
    *
@@ -195,7 +195,7 @@ public class CGRunner {
     private double likelihood;
 
 
-    public LikelihoodFunction(LambdaSolve m, double tol, boolean useGaussianPrior, double sigmaSquared, double[] sigmaSquareds) {
+    public LikelihoodFunction(LambdaSolve m, double tol, boolean useGaussianPrior, double sigmaSquared, double... sigmaSquareds) {
       model = m;
       this.tol = tol;
       this.useGaussianPrior = useGaussianPrior;
@@ -225,7 +225,7 @@ public class CGRunner {
     }
 
 
-    public double valueAt(double[] lambda) {
+    public double valueAt(double... lambda) {
       valueAtCalls++;
       model.lambda = lambda;
       double lik = model.logLikelihoodScratch();
@@ -233,7 +233,7 @@ public class CGRunner {
       if (useGaussianPrior) {
         //double twoSigmaSquared = 2 * sigmaSquared;
         for (int i = 0; i < lambda.length; i++) {
-          lik += (lambda[i] * lambda[i]) / (sigmaSquareds[i] + sigmaSquareds[i]);
+          lik += lambda[i] * lambda[i] / (sigmaSquareds[i] + sigmaSquareds[i]);
         }
       }
       // System.err.println(valueAtCalls + " calls to valueAt;" +
@@ -244,7 +244,7 @@ public class CGRunner {
     }
 
 
-    public double[] derivativeAt(double[] lambda) {
+    public double[] derivativeAt(double... lambda) {
       boolean eq = true;
       for (int j = 0; j < lambda.length; j++) {
         if (Math.abs(lambda[j] - model.lambda[j]) > tol) {
@@ -294,14 +294,13 @@ public class CGRunner {
       this.filename = filename;
     }
 
-    @SuppressWarnings({"ConstantConditions"})
-    public double valueAt(double[] lambda) {
+    public double valueAt(double... lambda) {
       double likelihood = lf.likelihood();
       // this line is printed in the middle of the normal line of QN minimization, so put println at beginning
       System.err.println();
       System.err.print(reportMonitoring(likelihood));
 
-      if (SAVE_LAMBDAS_REGULARLY  && iterations > 0 && iterations % 5 == 0) {
+      if (false) {
         model.save_lambdas(filename + '.' + iterations + ".lam");
       }
 

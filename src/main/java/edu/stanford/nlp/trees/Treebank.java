@@ -16,7 +16,7 @@ import java.util.Set;
 
 
 /**
- * A <code>Treebank</code> object provides access to a corpus of examples with
+ * A {@code Treebank} object provides access to a corpus of examples with
  * given tree structures.
  * This class now implements the Collection interface. However, it may offer
  * less than the full power of the Collection interface: some Treebanks are
@@ -28,8 +28,8 @@ import java.util.Set;
 public abstract class Treebank extends AbstractCollection<Tree> {
 
   /**
-   * Stores the <code>TreeReaderFactory</code> that will be used to
-   * create a <code>TreeReader</code> to process a file of trees.
+   * Stores the {@code TreeReaderFactory} that will be used to
+   * create a {@code TreeReader} to process a file of trees.
    */
   private TreeReaderFactory trf;
 
@@ -43,7 +43,7 @@ public abstract class Treebank extends AbstractCollection<Tree> {
   /**
    * Create a new Treebank (using a LabeledScoredTreeReaderFactory).
    */
-  public Treebank() {
+  protected Treebank() {
     this(new LabeledScoredTreeReaderFactory());
   }
 
@@ -52,9 +52,9 @@ public abstract class Treebank extends AbstractCollection<Tree> {
    * Create a new Treebank.
    *
    * @param trf the factory class to be called to create a new
-   *            <code>TreeReader</code>
+   *            {@code TreeReader}
    */
-  public Treebank(TreeReaderFactory trf) {
+  protected Treebank(TreeReaderFactory trf) {
     this.trf = trf;
   }
 
@@ -63,10 +63,10 @@ public abstract class Treebank extends AbstractCollection<Tree> {
    * Create a new Treebank.
    *
    * @param trf      the factory class to be called to create a new
-   *                 <code>TreeReader</code>
+   *                 {@code TreeReader}
    * @param encoding The charset encoding to use for treebank file decoding
    */
-  public Treebank(TreeReaderFactory trf, String encoding) {
+  protected Treebank(TreeReaderFactory trf, String encoding) {
     this.trf = trf;
     this.encoding = encoding;
   }
@@ -78,7 +78,7 @@ public abstract class Treebank extends AbstractCollection<Tree> {
    * @param initialCapacity The initial size of the underlying Collection,
    *                        (if a Collection-based storage mechanism is being provided)
    */
-  public Treebank(int initialCapacity) {
+  protected Treebank(int initialCapacity) {
     this(initialCapacity, new LabeledScoredTreeReaderFactory());
   }
 
@@ -89,18 +89,18 @@ public abstract class Treebank extends AbstractCollection<Tree> {
    * @param initialCapacity The initial size of the underlying Collection,
    *                        (if a Collection-based storage mechanism is being provided)
    * @param trf             the factory class to be called to create a new
-   *                        <code>TreeReader</code>
+   *                        {@code TreeReader}
    */
-  @SuppressWarnings({"UnusedDeclaration"})
-  public Treebank(int initialCapacity, TreeReaderFactory trf) {
+  @SuppressWarnings("UnusedDeclaration")
+  protected Treebank(int initialCapacity, TreeReaderFactory trf) {
     this.trf = trf;
   }
 
 
   /**
-   * Get the <code>TreeReaderFactory</code> for a <code>Treebank</code> --
+   * Get the {@code TreeReaderFactory} for a {@code Treebank} --
    * this method is provided in order to make the
-   * <code>TreeReaderFactory</code> available to subclasses.
+   * {@code TreeReaderFactory} available to subclasses.
    *
    * @return The TreeReaderFactory
    */
@@ -120,7 +120,7 @@ public abstract class Treebank extends AbstractCollection<Tree> {
 
 
   /**
-   * Empty a <code>Treebank</code>.
+   * Empty a {@code Treebank}.
    */
   @Override
   public abstract void clear();
@@ -156,11 +156,11 @@ public abstract class Treebank extends AbstractCollection<Tree> {
    * Load trees from given directory.
    *
    * @param pathName    File or directory name
-   * @param suffix      Extension of files to load: If <code>pathName</code>
+   * @param suffix      Extension of files to load: If {@code pathName}
    *                    is a directory, then, if this is
-   *                    non-<code>null</code>, all and only files ending in "." followed
-   *                    by this extension will be loaded; if it is <code>null</code>,
-   *                    all files in directories will be loaded.  If <code>pathName</code>
+   *                    non-{@code null}, all and only files ending in "." followed
+   *                    by this extension will be loaded; if it is {@code null},
+   *                    all files in directories will be loaded.  If {@code pathName}
    *                    is not a directory, this parameter is ignored.
    * @param recursively descend into subdirectories as well
    */
@@ -315,10 +315,10 @@ public abstract class Treebank extends AbstractCollection<Tree> {
     int numTreesLE40 = 0;
     int numNonUnaryRoots = 0;
     Tree nonUnaryEg = null;
-    ClassicCounter<Tree> nonUnaries = new ClassicCounter<Tree>();
-    ClassicCounter<String> roots = new ClassicCounter<String>();
-    ClassicCounter<String> starts = new ClassicCounter<String>();
-    ClassicCounter<String> puncts = new ClassicCounter<String>();
+    ClassicCounter<Tree> nonUnaries = new ClassicCounter<>();
+    ClassicCounter<String> roots = new ClassicCounter<>();
+    ClassicCounter<String> starts = new ClassicCounter<>();
+    ClassicCounter<String> puncts = new ClassicCounter<>();
     int numUnenclosedLeaves = 0;
     int numLeaves = 0;
     int numNonPhrasal = 0;
@@ -329,8 +329,8 @@ public abstract class Treebank extends AbstractCollection<Tree> {
     int longestSentence = 0;
     int numNullLabel = 0;
     Set<String> words = Generics.newHashSet();
-    ClassicCounter<String> tags = new ClassicCounter<String>();
-    ClassicCounter<String> cats = new ClassicCounter<String>();
+    ClassicCounter<String> tags = new ClassicCounter<>();
+    ClassicCounter<String> cats = new ClassicCounter<>();
     Tree leafEg = null;
     Tree preTerminalMultipleChildrenEg = null;
     Tree nullLabelEg = null;
@@ -373,7 +373,7 @@ public abstract class Treebank extends AbstractCollection<Tree> {
       }
       for (Tree subtree : t) {
         Label lab = subtree.label();
-        if (lab == null || lab.value() == null || "".equals(lab.value())) {
+        if (lab == null || lab.value() == null || lab.value() != null && lab.value().isEmpty()) {
           if (numNullLabel == 0) {
             nullLabelEg = subtree;
           }
@@ -453,7 +453,7 @@ public abstract class Treebank extends AbstractCollection<Tree> {
         pw.println("  Warning! " + numPreTerminalWithMultipleChildren + " preterminal nodes with multiple children.");
         pw.println("    Example: " + preTerminalMultipleChildrenEg);
       }
-      pw.println("  Sentences range from " + shortestSentence + " to " + longestSentence + " words, with an average length of " + (((numWords * 100) / numTrees) / 100.0) + " words.");
+      pw.println("  Sentences range from " + shortestSentence + " to " + longestSentence + " words, with an average length of " + numWords * 100 / numTrees / 100.0 + " words.");
       pw.println("  " + cats.size() + " phrasal category types, " + tags.size() + " tag types, and " + words.size() + " word types");
       String[] empties = {"*", "0", "*T*", "*RNR*", "*U*",
               "*?*", "*EXP*", "*ICH*", "*NOT*", "*PPA*",

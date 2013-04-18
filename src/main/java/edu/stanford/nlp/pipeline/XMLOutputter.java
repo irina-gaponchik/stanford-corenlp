@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations;
@@ -35,9 +36,11 @@ public class XMLOutputter {
   // the namespace is set in the XSLT file
   private static final String NAMESPACE_URI = null;
   private static final String STYLESHEET_NAME = "CoreNLP-to-HTML.xsl";
+    private static final Pattern COMPILE = Pattern.compile("\\s+");
+    private static final Pattern PATTERN = Pattern.compile("\\s+");
 
 
-  public static void xmlPrint(Annotation annotation, OutputStream os, StanfordCoreNLP pipeline) throws IOException {
+    public static void xmlPrint(Annotation annotation, OutputStream os, StanfordCoreNLP pipeline) throws IOException {
     Document xmlDoc = annotationToDoc(annotation, pipeline);
     Serializer ser = new Serializer(os, pipeline.getEncoding());
     ser.setIndent(2);
@@ -126,7 +129,7 @@ public class XMLOutputter {
         // add the MR entities and relations
         List<EntityMention> entities = sentence.get(MachineReadingAnnotations.EntityMentionsAnnotation.class);
         List<RelationMention> relations = sentence.get(MachineReadingAnnotations.RelationMentionsAnnotation.class);
-        if (entities != null && entities.size() > 0){
+        if (entities != null && !entities.isEmpty()){
           Element mrElem = new Element("MachineReading", NAMESPACE_URI);
           Element entElem = new Element("entities", NAMESPACE_URI);
           addEntities(entities, entElem, NAMESPACE_URI);
@@ -183,7 +186,7 @@ public class XMLOutputter {
       // so we print that out ourselves
       for (IndexedWord root : graph.getRoots()) {
         String rel = GrammaticalRelation.ROOT.getLongName();
-        rel = rel.replaceAll("\\s+", ""); // future proofing
+        rel = COMPILE.matcher(rel).replaceAll(""); // future proofing
         int source = 0;
         int target = root.index();
         String sourceWord = "ROOT";
@@ -194,7 +197,7 @@ public class XMLOutputter {
       }
       for (SemanticGraphEdge edge : graph.edgeListSorted()) {
         String rel = edge.getRelation().toString();
-        rel = rel.replaceAll("\\s+", "");
+        rel = PATTERN.matcher(rel).replaceAll("");
         int source = edge.getSource().index();
         int target = edge.getTarget().index();
         String sourceWord = tokens.get(source - 1).word();

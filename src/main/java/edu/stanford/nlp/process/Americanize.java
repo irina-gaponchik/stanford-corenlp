@@ -26,14 +26,16 @@ import java.util.regex.Pattern;
  * <i>This list is still quite incomplete, but does some of the
  * most common cases found when running our parser or doing biomedical
  * processing. to expand this list, we should probably look at:</i>
- * <code>http://wordlist.sourceforge.net/</code> or
- * <code>http://home.comcast.net/~helenajole/Harry.html</code>.
+ * {@code http://wordlist.sourceforge.net/} or
+ * {@code http://home.comcast.net/~helenajole/Harry.html}.
  *
  * @author Christopher Manning
  */
 public class Americanize implements Function<HasWord,HasWord> {
 
-  /** Whether to capitalize month and day names. The default is true. */
+    private static final Pattern COMPILE = Pattern.compile("[()]");
+    private static final Pattern PATTERN = Pattern.compile("\\s+");
+    /** Whether to capitalize month and day names. The default is true. */
   private final boolean capitalizeTimex;
 
   public static final int DONT_CAPITALIZE_TIMEX = 1;
@@ -165,7 +167,7 @@ public class Americanize implements Function<HasWord,HasWord> {
       }
       foo.append("(?:");
       // Remove groups from String before appending for speed
-      foo.append(patStrings[i].replaceAll("[()]", ""));
+      foo.append(COMPILE.matcher(patStrings[i]).replaceAll(""));
       foo.append(')');
     }
     disjunctivePattern = Pattern.compile(foo.toString());
@@ -230,9 +232,9 @@ public class Americanize implements Function<HasWord,HasWord> {
 
   @Override
   public String toString() {
-    return ("Americanize[capitalizeTimex is " + capitalizeTimex +
+    return "Americanize[capitalizeTimex is " + capitalizeTimex +
             "; " + "mapping has " + mapping.size() + " mappings; " +
-            "timexMapping has " + timexMapping.size() + " mappings]");
+            "timexMapping has " + timexMapping.size() + " mappings]";
   }
 
 
@@ -242,7 +244,7 @@ public class Americanize implements Function<HasWord,HasWord> {
    *
    * @param args Command line arguments: a list of words
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     System.err.println(new Americanize());
     System.err.println();
 
@@ -250,7 +252,7 @@ public class Americanize implements Function<HasWord,HasWord> {
       BufferedReader buf = new BufferedReader(new InputStreamReader(System.in));
       String line;
       while((line = buf.readLine()) != null) {
-        for(String w : line.split("\\s+")) {
+        for(String w : PATTERN.split(line)) {
           System.out.print(Americanize.americanize(w));
           System.out.print(' ');
         }

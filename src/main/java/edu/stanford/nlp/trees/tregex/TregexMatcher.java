@@ -96,7 +96,7 @@ public abstract class TregexMatcher {
    */
   public abstract boolean matches();
 
-  /** Rests the matcher and tests if it matches on the tree when rooted at <code>node</code>.
+  /** Rests the matcher and tests if it matches on the tree when rooted at {@code node}.
    *
    *  @param node The node where the match is checked
    *  @return whether the matcher matches at node
@@ -138,7 +138,7 @@ public abstract class TregexMatcher {
   }
 
   /**
-   * Similar to find, but matches count only if <code>node</code> is
+   * Similar to find, but matches count only if {@code node} is
    * the root of the match.  All other matches are ignored.  If you
    * know you are looking for matches with a particular root, this is
    * much faster than iterating over all matches and taking only the
@@ -152,7 +152,7 @@ public abstract class TregexMatcher {
    * otherwise, an AssertionError will be thrown.
    */
   public boolean findAt(Tree node) {
-    if (findCurrent != null && findCurrent != node) {
+    if (findCurrent != null && !findCurrent.equals(node)) {
       throw new AssertionError("Error: must call reset() before changing nodes for a call to findRootedAt");
     }
     if (findCurrent != null) {
@@ -172,7 +172,7 @@ public abstract class TregexMatcher {
   public boolean findNextMatchingNode() {
     Tree lastMatchingNode = getMatch();
     while(find()) {
-      if(getMatch() != lastMatchingNode)
+      if(!getMatch().equals(lastMatchingNode))
         return true;
     }
     return false;
@@ -182,7 +182,7 @@ public abstract class TregexMatcher {
   abstract boolean getChangesVariables();
 
   /**
-   * Returns the node labeled with <code>name</code> in the pattern.
+   * Returns the node labeled with {@code name} in the pattern.
    *
    * @param name the name of the node, specified in the pattern.
    * @return node labeled by the name
@@ -200,9 +200,9 @@ public abstract class TregexMatcher {
       return node.parent();
     }
     if (nodesToParents == null) {
-      nodesToParents = new IdentityHashMap<Tree, Tree>();
+      nodesToParents = new IdentityHashMap<>();
     }
-    if (nodesToParents.size() == 0) {
+    if (nodesToParents.isEmpty()) {
       fillNodesToParents(root, null);
     }
     return nodesToParents.get(node);

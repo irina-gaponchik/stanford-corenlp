@@ -18,7 +18,7 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
   public int size() {
     int size = 0;
     for (Map.Entry<K1, Map<K2, V>> entry : map.entrySet()) {
-      size += (entry.getValue().size());
+      size += entry.getValue().size();
     }
     return size;
   }
@@ -43,10 +43,7 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
   }
 
   public boolean contains(K1 key1, K2 key2) {
-    if (!containsKey(key1)) {
-      return false;
-    }
-    return getMap(key1).containsKey(key2);
+      return containsKey(key1) && getMap(key1).containsKey(key2);
   }
 
   public V get(K1 key1, K2 key2) {
@@ -108,8 +105,8 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
   }
 
   /**
-   * Adds all of the entries in the <code>other</code> map, performing
-   * <code>function</code> on them to transform the values
+   * Adds all of the entries in the {@code other} map, performing
+   * {@code function} on them to transform the values
    */
   public <V2> void addAll(TwoDimensionalMap<? extends K1, ? extends K2, ? extends V2> other, Function<V2, V> function) {
     for (TwoDimensionalMap.Entry<? extends K1, ? extends K2, ? extends V2> entry : other) {
@@ -138,15 +135,15 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
   }
 
   public static <K1, K2, V> TwoDimensionalMap<K1, K2, V> hashMap() {
-    return new TwoDimensionalMap<K1, K2, V>(MapFactory.<K1, Map<K2, V>>hashMapFactory(), MapFactory.<K2, V>hashMapFactory());
+    return new TwoDimensionalMap<>(MapFactory.<K1, Map<K2, V>>hashMapFactory(), MapFactory.<K2, V>hashMapFactory());
   }
 
   public static <K1, K2, V> TwoDimensionalMap<K1, K2, V> treeMap() {
-    return new TwoDimensionalMap<K1, K2, V>(MapFactory.<K1, Map<K2, V>>treeMapFactory(), MapFactory.<K2, V>treeMapFactory());
+    return new TwoDimensionalMap<>(MapFactory.<K1, Map<K2, V>>treeMapFactory(), MapFactory.<K2, V>treeMapFactory());
   }
 
   public static <K1, K2, V> TwoDimensionalMap<K1, K2, V> identityHashMap() {
-    return new TwoDimensionalMap<K1, K2, V>(MapFactory.<K1, Map<K2, V>>identityHashMapFactory(), MapFactory.<K2, V>identityHashMapFactory());
+    return new TwoDimensionalMap<>(MapFactory.<K1, Map<K2, V>>identityHashMapFactory(), MapFactory.<K2, V>identityHashMapFactory());
   }
 
   @Override
@@ -175,11 +172,11 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
    * Iterate over the map using the iterator and entry inner classes.
    */
   public Iterator<Entry<K1, K2, V>> iterator() {
-    return new TwoDimensionalMapIterator<K1, K2, V>(this);
+    return new TwoDimensionalMapIterator<>(this);
   }
 
   public Iterator<V> valueIterator() {
-    return new TwoDimensionalMapValueIterator<K1, K2, V>(this);
+    return new TwoDimensionalMapValueIterator<>(this);
   }
 
   static class TwoDimensionalMapValueIterator<K1, K2, V> implements Iterator<V> {
@@ -224,7 +221,7 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
 
     @Override
     public String toString() {
-      return "(" + firstKey + "," + secondKey + "," + value + ")";
+      return "(" + firstKey + ',' + secondKey + ',' + value + ')';
     }
   }
 
@@ -275,7 +272,7 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
         innerIterator = outerEntry.getValue().entrySet().iterator();
       }
       Map.Entry<K2, V> innerEntry = innerIterator.next();
-      next = new Entry<K1, K2, V>(k1, innerEntry.getKey(), innerEntry.getValue());
+      next = new Entry<>(k1, innerEntry.getKey(), innerEntry.getValue());
     }
 
     public void remove() {

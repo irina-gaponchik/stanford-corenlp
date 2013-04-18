@@ -192,8 +192,8 @@ public class Dictionaries {
 
   public final Map<List<String>, int[]> genderNumber = Generics.newHashMap();
 
-  public final ArrayList<Counter<Pair<String, String>>> corefDict = new ArrayList<Counter<Pair<String, String>>>(4);
-  public final Counter<Pair<String, String>> corefDictPMI = new ClassicCounter<Pair<String, String>>();
+  public final ArrayList<Counter<Pair<String, String>>> corefDict = new ArrayList<>(4);
+  public final Counter<Pair<String, String>> corefDictPMI = new ClassicCounter<>();
   public final Map<String,Counter<String>> NE_signatures = Generics.newHashMap();
 
   private void setPronouns() {
@@ -231,7 +231,7 @@ public class Dictionaries {
       reader = IOUtils.readerFromString(demonymFile);
       while(reader.ready()){
         String[] line = reader.readLine().split("\t");
-        if(line[0].startsWith("#")) continue;
+        if(!line[0].isEmpty() && line[0].charAt(0) == '#') continue;
         Set<String> set = Generics.newHashSet();
         for(String s : line){
           set.add(s.toLowerCase());
@@ -311,7 +311,7 @@ public class Dictionaries {
       String line;
       while ((line = reader.readLine())!=null){
         String[] split = line.split("\t");
-        List<String> tokens = new ArrayList<String>(Arrays.asList(split[0].split(" ")));
+        List<String> tokens = new ArrayList<>(Arrays.asList(split[0].split(" ")));
         String[] countStr = split[1].split(" ");
         int[] counts = new int[4];
         counts[0] = Integer.parseInt(countStr[0]);
@@ -356,7 +356,7 @@ public class Dictionaries {
 
         while(reader.ready()) {
           String[] split = reader.readLine().split("\t");
-          dict.get(i).setCount(new Pair<String, String>(split[0], split[1]), Double.parseDouble(split[2]));
+          dict.get(i).setCount(new Pair<>(split[0], split[1]), Double.parseDouble(split[2]));
         }
 
       } catch (IOException e) {
@@ -377,7 +377,7 @@ public class Dictionaries {
 
         while(reader.ready()) {
           String[] split = reader.readLine().split("\t");
-          dict.setCount(new Pair<String, String>(split[0], split[1]), Double.parseDouble(split[3]));
+          dict.setCount(new Pair<>(split[0], split[1]), Double.parseDouble(split[3]));
         }
 
       } catch (IOException e) {
@@ -394,7 +394,7 @@ public class Dictionaries {
 
       while(reader.ready()) {
         String[] split = reader.readLine().split("\t");
-        Counter<String> cntr = new ClassicCounter<String>();
+        Counter<String> cntr = new ClassicCounter<>();
         sigs.put(split[0], cntr);
         for (int i = 1; i < split.length; i=i+2) {
           cntr.setCount(split[i], Double.parseDouble(split[i+1]));
@@ -432,51 +432,36 @@ public class Dictionaries {
 
   public static String signature(Properties props) {
     StringBuilder os = new StringBuilder();
-    os.append(Constants.DEMONYM_PROP + ":" +
-            props.getProperty(Constants.DEMONYM_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_DEMONYM));
-    os.append(Constants.ANIMATE_PROP + ":" +
-            props.getProperty(Constants.ANIMATE_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_ANIMATE));
-    os.append(Constants.INANIMATE_PROP + ":" +
-            props.getProperty(Constants.INANIMATE_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_INANIMATE));
-    os.append(Constants.MALE_PROP + ":" +
-            props.getProperty(Constants.MALE_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_MALE));
-    os.append(Constants.NEUTRAL_PROP + ":" +
-            props.getProperty(Constants.NEUTRAL_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_NEUTRAL));
-    os.append(Constants.FEMALE_PROP + ":" +
-            props.getProperty(Constants.FEMALE_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_FEMALE));
-    os.append(Constants.PLURAL_PROP + ":" +
-            props.getProperty(Constants.PLURAL_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_PLURAL));
-    os.append(Constants.SINGULAR_PROP + ":" +
-            props.getProperty(Constants.SINGULAR_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_SINGULAR));
-    os.append(Constants.STATES_PROP + ":" +
-            props.getProperty(Constants.STATES_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_STATES));
-    os.append(Constants.GENDER_NUMBER_PROP + ":" +
-            props.getProperty(Constants.GENDER_NUMBER_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_GENDER_NUMBER));
-    os.append(Constants.COUNTRIES_PROP + ":" +
-            props.getProperty(Constants.COUNTRIES_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_COUNTRIES));
-    os.append(Constants.STATES_PROVINCES_PROP + ":" +
-            props.getProperty(Constants.STATES_PROVINCES_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_STATES_AND_PROVINCES));
-    os.append(Constants.EXTRA_GENDER_PROP + ":" +
-            props.getProperty(Constants.EXTRA_GENDER_PROP,
-                    DefaultPaths.DEFAULT_DCOREF_EXTRA_GENDER));
-    os.append(Constants.BIG_GENDER_NUMBER_PROP + ":" +
-            props.getProperty(Constants.BIG_GENDER_NUMBER_PROP,
-                    "false"));
-    os.append(Constants.REPLICATECONLL_PROP + ":" +
-            props.getProperty(Constants.REPLICATECONLL_PROP,
-                    "false"));
+    os.append(Constants.DEMONYM_PROP + ':').append(props.getProperty(Constants.DEMONYM_PROP,
+            DefaultPaths.DEFAULT_DCOREF_DEMONYM));
+    os.append(Constants.ANIMATE_PROP + ':').append(props.getProperty(Constants.ANIMATE_PROP,
+            DefaultPaths.DEFAULT_DCOREF_ANIMATE));
+    os.append(Constants.INANIMATE_PROP + ':').append(props.getProperty(Constants.INANIMATE_PROP,
+            DefaultPaths.DEFAULT_DCOREF_INANIMATE));
+    os.append(Constants.MALE_PROP + ':').append(props.getProperty(Constants.MALE_PROP,
+            DefaultPaths.DEFAULT_DCOREF_MALE));
+    os.append(Constants.NEUTRAL_PROP + ':').append(props.getProperty(Constants.NEUTRAL_PROP,
+            DefaultPaths.DEFAULT_DCOREF_NEUTRAL));
+    os.append(Constants.FEMALE_PROP + ':').append(props.getProperty(Constants.FEMALE_PROP,
+            DefaultPaths.DEFAULT_DCOREF_FEMALE));
+    os.append(Constants.PLURAL_PROP + ':').append(props.getProperty(Constants.PLURAL_PROP,
+            DefaultPaths.DEFAULT_DCOREF_PLURAL));
+    os.append(Constants.SINGULAR_PROP + ':').append(props.getProperty(Constants.SINGULAR_PROP,
+            DefaultPaths.DEFAULT_DCOREF_SINGULAR));
+    os.append(Constants.STATES_PROP + ':').append(props.getProperty(Constants.STATES_PROP,
+            DefaultPaths.DEFAULT_DCOREF_STATES));
+    os.append(Constants.GENDER_NUMBER_PROP + ':').append(props.getProperty(Constants.GENDER_NUMBER_PROP,
+            DefaultPaths.DEFAULT_DCOREF_GENDER_NUMBER));
+    os.append(Constants.COUNTRIES_PROP + ':').append(props.getProperty(Constants.COUNTRIES_PROP,
+            DefaultPaths.DEFAULT_DCOREF_COUNTRIES));
+    os.append(Constants.STATES_PROVINCES_PROP + ':').append(props.getProperty(Constants.STATES_PROVINCES_PROP,
+            DefaultPaths.DEFAULT_DCOREF_STATES_AND_PROVINCES));
+    os.append(Constants.EXTRA_GENDER_PROP + ':').append(props.getProperty(Constants.EXTRA_GENDER_PROP,
+            DefaultPaths.DEFAULT_DCOREF_EXTRA_GENDER));
+    os.append(Constants.BIG_GENDER_NUMBER_PROP + ':').append(props.getProperty(Constants.BIG_GENDER_NUMBER_PROP,
+            "false"));
+    os.append(Constants.REPLICATECONLL_PROP + ':').append(props.getProperty(Constants.REPLICATECONLL_PROP,
+            "false"));
     return os.toString();
   }
 

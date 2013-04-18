@@ -21,7 +21,7 @@ public abstract class AbstractTreeExtractor<T> implements Extractor<T> {
   }
 
 
-  @SuppressWarnings({"UnusedDeclaration"})
+  @SuppressWarnings("UnusedDeclaration")
   protected void tallyLeaf(Tree lt, double weight) {
   }
 

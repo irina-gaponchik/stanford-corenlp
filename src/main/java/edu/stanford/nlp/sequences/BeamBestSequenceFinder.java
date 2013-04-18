@@ -47,7 +47,7 @@ public class BeamBestSequenceFinder implements BestSequenceFinder {
       return allTags;
     }
 
-    public double scoreOf(int[] sequence) {
+    public double scoreOf(int... sequence) {
       throw new UnsupportedOperationException();
     }
 
@@ -66,10 +66,7 @@ public class BeamBestSequenceFinder implements BestSequenceFinder {
       if (match) {
         return pos;
       }
-      if (ones) {
-        return 0;//(length()/2-1);
-      }
-      return 0;
+        return 0;
     }
 
     public double[] scoresOf(int[] tags, int pos) {
@@ -84,35 +81,35 @@ public class BeamBestSequenceFinder implements BestSequenceFinder {
 
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     BestSequenceFinder ti = new BeamBestSequenceFinder(4, true);
     SequenceModel ts = new TestSequenceModel();
     int[] bestTags = ti.bestSequence(ts);
     System.out.println("The best sequence is .... " + Arrays.toString(bestTags));
   }
 
-  private static int[] tmp = null;
+  private static int[] tmp;
 
   private static class TagSeq implements Scored {
 
     private static class TagList {
       int tag = -1;
-      TagList last = null;
+      TagList last;
     }
 
-    private double score = 0.0;
+    private double score;
 
     public double score() {
       return score;
     }
 
-    private int size = 0;
+    private int size;
 
     public int size() {
       return size;
     }
 
-    private TagList info = null;
+    private TagList info;
 
     public int[] tmpTags(int count, int s) {
       if (tmp == null || tmp.length < s) {
@@ -174,7 +171,7 @@ public class BeamBestSequenceFinder implements BestSequenceFinder {
   private boolean recenter = true;
 
   public int[] bestSequence(SequenceModel ts) {
-    return bestSequence(ts, (1024 * 128));
+    return bestSequence(ts, 1024 << 7);
   }
 
   public int[] bestSequence(SequenceModel ts, int size) {
@@ -199,43 +196,40 @@ public class BeamBestSequenceFinder implements BestSequenceFinder {
       //System.out.flush();
 
       Beam oldBeam = newBeam;
-      if (pos < leftWindow + rightWindow && exhaustiveStart) {
-        newBeam = new Beam(100000, ScoredComparator.ASCENDING_COMPARATOR);
-      } else {
-        newBeam = new Beam(beamSize, ScoredComparator.ASCENDING_COMPARATOR);
-      }
+        newBeam = pos < leftWindow + rightWindow && exhaustiveStart ? new Beam(100000, ScoredComparator.ASCENDING_COMPARATOR) : new Beam(beamSize, ScoredComparator.ASCENDING_COMPARATOR);
       // each hypothesis gets extended and beamed
-      for (Iterator beamI = oldBeam.iterator(); beamI.hasNext();) {
-          System.out.print("#"); System.out.flush();
-        TagSeq tagSeq = (TagSeq) beamI.next();
-        for (int nextTagNum = 0; nextTagNum < tagNum[pos]; nextTagNum++) {
-          TagSeq nextSeq = tagSeq.tclone();
+        for (Object anOldBeam : oldBeam) {
+            System.out.print("#");
+            System.out.flush();
+            TagSeq tagSeq = (TagSeq) anOldBeam;
+            for (int nextTagNum = 0; nextTagNum < tagNum[pos]; nextTagNum++) {
+                TagSeq nextSeq = tagSeq.tclone();
 
-          if (pos >= leftWindow + rightWindow) {
-            nextSeq.extendWith(tags[pos][nextTagNum], ts, size);
-          } else {
-            nextSeq.extendWith(tags[pos][nextTagNum]);
-          }
+                if (pos >= leftWindow + rightWindow) {
+                    nextSeq.extendWith(tags[pos][nextTagNum], ts, size);
+                } else {
+                    nextSeq.extendWith(tags[pos][nextTagNum]);
+                }
 
-          //System.out.println("Created: "+nextSeq.score()+" %% "+arrayToString(nextSeq.tags(), nextSeq.size()));
-          newBeam.add(nextSeq);
-          //		System.out.println("Beam size: "+newBeam.size()+" of "+beamSize);
-          //System.out.println("Best is: "+((Scored)newBeam.iterator().next()).score());
+                //System.out.println("Created: "+nextSeq.score()+" %% "+arrayToString(nextSeq.tags(), nextSeq.size()));
+                newBeam.add(nextSeq);
+                //		System.out.println("Beam size: "+newBeam.size()+" of "+beamSize);
+                //System.out.println("Best is: "+((Scored)newBeam.iterator().next()).score());
+            }
         }
-      }
       System.out.println(" done");
       if (recenter) {
         double max = Double.NEGATIVE_INFINITY;
-        for (Iterator beamI = newBeam.iterator(); beamI.hasNext();) {
-          TagSeq tagSeq = (TagSeq) beamI.next();
-          if (tagSeq.score > max) {
-            max = tagSeq.score;
+          for (Object aNewBeam1 : newBeam) {
+              TagSeq tagSeq = (TagSeq) aNewBeam1;
+              if (tagSeq.score > max) {
+                  max = tagSeq.score;
+              }
           }
-        }
-        for (Iterator beamI = newBeam.iterator(); beamI.hasNext();) {
-          TagSeq tagSeq = (TagSeq) beamI.next();
-          tagSeq.score -= max;
-        }
+          for (Object aNewBeam : newBeam) {
+              TagSeq tagSeq = (TagSeq) aNewBeam;
+              tagSeq.score -= max;
+          }
       }
     }
     try {

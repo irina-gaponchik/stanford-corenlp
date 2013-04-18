@@ -59,7 +59,7 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
     return f * numClasses + c;
   }
 
-  public double[][] to2D(double[] x) {
+  public double[][] to2D(double... x) {
     double[][] x2 = new double[numFeatures][numClasses];
     for (int i = 0; i < numFeatures; i++) {
       for (int j = 0; j < numClasses; j++) {
@@ -70,14 +70,14 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
   }
 
   @Override
-  protected void calculate(double[] x) {
+  protected void calculate(double... x) {
     classifier.setWeights(to2D(x));
     if (derivative == null) {
       derivative = new double[x.length];
     } else {
       Arrays.fill(derivative, 0.0);
     }
-    Counter<Triple<Integer,Integer,Integer>> feature2classPairDerivatives = new ClassicCounter<Triple<Integer,Integer,Integer>>();
+    Counter<Triple<Integer,Integer,Integer>> feature2classPairDerivatives = new ClassicCounter<>();
 
     value = 0.0;
     for(int n = 0; n < geFeatures.size(); n++){
@@ -97,7 +97,7 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
       }
 
       //now  compute the value (KL-divergence) and the final value of the derivative.
-      if (activeData.size()>0) {
+      if (!activeData.isEmpty()) {
         for (int c = 0; c < numClasses; c++) {
           modelDist[c]/= activeData.size();
         }
@@ -110,7 +110,7 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
           for(int c = 0; c < numClasses; c++) {
             int wtIndex = indexOf(f,c);
             for(int cPrime = 0;  cPrime < numClasses; cPrime++){
-              derivative[wtIndex] += feature2classPairDerivatives.getCount(new Triple<Integer,Integer,Integer>(f,c,cPrime))*geFeature2EmpiricalDist[n][cPrime]/modelDist[cPrime];
+              derivative[wtIndex] += feature2classPairDerivatives.getCount(new Triple<>(f,c,cPrime))*geFeature2EmpiricalDist[n][cPrime]/modelDist[cPrime];
             }
             derivative[wtIndex] /= activeData.size();
           }
@@ -127,9 +127,9 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
          for (int c = 0; c < numClasses; c++) {
            for (int cPrime = 0; cPrime < numClasses; cPrime++) {
              if (cPrime == c) {
-               feature2classPairDerivatives.incrementCount(new Triple<Integer,Integer,Integer>(fID,c,cPrime), - probs[c]*(1-probs[c])*valueOfFeature(feature,datum));
+               feature2classPairDerivatives.incrementCount(new Triple<>(fID,c,cPrime), - probs[c]*(1-probs[c])*valueOfFeature(feature,datum));
              } else {
-               feature2classPairDerivatives.incrementCount(new Triple<Integer,Integer,Integer>(fID,c,cPrime), probs[c]*probs[cPrime]*valueOfFeature(feature,datum));
+               feature2classPairDerivatives.incrementCount(new Triple<>(fID,c,cPrime), probs[c]*probs[cPrime]*valueOfFeature(feature,datum));
              }
            }
          }
@@ -141,15 +141,13 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
     * This method assumes the feature already exists in the datum.
     */
    private double valueOfFeature(F feature, Datum<L,F> datum){
-      if(datum instanceof RVFDatum)
-        return ((RVFDatum<L,F>)datum).asFeaturesCounter().getCount(feature);
-      else return 1.0;
+       return datum instanceof RVFDatum ? ((RVFDatum<L, F>) datum).asFeaturesCounter().getCount(feature) : 1.0;
     }
 
     private void computeEmpiricalStatistics(List<F> geFeatures){
       //allocate memory to the containers and initialize them
       geFeature2EmpiricalDist = new double[geFeatures.size()][labeledDataset.labelIndex.size()];
-      geFeature2DatumList = new ArrayList<List<Integer>>(geFeatures.size());
+      geFeature2DatumList = new ArrayList<>(geFeatures.size());
       Map<F,Integer> geFeatureMap = Generics.newHashMap();
       Set<Integer> activeUnlabeledExamples = Generics.newHashSet();
       for(int n = 0; n < geFeatures.size(); n++){
@@ -190,9 +188,9 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
       System.out.println("Number of active unlabeled examples:"+activeUnlabeledExamples.size());
     }
 
-    private static void smoothDistribution(double [] dist) {
+    private static void smoothDistribution(double... dist) {
       //perform Laplace smoothing
-      double epsilon = 1e-6;
+      double epsilon = 1.0e-6;
       for(int i = 0; i < dist.length; i++)
         dist[i] += epsilon;
       ArrayMath.normalize(dist);
@@ -216,7 +214,7 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
     this.labeledDataset = labeledDataset;
     this.unlabeledDataList = unlabeledDataList;
     this.geFeatures = geFeatures;
-    this.classifier = new LinearClassifier<L,F>(null,labeledDataset.featureIndex,labeledDataset.labelIndex);
+    this.classifier = new LinearClassifier<>(null,labeledDataset.featureIndex,labeledDataset.labelIndex);
     computeEmpiricalStatistics(geFeatures);
     //empirical distributions don't change with iterations, so compute them only once.
     //model distributions will have to be recomputed every iteration though.

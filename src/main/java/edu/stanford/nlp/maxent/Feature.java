@@ -60,12 +60,12 @@ public class Feature {
     Map<Integer, Double> setNonZeros = Generics.newHashMap();
     for (int i = 0; i < vals.length; i++) {
       if (vals[i] != 0.0) {
-        Integer in = Integer.valueOf(indexOf(e.get(i)[0], e.get(i)[1]));// new Integer(e.get(i)[0]*e.ySize+e.get(i)[1]);
+        Integer in = indexOf(e.get(i)[0], e.get(i)[1]);// new Integer(e.get(i)[0]*e.ySize+e.get(i)[1]);
         Object val = setNonZeros.get(in);
         if (val == null) {
-          setNonZeros.put(in, new Double(vals[i]));
+          setNonZeros.put(in, vals[i]);
         }// if
-        else if (((Double) val).doubleValue() != vals[i]) {
+        else if ((Double) val != vals[i]) {
           System.out.println(" Incorrect function specification");
           System.out.println(" Has two values for one point ");
           System.exit(1);
@@ -76,8 +76,8 @@ public class Feature {
     indexedValues = new int[keys.length];
     valuesI = new double[keys.length];
     for (int j = 0; j < keys.length; j++) {
-      indexedValues[j] = ((Integer) keys[j]).intValue();
-      valuesI[j] = setNonZeros.get(keys[j]).doubleValue();
+      indexedValues[j] = (Integer) keys[j];
+      valuesI[j] = setNonZeros.get(keys[j]);
     } // for
     domain = e;
   }
@@ -190,9 +190,9 @@ public class Feature {
 
 
   public void setSum() {
-    for (int i = 0; i < valuesI.length; i++) {
-      sum += valuesI[i];
-    }
+      for (double aValuesI : valuesI) {
+          sum += aValuesI;
+      }
   }
 
 
@@ -211,11 +211,7 @@ public class Feature {
 
 
   public int len() {
-    if (indexedValues != null) {
-      return indexedValues.length;
-    } else {
-      return 0;
-    }
+      return indexedValues != null ? indexedValues.length : 0;
   }
 
 
@@ -250,12 +246,8 @@ public class Feature {
    * to initiallize the hashValues
    */
   public double getVal(int x, int y) {
-    Double val = hashValues.get(Integer.valueOf(indexOf(x, y)));
-    if (val == null) {
-      return 0.0;
-    } else {
-      return val.doubleValue();
-    }
+    Double val = hashValues.get(indexOf(x, y));
+      return val == null ? 0.0 : val;
 
   }
 
@@ -269,8 +261,8 @@ public class Feature {
     for (int i = 0; i < len(); i++) {
       int x = getX(i);
       int y = getY(i);
-      Double value = new Double(getVal(i));
-      this.hashValues.put(Integer.valueOf(indexOf(x, y)), value);
+      Double value = getVal(i);
+      this.hashValues.put(indexOf(x, y), value);
     }
   }
 

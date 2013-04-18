@@ -3,7 +3,7 @@ package edu.stanford.nlp.ling;
 import java.io.Serializable;
 
 /**
- * Something that implements the <code>HasWord</code> interface
+ * Something that implements the {@code HasWord} interface
  * knows about words.
  *
  * @author Christopher Manning

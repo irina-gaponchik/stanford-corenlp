@@ -13,10 +13,10 @@ public class TeXHyphenator {
   private static class Node {
     HashMap children = new HashMap();
 
-    int [] pattern = null;
-  };
+    int [] pattern;
+  }
 
-  /**
+    /**
    * Loads the default hyphenation rules in DefaultTeXHyphenator.
    */
   public void loadDefault() {
@@ -46,13 +46,13 @@ public class TeXHyphenator {
       int [] pattern = new int[linechars.length];
       char [] chars  = new char[linechars.length];
       int c = 0;
-      for( int i = 0; i < linechars.length; ++i) {
-        if( Character.isDigit(linechars[i]) ) {
-          pattern[c] = Character.digit(linechars[i], 10);
-        } else {
-          chars[c++] = linechars[i];
+        for (char linechar : linechars) {
+            if (Character.isDigit(linechar)) {
+                pattern[c] = Character.digit(linechar, 10);
+            } else {
+                chars[c++] = linechar;
+            }
         }
-      }
       char[] shortchars = new char[c];
       int [] shortpattern = new int[c+1];
       System.arraycopy(chars, 0, shortchars, 0, c);
@@ -63,27 +63,26 @@ public class TeXHyphenator {
 
   private Node head = new Node();
 
-  public static String toString(int[]i) {
-    StringBuffer sb = new StringBuffer();
-    for(int j = 0; j < i.length; ++j) {
-      sb.append(i[j]);
-    }
+  public static String toString(int... i) {
+    StringBuilder sb = new StringBuilder();
+      for (int anI : i) {
+          sb.append(anI);
+      }
     return sb.toString();
   }
 
-  private void insertHyphPattern(char [] chars, int [] pattern) {
+  private void insertHyphPattern(char [] chars, int... pattern) {
     // find target node, building as we go
     Node cur = head;
-    for( int c = 0; c < chars.length; ++c) {
-      Character curchar = new Character(chars[c]);
-      Node next = (Node) cur.children.get(curchar);
-      if( next == null ) {
-        next = new Node();
-        cur.children.put( curchar, next );
+      for (char curchar : chars) {
+          Node next = (Node) cur.children.get(curchar);
+          if (next == null) {
+              next = new Node();
+              cur.children.put(curchar, next);
+          }
+          cur = next;
       }
-      cur = next;
-    }
-    assert( cur.pattern == null );
+    assert cur.pattern == null;
     cur.pattern = pattern;
   }
 
@@ -94,7 +93,7 @@ public class TeXHyphenator {
       matchingPatterns.add(cur.pattern);
     }
     for(int c = startingIdx; cur != null && c < chars.length; ++c ) {
-      Character curchar = new Character(chars[c]);
+      Character curchar = chars[c];
       Node next = (Node) cur.children.get(curchar);
       cur = next;
       if( cur != null && cur.pattern != null ) {
@@ -106,7 +105,7 @@ public class TeXHyphenator {
       
 
   private void labelWordBreakPoints( char [] phrase, int start, int end,
-    boolean[] breakPoints)
+    boolean... breakPoints)
   {
 
     char [] word = new char[end-start+2];
@@ -119,22 +118,21 @@ public class TeXHyphenator {
 
     for( int c = 0; c < word.length; ++c ) {
       List patterns = getMatchingPatterns(word, c);
-      Iterator iter = patterns.iterator();
-      while(iter.hasNext()) {
-        int [] pattern = (int[]) iter.next();
-        for( int i = 0; i < pattern.length; ++i ) {
-          if( breakScore[c+i] < pattern[i] ) {
-            breakScore[c+i] = pattern[i];
-          }
+        for (Object pattern1 : patterns) {
+            int[] pattern = (int[]) pattern1;
+            for (int i = 0; i < pattern.length; ++i) {
+                if (breakScore[c + i] < pattern[i]) {
+                    breakScore[c + i] = pattern[i];
+                }
+            }
         }
-      }
     }
 
     breakPoints[start] = true;
     for( int i = start+1; i < end; i++) {
       // remember that breakPoints is offset by one because we introduced
       // the leading "."
-      breakPoints[i-1] |= (breakScore[i-start] % 2 == 1 );
+      breakPoints[i-1] |= breakScore[i-start] % 2 == 1;
     }
   }
   
@@ -144,7 +142,7 @@ public class TeXHyphenator {
    *    indicating whether it would be OK to insert a hyphen before that
    *    character.
    */
-  public boolean[] findBreakPoints(char [] lcphrase) {
+  public boolean[] findBreakPoints(char... lcphrase) {
 
     boolean [] breakPoints = new boolean[lcphrase.length];
 
@@ -167,25 +165,25 @@ public class TeXHyphenator {
     return breakPoints;
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
 
     TeXHyphenator hyphenator = new TeXHyphenator();
     hyphenator.loadDefault();
 
-    for( int a = 0; a < args.length; ++a) {
-      char[] chars = args[a].toLowerCase().toCharArray();
-      boolean [] breakPoints = hyphenator.findBreakPoints(chars);
-      System.out.println(args[a]);
-      StringBuffer sb = new StringBuffer();
-      for(int i = 0; i < breakPoints.length; ++i) {
-        if( breakPoints[i] ) {
-          sb.append("^");
-        } else {
-          sb.append("-");
-        }
+      for (String arg : args) {
+          char[] chars = arg.toLowerCase().toCharArray();
+          boolean[] breakPoints = hyphenator.findBreakPoints(chars);
+          System.out.println(arg);
+          StringBuilder sb = new StringBuilder();
+          for (boolean breakPoint : breakPoints) {
+              if (breakPoint) {
+                  sb.append('^');
+              } else {
+                  sb.append('-');
+              }
+          }
+          System.out.println(sb.toString());
       }
-      System.out.println(sb.toString());
-    }
   }
     
 

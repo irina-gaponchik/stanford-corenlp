@@ -3,7 +3,7 @@ package edu.stanford.nlp.io;
 import java.io.*;
 
 /**
- * An <code>OutputStream</code> that can be turned into a <code>String</code>.
+ * An {@code OutputStream} that can be turned into a {@code String}.
  *
  * @author Bill MacCartney
  */
@@ -11,9 +11,7 @@ public class StringOutputStream extends OutputStream {
 
   StringBuilder sb = new StringBuilder();
 
-  public StringOutputStream() {}
-
-  synchronized public void clear() {
+    synchronized public void clear() {
     sb.setLength(0);
   }
 

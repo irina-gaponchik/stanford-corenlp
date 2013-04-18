@@ -91,7 +91,7 @@ public class EnglishDateTimeUtils {
 
   // TODO: Java also knows about time zones...
   // %TE_TimeZones    = ("E" => -5, "C" => -6, "M" => -7, "P" => -8);
-  static Map<String,Integer> teTimeZones = new ArrayMap<String,Integer>(4);
+  static Map<String,Integer> teTimeZones = new ArrayMap<>(4);
   static {
     teTimeZones.put("E", -5);
     teTimeZones.put("C", -6);
@@ -101,7 +101,7 @@ public class EnglishDateTimeUtils {
 
   // %TE_Season       = ("spring" => "SP", "summer" => "SU",
   //     "autumn" => "FA", "fall" => "FA", "winter" => "WI");
-  static Map<String,String> teSeason = new ArrayMap<String,String>(5);
+  static Map<String,String> teSeason = new ArrayMap<>(5);
   static {
     teSeason.put("spring", "SP");
     teSeason.put("summer", "SU");
@@ -111,7 +111,7 @@ public class EnglishDateTimeUtils {
   }
 
   // %TE_Season2Month = ("SP" => 4, "SU" => 6, "FA" => 9, "WI" => 12);
-  static Map<String,Integer> teSeason2Month = new ArrayMap<String,Integer>(4);
+  static Map<String,Integer> teSeason2Month = new ArrayMap<>(4);
   static {
     teSeason2Month.put("SP", 4);
     teSeason2Month.put("SU", 6);
@@ -121,9 +121,9 @@ public class EnglishDateTimeUtils {
 
 
   // Length of month in days (without leap years)
-  static int[] teMl    = new int[]{0, 31, 28, 31,  30,  31,  30,  31,  31,  30,  31,  30, 31};
+  static int[] teMl    = {0, 31, 28, 31,  30,  31,  30,  31,  31,  30,  31,  30, 31};
   // Cumulative number of days from beginning for each month (without leap years)
-  static int[] teCumMl = new int[]{0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
+  static int[] teCumMl = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 
   // time expression ordinals - like ordWord2Num but only goes to thirty
   static Map<String,Integer> teOrd2Num = Generics.newHashMap(31);
@@ -176,22 +176,18 @@ public class EnglishDateTimeUtils {
 
   private static int getMonthLength(int year, int month) {
     int ml;
-    if((month == 2) && (isLeapYear(year))) { ml = 29; }
-    else { ml = teMl[month]; }
-    return(ml);
+      ml = month == 2 && isLeapYear(year) ? 29 : teMl[month];
+    return ml;
   } // End of subroutine getMonthLength
 
   private static boolean isLeapYear(int year) {
     // This is the Gregorian Calendar
-    if(((year % 400) == 0) ||
-       (((year % 4) == 0) && ((year % 100) != 0))) {
-	    return true;
-    } else { return false; }
+      return year % 400 == 0 ||
+              year % 4 == 0 && year % 100 != 0;
   } // End of subroutine isLeapYear
 
   // TODO: handle \A (match beginning of string, just once even when /m)
   private static final Pattern isoDateFormat = Pattern.compile("(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)");
-  @SuppressWarnings("unused")
   private static int dayOfYear(String iso)
   {
     Matcher matcher = isoDateFormat.matcher(iso);
@@ -209,7 +205,7 @@ public class EnglishDateTimeUtils {
   // should it be teCumMl[month] and month >= 2?
   private static int dayOfYear(int year, int month, int day) {
 	  int doy = teCumMl[month - 1] + day;
-	  if(isLeapYear(year) && (month > 2)) { doy++; }
+	  if(isLeapYear(year) && month > 2) { doy++; }
     return doy;
   } // End of subroutine dayOfYear
 
@@ -227,7 +223,6 @@ public class EnglishDateTimeUtils {
     }
   }
   private static Pattern isoYearWeekFormat = Pattern.compile("(\\d\\d\\d\\d)W(\\d\\d)");
-  @SuppressWarnings("unused")
   private static String week2DateIso(String iso)
   {
     Matcher matcher = isoYearWeekFormat.matcher(iso);
@@ -259,18 +254,14 @@ public class EnglishDateTimeUtils {
 
   protected static String date2Week(String iso) {
     SUTime.IsoDate isoDate = parseIsoDate(iso);
-    if (isoDate != null) {
-      return date2Week(isoDate.year, isoDate.month, isoDate.day);
-    } else {
-      return null;
-    }
+      return isoDate != null ? date2Week(isoDate.year, isoDate.month, isoDate.day) : null;
   } // End of subroutine date2Week
 
   private static String date2Week(int year, int month, int day) {
 	  int dl   = date2DOW(year, 1, 1);
 	  int doy  = dayOfYear(year, month, day);
 
-	  if((dl > 4) && (doy < (7-doy))) {
+	  if(dl > 4 && doy < 7-doy) {
 	    year--;
 	    dl   = date2DOW(year, 1, 1);
 	    doy += 365 + (isLeapYear(year)?1:0);
@@ -287,12 +278,7 @@ public class EnglishDateTimeUtils {
   // Sunday = 0, Monday = 1, etc
   private static int date2DOW(String iso)  {
     SUTime.IsoDate isoDate = parseIsoDate(iso);
-    if (isoDate != null) {
-      return date2DOW(isoDate.year, isoDate.month, isoDate.day);
-    } else {
-      // TODO: Is this the best thing to return????
-      return 7;
-    }
+      return isoDate != null ? date2DOW(isoDate.year, isoDate.month, isoDate.day) : 7;
   } // End of subroutine date2DOW
 
   // Converts date to Day of Week
@@ -300,9 +286,9 @@ public class EnglishDateTimeUtils {
   private static int date2DOW(int year, int month, int day)  {
     int a = (14 - month)/12;
     int y = year - a;
-    int m = month + (12 * a) - 2;
-    int d = (day + y + (y/4) - (y/100) + (y/400) + (31*m/12)) % 7;
-    return(d);
+    int m = month + 12 * a - 2;
+    int d = (day + y + y/4 - y/100 + y/400 + 31*m/12) % 7;
+    return d;
   } // End of subroutine date2DOW
 
 
@@ -320,24 +306,23 @@ public class EnglishDateTimeUtils {
     // print "C: $first  $shift\n";
 
     if(shift < 0) { shift += 7; }
-    return(shift+(7*nth)-6);
+    return shift+ 7*nth -6;
 }
 
   // Figures out the date of easter for a given year
-  @SuppressWarnings("unused")
   private static String getEasterDate(int year) {
 
     int g = year % 19;
     int c = year / 100;
-    int h = (c - (c/4) - ((8*c+13)/25) + 19*g +15) % 30;
-    int i = h - (h/28)*(1 - (h/28)*(29/(h+1))*((21-g)/11));
-    int j = (year + (year/4) + i + 2 - c + (c/4)) % 7;
+    int h = (c - c/4 - (8*c+13) /25 + 19*g +15) % 30;
+    int i = h - h/28 *(1 - h/28 * 29/ (h+1) * (21-g) /11);
+    int j = (year + year/4 + i + 2 - c + c/4) % 7;
     int l = i - j;
 
-    int m = 3 + ((l+40)/44);
-    int d = l + 28 - 31*(m/4);
+    int m = 3 + (l+40) /44;
+    int d = l + 28 - 31* m/4;
     String date = String.format("%04d%02d%02d", year, m, d);
-    return(date);
+    return date;
   }
 
   protected static String month2Iso(String month) {
@@ -368,18 +353,15 @@ public class EnglishDateTimeUtils {
     if (day == null) return -1;
     day = day.toLowerCase();
     if (Character.isLetter(day.charAt(0))) {
-      if ("ides".equals(day)) {
-			  return (month == 3 || month == 5 || month == 7 || month == 10)? 15:13;
-      } else if ("nones".equals(day)) {
-        return (month == 3 || month == 5 || month == 7 || month == 10)? 7:5;
-      } else {
-        Number d2 = NumberNormalizer.wordToNumber(day);
-        if (d2 != null) {
-          return d2.intValue();
-        } else {
-          return -1;
+        switch (day) {
+            case "ides":
+                return month == 3 || month == 5 || month == 7 || month == 10 ? 15 : 13;
+            case "nones":
+                return month == 3 || month == 5 || month == 7 || month == 10 ? 7 : 5;
+            default:
+                Number d2 = NumberNormalizer.wordToNumber(day);
+                return d2 != null ? d2.intValue() : -1;
         }
-      }
     } else {
       if (day.endsWith("th") || day.endsWith("rd") || day.endsWith("nd") || day.endsWith("st")) {
         day = day.substring(0, day.length()-2);
@@ -412,7 +394,7 @@ public class EnglishDateTimeUtils {
       return year;
     }
     year = year.toLowerCase();
-    if (year.startsWith("'")) {
+    if (!year.isEmpty() && year.charAt(0) == '\'') {
       year = year.substring(1);
     }
     boolean negative = false;
@@ -420,7 +402,7 @@ public class EnglishDateTimeUtils {
     if (m.find()) {
       String era = m.group(1);
       year = m.replaceAll("");
-      if (era.startsWith("b")) {
+      if (!era.isEmpty() && era.charAt(0) == 'b') {
         // BC
         negative = true;
       }
@@ -434,16 +416,15 @@ public class EnglishDateTimeUtils {
         if (decade != null && century != null) {
           // TODO: Do we allow things like nineteen fifties B.C.?
           String res = String.format("%02d%01dX", century, decade);
-          return (negative)? "-" + res: res;
-        } else {
-          throw new IllegalArgumentException("Invalid year: " + year);
+          return negative ? '-' + res: res;
         }
+          throw new IllegalArgumentException("Invalid year: " + year);
       } else if (fields.length == 1) {
         Integer decade = teDecadeNums.get(fields[0]);
         if (decade != null) {
           // TODO: Do we allow things like fifties B.C.?
           String res = String.format("XX%01dX", decade);
-          return (negative)? "-" + res: res;
+          return negative ? '-' + res: res;
         } else {
           throw new IllegalArgumentException("Invalid year: " + year);
         }
@@ -460,33 +441,33 @@ public class EnglishDateTimeUtils {
         if (decade != null && century != null) {
           // TODO: Do we allow things like 1950s B.C.?
           String res = String.format("%02d%01dX", century, decade.intValue()/10);
-          return (negative)? "-" + res: res;
-        } else {
-          throw new IllegalArgumentException("Invalid year: " + year);
+          return negative ? '-' + res: res;
         }
-      } else if (fields.length == 1) {
-        Number decade = NumberNormalizer.wordToNumber(fields[0]);
-        if (decade != null) {
-          if (decade.intValue() < 100) {
-            // TODO: Do we allow things like 50s B.C.?
-            String res = String.format("XX%01dX", decade.intValue()/10);
-            return (negative)? "-" + res: res;
-          } else {
-            if (decade.intValue() % 100 == 0) {
-              // centuries
-              String res = String.format("%02dXX", decade.intValue()/100);
-              return (negative)? "-" + res: res;
+          throw new IllegalArgumentException("Invalid year: " + year);
+      }
+        if (fields.length == 1) {
+          Number decade = NumberNormalizer.wordToNumber(fields[0]);
+          if (decade != null) {
+            if (decade.intValue() < 100) {
+              // TODO: Do we allow things like 50s B.C.?
+              String res = String.format("XX%01dX", decade.intValue()/10);
+              return negative ? '-' + res: res;
             } else {
-              String res = String.format("%03dX", decade.intValue()/10);
-              return (negative)? "-" + res: res;
+              if (decade.intValue() % 100 == 0) {
+                // centuries
+                String res = String.format("%02dXX", decade.intValue()/100);
+                return negative ? '-' + res: res;
+              } else {
+                String res = String.format("%03dX", decade.intValue()/10);
+                return negative ? '-' + res: res;
+              }
             }
+          } else {
+            throw new IllegalArgumentException("Invalid year: " + year);
           }
         } else {
           throw new IllegalArgumentException("Invalid year: " + year);
         }
-      } else {
-        throw new IllegalArgumentException("Invalid year: " + year);
-      }
 
     } else{
       if (year.contains("teen ")) {

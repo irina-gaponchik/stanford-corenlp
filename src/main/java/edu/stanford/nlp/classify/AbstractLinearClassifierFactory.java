@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Shared methods for training a {@link LinearClassifier}.
  * Inheriting classes need to implement the
- * <code>trainWeights</code> method.
+ * {@code trainWeights} method.
  *
  * @author Dan Klein
  *
@@ -26,10 +26,10 @@ public abstract class AbstractLinearClassifierFactory<L, F> implements Classifie
 
   private static final long serialVersionUID = 1L;
 
-  Index<L> labelIndex = new HashIndex<L>();
-  Index<F> featureIndex = new HashIndex<F>();
+  Index<L> labelIndex = new HashIndex<>();
+  Index<F> featureIndex = new HashIndex<>();
 
-  public AbstractLinearClassifierFactory() {
+  protected AbstractLinearClassifierFactory() {
   }
 
   int numFeatures() {
@@ -41,7 +41,7 @@ public abstract class AbstractLinearClassifierFactory<L, F> implements Classifie
   }
 
   public Classifier<L,F> trainClassifier(List<RVFDatum<L, F>> examples) {
-    Dataset<L, F> dataset = new Dataset<L, F>();
+    Dataset<L, F> dataset = new Dataset<>();
     dataset.addAll(examples);
     return trainClassifier(dataset);
   }
@@ -57,7 +57,7 @@ public abstract class AbstractLinearClassifierFactory<L, F> implements Classifie
    * @return A {@link Classifier} trained on it.
    */
   public LinearClassifier<L, F> trainClassifier(Collection<Datum<L, F>> examples) {
-    Dataset<L, F> dataset = new Dataset<L, F>();
+    Dataset<L, F> dataset = new Dataset<>();
     dataset.addAll(examples);
     return trainClassifier(dataset);
   }
@@ -85,7 +85,7 @@ public abstract class AbstractLinearClassifierFactory<L, F> implements Classifie
     labelIndex = data.labelIndex();
     featureIndex = data.featureIndex();
     double[][] weights = trainWeights(data);
-    return new LinearClassifier<L, F>(weights, featureIndex, labelIndex);
+    return new LinearClassifier<>(weights, featureIndex, labelIndex);
   }
 
 }

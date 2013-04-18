@@ -86,17 +86,17 @@ public class MemoryMonitor {
   }
 
   protected static ArrayList<String> parseFields(BufferedReader br, String splitStr,
-      int[] lineNums, int[] positions) throws IOException {
+      int[] lineNums, int... positions) throws IOException {
     int currLine = 0;
     int processed = 0;
-    ArrayList<String> found = new ArrayList<String>();
+    ArrayList<String> found = new ArrayList<>();
     while (br.ready()) {
       String[] fields = br.readLine().split(splitStr);
       currLine++;
       if (currLine == lineNums[processed]) {
         int currPosition = 0;
         for (String f : fields) {
-          if (f.length() > 0) {
+          if (!f.isEmpty()) {
             currPosition++;
             if (currPosition == positions[processed]) {
               found.add(f);
@@ -173,7 +173,7 @@ public class MemoryMonitor {
   }
 
   public boolean systemIsSwapping() {
-    return (getSystemSwapsPerSec() > MAX_SWAPS);
+    return getSystemSwapsPerSec() > MAX_SWAPS;
   }
 
   @Override
@@ -191,34 +191,34 @@ public class MemoryMonitor {
 
   /**
    * This class offers a simple way to track the peak memory used by a program.
-   * Simply launch a <code>PeakMemoryMonitor</code> as
+   * Simply launch a {@code PeakMemoryMonitor} as
    *
-   * <blockquote><code>
+   * <blockquote>{@code
    * Thread monitor = new Thread(new PeakMemoryMonitor());<br />
    * monitor.start()
-   * </code></blockquote>
+   * }</blockquote>
    *
    * and then when you want to stop monitoring, call
    *
-   * <blockquote><code>
+   * <blockquote>{@code
    * monitor.interrupt();
    * monitor.join();
-   * </code></blockquote>
+   * }</blockquote>
    *
    * You only need the last line if you want to be sure the monitor stops before
    * you move on in the code; and strictly speaking, you should surround the
-   * <code>monitor.join()</code> call with a <code>try/catch</code> block, as
-   * the <code>Thread</code> you are running could itself be interrupted, so you
+   * {@code monitor.join()} call with a {@code try/catch} block, as
+   * the {@code Thread} you are running could itself be interrupted, so you
    * should actually have something like
    *
-   * <blockquote><code>
+   * <blockquote>{@code
    * monitor.interrupt();
    * try {
    *   monitor.join();
    * } catch (InterruptedException ex) {
    *   // handle the exception
    * }
-   * </code></blockquote>
+   * }</blockquote>
    *
    * or else throw the exception.
    *
@@ -232,7 +232,7 @@ public class MemoryMonitor {
     private int logFrequency;
     private Timing timer;
     private PrintStream outstream;
-    private long peak = 0;
+    private long peak;
 
     public PeakMemoryMonitor() {
       this(DEFAULT_POLL_FREQUENCY, DEFAULT_LOG_FREQUENCY);
@@ -280,7 +280,7 @@ public class MemoryMonitor {
     }
   }
 
-  public static void main(String[] args) throws InterruptedException {
+  public static void main(String... args) throws InterruptedException {
     Thread pmm = new Thread(new PeakMemoryMonitor());
     pmm.start();
 

@@ -87,11 +87,7 @@ public class WordShapeClassifier {
       return WORDSHAPEDIGITS;
     } else if (name.equalsIgnoreCase("chinese")) {
       return WORDSHAPECHINESE;
-    } else if (name.equalsIgnoreCase("cluster1")) {
-      return WORDSHAPECLUSTER1;
-    } else {
-      return NOWORDSHAPE;
-    }
+    } else return name.equalsIgnoreCase("cluster1") ? WORDSHAPECLUSTER1 : NOWORDSHAPE;
   }
 
   /**
@@ -214,7 +210,7 @@ public class WordShapeClassifier {
       if (!Character.isUpperCase(c)) {
         upper = false;
       }
-      if ((i == 0 && !Character.isUpperCase(c)) || (i >= 1 && !Character.isLowerCase(c))) {
+      if (i == 0 && !Character.isUpperCase(c) || i >= 1 && !Character.isLowerCase(c)) {
         mixed = false;
       }
     }
@@ -356,17 +352,13 @@ public class WordShapeClassifier {
    */
   private static String wordShapeChris2(String s, boolean omitIfInBoundary, Collection<String> knownLCWords) {
     int len = s.length();
-    if (len <= BOUNDARY_SIZE * 2) {
-      return wordShapeChris2Short(s, len, knownLCWords);
-    } else {
-      return wordShapeChris2Long(s, omitIfInBoundary, len, knownLCWords);
-    }
+      return len <= BOUNDARY_SIZE << 1 ? wordShapeChris2Short(s, len, knownLCWords) : wordShapeChris2Long(s, omitIfInBoundary, len, knownLCWords);
   }
 
   // Do the simple case of words <= BOUNDARY_SIZE * 2 (i.e., 4) with only 1 object allocation!
   private static String wordShapeChris2Short(String s, int len, Collection<String> knownLCWords) {
-    int sbLen = (knownLCWords != null) ? len + 1: len;  // markKnownLC makes String 1 longer
-    final StringBuilder sb = new StringBuilder(sbLen);
+    int sbLen = knownLCWords != null ? len + 1: len;  // markKnownLC makes String 1 longer
+    StringBuilder sb = new StringBuilder(sbLen);
     boolean nonLetters = false;
 
     for (int i = 0; i < len; i++) {
@@ -414,11 +406,11 @@ public class WordShapeClassifier {
   // But we want the initial size to be greater than BOUNDARY_SIZE * 2 * (4/3) since the default loadfactor is 3/4.
   // That is, of size 6, which become 8, since HashMaps are powers of 2.  Still, it's half the size
   private static String wordShapeChris2Long(String s, boolean omitIfInBoundary, int len, Collection<String> knownLCWords) {
-    final char[] beginChars = new char[BOUNDARY_SIZE];
-    final char[] endChars = new char[BOUNDARY_SIZE];
+    char[] beginChars = new char[BOUNDARY_SIZE];
+    char[] endChars = new char[BOUNDARY_SIZE];
     int beginUpto = 0;
     int endUpto = 0;
-    final Set<Character> seenSet = new TreeSet<Character>();  // TreeSet guarantees stable ordering; has no size parameter
+    Set<Character> seenSet = new TreeSet<>();  // TreeSet guarantees stable ordering; has no size parameter
 
     boolean nonLetters = false;
 
@@ -448,7 +440,7 @@ public class WordShapeClassifier {
       if (i < BOUNDARY_SIZE) {
         beginChars[beginUpto++] = m;
       } else if (i < len - BOUNDARY_SIZE) {
-        seenSet.add(Character.valueOf(m));
+        seenSet.add(m);
       } else {
         endChars[endUpto++] = m;
       }
@@ -459,13 +451,13 @@ public class WordShapeClassifier {
     // Calculate size. This may be an upperbound, but is often correct
     int sbSize = beginUpto + endUpto + seenSet.size();
     if (knownLCWords != null) { sbSize++; }
-    final StringBuilder sb = new StringBuilder(sbSize);
+    StringBuilder sb = new StringBuilder(sbSize);
     // put in the beginning chars
     sb.append(beginChars, 0, beginUpto);
     // put in the stored ones sorted
     if (omitIfInBoundary) {
       for (Character chr : seenSet) {
-        char ch = chr.charValue();
+        char ch = chr;
         boolean insert = true;
         for (int i = 0; i < beginUpto; i++) {
           if (beginChars[i] == ch) {
@@ -501,7 +493,7 @@ public class WordShapeClassifier {
   }
 
 
-  private static char chris4equivalenceClass(final char c) {
+  private static char chris4equivalenceClass(char c) {
     int type = Character.getType(c);
     if (Character.isDigit(c) || type == Character.LETTER_NUMBER
             || type == Character.OTHER_NUMBER
@@ -540,11 +532,7 @@ public class WordShapeClassifier {
       return '.';
     } else if (type == Character.CONNECTOR_PUNCTUATION) {
       return '_';
-    } else if (type == Character.DASH_PUNCTUATION) {
-      return '-';
-    } else {
-      return 'q';
-    }
+    } else return type == Character.DASH_PUNCTUATION ? '-' : 'q';
   }
 
   public static String wordShapeChris4(String s) {
@@ -572,17 +560,13 @@ public class WordShapeClassifier {
    */
   private static String wordShapeChris4(String s, boolean omitIfInBoundary, Collection<String> knownLCWords) {
     int len = s.length();
-    if (len <= BOUNDARY_SIZE * 2) {
-      return wordShapeChris4Short(s, len, knownLCWords);
-    } else {
-      return wordShapeChris4Long(s, omitIfInBoundary, len, knownLCWords);
-    }
+      return len <= BOUNDARY_SIZE << 1 ? wordShapeChris4Short(s, len, knownLCWords) : wordShapeChris4Long(s, omitIfInBoundary, len, knownLCWords);
   }
 
   // Do the simple case of words <= BOUNDARY_SIZE * 2 (i.e., 4) with only 1 object allocation!
   private static String wordShapeChris4Short(String s, int len, Collection<String> knownLCWords) {
-    int sbLen = (knownLCWords != null) ? len + 1: len;  // markKnownLC makes String 1 longer
-    final StringBuilder sb = new StringBuilder(sbLen);
+    int sbLen = knownLCWords != null ? len + 1: len;  // markKnownLC makes String 1 longer
+    StringBuilder sb = new StringBuilder(sbLen);
     boolean nonLetters = false;
 
     for (int i = 0; i < len; i++) {
@@ -617,8 +601,8 @@ public class WordShapeClassifier {
   private static String wordShapeChris4Long(String s, boolean omitIfInBoundary, int len, Collection<String> knownLCWords) {
     StringBuilder sb = new StringBuilder(s.length() + 1);
     StringBuilder endSB = new StringBuilder(BOUNDARY_SIZE);
-    Set<Character> boundSet = Generics.newHashSet(BOUNDARY_SIZE * 2);
-    Set<Character> seenSet = new TreeSet<Character>();  // TreeSet guarantees stable ordering
+    Set<Character> boundSet = Generics.newHashSet(BOUNDARY_SIZE << 1);
+    Set<Character> seenSet = new TreeSet<>();  // TreeSet guarantees stable ordering
     boolean nonLetters = false;
     for (int i = 0; i < len; i++) {
       char c = s.charAt(i);
@@ -638,11 +622,11 @@ public class WordShapeClassifier {
 
       if (i < BOUNDARY_SIZE) {
         sb.append(m);
-        boundSet.add(Character.valueOf(m));
+        boundSet.add(m);
       } else if (i < len - BOUNDARY_SIZE) {
-        seenSet.add(Character.valueOf(m));
+        seenSet.add(m);
       } else {
-        boundSet.add(Character.valueOf(m));
+        boundSet.add(m);
         endSB.append(m);
       }
       // System.out.println("Position " + i + " --> " + m);
@@ -651,7 +635,7 @@ public class WordShapeClassifier {
     // put in the stored ones sorted and add end ones
     for (Character chr : seenSet) {
       if (!omitIfInBoundary || !boundSet.contains(chr)) {
-        char ch = chr.charValue();
+        char ch = chr;
         sb.append(ch);
       }
     }
@@ -674,11 +658,7 @@ public class WordShapeClassifier {
    * for a greek letter embedded in the String, which is useful for bio.
    */
   private static String wordShapeDan2Bio(String s, Collection<String> knownLCWords) {
-    if (containsGreekLetter(s)) {
-      return wordShapeDan2(s, knownLCWords) + "-GREEK";
-    } else {
-      return wordShapeDan2(s, knownLCWords);
-    }
+      return containsGreekLetter(s) ? wordShapeDan2(s, knownLCWords) + "-GREEK" : wordShapeDan2(s, knownLCWords);
   }
 
 
@@ -730,7 +710,7 @@ public class WordShapeClassifier {
         seenNonDigit = true;
       }
       // allow commas, decimals, and negative numbers
-      digit = digit || ch == '.' || ch == ',' || (i == 0 && (ch == '-' || ch == '+'));
+      digit = digit || ch == '.' || ch == ',' || i == 0 && (ch == '-' || ch == '+');
       if (!digit) {
         number = false;
       }
@@ -745,11 +725,7 @@ public class WordShapeClassifier {
     if (cardinal) {
       if (length < 4) {
         return "CARDINAL13";
-      } else if (length == 4) {
-        return "CARDINAL4";
-      } else {
-        return "CARDINAL5PLUS";
-      }
+      } else return length == 4 ? "CARDINAL4" : "CARDINAL5PLUS";
     } else if (number) {
       return "NUMBER";
     }
@@ -824,11 +800,7 @@ public class WordShapeClassifier {
       return "MIXEDCASE-DIGIT";
     } else if (seenLower) {
       return "MIXEDCASE";
-    } else if (seenDigit) {
-      return "SYMBOL-DIGIT";
-    } else {
-      return "SYMBOL";
-    }
+    } else return seenDigit ? "SYMBOL-DIGIT" : "SYMBOL";
   }
 
 
@@ -839,7 +811,7 @@ public class WordShapeClassifier {
    * @param s String to find word shape of
    * @return The same string except digits are equivalence classed to 9.
    */
-  private static String wordShapeDigits(final String s) {
+  private static String wordShapeDigits(String s) {
     char[] outChars = null;
 
     for (int i = 0; i < s.length(); i++) {
@@ -851,12 +823,7 @@ public class WordShapeClassifier {
         outChars[i] = '9';
       }
     }
-    if (outChars == null) {
-      // no digit found
-      return s;
-    } else {
-      return new String(outChars);
-    }
+      return outChars == null ? s : new String(outChars);
   }
 
 
@@ -872,7 +839,7 @@ public class WordShapeClassifier {
     boolean digit = true;
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
-      if ( ! (Character.isDigit(c) || c == '.' || c == ',' || (i == 0 && (c == '-' || c == '+')))) {
+      if ( ! (Character.isDigit(c) || c == '.' || c == ',' || i == 0 && (c == '-' || c == '+'))) {
         digit = false;
       }
     }
@@ -887,16 +854,17 @@ public class WordShapeClassifier {
     }
   }
 
-  private static String wordShapeChinese(final String s) {
+  private static String wordShapeChinese(String s) {
     return ChineseUtils.shapeOf(s, true, true);
   }
 
 
   private static class DistributionalClusters {
 
-    private DistributionalClusters() {}
+      private static final Pattern COMPILE = Pattern.compile("\\t");
+      private static final Pattern PATTERN = Pattern.compile("\\s+");
 
-    public static Map<String,String> cluster1  = loadWordClusters("/u/nlp/data/pos_tags_are_useless/egw.bnc.200",
+      public static Map<String,String> cluster1  = loadWordClusters("/u/nlp/data/pos_tags_are_useless/egw.bnc.200",
                                                            "alexClark");
 
     private static class LcMap<K,V> extends HashMap<K,V> {
@@ -911,10 +879,10 @@ public class WordShapeClassifier {
 
     public static Map<String,String> loadWordClusters(String file, String format) {
       Timing.startDoing("Loading distsim lexicon from " + file);
-      Map<String,String> lexicon = new LcMap<String, String>();
+      Map<String,String> lexicon = new LcMap<>();
       if ("terryKoo".equals(format)) {
         for (String line : ObjectBank.getLineIterator(file)) {
-          String[] bits = line.split("\\t");
+          String[] bits = COMPILE.split(line);
           String word = bits[1];
           // for now, always lowercase, but should revisit this
           word = word.toLowerCase();
@@ -924,7 +892,7 @@ public class WordShapeClassifier {
       } else {
         // "alexClark"
         for (String line : ObjectBank.getLineIterator(file)) {
-          String[] bits = line.split("\\s+");
+          String[] bits = PATTERN.split(line);
           String word = bits[0];
           // for now, always lowercase, but should revisit this
           word = word.toLowerCase();
@@ -939,16 +907,16 @@ public class WordShapeClassifier {
 
 
   /**
-   * Usage: <code>java edu.stanford.nlp.process.WordShapeClassifier
-   * [-wordShape name] string+ </code><br>
-   * where <code>name</code> is an argument to <code>lookupShaper</code>.
+   * Usage: {@code java edu.stanford.nlp.process.WordShapeClassifier
+   * [-wordShape name] string+ }<br>
+   * where {@code name} is an argument to {@code lookupShaper}.
    * Known names have patterns along the lines of: dan[12](bio)?(UseLC)?,
    * jenny1(useLC)?, chris[1234](useLC)?, cluster1.
    * If you don't specify a word shape function, you get chris1.
    *
    * @param args Command-line arguments, as above.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     int i = 0;
     int classifierToUse = WORDSHAPECHRIS1;
     if (args.length == 0) {

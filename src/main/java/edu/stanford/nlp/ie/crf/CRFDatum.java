@@ -3,6 +3,7 @@ package edu.stanford.nlp.ie.crf;
 import edu.stanford.nlp.ling.Datum;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -17,11 +18,10 @@ public class CRFDatum<FEAT,LAB> implements Serializable {
   /**
    * Features for this Datum.
    */
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
   private final List<FEAT> features;
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
   private final LAB label;
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
   // featureVals holds the (optional) feature value for non-boolean features
   // such as the ones used in continuous vector space embeddings
   private final List<double[]> featureVals;
@@ -51,7 +51,7 @@ public class CRFDatum<FEAT,LAB> implements Serializable {
    * Returns the double array containing the feature values
    *
    * @return the double array that contains the feature values matching each feature as 
-   *         returned by <code>asFeatures()</code>
+   *         returned by {@code asFeatures()}
    */
   public List<double[]> asFeatureVals() {
     return featureVals;
@@ -76,7 +76,7 @@ public class CRFDatum<FEAT,LAB> implements Serializable {
     sb.append("    label=").append(label).append('\n');
     for (int i = 0, sz = features.size(); i < sz; i++) {
       sb.append("    features(").append(i).append("):").append(features.get(i));
-      sb.append(", val=").append(featureVals.get(i));
+      sb.append(", val=").append(Arrays.toString(featureVals.get(i)));
       sb.append('\n');
     }
     sb.append(']');
@@ -96,7 +96,7 @@ public class CRFDatum<FEAT,LAB> implements Serializable {
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof Datum)) {
-      return (false);
+      return false;
     }
 
     Datum d = (Datum) o;

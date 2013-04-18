@@ -13,14 +13,14 @@ class ExciseNode extends TsurgeonPattern {
    * Top should evaluate to a node that dominates bottom, but this is not checked!
    */
   public ExciseNode(TsurgeonPattern top, TsurgeonPattern bottom) {
-    super("excise", new TsurgeonPattern[] { top, bottom });
+    super("excise", top, bottom);
   }
 
   /**
    * Excises only the directed node.
    */
   public ExciseNode(TsurgeonPattern node) {
-    super("excise", new TsurgeonPattern[] { node,node });
+    super("excise", node,node);
   }
 
   @Override
@@ -32,7 +32,7 @@ class ExciseNode extends TsurgeonPattern {
       t.pennPrint(System.err);
       System.err.println("top: " + topNode + "\nbottom:" + bottomNode);
     }
-    if(topNode==t)
+    if(topNode.equals(t))
       return null;
     Tree parent = topNode.parent(t);
     if(Tsurgeon.verbose)

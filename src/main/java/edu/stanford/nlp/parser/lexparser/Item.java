@@ -20,11 +20,11 @@ abstract public class Item implements Scored {
   
   private final boolean exhaustiveTest;
 
-  public Item(boolean exhaustiveTest) {
+  protected Item(boolean exhaustiveTest) {
     this.exhaustiveTest = exhaustiveTest;
   }
   
-  public Item(Item item) {
+  protected Item(Item item) {
     start = item.start;
     end = item.end;
     state = item.state;
@@ -37,11 +37,7 @@ abstract public class Item implements Scored {
   }
   
   public double score() {
-    if (exhaustiveTest) {
-      return iScore;
-    } else {
-      return iScore + oScore;
-    }
+      return exhaustiveTest ? iScore : iScore + oScore;
   }
 
   public boolean isEdge() {

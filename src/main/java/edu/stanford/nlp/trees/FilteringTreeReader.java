@@ -5,7 +5,7 @@ import java.io.IOException;
 import edu.stanford.nlp.util.Filter;
 
 /**
- * A <code>FilteringTreeReader</code> filters the output of another TreeReader.
+ * A {@code FilteringTreeReader} filters the output of another TreeReader.
  * It applies a Filter&lt;Tree&gt; to each returned tree and only returns trees 
  * that are accepted by the Filter.  The Filter should accept trees that it 
  * wants returned.
@@ -26,7 +26,7 @@ public class FilteringTreeReader implements TreeReader {
   /**
    * Reads a single tree.
    *
-   * @return A single tree, or <code>null</code> at end of file.
+   * @return A single tree, or {@code null} at end of file.
    */
   public Tree readTree() throws IOException {
     Tree t;
@@ -37,7 +37,7 @@ public class FilteringTreeReader implements TreeReader {
   }
 
   /**
-   * Close the Reader behind this <code>TreeReader</code>.
+   * Close the Reader behind this {@code TreeReader}.
    */
   public void close() throws IOException {
     tr.close();

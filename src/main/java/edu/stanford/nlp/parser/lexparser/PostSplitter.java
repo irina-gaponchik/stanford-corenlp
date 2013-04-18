@@ -21,7 +21,7 @@ import java.util.*;
  */
 class PostSplitter implements TreeTransformer {
 
-  private ClassicCounter<String> nonTerms = new ClassicCounter<String>();
+  private ClassicCounter<String> nonTerms = new ClassicCounter<>();
   private TreebankLangParserParams tlpParams;
   private TreeFactory tf;
   private HeadFinder hf;
@@ -63,24 +63,16 @@ class PostSplitter implements TreeTransformer {
       nonTerms.incrementCount(t.label().value());
     } else {
       nonTerms.incrementCount(t.label().value());
-      if (trainOptions.postPA && !trainOptions.smoothing && baseParentStr.length() > 0) {
+      if (trainOptions.postPA && !trainOptions.smoothing && !baseParentStr.isEmpty()) {
         String cat2;
-        if (trainOptions.postSplitWithBaseCategory) {
-          cat2 = cat + "^" + baseParentStr;
-        } else {
-          cat2 = cat + "^" + parentStr;
-        }
+          cat2 = trainOptions.postSplitWithBaseCategory ? cat + '^' + baseParentStr : cat + '^' + parentStr;
         if (!trainOptions.selectivePostSplit || trainOptions.postSplitters.contains(cat2)) {
           cat = cat2;
         }
       }
-      if (trainOptions.postGPA && !trainOptions.smoothing && grandParentStr.length() > 0) {
+      if (trainOptions.postGPA && !trainOptions.smoothing && !grandParentStr.isEmpty()) {
         String cat2;
-        if (trainOptions.postSplitWithBaseCategory) {
-          cat2 = cat + "~" + baseGrandParentStr;
-        } else {
-          cat2 = cat + "~" + grandParentStr;
-        }
+          cat2 = trainOptions.postSplitWithBaseCategory ? cat + '~' + baseGrandParentStr : cat + '~' + grandParentStr;
         if (trainOptions.selectivePostSplit) {
           if (cat.contains("^") && trainOptions.postSplitters.contains(cat2)) {
             cat = cat2;
@@ -90,8 +82,8 @@ class PostSplitter implements TreeTransformer {
         }
       }
     }
-    result = tf.newTreeNode(new CategoryWordTag(cat, word, cat), Collections.EMPTY_LIST);
-    ArrayList<Tree> newKids = new ArrayList<Tree>();
+    result = tf.newTreeNode(new CategoryWordTag(cat, word, cat), Collections.<Tree>emptyList());
+    ArrayList<Tree> newKids = new ArrayList<>();
     Tree[] kids = t.children();
     for (Tree kid : kids) {
       newKids.add(transformTreeHelper(kid, root));
@@ -102,7 +94,7 @@ class PostSplitter implements TreeTransformer {
 
   public void dumpStats() {
     System.out.println("%% Counts of nonterminals:");
-    List<String> biggestCounts = new ArrayList<String>(nonTerms.keySet());
+    List<String> biggestCounts = new ArrayList<>(nonTerms.keySet());
     Collections.sort(biggestCounts, Counters.toComparatorDescending(nonTerms));
     for (String str : biggestCounts) {
       System.out.println(str + ": " + nonTerms.getCount(str));

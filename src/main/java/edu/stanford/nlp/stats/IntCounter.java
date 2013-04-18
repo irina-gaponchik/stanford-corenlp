@@ -42,9 +42,8 @@ import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
  */
 public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
 
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
   private Map<E, MutableInteger>  map;
-  @SuppressWarnings("unchecked")
   private MapFactory mapFactory;
   private int totalCount;
   private int defaultValue; // = 0;
@@ -52,7 +51,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   /**
    * Default comparator for breaking ties in argmin and argmax.
    */
-  private static final Comparator<Object> naturalComparator = new NaturalComparator<Object>();
+  private static final Comparator<Object> naturalComparator = new NaturalComparator<>();
   private static final long serialVersionUID = 4;
 
   // CONSTRUCTORS
@@ -125,7 +124,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
         total += getIntCount(key);
       }
     }
-    return (total);
+    return total;
   }
 
   public double totalDoubleCount(Filter<E> filter) {
@@ -146,7 +145,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   /**
    * Returns the current count for the given key, which is 0 if it hasn't
    * been
-   * seen before. This is a convenient version of <code>get</code> that casts
+   * seen before. This is a convenient version of {@code get} that casts
    * and extracts the primitive value.
    */
   public double getCount(Object key) {
@@ -160,7 +159,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   /**
    * Returns the current count for the given key, which is 0 if it hasn't
    * been
-   * seen before. This is a convenient version of <code>get</code> that casts
+   * seen before. This is a convenient version of {@code get} that casts
    * and extracts the primitive value.
    */
   public int getIntCount(Object key) {
@@ -176,7 +175,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    * really you should create a {@link edu.stanford.nlp.stats.Distribution} instead of using this method.
    */
   public double getNormalizedCount(E key) {
-    return getCount(key) / (totalCount());
+    return getCount(key) / totalCount();
   }
 
   /**
@@ -206,7 +205,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   }
 
   // for more efficient memory usage
-  private transient MutableInteger tempMInteger = null;
+  private transient MutableInteger tempMInteger;
 
   /**
    * Sets the current count for each of the given keys. This will wipe out
@@ -397,11 +396,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   public double remove(E key) {
     totalCount -= getCount(key); // subtract removed count from total (may be 0)
     MutableInteger val = map.remove(key);
-    if (val == null) {
-      return Double.NaN;
-    } else {
-      return val.doubleValue();
-    }
+      return val == null ? Double.NaN : val.doubleValue();
   }
 
   /**
@@ -460,7 +455,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
               }
 
               public Double setValue(Double value) {
-                final double old = e.getValue().doubleValue();
+                double old = e.getValue().doubleValue();
                 e.getValue().set(value.intValue());
                 totalCount = totalCount - (int)old + value.intValue();
                 return old;
@@ -483,7 +478,6 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
 
   // OBJECT STUFF
 
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -493,7 +487,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
       return false;
     }
 
-    final IntCounter counter = (IntCounter) o;
+    IntCounter counter = (IntCounter) o;
 
     return map.equals(counter.map);
   }
@@ -509,11 +503,10 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   }
 
 
-  @SuppressWarnings("unchecked")
   public String toString(NumberFormat nf, String preAppend, String postAppend, String keyValSeparator, String itemSeparator) {
     StringBuilder sb = new StringBuilder();
     sb.append(preAppend);
-    List<E> list = new ArrayList<E>(map.keySet());
+    List<E> list = new ArrayList<>(map.keySet());
     try {
       Collections.sort((List)list); // see if it can be sorted
     } catch (Exception e) {
@@ -521,7 +514,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
     for (Iterator<E> iter = list.iterator(); iter.hasNext();) {
       Object key = iter.next();
       MutableInteger d = map.get(key);
-      sb.append(key + keyValSeparator);
+      sb.append(key).append(keyValSeparator);
       sb.append(nf.format(d));
       if (iter.hasNext()) {
         sb.append(itemSeparator);
@@ -532,11 +525,10 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   }
 
 
-  @SuppressWarnings("unchecked")
   public String toString(NumberFormat nf) {
     StringBuilder sb = new StringBuilder();
-    sb.append("{");
-    List<E> list = new ArrayList<E>(map.keySet());
+    sb.append('{');
+    List<E> list = new ArrayList<>(map.keySet());
     try {
       Collections.sort((List)list); // see if it can be sorted
     } catch (Exception e) {
@@ -544,19 +536,19 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
     for (Iterator<E> iter = list.iterator(); iter.hasNext();) {
       Object key = iter.next();
       MutableInteger d = map.get(key);
-      sb.append(key + "=");
+      sb.append(key).append('=');
       sb.append(nf.format(d));
       if (iter.hasNext()) {
         sb.append(", ");
       }
     }
-    sb.append("}");
+    sb.append('}');
     return sb.toString();
   }
 
   @Override
   public Object clone() {
-    return new IntCounter<E>(this);
+    return new IntCounter<>(this);
   }
 
   // EXTRA CALCULATION METHODS
@@ -619,7 +611,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
     E argmax = null;
     for (E key : keySet()) {
       int count = getIntCount(key);
-      if (argmax == null || count > max || (count == max && tieBreaker.compare(key, argmax) < 0)) {
+      if (argmax == null || count > max || count == max && tieBreaker.compare(key, argmax) < 0) {
         max = count;
         argmax = key;
       }
@@ -652,7 +644,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
     E argmin = null;
     for (E key : map.keySet()) {
       int count = getIntCount(key);
-      if (argmin == null || count < min || (count == min && tieBreaker.compare(key, argmin) < 0)) {
+      if (argmin == null || count < min || count == min && tieBreaker.compare(key, argmin) < 0) {
         min = count;
         argmin = key;
       }
@@ -735,7 +727,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
       private static final long serialVersionUID = 7470763055803428477L;
 
       public Counter<E> create() {
-        return new IntCounter<E>(getMapFactory());
+        return new IntCounter<>(getMapFactory());
       }
     };
   }

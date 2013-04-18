@@ -25,11 +25,7 @@ public class ExtensionFileFilter extends javax.swing.filechooser.FileFilter impl
    */
   public ExtensionFileFilter(String ext, boolean recurse) {
     if (ext != null) {
-      if (ext.startsWith(".")) {
-        extension = ext;
-      } else {
-        extension = '.' + ext;
-      }
+        extension = !ext.isEmpty() && ext.charAt(0) == '.' ? ext : '.' + ext;
     }
     recursively = recurse;
   }
@@ -52,11 +48,7 @@ public class ExtensionFileFilter extends javax.swing.filechooser.FileFilter impl
   public boolean accept(File file) {
     if (file.isDirectory()) {
       return recursively;
-    } else if (extension == null) {
-      return true;
-    } else {
-      return file.getName().endsWith(extension);
-    }
+    } else return extension == null ? true : file.getName().endsWith(extension);
   }
 
   /**
@@ -69,7 +61,7 @@ public class ExtensionFileFilter extends javax.swing.filechooser.FileFilter impl
   @Override
   public String getDescription() {
     String ucExt = extension.substring(1).toUpperCase();
-    return (ucExt + " Files (*" + extension + ')');
+    return ucExt + " Files (*" + extension + ')';
   }
 
 }

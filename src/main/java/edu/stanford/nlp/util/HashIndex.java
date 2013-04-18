@@ -8,16 +8,16 @@ import java.util.concurrent.Semaphore;
  * An Index is a collection that maps between an Object vocabulary and a
  * contiguous non-negative integer index series beginning (inclusively) at 0.
  * It supports constant-time lookup in
- * both directions (via <code>get(int)</code> and <code>indexOf(E)</code>.
- * The <code>indexOf(E)</code> method compares objects by
- * <code>equals</code>, as other Collections.
+ * both directions (via {@code get(int)} and {@code indexOf(E)}.
+ * The {@code indexOf(E)} method compares objects by
+ * {@code equals}, as other Collections.
  * <p/>
  * The typical usage would be:
- * <p><code>Index index = new Index(collection);</code>
+ * <p>{@code Index index = new Index(collection);}
  * <p> followed by
- * <p><code>int i = index.indexOf(object);</code>
+ * <p>{@code int i = index.indexOf(object);}
  * <p> or
- * <p><code>Object o = index.get(i);</code>
+ * <p>{@code Object o = index.get(i);}
  * <p>The source contains a concrete example of use as the main method.
  * <p>An Index can be locked or unlocked: a locked index cannot have new
  * items added to it.
@@ -31,7 +31,7 @@ import java.util.concurrent.Semaphore;
 public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, RandomAccess {
 
   // these variables are also used in IntArrayIndex
-  ArrayList<E> objects = new ArrayList<E>();
+  ArrayList<E> objects = new ArrayList<>();
   Map<E,Integer> indexes = Generics.newHashMap();
   boolean locked; // = false;
 
@@ -65,7 +65,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * @param indices An array of indices
    * @return a {@link Collection} of the objects corresponding to the indices argument.
    */
-  public Collection<E> objects(final int[] indices) {
+  public Collection<E> objects(final int... indices) {
     return new AbstractList<E>() {
       @Override
       public E get(int index) {
@@ -99,7 +99,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
     if (i < 0 || i >= objects.size())
       throw new ArrayIndexOutOfBoundsException("Index " + i + 
                                                " outside the bounds [0," + 
-                                               size() + ")");
+                                               size() + ')');
     return objects.get(i);
   }
 
@@ -124,13 +124,13 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
   }
 
   /** Locks the Index.  A locked index cannot have new elements added to it (calls to {@link #add} will
-   * leave the Index unchanged and return <code>false</code>).*/
+   * leave the Index unchanged and return {@code false}).*/
   public void lock() {
     locked = true;
   }
 
   /** Unlocks the Index.  A locked index cannot have new elements added to it (calls to {@link #add} will
-   * leave the Index unchanged and return <code>false</code>).*/
+   * leave the Index unchanged and return {@code false}).*/
   public void unlock() {
     locked = false;
   }
@@ -225,7 +225,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * @param o the object to be queried.
    * @return true iff there is an index for the queried object.
    */
-  @SuppressWarnings({"SuspiciousMethodCalls"})
+  @SuppressWarnings("SuspiciousMethodCalls")
   @Override
   public boolean contains(Object o) {
     return indexes.containsKey(o);
@@ -235,7 +235,6 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * Creates a new Index.
    */
   public HashIndex() {
-    super();
   }
 
   /**
@@ -243,8 +242,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * @param capacity Initial capacity of Index.
    */
   public HashIndex(int capacity) {
-    super();
-    objects = new ArrayList<E>(capacity);
+      objects = new ArrayList<>(capacity);
     indexes = Generics.newHashMap(capacity);
   }
 
@@ -289,7 +287,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * @return An index built out of the lines in the file
    */
   public static Index<String> loadFromFilename(String file) {
-    Index<String> index = new HashIndex<String>();
+    Index<String> index = new HashIndex<>();
     BufferedReader br = null;
     try {
       br = new BufferedReader(new FileReader(file));
@@ -320,7 +318,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * text-serialization.  This is not intended to act as a standalone routine,
    * instead being called from the text-serialization routine for a component
    * that makes use of an Index, so everything can be stored in one file.  This is
-   * similar to <code>saveToFileName</code>.
+   * similar to {@code saveToFileName}.
    * @param bw Writer to save to.
    * @throws IOException Exception thrown if cannot save.
    */
@@ -331,7 +329,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
   }
 
   /**
-   * This is the analogue of <code>loadFromFilename</code>, and is intended to be included in a routine
+   * This is the analogue of {@code loadFromFilename}, and is intended to be included in a routine
    * that unpacks a text-serialized form of an object that incorporates an Index.
    * NOTE: presumes that the next readLine() will read in the first line of the
    * portion of the text file representing the saved Index.  Currently reads until it
@@ -341,10 +339,10 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * @return An Index read from a file
    */
   public static Index<String> loadFromReader(BufferedReader br) throws IOException {
-    HashIndex<String> index = new HashIndex<String>();
+    HashIndex<String> index = new HashIndex<>();
     String line = br.readLine();
     // terminate if EOF reached, or if a blank line is encountered.
-    while ((line != null) && (line.length() > 0)) {
+    while (line != null && !line.isEmpty()) {
       int start = line.indexOf('=');
       if (start == -1 || start == line.length() - 1) {
         continue;
@@ -385,7 +383,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
     for (i = 0; i < n; i++) {
       E e = objects.get(i);
       buff.append(i).append('=').append(e);
-      if (i < (sz-1)) buff.append(',');
+      if (i < sz-1) buff.append(',');
     }
     if (i < sz) buff.append("...");
     buff.append(']');
@@ -402,7 +400,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
     for (i = 0; i < n; i++) {
       E e = objects.get(i);
       buff.append(e);
-      if (i < (sz-1)) buff.append('\n');
+      if (i < sz-1) buff.append('\n');
     }
     if (i < sz) buff.append("...");
     return buff.toString();
@@ -459,7 +457,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * @return An index built out of the lines in the file
    */
   public static Index<String> loadFromFileWithList(String file) {
-    Index<String> index = new HashIndex<String>();
+    Index<String> index = new HashIndex<>();
     BufferedReader br = null;
     try {
       br = new BufferedReader(new FileReader(file));

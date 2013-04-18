@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class ISODateInstance {
 
   private static final boolean DEBUG = false;
-  private ArrayList<String> tokens = new ArrayList<String>();//each token contains some piece of the date, from our input.
+  private ArrayList<String> tokens = new ArrayList<>();//each token contains some piece of the date, from our input.
 
   public static final String OPEN_RANGE_AFTER = "A";
   public static final String OPEN_RANGE_BEFORE = "B";
@@ -56,7 +56,7 @@ public class ISODateInstance {
   private String isoDate = "";
 
   //Variable for marking if we were unable to parse the string associated with this isoDate
-  private boolean unparseable = false;
+  private boolean unparseable;
 
   //private String isoTime = "";
 
@@ -105,7 +105,7 @@ public class ISODateInstance {
     }
 
     isoDate = startString + '/' + endString;
-    unparseable = (start.isUnparseable() || end.isUnparseable());
+    unparseable = start.unparseable || end.unparseable;
   }
 
   /**
@@ -153,8 +153,8 @@ public class ISODateInstance {
     //Month is not a variable
     Integer monthNum = Integer.parseInt(monthString);
     //Check if we're an edge case
-    if (((monthNum + relation.second()) > 12) || ((monthNum + relation.second) < 1)) {
-      boolean decreasing = ((monthNum + relation.second) < 1);
+    if (monthNum + relation.second() > 12 || monthNum + relation.second < 1) {
+      boolean decreasing = monthNum + relation.second < 1;
       int newMonthNum = (monthNum + relation.second()) % 12;
       if (newMonthNum < 0) {
         newMonthNum *= -1;
@@ -166,14 +166,10 @@ public class ISODateInstance {
       if (!yearString.contains("*")) {
         //How much we increment depends on above mod
         int numYearsToIncrement = (int) Math.ceil(relation.second() / 12.0);
-        if (decreasing) {
-          isoDate = makeStringYearChange(isoDate, Integer.parseInt(yearString) - numYearsToIncrement);
-        } else {
-          isoDate = makeStringYearChange(isoDate, Integer.parseInt(yearString) + numYearsToIncrement);
-        }
+          isoDate = decreasing ? makeStringYearChange(isoDate, Integer.parseInt(yearString) - numYearsToIncrement) : makeStringYearChange(isoDate, Integer.parseInt(yearString) + numYearsToIncrement);
       }
     } else {
-      isoDate = makeStringMonthChange(origDateString, (monthNum + relation.second()));
+      isoDate = makeStringMonthChange(origDateString, monthNum + relation.second());
     }
   }
 
@@ -211,43 +207,27 @@ public class ISODateInstance {
     }
     //At this point, neither our day nor our month is a variable
     isoDate = origDateString;
-    boolean decreasing = (dayNum + relation.second() < 1);
+    boolean decreasing = dayNum + relation.second() < 1;
     //Need to increment the month, set the date appropriately - we need the new month num to set the day appropriately, so do month first
     int newMonthNum;
     //Now, check if we're an edge case for month
-    if ((monthNum + 1 > 12 && !decreasing) || (monthNum - 1 < 1 && decreasing)) {
+    if (monthNum + 1 > 12 && !decreasing || monthNum - 1 < 1 && decreasing) {
       //First, change the month
-      if (decreasing) {
-        newMonthNum = 12;
-      } else {
-        newMonthNum = 1;
-      }
+        newMonthNum = decreasing ? 12 : 1;
       //If we can, increment the year
       //TODO: fix this to work more nicely with variables and thus handle more cases
       String yearString = origDateString.substring(0, 4);
       if (!yearString.contains("*")) {
-        if (decreasing) {
-          isoDate = makeStringYearChange(isoDate, Integer.parseInt(yearString) - 1);
-        } else {
-          isoDate = makeStringYearChange(isoDate, Integer.parseInt(yearString) + 1);
-        }
+          isoDate = decreasing ? makeStringYearChange(isoDate, Integer.parseInt(yearString) - 1) : makeStringYearChange(isoDate, Integer.parseInt(yearString) + 1);
       }
     } else {
       //We're not an edge case for month - just increment
-      if (decreasing) {
-        newMonthNum = monthNum - 1;
-      } else {
-        newMonthNum = monthNum + 1;
-      }
+        newMonthNum = decreasing ? monthNum - 1 : monthNum + 1;
     }
     //do the increment
     isoDate = makeStringMonthChange(isoDate, newMonthNum);
     int newDateNum;
-    if (decreasing) {
-      newDateNum = -relation.second() + daysPerMonth.get(newMonthNum) - dayNum;
-    } else {
-      newDateNum = relation.second() - dayNum + daysPerMonth.get(monthNum);
-    }
+      newDateNum = decreasing ? -relation.second() + daysPerMonth.get(newMonthNum) - dayNum : relation.second() - dayNum + daysPerMonth.get(monthNum);
     //Now, change the day in our original string to be appropriate
     isoDate = makeStringDayChange(isoDate, newDateNum);
 
@@ -260,7 +240,7 @@ public class ISODateInstance {
    *
    */
   private static String makeStringDayChange(String origDate, int newDay) {
-    String newDayString = (newDay < 10 ? ("0" + newDay) : String.valueOf(newDay));
+    String newDayString = newDay < 10 ? "0" + newDay : String.valueOf(newDay);
     return origDate.substring(0, origDate.length() - 2) + newDayString;
   }
 
@@ -270,7 +250,7 @@ public class ISODateInstance {
    *
    */
   private static String makeStringMonthChange(String origDate, int newMonth) {
-    String newMonthString = (newMonth < 10 ? ("0" + newMonth) : String.valueOf(newMonth));
+    String newMonthString = newMonth < 10 ? "0" + newMonth : String.valueOf(newMonth);
     return origDate.substring(0, 4) + newMonthString + origDate.substring(6, 8);
   }
 
@@ -291,7 +271,7 @@ public class ISODateInstance {
   /**
    * Enum for the fields *
    */
-  public static enum DateField {
+  public enum DateField {
     DAY, MONTH, YEAR
   }
 
@@ -303,9 +283,9 @@ public class ISODateInstance {
 
   static {
     //Add entries to the relative datemap
-    relativeDateMap.put("today", new Pair<DateField, Integer>(DateField.DAY, 0));
-    relativeDateMap.put("tomorrow", new Pair<DateField, Integer>(DateField.DAY, 1));
-    relativeDateMap.put("yesterday", new Pair<DateField, Integer>(DateField.DAY, -1));
+    relativeDateMap.put("today", new Pair<>(DateField.DAY, 0));
+    relativeDateMap.put("tomorrow", new Pair<>(DateField.DAY, 1));
+    relativeDateMap.put("yesterday", new Pair<>(DateField.DAY, -1));
 
 
   }
@@ -373,15 +353,15 @@ public class ISODateInstance {
         //consider whether it's a leading modifier; e.g., "June 8-10" will be split into June 8, and 10 when really we'd like June 8 and June 10
         String date = dateEndpoints.first().substring(0, dateEndpoints.first().indexOf(' ')) + ' ' + dateEndpoints.second();
         ISODateInstance date2 = new ISODateInstance(date);
-        if (!date1.isUnparseable() && !date2.isUnparseable()) {
-          isoDate = (new ISODateInstance(date1, date2)).getDateString();
+        if (!date1.unparseable && !date2.unparseable) {
+          isoDate = new ISODateInstance(date1, date2).getDateString();
           return true;
         }
       }
 
       ISODateInstance date2 = new ISODateInstance(dateEndpoints.second());
-      if (!date1.isUnparseable() && !date2.isUnparseable()) {
-        isoDate = (new ISODateInstance(date1, date2)).getDateString();
+      if (!date1.unparseable && !date2.unparseable) {
+        isoDate = new ISODateInstance(date1, date2).getDateString();
         return true;
       }
     }
@@ -422,7 +402,7 @@ public class ISODateInstance {
     for (String curIndicator : rangeIndicators) {
       String[] dates = inputDate.split(curIndicator);
       if (dates.length == 2) {
-        return new Pair<String, String>(dates[0], dates[1]);
+        return new Pair<>(dates[0], dates[1]);
       }
     }
     return null;
@@ -437,11 +417,7 @@ public class ISODateInstance {
       if (inputDate.contains("first") && isoDate.length() <= 6) {
         String firstDate = isoDate + "01";
         String secondDate;
-        if (isoDate.length() == 4) {//year
-          secondDate = isoDate + MONTH_OF_HALF_YEAR;
-        } else {//month
-          secondDate = isoDate + DAY_OF_HALF_MONTH;
-        }
+          secondDate = isoDate.length() == 4 ? isoDate + MONTH_OF_HALF_YEAR : isoDate + DAY_OF_HALF_MONTH;
         isoDate = firstDate + '/' + secondDate;
         return true;
       } else if (inputDate.contains("second") && isoDate.length() <= 6) {
@@ -471,10 +447,7 @@ public class ISODateInstance {
    * @return Whether this date represents a range
    */
   public boolean isRange() {
-    if (unparseable) {
-      return false;
-    }
-    return isoDate.matches("/");
+      return !unparseable && isoDate.matches("/");
   }
 
   /**
@@ -500,7 +473,7 @@ public class ISODateInstance {
     if (!isRange()) {
       return isoDate;
     }
-    if (isoDate.startsWith("/")) {
+    if (!isoDate.isEmpty() && isoDate.charAt(0) == '/') {
       return "";
     }
     return isoDate.split("/")[0];
@@ -517,7 +490,7 @@ public class ISODateInstance {
     if (!isRange()) {
       return isoDate;
     }
-    if (isoDate.endsWith("/")) {
+    if (!isoDate.isEmpty() && isoDate.charAt(isoDate.length() - 1) == '/') {
       return "";
     }
     String[] split = isoDate.split("/");
@@ -561,11 +534,7 @@ public class ISODateInstance {
     }
 
     if (date1.length() < 6 || date2.length() < 6) {
-      if (year.contains("*") || yearOther.contains("*")) {
-        return after;
-      } else {
-        return after && (!Integer.valueOf(year).equals(Integer.valueOf(yearOther)));
-      }
+        return year.contains("*") || yearOther.contains("*") ? after : after && !Integer.valueOf(year).equals(Integer.valueOf(yearOther));
     }
     //then check months
     String month = date1.substring(4, 6);
@@ -579,11 +548,7 @@ public class ISODateInstance {
     }
 
     if (date1.length() < 8 || date2.length() < 8) {
-      if (month.contains("*") || monthOther.contains("*")) {
-        return after;
-      } else {
-        return after && (!Integer.valueOf(month).equals(Integer.valueOf(monthOther)));
-      }
+        return month.contains("*") || monthOther.contains("*") ? after : after && !Integer.valueOf(month).equals(Integer.valueOf(monthOther));
     }
 
     //then check days
@@ -605,7 +570,6 @@ public class ISODateInstance {
    * wildcards or they are equivalent
    *
    */
-  @SuppressWarnings("unused")
   private static boolean checkWildcardAfterCompatibility(String txt1, String txt2) {
     if (txt1.length() != txt2.length()) {
       return false;
@@ -693,7 +657,7 @@ public class ISODateInstance {
     String month = date1.substring(4, 6);
     String monthOther = date2.substring(4, 6);
     if (month.contains("*") || monthOther.contains("*")) {
-      compatible = (compatible && checkWildcardCompatibility(month, monthOther));
+      compatible = compatible && checkWildcardCompatibility(month, monthOther);
     } else if (!month.equals(monthOther)) {
       return false;
     }
@@ -750,13 +714,13 @@ public class ISODateInstance {
    *
    */
   public boolean contains(ISODateInstance other) {
-    if (this.isUnparseable() || other.isUnparseable()) {
+    if (this.unparseable || other.unparseable) {
       return this.isoDate.equals(other.isoDate);
     }
     String start = this.getStartDate();
-    if (!start.equals("")) {//we have a start date, need to make sure other is after it
+    if (!start.isEmpty()) {//we have a start date, need to make sure other is after it
       String startOther = other.getStartDate();
-      if (startOther.equals("")) {
+      if (startOther.isEmpty()) {
         return false;//incompatible
       } else {
         if (!isAfter(startOther, start)) {
@@ -766,9 +730,9 @@ public class ISODateInstance {
     }
     //now we've found out that the start date is appropriate, check the end date
     String end = this.getEndDate();
-    if (!end.equals("")) {
+    if (!end.isEmpty()) {
       String endOther = other.getEndDate();
-      if (endOther.equals("")) {
+      if (endOther.isEmpty()) {
         return false;
       } else {
         if (!isAfter(end, endOther)) {
@@ -802,28 +766,18 @@ public class ISODateInstance {
    *
    */
   public boolean isAfter(String dateString) {
-    if (this.isUnparseable()) {
-      return false;
-    }
-    if (!isDateFormat(dateString)) {
-      return false;
-    }
-    return isAfter(this.getEndDate(), dateString);
+      return !this.unparseable && isDateFormat(dateString) && isAfter(this.getEndDate(), dateString);
   }
 
   public boolean isCompatibleDate(ISODateInstance other) {
-    if (this.isUnparseable() || other.isUnparseable()) {
+    if (this.unparseable || other.unparseable) {
       return this.isoDate.equals(other.isoDate);
     }
 
     //first see if either is a range
     if (this.isRange()) {
       return this.contains(other);
-    } else if (other.isRange()) {
-      return false;//not compatible if other is range and this isn't
-    } else {
-      return isCompatible(isoDate, other.getDateString());
-    }
+    } else return other.isRange() ? false : isCompatible(isoDate, other.getDateString());
   }
 
   /**
@@ -833,7 +787,7 @@ public class ISODateInstance {
    *
    */
   public boolean isYearCompatible(ISODateInstance other) {
-    if (this.isUnparseable() || other.isUnparseable()) {
+    if (this.unparseable || other.unparseable) {
       return this.isoDate.equals(other.isoDate);
     }
 
@@ -847,7 +801,7 @@ public class ISODateInstance {
    *
    */
   public boolean isMonthCompatible(ISODateInstance other) {
-    if (this.isUnparseable() || other.isUnparseable()) {
+    if (this.unparseable || other.unparseable) {
       return this.isoDate.equals(other.isoDate);
     }
 
@@ -861,7 +815,7 @@ public class ISODateInstance {
    *
    */
   public boolean isDayCompatible(ISODateInstance other) {
-    if (this.isUnparseable() || other.isUnparseable()) {
+    if (this.unparseable || other.unparseable) {
       return this.isoDate.equals(other.isoDate);
     }
 
@@ -873,7 +827,7 @@ public class ISODateInstance {
   //These methods are taken directly from or modified slightly from {@link DateInstance}
 
   private void tokenizeDate(String inputDate) {
-    tokens = new ArrayList<String>();
+    tokens = new ArrayList<>();
     Pattern pat = Pattern.compile("[-]");
     if (inputDate == null) {
       System.out.println("Null input date");
@@ -945,11 +899,7 @@ public class ISODateInstance {
       if (m.group(3).length() == 2) {
         int yearInt = Integer.parseInt(m.group(3));
         //Now we add "20" or "19" to the front of the two digit year depending on its value....
-        if (yearInt < 50) {
-          yearString = "20" + m.group(3);
-        } else {
-          yearString = "19" + m.group(3);
-        }
+          yearString = yearInt < 50 ? "20" + m.group(3) : "19" + m.group(3);
 
       } else {
         yearString = m.group(3);
@@ -977,30 +927,26 @@ public class ISODateInstance {
       extract = m2.group(1);
     } else {
       extract = foundMiscYearPattern(inputDate);
-      if (extract == null || extract.equals("")) {
+      if (extract == null || extract.isEmpty()) {
         isoDate = "****";
         return false;
       }
     }
 
-    if ( ! "".equals(extract)) {
+    if (extract != null && !extract.isEmpty()) {
       if (extract.charAt(0) == '\'') {
         extract = extract.substring(1);
       }
       extract = extract.trim();
       if (extract.length() == 2) {
-        if (extract.charAt(0) < '5') {
-          extract = "20" + extract;
-        } else {
-          extract = "19" + extract;
-        }
+          extract = extract.charAt(0) < '5' ? "20" + extract : "19" + extract;
       }
       if (inputDate.charAt(inputDate.length() - 1) == 's') {//decade or century marker
         if (extract.charAt(2) == '0') {//e.g., 1900s -> 1900/1999
-          String endDate = Integer.toString((Integer.valueOf(extract) + 99));
+          String endDate = Integer.toString(Integer.valueOf(extract) + 99);
           extract = extract + '/' + endDate;
         } else {//e.g., 1920s -> 1920/1929
-          String endDate = Integer.toString((Integer.valueOf(extract) + 9));
+          String endDate = Integer.toString(Integer.valueOf(extract) + 9);
           extract = extract + '/' + endDate;
         }
       }
@@ -1025,19 +971,19 @@ public class ISODateInstance {
       if (inputDate.endsWith("A.D. ")) {
         inputDate = inputDate.substring(0, inputDate.length()-5);
         if(DEBUG) {
-          System.out.println("inputDate: |" + inputDate + "|");
+          System.out.println("inputDate: |" + inputDate + '|');
         }
       }
       if (inputDate.startsWith("late")) {
         inputDate = inputDate.substring(5, inputDate.length());
         if(DEBUG) {
-          System.out.println("inputDate: |" + inputDate + "|");
+          System.out.println("inputDate: |" + inputDate + '|');
         }
       }
       if (inputDate.startsWith("early")) {
         inputDate = inputDate.substring(6, inputDate.length());
         if(DEBUG) {
-          System.out.println("inputDate: |" + inputDate + "|");
+          System.out.println("inputDate: |" + inputDate + '|');
         }
       }
       if (Character.isDigit(inputDate.charAt(0))) {
@@ -1075,7 +1021,7 @@ public class ISODateInstance {
       if (m.find()) {
         extract = m.group(0);
       }
-      if ( ! "".equals(extract)) {
+      if (extract != null && !extract.isEmpty()) {
         if (!foundMonth) {
           if (DEBUG) {
             System.err.println("month extracted: " + extract);
@@ -1084,7 +1030,7 @@ public class ISODateInstance {
           if (isoDate.length() != 4) {
             isoDate = "****";
           }
-          String month = (monthNum < 10) ? "0" + monthNum : String.valueOf(monthNum);
+          String month = monthNum < 10 ? "0" + monthNum : String.valueOf(monthNum);
           isoDate += month;
           foundMonth = true;
         }
@@ -1102,19 +1048,14 @@ public class ISODateInstance {
         extract = Integer.toString(Double.valueOf(QuantifiableEntityNormalizer.ordinalsToValues.getCount(extract)).intValue());
       }
       extract = extract.replaceAll("[^0-9]", "");
-      if (!extract.equals("")) {
+      if (!extract.isEmpty()) {
         try {
           Integer i = Integer.valueOf(extract);
-          if (i.intValue() < 32 && i.intValue() > 0) {
+          if (i < 32 && i > 0) {
             if (isoDate.length() < 6) {//should already have year and month
-              if (isoDate.length() != 4)//throw new RuntimeException("Error extracting dates; should have had month and year but didn't");
-              {
-                isoDate = isoDate + "******";
-              } else {
-                isoDate = isoDate + "**";
-              }
+                isoDate = isoDate.length() != 4 ? isoDate + "******" : isoDate + "**";
             }
-            String day = (i < 10) ? "0" + i : String.valueOf(i);
+            String day = i < 10 ? "0" + i : String.valueOf(i);
             isoDate = isoDate + day;
             return true;
           }
@@ -1151,7 +1092,7 @@ public class ISODateInstance {
    * For testing only
    *
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Properties props = StringUtils.argsToProperties(args);
     String dateProperty = props.getProperty("date");
     if (dateProperty != null) {

@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 
 /**
  * An abstract tokenizer.  Tokenizers extending AbstractTokenizer need only
- * implement the <code>getNext()</code> method. This implementation does not
+ * implement the {@code getNext()} method. This implementation does not
  * allow null tokens, since
  * null is used in the protected nextToken field to signify that no more
  * tokens are available.
@@ -46,7 +46,7 @@ public abstract class AbstractTokenizer<T> implements Tokenizer<T> {
   }
 
   /**
-   * Returns <code>true</code> if this Tokenizer has more elements.
+   * Returns {@code true} if this Tokenizer has more elements.
    */
   public boolean hasNext() {
     if (nextToken == null) {
@@ -86,7 +86,7 @@ public abstract class AbstractTokenizer<T> implements Tokenizer<T> {
    */
   public List<T> tokenize() {
     // System.out.println("tokenize called");
-    List<T> result = new ArrayList<T>();
+    List<T> result = new ArrayList<>();
     while (hasNext()) {
       result.add(next());
     }

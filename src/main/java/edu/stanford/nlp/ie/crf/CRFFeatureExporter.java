@@ -43,11 +43,7 @@ public class CRFFeatureExporter<IN extends CoreMap> {
   {
     if (feat.endsWith("|C")) {
       return "U-" + feat;
-    } else if (feat.endsWith("|CpC")) {
-      return "B-" + feat;
-    } else {
-      return feat;
-    }
+    } else return feat.endsWith("|CpC") ? "B-" + feat : feat;
   }
 
   /**
@@ -77,14 +73,14 @@ public class CRFFeatureExporter<IN extends CoreMap> {
       CRFDatum d = classifier.makeDatum(document, j, classifier.featureFactory);
 
       List features = d.asFeatures();
-      for (int k = 0, fSize = features.size(); k < fSize; k++) {
-        Collection<String> cliqueFeatures = (Collection<String>) features.get(k);
-        for (String feat: cliqueFeatures) {
-          feat = ubPrefixFeatureString(feat);
-          sb.append(delimiter);
-          sb.append(feat);
+        for (Object feature : features) {
+            Collection<String> cliqueFeatures = (Collection<String>) feature;
+            for (String feat : cliqueFeatures) {
+                feat = ubPrefixFeatureString(feat);
+                sb.append(delimiter);
+                sb.append(feat);
+            }
         }
-      }
       sb.append(eol);
     }
     if (classifier.flags.useReverse) {
@@ -153,7 +149,7 @@ public class CRFFeatureExporter<IN extends CoreMap> {
     }
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     StringUtils.printErrInvocationString("CRFFeatureExporter", args);
     Properties props = StringUtils.argsToProperties(args);
     CRFClassifier crf = new CRFClassifier(props);

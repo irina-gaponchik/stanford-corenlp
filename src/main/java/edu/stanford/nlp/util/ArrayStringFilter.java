@@ -17,9 +17,7 @@ public class ArrayStringFilter implements Filter<String> {
 
   public ArrayStringFilter(String ... words) {
     this.words = new String[words.length];
-    for (int i = 0; i < words.length; ++i) {
-      this.words[i] = words[i];
-    }
+      System.arraycopy(words, 0, this.words, 0, words.length);
     this.length = words.length;
   }
 

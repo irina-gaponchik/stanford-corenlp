@@ -77,7 +77,7 @@ public class PTBEscapingProcessor<IN extends HasWord, L, F> extends AbstractList
    * @param input must be a List of objects of type HasWord
    */
   public List<HasWord> process(List<? extends IN> input) {
-    List<HasWord> output = new ArrayList<HasWord>();
+    List<HasWord> output = new ArrayList<>();
     for (IN h : input) {
       String s = h.word();
       h.setWord(escapeString(s));
@@ -92,7 +92,7 @@ public class PTBEscapingProcessor<IN extends HasWord, L, F> extends AbstractList
 
   private static List<HasWord> fixQuotes(List<HasWord> input) {
     int inputSize = input.size();
-    LinkedList<HasWord> result = new LinkedList<HasWord>();
+    LinkedList<HasWord> result = new LinkedList<>();
     if (inputSize == 0) {
       return result;
     }
@@ -118,20 +118,19 @@ public class PTBEscapingProcessor<IN extends HasWord, L, F> extends AbstractList
     } else {
       // alternate from the beginning
       begin = true;
-      for (int i = 0; i < inputSize; i++) {
-        HasWord hw = input.get(i);
-        String tok = hw.word();
-        if (tok.equals("\"")) {
-          if (begin) {
-            hw.setWord("``");
-            begin = false;
-          } else {
-            hw.setWord("\'\'");
-            begin = true;
-          }
-        } // otherwise leave it alone
-        result.addLast(hw);
-      } // end loop
+        for (HasWord hw : input) {
+            String tok = hw.word();
+            if (tok.equals("\"")) {
+                if (begin) {
+                    hw.setWord("``");
+                    begin = false;
+                } else {
+                    hw.setWord("\'\'");
+                    begin = true;
+                }
+            } // otherwise leave it alone
+            result.addLast(hw);
+        } // end loop
     }
     return result;
   }
@@ -209,7 +208,7 @@ public class PTBEscapingProcessor<IN extends HasWord, L, F> extends AbstractList
    *
    * @param args Command line argument: a file or URL
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if (args.length != 1) {
       System.out.println("usage: java edu.stanford.nlp.process.PTBEscapingProcessor fileOrUrl");
       return;
@@ -219,12 +218,12 @@ public class PTBEscapingProcessor<IN extends HasWord, L, F> extends AbstractList
       Document<String, Word, Word> d; // initialized below
       if (filename.startsWith("http://")) {
         Document<String, Word, Word> dpre = new BasicDocument<String>(WhitespaceTokenizer.factory()).init(new URL(filename));
-        DocumentProcessor<Word, Word, String, Word> notags = new StripTagsProcessor<String, Word>();
+        DocumentProcessor<Word, Word, String, Word> notags = new StripTagsProcessor<>();
         d = notags.processDocument(dpre);
       } else {
         d = new BasicDocument<String>(WhitespaceTokenizer.factory()).init(new File(filename));
       }
-      DocumentProcessor<Word, HasWord, String, Word> proc = new PTBEscapingProcessor<Word, String, Word>();
+      DocumentProcessor<Word, HasWord, String, Word> proc = new PTBEscapingProcessor<>();
       Document<String, Word, HasWord> newD = proc.processDocument(d);
       for (HasWord word : newD) {
         System.out.println(word);

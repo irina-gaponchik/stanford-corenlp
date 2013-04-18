@@ -33,10 +33,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class MulticoreWrapper<I,O> {
 
-  private long maxSubmitBlockTime = 0;
+  private long maxSubmitBlockTime;
 
   private final int nThreads;
-  private int lastSubmittedItemId = 0;
+  private int lastSubmittedItemId;
   // Which id was the last id returned.  Only meaningful in the case
   // of a queue where output order matters.
   private int lastReturnedId = -1;
@@ -74,12 +74,12 @@ public class MulticoreWrapper<I,O> {
   public MulticoreWrapper(int numThreads, ThreadsafeProcessor<I,O> processor, boolean orderResults) {
     nThreads = numThreads <= 0 ? Runtime.getRuntime().availableProcessors() : numThreads;
     this.orderResults = orderResults;
-    outputQueue = new PriorityBlockingQueue<QueueItem<O>>(10*nThreads);
+    outputQueue = new PriorityBlockingQueue<>(10*nThreads);
     threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThreads);
-    queue = new ExecutorCompletionService<JobResult<O>>(threadPool);
-    processorList = new ArrayList<ThreadsafeProcessor<I,O>>(nThreads);
-    idleProcessors = new ConcurrentLinkedQueue<Integer>();
-    runningJobs = new HashMap<Integer, Future<JobResult<O>>>();
+    queue = new ExecutorCompletionService<>(threadPool);
+    processorList = new ArrayList<>(nThreads);
+    idleProcessors = new ConcurrentLinkedQueue<>();
+    runningJobs = new HashMap<>();
 
     // Sanity check: Fixed thread pool so prevent timeouts.
     // Default should be false
@@ -127,7 +127,7 @@ public class MulticoreWrapper<I,O> {
     if (idleProcessors.peek() == null) blockingGetResult();
     int procId = idleProcessors.poll();
     int itemId = lastSubmittedItemId++;
-    CallableJob<I,O> job = new CallableJob<I,O>(item, itemId, processorList.get(procId), procId);
+    CallableJob<I,O> job = new CallableJob<>(item, itemId, processorList.get(procId), procId);
     Future<JobResult<O>> future = queue.submit(job);
     runningJobs.put(itemId, future);
   }
@@ -139,34 +139,27 @@ public class MulticoreWrapper<I,O> {
     try {
       // Blocking call
       Future<JobResult<O>> resultFuture;
-      if (maxSubmitBlockTime > 0) {
-        resultFuture = queue.poll(maxSubmitBlockTime, TimeUnit.MILLISECONDS);
-      } else {
-        resultFuture = queue.take();
-      }
+        resultFuture = maxSubmitBlockTime > 0 ? queue.poll(maxSubmitBlockTime, TimeUnit.MILLISECONDS) : queue.take();
       if (resultFuture != null) {
         JobResult<O> result = resultFuture.get();
-        QueueItem<O> output = new QueueItem<O>(result.output, result.inputItemId);
+        QueueItem<O> output = new QueueItem<>(result.output, result.inputItemId);
         outputQueue.add(output);
         idleProcessors.add(result.processorId);
         runningJobs.remove(result.inputItemId);
         return;
       }
-    } catch (InterruptedException e) {
-      threadPool.shutdownNow();
-      throw new RuntimeException(e);
-    } catch (ExecutionException e) {
+    } catch (InterruptedException | ExecutionException e) {
       threadPool.shutdownNow();
       throw new RuntimeException(e);
     }
 
-    // oops, timed out or hit other error
+      // oops, timed out or hit other error
     // first, remove everything from the queue
     // then put null entries into the output queue and hope the
     // consumer knows how to handle that
     for (Map.Entry<Integer, Future<JobResult<O>>> entry : runningJobs.entrySet()) {
       entry.getValue().cancel(true);
-      QueueItem<O> output = new QueueItem<O>(null, entry.getKey());
+      QueueItem<O> output = new QueueItem<>(null, entry.getKey());
       outputQueue.add(output);
     }
     runningJobs.clear();
@@ -202,8 +195,8 @@ public class MulticoreWrapper<I,O> {
     if (outputQueue.isEmpty()) {
       return false;
     } else {
-      final int nextId = outputQueue.peek().id;
-      return orderResults ? nextId == lastReturnedId + 1 : true;
+      int nextId = outputQueue.peek().id;
+      return !orderResults || nextId == lastReturnedId + 1;
     }
   }
 
@@ -260,7 +253,7 @@ public class MulticoreWrapper<I,O> {
 
     @Override
     public JobResult<O> call() throws Exception {
-      return new JobResult<O>(processor.process(item), itemId, processorId);
+      return new JobResult<>(processor.process(item), itemId, processorId);
     }
   }
 

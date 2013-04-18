@@ -12,8 +12,8 @@ import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.util.Generics;
 
 /**
- * A <code>Processor</code> whose <code>process</code> method deletes all
- * SGML/XML/HTML tags (tokens starting with <code>&lt;</code> and ending
+ * A {@code Processor} whose {@code process} method deletes all
+ * SGML/XML/HTML tags (tokens starting with {@code &lt;} and ending
  * with <code>&gt;<code>. Optionally, newlines can be inserted after the
  * end of block-level tags to roughly simulate where continuous text was
  * broken up (this helps finding sentence boundaries for example).
@@ -50,7 +50,7 @@ public class StripTagsProcessor<L, F> extends AbstractListProcessor<Word, Word, 
    * Constructs a new StripTagProcessor that marks line breaks as specified.
    */
   public StripTagsProcessor(boolean markLineBreaks) {
-    setMarkLineBreaks(markLineBreaks);
+      this.markLineBreaks = markLineBreaks;
   }
 
   /**
@@ -61,7 +61,7 @@ public class StripTagsProcessor<L, F> extends AbstractListProcessor<Word, Word, 
    * ("\n") at the end of block-level tags.
    */
   public boolean getMarkLineBreaks() {
-    return (markLineBreaks);
+    return markLineBreaks;
   }
 
   /**
@@ -77,11 +77,11 @@ public class StripTagsProcessor<L, F> extends AbstractListProcessor<Word, Word, 
    * and the same words except tags are stripped.
    */
   public List<Word> process(List<? extends Word> in) {
-    List<Word> out = new ArrayList<Word>();
+    List<Word> out = new ArrayList<>();
     boolean justInsertedNewline = false; // to prevent contiguous newlines
     for (Word w : in) {
       String ws = w.word();
-      if (ws.startsWith("<") && ws.endsWith(">")) {
+      if (!ws.isEmpty() && ws.charAt(0) == '<' && !ws.isEmpty() && ws.charAt(ws.length() - 1) == '>') {
         if (markLineBreaks && !justInsertedNewline) {
           // finds start and end of tag name (ignores brackets and /)
           // e.g. <p>, <br/>, or </table>
@@ -118,7 +118,7 @@ public class StripTagsProcessor<L, F> extends AbstractListProcessor<Word, Word, 
   /**
    * For internal debugging purposes only.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     new BasicDocument<String>();
     Document<String, Word, Word> htmlDoc = BasicDocument.init("top text <h1>HEADING text</h1> this is <p>new paragraph<br>next line<br/>xhtml break etc.");
     System.out.println("Before:");

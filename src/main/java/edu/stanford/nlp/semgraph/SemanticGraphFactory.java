@@ -67,15 +67,15 @@ public class SemanticGraphFactory {
 
 
   /**
-   * Returns a new <code>SemanticGraph</code> constructed from a given {@link
+   * Returns a new {@code SemanticGraph} constructed from a given {@link
    * Tree} with given options. <p/>
    *
    * This factory method is intended to replace a profusion of highly similar
    * factory methods, such as
-   * <code>typedDependencies()</code>,
-   * <code>typedDependenciesCollapsed()</code>,
-   * <code>allTypedDependencies()</code>,
-   * <code>allTypedDependenciesCollapsed()</code>, etc. <p/>
+   * {@code typedDependencies()},
+   * {@code typedDependenciesCollapsed()},
+   * {@code allTypedDependencies()},
+   * {@code allTypedDependenciesCollapsed()}, etc. <p/>
    *
    * For a fuller explanation of the meaning of the boolean arguments, see
    * {@link GrammaticalStructure}. <p/>
@@ -84,8 +84,8 @@ public class SemanticGraphFactory {
    * @param collapse Whether to do "collapsing" of pairs of dependencies into
    * single dependencies, e.g., for prepositions and conjunctions
    * @param ccProcess Whether to do processing of CC complements resulting from
-   * collapsing.  This argument is ignored unless <code>collapse</code> is
-   * <code>true</code>
+   * collapsing.  This argument is ignored unless {@code collapse} is
+   * {@code true}
    * @param includeExtras Whether to include extra dependencies, which may
    * result in a non-tree
    * @param lemmatize Whether to compute lemma for each node
@@ -104,15 +104,15 @@ public class SemanticGraphFactory {
   }
 
   /**
-   * Returns a new <code>SemanticGraph</code> constructed from a given {@link
+   * Returns a new {@code SemanticGraph} constructed from a given {@link
    * Tree} with given options. <p/>
    *
    * This factory method is intended to replace a profusion of highly similar
    * factory methods, such as
-   * <code>typedDependencies()</code>,
-   * <code>typedDependenciesCollapsed()</code>,
-   * <code>allTypedDependencies()</code>,
-   * <code>allTypedDependenciesCollapsed()</code>, etc. <p/>
+   * {@code typedDependencies()},
+   * {@code typedDependenciesCollapsed()},
+   * {@code allTypedDependencies()},
+   * {@code allTypedDependenciesCollapsed()}, etc. <p/>
    *
    * For a fuller explanation of the meaning of the boolean arguments, see
    * {@link GrammaticalStructure}. <p/>
@@ -121,8 +121,8 @@ public class SemanticGraphFactory {
    * @param collapse Whether to do "collapsing" of pairs of dependencies into
    * single dependencies, e.g., for prepositions and conjunctions
    * @param ccProcess Whether to do processing of CC complements resulting from
-   * collapsing.  This argument is ignored unless <code>collapse</code> is
-   * <code>true</code>
+   * collapsing.  This argument is ignored unless {@code collapse} is
+   * {@code true}
    * @param includeExtras Whether to include extra dependencies, which may
    * result in a non-tree
    * @param lemmatize Whether to compute lemma for each node
@@ -140,11 +140,7 @@ public class SemanticGraphFactory {
       Filter<TypedDependency> filter,
       String docID, int sentIndex) {
     Filter<String> wordFilt;
-    if (INCLUDE_PUNCTUATION_DEPENDENCIES) {
-      wordFilt = Filters.acceptFilter();
-    } else {
-      wordFilt = new PennTreebankLanguagePack().punctuationWordRejectFilter();
-    }
+      wordFilt = INCLUDE_PUNCTUATION_DEPENDENCIES ? Filters.<String>acceptFilter() : new PennTreebankLanguagePack().punctuationWordRejectFilter();
     GrammaticalStructure gs = new EnglishGrammaticalStructure(tree,
             wordFilt,
             new SemanticHeadFinder(true),
@@ -170,11 +166,7 @@ public class SemanticGraphFactory {
       deps = gs.typedDependenciesCollapsedTree();
     }
     else if (collapse) {
-      if (ccProcess) {
-        deps = gs.typedDependenciesCCprocessed(includeExtras);
-      } else {
-        deps = gs.typedDependenciesCollapsed(includeExtras);
-      }
+        deps = ccProcess ? gs.typedDependenciesCCprocessed(includeExtras) : gs.typedDependenciesCollapsed(includeExtras);
     } else {
       deps = gs.typedDependencies(includeExtras);
     }
@@ -287,7 +279,7 @@ public class SemanticGraphFactory {
     // annotated with head word, (2) traverse nodes of GrammaticalStructure in
     // reverse of pre-order (bottom up), and (3) at each, get head word and
     // annotate it with category of this node.
-    List<TreeGraphNode> nodes = new ArrayList<TreeGraphNode>();
+    List<TreeGraphNode> nodes = new ArrayList<>();
     for (Tree node : gs.root()) {       // pre-order traversal
       nodes.add((TreeGraphNode) node);
     }
@@ -351,8 +343,8 @@ public class SemanticGraphFactory {
    * adding additional nodes.
    */
   public static SemanticGraph makeFromVertices(SemanticGraph sg, Collection<IndexedWord> nodes) {
-    List<SemanticGraphEdge> edgesToAdd = new ArrayList<SemanticGraphEdge>();
-    List<IndexedWord> nodesToAdd = new ArrayList<IndexedWord>(nodes);
+    List<SemanticGraphEdge> edgesToAdd = new ArrayList<>();
+    List<IndexedWord> nodesToAdd = new ArrayList<>(nodes);
     for (IndexedWord nodeA :nodes) {
       for (IndexedWord nodeB : nodes) {
         if (nodeA != nodeB) {
@@ -431,14 +423,14 @@ public class SemanticGraphFactory {
    * Like makeFromGraphs, but it makes a deep copy of the graphs and
    * renumbers the index words.
    * <br>
-   * <code>lengths</code> must be a vector containing the number of
+   * {@code lengths} must be a vector containing the number of
    * tokens in each sentence.  This is used to reindex the tokens.
    */
   public static SemanticGraph deepCopyFromGraphs(List<SemanticGraph> graphs,
                                                  List<Integer> lengths) {
     SemanticGraph newGraph = new SemanticGraph();
     Map<Integer, IndexedWord> newWords = Generics.newHashMap();
-    List<IndexedWord> newRoots = new ArrayList<IndexedWord>();
+    List<IndexedWord> newRoots = new ArrayList<>();
     int vertexOffset = 0;
     for (int i = 0; i < graphs.size(); ++i) {
       SemanticGraph graph = graphs.get(i);

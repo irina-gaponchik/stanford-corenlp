@@ -15,15 +15,15 @@ import java.io.IOException;
  * @author Alex Kleeman
  */
 public class StochasticDiffFunctionTester {
-  static private double EPS = 1e-8;
-  static private boolean quiet = false;
+  static private double EPS = 1.0e-8;
+  static private boolean quiet;
 
   protected int testBatchSize;
   protected int numBatches;
   protected AbstractStochasticCachingDiffFunction thisFunc;
 
   double[]  approxGrad,fullGrad,diff,Hv,HvFD,v,curGrad,gradFD;
-  double diffNorm,diffValue,fullValue,approxValue,diffGrad,maxGradDiff = 0.0,maxHvDiff = 0.0;
+  double diffNorm,diffValue,fullValue,approxValue,diffGrad,maxGradDiff,maxHvDiff;
   Random generator;
   private static NumberFormat nf = new DecimalFormat("00.0");
 
@@ -43,7 +43,7 @@ public class StochasticDiffFunctionTester {
     testBatchSize = (int) getTestBatchSize(thisFunc.dataDimension());
 
     //  Again make sure that our calculated batchSize is actually valid
-    if(testBatchSize < 0 || testBatchSize > thisFunc.dataDimension() || (thisFunc.dataDimension()%testBatchSize != 0)){
+    if(testBatchSize < 0 || testBatchSize > thisFunc.dataDimension() || thisFunc.dataDimension()%testBatchSize != 0){
       System.err.println("Invalid testBatchSize found, testing aborted.  Data size: " + thisFunc.dataDimension() + " batchSize: " + testBatchSize);
       System.exit(1);
     }
@@ -59,7 +59,7 @@ public class StochasticDiffFunctionTester {
 
 
 
-  private void sayln(String s) {
+  private static void sayln(String s) {
     if (!quiet) {
       System.err.println(s);
     }
@@ -186,7 +186,7 @@ public class StochasticDiffFunctionTester {
     //This loop runs through all the batches and sums of the calculations to compare against the full gradient
     for (int i = 0; i < numBatches ; i ++){
 
-      percent = 100*((double) i)/(numBatches);
+      percent = 100* (double) i / numBatches;
 
 
       //  update the value
@@ -214,7 +214,7 @@ public class StochasticDiffFunctionTester {
 
     diff = new double[x.length];
 
-    if( (ArrayMath.norm_inf(diff = ArrayMath.pairwiseSubtract(fullGrad,approxGrad))) < functionTolerance){
+    if( ArrayMath.norm_inf(diff = ArrayMath.pairwiseSubtract(fullGrad,approxGrad)) < functionTolerance){
       sayln("");
       sayln("Success: sum of batch gradients equals full gradient");
       ret = true;
@@ -290,7 +290,7 @@ public class StochasticDiffFunctionTester {
     //This loop runs through all the batches and sums of the calculations to compare against the full gradient
     for (int i = 0; i < numBatches ; i ++){
 
-      percent = 100*((double) i)/(numBatches);
+      percent = 100* (double) i / numBatches;
 
       //Can't figure out how to get a carriage return???  ohh well
       System.err.printf("%5.1f percent complete\n",percent);
@@ -402,7 +402,7 @@ public class StochasticDiffFunctionTester {
   }
 
 
-  public double[] getVariance(double[] x){
+  public double[] getVariance(double... x){
     return getVariance(x,testBatchSize);
   }
 
@@ -412,7 +412,7 @@ public class StochasticDiffFunctionTester {
     double[] fullHx = new double[thisFunc.domainDimension()];
     double[] thisHx = new double[x.length];
     double[] thisGrad = new double[x.length];
-    List<double[]> HxList = new ArrayList<double[]>();
+    List<double[]> HxList = new ArrayList<>();
 
     /*
     PrintWriter file = null;
@@ -432,7 +432,7 @@ public class StochasticDiffFunctionTester {
     System.arraycopy(thisFunc.derivativeAt(x,x,thisFunc.dataDimension()),0,thisGrad,0,thisGrad.length);
     System.arraycopy(thisFunc.HdotVAt(x,x,thisGrad,thisFunc.dataDimension()),0,fullHx,0,fullHx.length);
     double fullNorm = ArrayMath.norm(fullHx);
-    double hessScale = ((double) thisFunc.dataDimension()) / ((double) batchSize);
+    double hessScale = (double) thisFunc.dataDimension() / (double) batchSize;
     thisFunc.sampleMethod = AbstractStochasticCachingDiffFunction.SamplingMethod.RandomWithReplacement;
 
     int n = 100;
@@ -480,7 +480,7 @@ public class StochasticDiffFunctionTester {
   }
 
 
-  public void testVariance(double[] x){
+  public void testVariance(double... x){
 
     int[] batchSizes = {10,20,35,50,75,150,300,500,750,1000,5000,10000};
     double[] varResult;
@@ -499,8 +499,8 @@ public class StochasticDiffFunctionTester {
     for(int bSize:batchSizes){
 
       varResult = getVariance(x,bSize);
-      file.println(bSize + "," + nf.format(varResult[0]) + "," + nf.format(varResult[1]) + "," + nf.format(varResult[2]) + "," + nf.format(varResult[3]));
-      System.err.println("Batch size of: " + bSize + "   " + varResult[0] + "," + nf.format(varResult[1]) + "," + nf.format(varResult[2]) + "," + nf.format(varResult[3]));
+      file.println(bSize + "," + nf.format(varResult[0]) + ',' + nf.format(varResult[1]) + ',' + nf.format(varResult[2]) + ',' + nf.format(varResult[3]));
+      System.err.println("Batch size of: " + bSize + "   " + varResult[0] + ',' + nf.format(varResult[1]) + ',' + nf.format(varResult[2]) + ',' + nf.format(varResult[3]));
     }
 
 
@@ -557,7 +557,7 @@ public class StochasticDiffFunctionTester {
   }
   */
 
-  public void listToFile(List<double[]> thisList,String fileName){
+  public static void listToFile(List<double[]> thisList, String fileName){
     PrintWriter file = null;
     NumberFormat nf = new DecimalFormat("0.000E0");
 
@@ -580,7 +580,7 @@ public class StochasticDiffFunctionTester {
 
   }
 
-  public void arrayToFile(double[] thisArray,String fileName){
+  public static void arrayToFile(double[] thisArray, String fileName){
     PrintWriter file = null;
     NumberFormat nf = new DecimalFormat("0.000E0");
 

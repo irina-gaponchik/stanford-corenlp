@@ -74,12 +74,12 @@ public class AceReader extends GenericDataSetReader {
   public AceReader(StanfordCoreNLP processor, boolean preprocess, String version) {
     super(processor, preprocess, false, true);
 
-    entityCounts = new ClassicCounter<String>();
-    adjacentEntityMentions = new ClassicCounter<String>();
-    nameRelationCounts = new ClassicCounter<String>();
-    relationCounts = new ClassicCounter<String>();
-    eventCounts = new ClassicCounter<String>();
-    mentionTypeCounts = new ClassicCounter<String>();
+    entityCounts = new ClassicCounter<>();
+    adjacentEntityMentions = new ClassicCounter<>();
+    nameRelationCounts = new ClassicCounter<>();
+    relationCounts = new ClassicCounter<>();
+    eventCounts = new ClassicCounter<>();
+    mentionTypeCounts = new ClassicCounter<>();
 
     logger = Logger.getLogger(AceReader.class.getName());
     // run quietly by default
@@ -102,7 +102,7 @@ public class AceReader extends GenericDataSetReader {
    */
   @Override
   public Annotation read(String path) throws IOException, SAXException, ParserConfigurationException {
-    List<CoreMap> allSentences = new ArrayList<CoreMap>();
+    List<CoreMap> allSentences = new ArrayList<>();
     File basePath = new File(path);
     assert basePath.exists();
     Annotation corpus = new Annotation("");
@@ -161,7 +161,7 @@ public class AceReader extends GenericDataSetReader {
       for(RelationMention m: mentions) {
         List<EntityMention> args = m.getEntityMentionArgs();
         if(args.size() == 2 && args.get(0).getMentionType().equals("NAM") && args.get(1).getMentionType().equals("NAM")){
-          nameRelationCounts.incrementCount(m.getType() + "." + m.getSubType());
+          nameRelationCounts.incrementCount(m.getType() + '.' + m.getSubType());
         }
       }
     }
@@ -172,10 +172,9 @@ public class AceReader extends GenericDataSetReader {
     if(mentions != null){
       for(EntityMention m1: mentions){
         for(EntityMention m2: mentions){
-          if(m1 == m2) continue;
-          if(m1.getHeadTokenEnd() == m2.getHeadTokenStart() && m1.getType().equals(m2.getType())){
-            adjacentEntityMentions.incrementCount(m1.getType());
-          }
+            if (!m1.equals(m2) && m1.getHeadTokenEnd() == m2.getHeadTokenStart() && m1.getType().equals(m2.getType())) {
+                adjacentEntityMentions.incrementCount(m1.getType());
+            }
         }
       }
     }
@@ -187,7 +186,7 @@ public class AceReader extends GenericDataSetReader {
     b.append(h).append(" counts:\n");
     Set<String> keys = c.keySet();
     for(String k: keys){
-      b.append("\t").append(k).append(": ").append(c.getCount(k)).append("\n");
+      b.append('\t').append(k).append(": ").append(c.getCount(k)).append('\n');
     }
     logger.info(b.toString());
   }
@@ -219,13 +218,9 @@ public class AceReader extends GenericDataSetReader {
   private List<CoreMap> readDocument(String prefix, Annotation corpus) throws IOException, SAXException,
       ParserConfigurationException {
     logger.info("Reading document: " + prefix);
-    List<CoreMap> results = new ArrayList<CoreMap>();
+    List<CoreMap> results = new ArrayList<>();
     AceDocument aceDocument;
-    if(aceVersion.equals("ACE2004")){
-      aceDocument = AceDocument.parseDocument(prefix, false, aceVersion);
-    } else {
-      aceDocument = AceDocument.parseDocument(prefix, false);
-    }
+      aceDocument = aceVersion.equals("ACE2004") ? AceDocument.parseDocument(prefix, false, aceVersion) : AceDocument.parseDocument(prefix, false);
     String docId = aceDocument.getId();
 
     // map entity mention ID strings to their EntityMention counterparts
@@ -244,7 +239,7 @@ public class AceReader extends GenericDataSetReader {
     for (int sentenceIndex = 0; sentenceIndex < aceDocument.getSentenceCount(); sentenceIndex++) {
       List<AceToken> tokens = aceDocument.getSentence(sentenceIndex);
 
-      List<CoreLabel> words = new ArrayList<CoreLabel>();
+      List<CoreLabel> words = new ArrayList<>();
       StringBuilder textContent = new StringBuilder();
       for(int i = 0; i < tokens.size(); i ++){
         CoreLabel l = new CoreLabel();
@@ -252,14 +247,14 @@ public class AceReader extends GenericDataSetReader {
         l.set(CoreAnnotations.CharacterOffsetBeginAnnotation.class, tokens.get(i).getByteStart());
         l.set(CoreAnnotations.CharacterOffsetEndAnnotation.class, tokens.get(i).getByteEnd());
         words.add(l);
-        if(i > 0) textContent.append(" ");
+        if(i > 0) textContent.append(' ');
         textContent.append(tokens.get(i).getLiteral());
       }
 
       // skip "sentences" that are really just SGML tags (which come from using the RobustTokenizer)
       if (words.size() == 1) {
         String word = words.get(0).word();
-        if (word.startsWith("<") && word.endsWith(">")) {
+        if (!word.isEmpty() && word.charAt(0) == '<' && !word.isEmpty() && word.charAt(word.length() - 1) == '>') {
           tokenOffset += tokens.size();
           continue;
         }
@@ -268,7 +263,7 @@ public class AceReader extends GenericDataSetReader {
       CoreMap sentence = new Annotation(textContent.toString());
       sentence.set(CoreAnnotations.DocIDAnnotation.class, docId);
       sentence.set(CoreAnnotations.TokensAnnotation.class, words);
-      logger.info("Reading sentence: \"" + textContent + "\"");
+      logger.info("Reading sentence: \"" + textContent + '"');
 
       List<AceEntityMention> entityMentions = aceDocument.getEntityMentions(sentenceIndex);
       List<AceRelationMention> relationMentions = aceDocument.getRelationMentions(sentenceIndex);
@@ -330,9 +325,9 @@ public class AceReader extends GenericDataSetReader {
       CoreMap sentence, Map<String, EntityMention> entityMap,
       int tokenOffset) {
     Set<String> roleSet = aceEventMention.getRoles();
-    List<String> roles = new ArrayList<String>();
+    List<String> roles = new ArrayList<>();
     for(String role: roleSet) roles.add(role);
-    List<ExtractionObject> convertedArgs = new ArrayList<ExtractionObject>();
+    List<ExtractionObject> convertedArgs = new ArrayList<>();
 
     int left = Integer.MAX_VALUE;
     int right = Integer.MIN_VALUE;
@@ -372,8 +367,8 @@ public class AceReader extends GenericDataSetReader {
   private RelationMention convertAceRelationMention(AceRelationMention aceRelationMention, String docId,
       CoreMap sentence, Map<String, EntityMention> entityMap) {
     List<AceRelationMentionArgument> args = Arrays.asList(aceRelationMention.getArgs());
-    List<ExtractionObject> convertedArgs = new ArrayList<ExtractionObject>();
-    List<String> argNames = new ArrayList<String>();
+    List<ExtractionObject> convertedArgs = new ArrayList<>();
+    List<String> argNames = new ArrayList<>();
 
     // the arguments are already stored in semantic order. Make sure we preserve the same ordering!
     int left = Integer.MAX_VALUE;
@@ -460,7 +455,7 @@ public class AceReader extends GenericDataSetReader {
     if(headEnd > extEnd){
       headEnd = extEnd;
     }
-    assert(headStart < headEnd);
+    assert headStart < headEnd;
 
     // note: the ace.reader stores absolute token offset from the beginning of the document, but
     //       we need token offsets from the beginning of the sentence => adjust by tokenOffset
@@ -484,7 +479,7 @@ public class AceReader extends GenericDataSetReader {
   }
 
   // simple testing code
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     Properties props = StringUtils.argsToProperties(args);
     AceReader r = new AceReader(new StanfordCoreNLP(props, false), false);
     r.setLoggerLevel(Level.INFO);

@@ -38,7 +38,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
   String crfType = "maxent";
   String backgroundSymbol;
 
-  public static boolean VERBOSE = false;
+  public static boolean VERBOSE;
 
   CRFLogConditionalObjectiveFunctionForLOP(int[][][][] data, int[][] labels, double[][] lopExpertWeights, int window,
       Index<String> classIndex, List<Index<CRFLabel>> labelIndices, int[] map, String backgroundSymbol, int numLopExpert,
@@ -168,12 +168,11 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
           for (int lopIter = 0; lopIter < numLopExpert; lopIter++) {
             double[][] ehatOfIter = Ehat[lopIter];
             Set<Integer> indicesSet = featureIndicesSetArray.get(lopIter);
-            for (int k = 0; k < docDataIJ.length; k++) { // k iterates over features
-              int featureIdx = docDataIJ[k];
-              if (indicesSet.contains(featureIdx)) {
-                ehatOfIter[featureIdx][observedLabelIndex]++;
+              for (int featureIdx : docDataIJ) { // k iterates over features
+                  if (indicesSet.contains(featureIdx)) {
+                      ehatOfIter[featureIdx][observedLabelIndex]++;
+                  }
               }
-            }
           }
         }
       }
@@ -221,16 +220,15 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
           for (int lopIter = 0; lopIter < numLopExpert; lopIter++) {
             double[] sumOfELPmijIter = new double[labelIndex.size()]; 
             Set<Integer> indicesSet = featureIndicesSetArray.get(lopIter);
-            for (int k = 0; k < docDataIJ.length; k++) { // k iterates over features
-              int featureIdx = docDataIJ[k];
-              if (indicesSet.contains(featureIdx)) {
-                sumOfObservedLogPotential[lopIter] += learnedLopExpertWeights2D[lopIter][featureIdx][observedLabelIndex];
-                // sum over potential of this clique over all possible labels, used later in calculating expected counts
-                for (int l = 0; l < labelIndex.size(); l++) {
-                  sumOfELPmijIter[l] += learnedLopExpertWeights2D[lopIter][featureIdx][l];
-                }
+              for (int featureIdx : docDataIJ) { // k iterates over features
+                  if (indicesSet.contains(featureIdx)) {
+                      sumOfObservedLogPotential[lopIter] += learnedLopExpertWeights2D[lopIter][featureIdx][observedLabelIndex];
+                      // sum over potential of this clique over all possible labels, used later in calculating expected counts
+                      for (int l = 0; l < labelIndex.size(); l++) {
+                          sumOfELPmijIter[l] += learnedLopExpertWeights2D[lopIter][featureIdx][l];
+                      }
+                  }
               }
-            }
             sumOfELPmij[lopIter] = sumOfELPmijIter;
           }
           sumOfELPmi[j] = sumOfELPmij;
@@ -241,7 +239,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
     }
   }
 
-  public static double[] combineAndScaleLopWeights(int numLopExpert, double[][] lopExpertWeights, double[] lopScales) {
+  public static double[] combineAndScaleLopWeights(int numLopExpert, double[][] lopExpertWeights, double... lopScales) {
     double[] newWeights = new double[lopExpertWeights[0].length];
     for (int i = 0; i < newWeights.length; i++) {
       double tempWeight = 0;
@@ -253,7 +251,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
     return newWeights;
   }
 
-  public static double[][] combineAndScaleLopWeights2D(int numLopExpert, double[][][] lopExpertWeights2D, double[] lopScales) {
+  public static double[][] combineAndScaleLopWeights2D(int numLopExpert, double[][][] lopExpertWeights2D, double... lopScales) {
     double[][] newWeights = new double[lopExpertWeights2D[0].length][];
     for (int i = 0; i < newWeights.length; i++) {
       int innerDim = lopExpertWeights2D[0][i].length;
@@ -270,7 +268,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
     return newWeights;
   }
 
-  public double[][][] separateLopExpertWeights2D(double[] learnedParams) {
+  public double[][][] separateLopExpertWeights2D(double... learnedParams) {
     double[][][] learnedWeights2D = empty2D();
     for (int paramIndex = numLopExpert; paramIndex < learnedParams.length; paramIndex++) {
       int[] mapping = learnedParamsMapping[paramIndex];
@@ -279,7 +277,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
     return learnedWeights2D;
   }
 
-  public double[][] separateLopExpertWeights(double[] learnedParams) {
+  public double[][] separateLopExpertWeights(double... learnedParams) {
     double[][] learnedWeights = new double[numLopExpert][];
     double[][][] learnedWeights2D = separateLopExpertWeights2D(learnedParams);
     for (int i = 0; i < numLopExpert; i++) {
@@ -288,13 +286,14 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
     return learnedWeights;
   }
 
-  public double[] separateLopScales(double[] learnedParams) {
+  public double[] separateLopScales(double... learnedParams) {
     double[] rawScales = new double[numLopExpert];
     System.arraycopy(learnedParams, 0, rawScales, 0, numLopExpert);
     return rawScales;
   }
 
-  public CliquePotentialFunction getCliquePotentialFunction(double[] x) {
+  @Override
+  public CliquePotentialFunction getCliquePotentialFunction(double... x) {
     double[] rawScales = separateLopScales(x);
     double[] scales = ArrayMath.softmax(rawScales);
     double[][][] learnedLopExpertWeights2D = lopExpertWeights2D;
@@ -311,7 +310,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
    * Calculates both value and partial derivatives at the point x, and save them internally.
    */
   @Override
-  public void calculate(double[] x) {
+  public void calculate(double... x) {
 
     double prob = 0.0; // the log prob of the sequence given the model, which is the negation of value at this point
     double[][][] E = empty2D();
@@ -352,7 +351,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
         int label = docLabels[i];
         double p = cliqueTree.condLogProbGivenPrevious(i, label, given);
         if (VERBOSE) {
-          System.err.println("P(" + label + "|" + ArrayMath.toString(given) + ")=" + p);
+          System.err.println("P(" + label + '|' + ArrayMath.toString(given) + ")=" + p);
         }
         prob += p;
         System.arraycopy(given, 1, given, 0, given.length - 1);
@@ -379,7 +378,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
                 expected -= scales[innerLopIter] * sumOfELPmij[innerLopIter][l];
               }
               expected *= scale;
-              eScales[lopIter] += (p * expected);
+              eScales[lopIter] += p * expected;
 
               double[][] eOfIter = E[lopIter];
               if (backpropTraining) {
@@ -414,7 +413,7 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
       observed *= scale;
       double expected = eScales[lopIter];
 
-      derivative[lopIter] = (expected - observed);
+      derivative[lopIter] = expected - observed;
       if (VERBOSE) {
         System.err.println("deriv(" + lopIter + ") = " + expected + " - " + observed + " = " + derivative[lopIter]);
       }
@@ -430,12 +429,12 @@ public class CRFLogConditionalObjectiveFunctionForLOP extends AbstractCachingDif
           for (int j = 0; j < eOfExpert[fIndex].length; j++) {
             derivative[dIndex++] = scale * (eOfExpert[fIndex][j] - ehatOfExpert[fIndex][j]);
             if (VERBOSE) {
-              System.err.println("deriv[" + lopIter+ "](" + fIndex + "," + j + ") = " + scale + " * (" + eOfExpert[fIndex][j] + " - " + ehatOfExpert[fIndex][j] + ") = " + derivative[dIndex - 1]);
+              System.err.println("deriv[" + lopIter+ "](" + fIndex + ',' + j + ") = " + scale + " * (" + eOfExpert[fIndex][j] + " - " + ehatOfExpert[fIndex][j] + ") = " + derivative[dIndex - 1]);
             }
           }
         }
       }
-      assert(dIndex == domainDimension());
+      assert dIndex == domainDimension();
     }
   }
 }

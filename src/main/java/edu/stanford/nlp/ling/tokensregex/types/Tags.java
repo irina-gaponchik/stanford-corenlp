@@ -33,7 +33,7 @@ public class Tags implements Serializable {
   }
 
   public boolean hasTag(String tag) {
-    return (tags != null)? tags.containsKey(tag): false;
+    return tags != null && tags.containsKey(tag);
   }
 
   public void addTag(String tag) {
@@ -50,7 +50,7 @@ public class Tags implements Serializable {
   }
 
   public Value getTag(String tag) {
-    return (tags != null)? tags.get(tag): null;
+    return tags != null ? tags.get(tag): null;
   }
   
   private static final long serialVersionUID = 2;

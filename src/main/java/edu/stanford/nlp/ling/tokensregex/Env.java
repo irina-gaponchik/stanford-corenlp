@@ -17,10 +17,10 @@ import java.util.regex.Pattern;
  * <p>
  * Some of the types of variables to bind are:
  * <ul>
- * <li><code>SequencePattern</code> (compiled pattern)</li>
- * <li><code>PatternExpr</code> (sequence pattern expression - precompiled)</li>
- * <li><code>NodePattern</code> (pattern for matching one element)</li>
- * <li><code>Class</code> (binding of coremap attribute to java Class)</li>
+ * <li>{@code SequencePattern} (compiled pattern)</li>
+ * <li>{@code PatternExpr} (sequence pattern expression - precompiled)</li>
+ * <li>{@code NodePattern} (pattern for matching one element)</li>
+ * <li>{@code Class} (binding of coremap attribute to java Class)</li>
  * </ul>
  * </p>
  */
@@ -38,9 +38,9 @@ public class Env {
    * Mapping of variables that can be expanded in a regular expression for strings,
    *   to their regular expressions.
    * The variable name must start with "$" and include only the alphanumeric characters
-   *   (it should follow the pattern <code>$[A-Za-z0-9_]+</code>).
-   * Each variable is mapped to a pair, consisting of the <code>Pattern</code> representing
-   *   the name of the variable to be replaced, and a <code>String</code> representing the
+   *   (it should follow the pattern {@code $[A-Za-z0-9_]+}).
+   * Each variable is mapped to a pair, consisting of the {@code Pattern} representing
+   *   the name of the variable to be replaced, and a {@code String} representing the
    *   regular expression (escaped) that is used to replace the name of the variable.
    */
   Map<String, Pair<Pattern,String>> stringRegexVariables = Generics.newHashMap();
@@ -50,7 +50,7 @@ public class Env {
    */
   public Map<String, Object> defaults = Generics.newHashMap();
 
-  public int defaultStringPatternFlags = 0;
+  public int defaultStringPatternFlags;
   public Class sequenceMatchResultExtractor;
   public Class stringMatchResultExtractor;
   public Class defaultTokensAnnotationKey;
@@ -195,14 +195,14 @@ public class Env {
     }
     Pattern varPattern = Pattern.compile(Pattern.quote(var));
     String replace = Matcher.quoteReplacement(regex);
-    stringRegexVariables.put(var, new Pair<Pattern, String>(varPattern, replace));
+    stringRegexVariables.put(var, new Pair<>(varPattern, replace));
   }
   public String expandStringRegex(String regex)
   {
     // Replace all variables in regex
     String expanded = regex;
-    for (String v:stringRegexVariables.keySet()) {
-      Pair<Pattern,String> p = stringRegexVariables.get(v);
+    for (Map.Entry<String, Pair<Pattern, String>> stringPairEntry : stringRegexVariables.entrySet()) {
+      Pair<Pattern,String> p = stringPairEntry.getValue();
       expanded = p.first().matcher(expanded).replaceAll(p.second());
     }
     return expanded;
@@ -269,7 +269,7 @@ public class Env {
         return seqPattern.getPatternExpr();
       } else if (obj instanceof SequencePattern.PatternExpr) {
         SequencePattern.PatternExpr pe = (SequencePattern.PatternExpr) obj;
-        return (copy)? pe.copy():pe;
+        return copy ? pe.copy():pe;
       } else if (obj instanceof NodePattern) {
         return new SequencePattern.NodePatternExpr( (NodePattern) obj);
       } else if (obj instanceof String) {

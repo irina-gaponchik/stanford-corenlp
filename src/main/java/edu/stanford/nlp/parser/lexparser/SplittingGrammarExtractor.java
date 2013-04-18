@@ -58,10 +58,10 @@ public class SplittingGrammarExtractor {
   static final int MAX_DEBUG_ITERATION=0;
   static final int MAX_ITERATIONS = Integer.MAX_VALUE;
 
-  int iteration = 0;
+  int iteration;
 
   boolean DEBUG() {
-    return (iteration >= MIN_DEBUG_ITERATION && iteration < MAX_DEBUG_ITERATION);
+    return iteration >= MIN_DEBUG_ITERATION && iteration < MAX_DEBUG_ITERATION;
   }
   
   Options op;
@@ -80,7 +80,7 @@ public class SplittingGrammarExtractor {
   /**
    * A combined list of all the trees in the training set.
    */
-  List<Tree> trees = new ArrayList<Tree>();
+  List<Tree> trees = new ArrayList<>();
 
   /**
    * All of the weights associated with the trees in the training set.
@@ -88,7 +88,7 @@ public class SplittingGrammarExtractor {
    * Note that this uses an identity hash map to map from tree pointer
    * to weight.
    */
-  Counter<Tree> treeWeights = new ClassicCounter<Tree>(MapFactory.<Tree,MutableDouble>identityHashMapFactory());
+  Counter<Tree> treeWeights = new ClassicCounter<>(MapFactory.<Tree,MutableDouble>identityHashMapFactory());
 
   /**
    * How many total weighted trees we have
@@ -103,18 +103,18 @@ public class SplittingGrammarExtractor {
   /**
    * The current number of times a particular state has been split
    */
-  IntCounter<String> stateSplitCounts = new IntCounter<String>();
+  IntCounter<String> stateSplitCounts = new IntCounter<>();
 
   /**
    * The binary betas are weights to go from Ax to By, Cz.  This maps
    * from (A, B, C) to (x, y, z) to beta(Ax, By, Cz).
    */
-  ThreeDimensionalMap<String, String, String, double[][][]> binaryBetas = new ThreeDimensionalMap<String, String, String, double[][][]>();
+  ThreeDimensionalMap<String, String, String, double[][][]> binaryBetas = new ThreeDimensionalMap<>();
   /**
    * The unary betas are weights to go from Ax to By.  This maps 
    * from (A, B) to (x, y) to beta(Ax, By).
    */
-  TwoDimensionalMap<String, String, double[][]> unaryBetas = new TwoDimensionalMap<String, String, double[][]>();
+  TwoDimensionalMap<String, String, double[][]> unaryBetas = new TwoDimensionalMap<>();
 
   /**
    * The latest lexicon we trained.  At the end of the process, this
@@ -145,7 +145,7 @@ public class SplittingGrammarExtractor {
     startSymbols = Arrays.asList(op.langpack().startSymbols());
   }
 
-  double[] neginfDoubles(int size) {
+  static double[] neginfDoubles(int size) {
     double[] result = new double[size];
     for (int i = 0; i < size; ++i) {
       result[i] = Double.NEGATIVE_INFINITY;
@@ -159,9 +159,9 @@ public class SplittingGrammarExtractor {
     outputTransitions(tree, 0, unaryTransitions, binaryTransitions);
   }
 
-  public void outputTransitions(Tree tree, int depth,
-                                IdentityHashMap<Tree, double[][]> unaryTransitions,
-                                IdentityHashMap<Tree, double[][][]> binaryTransitions) {
+  public static void outputTransitions(Tree tree, int depth,
+                                       IdentityHashMap<Tree, double[][]> unaryTransitions,
+                                       IdentityHashMap<Tree, double[][][]> binaryTransitions) {
     for (int i = 0; i < depth; ++i) {
       System.out.print(" ");
     }
@@ -178,12 +178,12 @@ public class SplittingGrammarExtractor {
             for (int z = 0; z < depth; ++z) {
               System.out.print(" ");
             }
-            System.out.println("  " + i + "," + j + ": " + transitions[i][j] + " | " + Math.exp(transitions[i][j]));
+            System.out.println("  " + i + ',' + j + ": " + transitions[i][j] + " | " + Math.exp(transitions[i][j]));
           }
         }
       }
     } else {
-      System.out.println(tree.label().value() + " -> " + tree.children()[0].label().value() + " " + tree.children()[1].label().value());
+      System.out.println(tree.label().value() + " -> " + tree.children()[0].label().value() + ' ' + tree.children()[1].label().value());
       double[][][] transitions = binaryTransitions.get(tree);
       for (int i = 0; i < transitions.length; ++i) {
         for (int j = 0; j < transitions[0].length; ++j) {
@@ -191,7 +191,7 @@ public class SplittingGrammarExtractor {
             for (int z = 0; z < depth; ++z) {
               System.out.print(" ");
             }
-            System.out.println("  " + i + "," + j + "," + k + ": " + transitions[i][j][k] + " | " + Math.exp(transitions[i][j][k]));
+            System.out.println("  " + i + ',' + j + ',' + k + ": " + transitions[i][j][k] + " | " + Math.exp(transitions[i][j][k]));
           }
         }
       }
@@ -214,7 +214,7 @@ public class SplittingGrammarExtractor {
         int childStates = betas[0].length;
         for (int i = 0; i < parentStates; ++i) {
           for (int j = 0; j < childStates; ++j) {
-            System.out.println("    " + i + "->" + j + " " + betas[i][j] + " | " + Math.exp(betas[i][j]));
+            System.out.println("    " + i + "->" + j + ' ' + betas[i][j] + " | " + Math.exp(betas[i][j]));
           }
         }
       }
@@ -223,7 +223,7 @@ public class SplittingGrammarExtractor {
     for (String parent : binaryBetas.firstKeySet()) { 
       for (String left : binaryBetas.get(parent).firstKeySet()) {
         for (String right : binaryBetas.get(parent).get(left).keySet()) {
-          System.out.println("  " + parent + "->" + left + "," + right);
+          System.out.println("  " + parent + "->" + left + ',' + right);
           double[][][] betas = binaryBetas.get(parent).get(left).get(right);
           int parentStates = betas.length;
           int leftStates = betas[0].length;
@@ -231,7 +231,7 @@ public class SplittingGrammarExtractor {
           for (int i = 0; i < parentStates; ++i) {
             for (int j = 0; j < leftStates; ++j) {
               for (int k = 0; k < rightStates; ++k) {
-                System.out.println("    " + i + "->" + j + "," + k + " " + betas[i][j][k] + " | " + Math.exp(betas[i][j][k]));
+                System.out.println("    " + i + "->" + j + ',' + k + ' ' + betas[i][j][k] + " | " + Math.exp(betas[i][j][k]));
               }
             }
           }
@@ -244,7 +244,7 @@ public class SplittingGrammarExtractor {
     if (startSymbols.contains(tag) || tag.equals(Lexicon.BOUNDARY_TAG)) {
       return tag;
     }
-    return tag + "^" + i;
+    return tag + '^' + i;
   }
 
   public int getStateSplitCount(Tree tree) {
@@ -288,8 +288,8 @@ public class SplittingGrammarExtractor {
   }
 
   private void initialBetasAndLexicon() {
-    wordIndex = new HashIndex<String>();
-    tagIndex = new HashIndex<String>();
+    wordIndex = new HashIndex<>();
+    tagIndex = new HashIndex<>();
     lex = op.tlpParams.lex(op, wordIndex, tagIndex);
     lex.initializeTraining(trainSize);
 
@@ -314,7 +314,7 @@ public class SplittingGrammarExtractor {
       String word = tree.children()[0].label().value();
       TaggedWord tw = new TaggedWord(word, state(tag, 0));
       lex.train(tw, position, weight);
-      return (position + 1);
+      return position + 1;
     } 
 
     if (tree.children().length == 2) {
@@ -353,7 +353,7 @@ public class SplittingGrammarExtractor {
    */
   private void splitStateCounts() {
     // double the count of states...
-    IntCounter<String> newStateSplitCounts = new IntCounter<String>();
+    IntCounter<String> newStateSplitCounts = new IntCounter<>();
     newStateSplitCounts.addAll(stateSplitCounts);
     newStateSplitCounts.addAll(stateSplitCounts);
 
@@ -382,8 +382,8 @@ public class SplittingGrammarExtractor {
    * variation between child states.
    */
   public void splitBetas() {
-    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<String, String, double[][]>();
-    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<String, String, String, double[][][]>();
+    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<>();
+    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<>();
 
     for (String parent : unaryBetas.firstKeySet()) {
       for (String child : unaryBetas.get(parent).keySet()) {
@@ -393,23 +393,23 @@ public class SplittingGrammarExtractor {
         
         double[][] newBetas;
         if (!startSymbols.contains(parent)) {
-          newBetas = new double[parentStates * 2][childStates];
+          newBetas = new double[(parentStates << 1)][childStates];
           for (int i = 0; i < parentStates; ++i) {
             for (int j = 0; j < childStates; ++j) {
-              newBetas[i * 2][j] = betas[i][j];
-              newBetas[i * 2 + 1][j] = betas[i][j];
+              newBetas[(i << 1)][j] = betas[i][j];
+              newBetas[(i << 1) + 1][j] = betas[i][j];
             }
           }
-          parentStates *= 2;
+            parentStates <<= 1;
           betas = newBetas;
         }
         if (!child.equals(Lexicon.BOUNDARY_TAG)) {
-          newBetas = new double[parentStates][childStates * 2];
+          newBetas = new double[parentStates][(childStates << 1)];
           for (int i = 0; i < parentStates; ++i) {
             for (int j = 0; j < childStates; ++j) {
               double childWeight = 0.45 + random.nextDouble() * 0.1;
-              newBetas[i][j * 2] = betas[i][j] + Math.log(childWeight);
-              newBetas[i][j * 2 + 1] = betas[i][j] + Math.log(1.0 - childWeight);
+              newBetas[i][(j << 1)] = betas[i][j] + Math.log(childWeight);
+              newBetas[i][(j << 1) + 1] = betas[i][j] + Math.log(1.0 - childWeight);
             }
           }
           betas = newBetas;
@@ -428,40 +428,40 @@ public class SplittingGrammarExtractor {
         
           double[][][] newBetas;
           if (!startSymbols.contains(parent)) {
-            newBetas = new double[parentStates * 2][leftStates][rightStates];
+            newBetas = new double[(parentStates << 1)][leftStates][rightStates];
             for (int i = 0; i < parentStates; ++i) {
               for (int j = 0; j < leftStates; ++j) {
                 for (int k = 0; k < rightStates; ++k) {
-                  newBetas[i * 2][j][k] = betas[i][j][k];
-                  newBetas[i * 2 + 1][j][k] = betas[i][j][k];
+                  newBetas[(i << 1)][j][k] = betas[i][j][k];
+                  newBetas[(i << 1) + 1][j][k] = betas[i][j][k];
                 }
               }
             }
-            parentStates *= 2;
+              parentStates <<= 1;
             betas = newBetas;
           }
 
-          newBetas = new double[parentStates][leftStates * 2][rightStates];
+          newBetas = new double[parentStates][(leftStates << 1)][rightStates];
           for (int i = 0; i < parentStates; ++i) {
             for (int j = 0; j < leftStates; ++j) {
               for (int k = 0; k < rightStates; ++k) {
                 double leftWeight = 0.45 + random.nextDouble() * 0.1;
-                newBetas[i][j * 2][k] = betas[i][j][k] + Math.log(leftWeight);
-                newBetas[i][j * 2 + 1][k] = betas[i][j][k] + Math.log(1 - leftWeight);
+                newBetas[i][(j << 1)][k] = betas[i][j][k] + Math.log(leftWeight);
+                newBetas[i][(j << 1) + 1][k] = betas[i][j][k] + Math.log(1 - leftWeight);
               }
             }
           }
-          leftStates *= 2;
+            leftStates <<= 1;
           betas = newBetas;
 
           if (!right.equals(Lexicon.BOUNDARY_TAG)) {
-            newBetas = new double[parentStates][leftStates][rightStates * 2];
+            newBetas = new double[parentStates][leftStates][(rightStates << 1)];
             for (int i = 0; i < parentStates; ++i) {
               for (int j = 0; j < leftStates; ++j) {
                 for (int k = 0; k < rightStates; ++k) {
                   double rightWeight = 0.45 + random.nextDouble() * 0.1;
-                  newBetas[i][j][k * 2] = betas[i][j][k] + Math.log(rightWeight);
-                  newBetas[i][j][k * 2 + 1] = betas[i][j][k] + Math.log(1 - rightWeight);
+                  newBetas[i][j][(k << 1)] = betas[i][j][k] + Math.log(rightWeight);
+                  newBetas[i][j][(k << 1) + 1] = betas[i][j][k] + Math.log(1 - rightWeight);
                 }
               }
             }
@@ -502,8 +502,8 @@ public class SplittingGrammarExtractor {
       }
     }
 
-    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<String, String, double[][]>();
-    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<String, String, String, double[][][]>();
+    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<>();
+    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<>();
 
     recalculateTemporaryBetas(splitStates, null, tempUnaryBetas, tempBinaryBetas);
     boolean converged = useNewBetas(!splitStates, tempUnaryBetas, tempBinaryBetas);
@@ -553,8 +553,8 @@ public class SplittingGrammarExtractor {
   public void recalculateTemporaryBetas(boolean splitStates, Map<String, double[]> totalStateMass,
                                         TwoDimensionalMap<String, String, double[][]> tempUnaryBetas,
                                         ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas) {
-    tempWordIndex = new HashIndex<String>();
-    tempTagIndex = new HashIndex<String>();
+    tempWordIndex = new HashIndex<>();
+    tempTagIndex = new HashIndex<>();
     tempLex = op.tlpParams.lex(op, tempWordIndex, tempTagIndex);
     tempLex.initializeTraining(trainSize);
 
@@ -628,8 +628,8 @@ public class SplittingGrammarExtractor {
     }
     double[] stateWeights = { Math.log(treeWeights.getCount(tree)) };
 
-    IdentityHashMap<Tree, double[][]> unaryTransitions = new IdentityHashMap<Tree, double[][]>();
-    IdentityHashMap<Tree, double[][][]> binaryTransitions = new IdentityHashMap<Tree, double[][][]>();
+    IdentityHashMap<Tree, double[][]> unaryTransitions = new IdentityHashMap<>();
+    IdentityHashMap<Tree, double[][][]> binaryTransitions = new IdentityHashMap<>();
     recountTree(tree, splitStates, unaryTransitions, binaryTransitions);
 
     if (DEBUG()) {
@@ -670,9 +670,9 @@ public class SplittingGrammarExtractor {
       // We smooth by LEX_SMOOTH, if relevant.  We rescale so that sum
       // of the weights being added to the lexicon stays the same.
       double total = 0.0;
-      for (int state = 0; state < stateWeights.length; ++state) {
-        total += Math.exp(stateWeights[state]);
-      }
+        for (double stateWeight : stateWeights) {
+            total += Math.exp(stateWeight);
+        }
       if (total <= 0.0) {
         return position + 1;
       }
@@ -750,8 +750,8 @@ public class SplittingGrammarExtractor {
     return position;
   }
 
-  public void rescaleTemporaryBetas(TwoDimensionalMap<String, String, double[][]> tempUnaryBetas,
-                                    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas) {
+  public static void rescaleTemporaryBetas(TwoDimensionalMap<String, String, double[][]> tempUnaryBetas,
+                                           ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas) {
     for (String parent : tempUnaryBetas.firstKeySet()) {
       for (String child : tempUnaryBetas.get(parent).keySet()) {
         double[][] betas = tempUnaryBetas.get(parent).get(child);
@@ -811,8 +811,8 @@ public class SplittingGrammarExtractor {
   public void recountTree(Tree tree, boolean splitStates,
                           IdentityHashMap<Tree, double[][]> unaryTransitions,
                           IdentityHashMap<Tree, double[][][]> binaryTransitions) {
-    IdentityHashMap<Tree, double[]> probIn = new IdentityHashMap<Tree, double[]>();
-    IdentityHashMap<Tree, double[]> probOut = new IdentityHashMap<Tree, double[]>();
+    IdentityHashMap<Tree, double[]> probIn = new IdentityHashMap<>();
+    IdentityHashMap<Tree, double[]> probOut = new IdentityHashMap<>();
     recountTree(tree, splitStates, probIn, probOut, unaryTransitions, binaryTransitions);
   }
 
@@ -1025,11 +1025,11 @@ public class SplittingGrammarExtractor {
           IntTaggedWord tw = new IntTaggedWord(word, state(tag, i), wordIndex, tagIndex);
           double logProb = lex.score(tw, loc, word, null);
           double wordWeight = 0.45 + random.nextDouble() * 0.1;
-          scores[i * 2] = logProb + Math.log(wordWeight);
-          scores[i * 2 + 1] = logProb + Math.log(1.0 - wordWeight);
+          scores[(i << 1)] = logProb + Math.log(wordWeight);
+          scores[(i << 1) + 1] = logProb + Math.log(1.0 - wordWeight);
           if (DEBUG()) {
-            System.out.println("Lexicon log prob " + state(tag, i) + "-" + word + ": " + logProb);
-            System.out.println("  Log Split -> " + scores[i * 2] + "," + scores[i * 2 + 1]);
+            System.out.println("Lexicon log prob " + state(tag, i) + '-' + word + ": " + logProb);
+            System.out.println("  Log Split -> " + scores[(i << 1)] + ',' + scores[(i << 1) + 1]);
           }
         }
       } else {
@@ -1037,7 +1037,7 @@ public class SplittingGrammarExtractor {
           IntTaggedWord tw = new IntTaggedWord(word, state(tag, i), wordIndex, tagIndex);
           double prob = lex.score(tw, loc, word, null);
           if (DEBUG()) {
-            System.out.println("Lexicon log prob " + state(tag, i) + "-" + word + ": " + prob);
+            System.out.println("Lexicon log prob " + state(tag, i) + '-' + word + ": " + prob);
           }
           scores[i] = prob;
         }
@@ -1063,9 +1063,9 @@ public class SplittingGrammarExtractor {
       if (DEBUG()) {
         System.out.println(parentLabel + " -> " + childLabel);
         for (int i = 0; i < parentStates; ++i) {
-          System.out.println("  " + i + ":" + scores[i]);
+          System.out.println("  " + i + ':' + scores[i]);
           for (int j = 0; j < childStates; ++j) {
-            System.out.println("    " + i + "," + j + ": " + betas[i][j] + " | " + Math.exp(betas[i][j]));
+            System.out.println("    " + i + ',' + j + ": " + betas[i][j] + " | " + Math.exp(betas[i][j]));
           }
         }
       }
@@ -1093,12 +1093,12 @@ public class SplittingGrammarExtractor {
         }
       }
       if (DEBUG()) {
-        System.out.println(parentLabel + " -> " + leftLabel + "," + rightLabel);
+        System.out.println(parentLabel + " -> " + leftLabel + ',' + rightLabel);
         for (int i = 0; i < parentStates; ++i) {
-          System.out.println("  " + i + ":" + scores[i]);
+          System.out.println("  " + i + ':' + scores[i]);
           for (int j = 0; j < leftStates; ++j) {
             for (int k = 0; k < rightStates; ++k) {
-              System.out.println("    " + i + "," + j + "," + k + ": " + betas[i][j][k] + " | " + Math.exp(betas[i][j][k]));
+              System.out.println("    " + i + ',' + j + ',' + k + ": " + betas[i][j][k] + " | " + Math.exp(betas[i][j][k]));
             }
           }
         }
@@ -1114,8 +1114,8 @@ public class SplittingGrammarExtractor {
 
     // we go through the machinery to sum up the temporary betas,
     // counting the total mass
-    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<String, String, double[][]>();
-    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<String, String, String, double[][][]>();
+    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<>();
+    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<>();
     Map<String, double[]> totalStateMass = Generics.newHashMap();
     recalculateTemporaryBetas(false, totalStateMass, tempUnaryBetas, tempBinaryBetas);
 
@@ -1131,11 +1131,11 @@ public class SplittingGrammarExtractor {
     // merging each state.  We merge the ones that provide the least
     // benefit, up to the splitRecombineRate
     List<Triple<String, Integer, Double>> sortedDeltas = 
-      new ArrayList<Triple<String, Integer, Double>>();
-    for (String state : deltaAnnotations.keySet()) {
-      double[] scores = deltaAnnotations.get(state);
+      new ArrayList<>();
+    for (Map.Entry<String, double[]> stringEntry : deltaAnnotations.entrySet()) {
+      double[] scores = stringEntry.getValue();
       for (int i = 0; i < scores.length; ++i) {
-        sortedDeltas.add(new Triple<String, Integer, Double>(state, i * 2, scores[i]));
+        sortedDeltas.add(new Triple<>(stringEntry.getKey(), i << 1, scores[i]));
       }
     }
     Collections.sort(sortedDeltas, new Comparator<Triple<String, Integer, Double>>() {
@@ -1175,11 +1175,11 @@ public class SplittingGrammarExtractor {
   }
 
   public void recalculateMergedBetas(Map<String, int[]> mergeCorrespondence) {
-    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<String, String, double[][]>();
-    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<String, String, String, double[][][]>();
+    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<>();
+    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<>();
 
-    tempWordIndex = new HashIndex<String>();
-    tempTagIndex = new HashIndex<String>();
+    tempWordIndex = new HashIndex<>();
+    tempTagIndex = new HashIndex<>();
     tempLex = op.tlpParams.lex(op, tempWordIndex, tempTagIndex);
     tempLex.initializeTraining(trainSize);
 
@@ -1188,12 +1188,12 @@ public class SplittingGrammarExtractor {
       double[] stateWeights = { Math.log(treeWeight) };
       tempLex.incrementTreesRead(treeWeight);
 
-      IdentityHashMap<Tree, double[][]> oldUnaryTransitions = new IdentityHashMap<Tree, double[][]>();
-      IdentityHashMap<Tree, double[][][]> oldBinaryTransitions = new IdentityHashMap<Tree, double[][][]>();
+      IdentityHashMap<Tree, double[][]> oldUnaryTransitions = new IdentityHashMap<>();
+      IdentityHashMap<Tree, double[][][]> oldBinaryTransitions = new IdentityHashMap<>();
       recountTree(tree, false, oldUnaryTransitions, oldBinaryTransitions);
 
-      IdentityHashMap<Tree, double[][]> unaryTransitions = new IdentityHashMap<Tree, double[][]>();
-      IdentityHashMap<Tree, double[][][]> binaryTransitions = new IdentityHashMap<Tree, double[][][]>();
+      IdentityHashMap<Tree, double[][]> unaryTransitions = new IdentityHashMap<>();
+      IdentityHashMap<Tree, double[][][]> binaryTransitions = new IdentityHashMap<>();
       mergeTransitions(tree, oldUnaryTransitions, oldBinaryTransitions, unaryTransitions, binaryTransitions, stateWeights, mergeCorrespondence);
 
       recalculateTemporaryBetas(tree, stateWeights, 0, unaryTransitions, binaryTransitions, 
@@ -1386,10 +1386,10 @@ public class SplittingGrammarExtractor {
 
   public void countMergeEffects(Tree tree, Map<String, double[]> totalStateMass, 
                                 Map<String, double[]> deltaAnnotations) {
-    IdentityHashMap<Tree, double[]> probIn = new IdentityHashMap<Tree, double[]>();
-    IdentityHashMap<Tree, double[]> probOut = new IdentityHashMap<Tree, double[]>();
-    IdentityHashMap<Tree, double[][]> unaryTransitions = new IdentityHashMap<Tree, double[][]>();
-    IdentityHashMap<Tree, double[][][]> binaryTransitions = new IdentityHashMap<Tree, double[][][]>();
+    IdentityHashMap<Tree, double[]> probIn = new IdentityHashMap<>();
+    IdentityHashMap<Tree, double[]> probOut = new IdentityHashMap<>();
+    IdentityHashMap<Tree, double[][]> unaryTransitions = new IdentityHashMap<>();
+    IdentityHashMap<Tree, double[][][]> binaryTransitions = new IdentityHashMap<>();
     recountTree(tree, false, probIn, probOut, unaryTransitions, binaryTransitions);
 
     // no need to count the root
@@ -1398,10 +1398,10 @@ public class SplittingGrammarExtractor {
     }
   }
 
-  public void countMergeEffects(Tree tree, Map<String, double[]> totalStateMass, 
-                                Map<String, double[]> deltaAnnotations,
-                                IdentityHashMap<Tree, double[]> probIn,
-                                IdentityHashMap<Tree, double[]> probOut) {
+  public static void countMergeEffects(Tree tree, Map<String, double[]> totalStateMass,
+                                       Map<String, double[]> deltaAnnotations,
+                                       IdentityHashMap<Tree, double[]> probIn,
+                                       IdentityHashMap<Tree, double[]> probOut) {
     if (tree.isLeaf()) {
       return;
     }
@@ -1426,12 +1426,12 @@ public class SplittingGrammarExtractor {
     }
 
     for (int i = 0; i < nodeProbIn.length / 2; ++i) {
-      double probInMerged = SloppyMath.logAdd(Math.log(stateMass[i * 2] / totalMass) + nodeProbIn[i * 2],
-                                              Math.log(stateMass[i * 2 + 1] / totalMass) + nodeProbIn[i * 2 + 1]);
-      double probOutMerged = SloppyMath.logAdd(nodeProbOut[i * 2], nodeProbOut[i * 2 + 1]);
+      double probInMerged = SloppyMath.logAdd(Math.log(stateMass[(i << 1)] / totalMass) + nodeProbIn[(i << 1)],
+                                              Math.log(stateMass[(i << 1) + 1] / totalMass) + nodeProbIn[(i << 1) + 1]);
+      double probOutMerged = SloppyMath.logAdd(nodeProbOut[(i << 1)], nodeProbOut[(i << 1) + 1]);
       double probMerged = probInMerged + probOutMerged;
-      double probUnmerged = SloppyMath.logAdd(nodeProbIn[i * 2] + nodeProbOut[i * 2],
-                                              nodeProbIn[i * 2 + 1] + nodeProbOut[i * 2 + 1]);
+      double probUnmerged = SloppyMath.logAdd(nodeProbIn[(i << 1)] + nodeProbOut[(i << 1)],
+                                              nodeProbIn[(i << 1) + 1] + nodeProbOut[(i << 1) + 1]);
       nodeDelta[i] = nodeDelta[i] + probMerged - probUnmerged;
     }
 
@@ -1444,7 +1444,7 @@ public class SplittingGrammarExtractor {
   }
 
   public void buildStateIndex() {
-    stateIndex = new HashIndex<String>();
+    stateIndex = new HashIndex<>();
     for (String key : stateSplitCounts.keySet()) {
       for (int i = 0; i < stateSplitCounts.getIntCount(key); ++i) {
         stateIndex.indexOf(state(key, i), true);
@@ -1460,8 +1460,8 @@ public class SplittingGrammarExtractor {
 
     // we go through the machinery to sum up the temporary betas,
     // counting the total mass...
-    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<String, String, double[][]>();
-    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<String, String, String, double[][][]>();
+    TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<>();
+    ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<>();
     Map<String, double[]> totalStateMass = Generics.newHashMap();
     recalculateTemporaryBetas(false, totalStateMass, tempUnaryBetas, tempBinaryBetas);
 
@@ -1524,7 +1524,7 @@ public class SplittingGrammarExtractor {
     }
 
 
-    bgug = new Pair<UnaryGrammar, BinaryGrammar>(ug, bg);
+    bgug = new Pair<>(ug, bg);
   }
 
   public void saveTrees(Collection<Tree> trees1, double weight1,

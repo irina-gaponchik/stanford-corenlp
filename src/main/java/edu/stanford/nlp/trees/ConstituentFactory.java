@@ -3,8 +3,8 @@ package edu.stanford.nlp.trees;
 import edu.stanford.nlp.ling.Label;
 
 /**
- * A <code>ConstituentFactory</code> is a factory for creating objects
- * of class <code>Constituent</code>, or some descendent class.
+ * A {@code ConstituentFactory} is a factory for creating objects
+ * of class {@code Constituent}, or some descendent class.
  * An interface.
  *
  * @author Christopher Manning

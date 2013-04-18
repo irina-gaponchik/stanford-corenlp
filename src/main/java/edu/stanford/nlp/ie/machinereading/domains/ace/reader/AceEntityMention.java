@@ -11,7 +11,7 @@ public class AceEntityMention extends AceMention {
   @Override
   public String toString() {
     return "AceEntityMention [mHead=" + mHead + ", mLdctype=" + mLdctype
-        + ", mType=" + mType + "]";
+        + ", mType=" + mType + ']';
   }
 
   private String mType;
@@ -44,8 +44,8 @@ public class AceEntityMention extends AceMention {
     mExtent = extent;
     mHeadTokenPosition = -1;
     mParent = null;
-    mRelationMentions = new ArrayList<AceRelationMention>();
-    mEventMentions = new ArrayList<AceEventMention>();
+    mRelationMentions = new ArrayList<>();
+    mEventMentions = new ArrayList<>();
   }
 
   public String getMention() { return mType; }
@@ -54,8 +54,8 @@ public class AceEntityMention extends AceMention {
   public AceEntity getParent() { return mParent; }
 
   public AceCharSeq getHead() { return mHead; }
-  public AceCharSeq getExtent() { return mExtent; }
-  public int getHeadTokenPosition() { return mHeadTokenPosition; }
+
+    public int getHeadTokenPosition() { return mHeadTokenPosition; }
 
   public void setType(String s) { mType = s; }
   public String getType() { return mType; }
@@ -81,27 +81,25 @@ public class AceEntityMention extends AceMention {
     String mentionType = mType;
 
     appendOffset(buffer, offset);
-    buffer.append("<entity_mention ID=\"" + getId() + "\" TYPE =\"" + 
-		  mentionType +
-		  "\" LDCTYPE=\"" + mLdctype + "\">\n");
+    buffer.append("<entity_mention ID=\"").append(getId()).append("\" TYPE =\"").append(mentionType).append("\" LDCTYPE=\"").append(mLdctype).append("\">\n");
 
     buffer.append(mExtent.toXml("extent", offset + 2));
-    buffer.append("\n");
+    buffer.append('\n');
     buffer.append(mHead.toXml("head", offset + 2));
-    buffer.append("\n");
+    buffer.append('\n');
 
     appendOffset(buffer, offset);
     buffer.append("</entity_mention>");
 
     if(mentionType.equals("NAM")){
       // XXX: <entity_attributes> should be in Entity.toXml()
-      buffer.append("\n");
+      buffer.append('\n');
       appendOffset(buffer, offset);
       buffer.append("<entity_attributes>\n");
       
       appendOffset(buffer, offset + 2);
-      buffer.append("<name NAME=\"" + mHead.getText() + "\">\n");
-      buffer.append(mHead.toXml(offset + 4) + "\n");
+      buffer.append("<name NAME=\"").append(mHead.getText()).append("\">\n");
+      buffer.append(mHead.toXml(offset + 4)).append('\n');
       appendOffset(buffer, offset + 2);
       buffer.append("</name>\n");
 
@@ -114,9 +112,9 @@ public class AceEntityMention extends AceMention {
   
   private static boolean contains(ArrayList<Integer> set,
 				  int elem) {
-    for(int i = 0; i < set.size(); i ++){
-      if(elem == set.get(i)) return true;
-    }
+      for (Integer aSet : set) {
+          if (elem == aSet) return true;
+      }
     return false;
   }
 
@@ -128,7 +126,7 @@ public class AceEntityMention extends AceMention {
    * Note: the mHead must be already matched against tokens!
    */
   public void detectHeadToken(AceDocument doc) {
-    ArrayList<Integer> preps = new ArrayList<Integer>();
+    ArrayList<Integer> preps = new ArrayList<>();
     preps.add(AceToken.OTHERS.get("IN"));
 
     for(int i = mHead.getTokenStart(); i <= mHead.getTokenEnd(); i ++){
@@ -146,13 +144,11 @@ public class AceEntityMention extends AceMention {
 
   /** Verifies if this mention appears before the parameter in textual order */
   public boolean before(AceEntityMention em) {
-    if(mHead.getByteEnd() < em.mHead.getByteStart()) return true;
-    return false;
+      return mHead.getByteEnd() < em.mHead.getByteStart();
   }
 
   /** Verifies if this mention appears after the parameter in textual order */
   public boolean after(AceEntityMention em) {
-    if(mHead.getByteStart() > em.mHead.getByteEnd()) return true;
-    return false;
+      return mHead.getByteStart() > em.mHead.getByteEnd();
   }
 }

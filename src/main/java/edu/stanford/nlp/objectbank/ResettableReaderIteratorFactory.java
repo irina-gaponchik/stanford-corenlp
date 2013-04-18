@@ -58,7 +58,6 @@ public class ResettableReaderIteratorFactory extends ReaderIteratorFactory {
    * input sources.
    */
   public ResettableReaderIteratorFactory() {
-    super();
   }
 
   /**
@@ -68,7 +67,7 @@ public class ResettableReaderIteratorFactory extends ReaderIteratorFactory {
    */
   @Override
   public Iterator<Reader> iterator() {
-    Collection<Object> newCollection = new ArrayList<Object>();
+    Collection<Object> newCollection = new ArrayList<>();
     for (Object o : c) {
       if (o instanceof Reader) {
         String name = o.toString()+".tmp";

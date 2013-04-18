@@ -15,7 +15,7 @@ package edu.stanford.nlp.optimization;
  */
 public class HybridMinimizer implements Minimizer<DiffFunction>, HasEvaluators {
 
-  Minimizer<DiffFunction> firstMinimizer = new SMDMinimizer<DiffFunction>();
+  Minimizer<DiffFunction> firstMinimizer = new SMDMinimizer<>();
   Minimizer<DiffFunction> secondMinimizer = new QNMinimizer(15);
   int iterationCutoff = 1000;
 
@@ -25,7 +25,7 @@ public class HybridMinimizer implements Minimizer<DiffFunction>, HasEvaluators {
     this.iterationCutoff = iterationCutoff;
   }
 
-  public void setEvaluators(int iters, Evaluator[] evaluators) {
+  public void setEvaluators(int iters, Evaluator... evaluators) {
     if (firstMinimizer instanceof HasEvaluators) {
       ((HasEvaluators) firstMinimizer).setEvaluators(iters, evaluators);
     }
@@ -35,7 +35,7 @@ public class HybridMinimizer implements Minimizer<DiffFunction>, HasEvaluators {
   }
 
 
-  public double[] minimize(DiffFunction function, double functionTolerance, double[] initial) {
+  public double[] minimize(DiffFunction function, double functionTolerance, double... initial) {
     return minimize(function, functionTolerance, initial, -1);
   }
 

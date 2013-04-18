@@ -56,11 +56,7 @@ public class TimeExpressionExtractorImpl implements TimeExpressionExtractor {
       logger.setLevel(Level.SEVERE);
     }
     NumberNormalizer.setVerbose(options.verbose);
-    if (options.grammarFilename != null) {
-      timexPatterns = new GenericTimeExpressionPatterns(options);
-    } else {
-      timexPatterns = new EnglishTimeExpressionPatterns(options);
-    }
+      timexPatterns = options.grammarFilename != null ? new GenericTimeExpressionPatterns(options) : new EnglishTimeExpressionPatterns(options);
     this.expressionExtractor = timexPatterns.createExtractor();
     this.expressionExtractor.setLogger(logger);
   }
@@ -80,7 +76,7 @@ public class TimeExpressionExtractorImpl implements TimeExpressionExtractor {
   private List<CoreMap> toCoreMaps(CoreMap annotation, List<TimeExpression> timeExpressions, SUTime.TimeIndex timeIndex)
   {
     if (timeExpressions == null) return null;
-    List<CoreMap> coreMaps = new ArrayList<CoreMap>(timeExpressions.size());
+    List<CoreMap> coreMaps = new ArrayList<>(timeExpressions.size());
     for (TimeExpression te:timeExpressions) {
       CoreMap cm = te.getAnnotation();
       SUTime.Temporal temporal = te.getTemporal();
@@ -134,10 +130,10 @@ public class TimeExpressionExtractorImpl implements TimeExpressionExtractor {
     try {
       docDate = SUTime.parseDateTime(docDateStr);
     } catch (Exception e) {
-      throw new RuntimeException("Could not parse date string: [" + docDateStr + "]", e);
+      throw new RuntimeException("Could not parse date string: [" + docDateStr + ']', e);
     }
     List<? extends MatchedExpression> matchedExpressions = expressionExtractor.extractExpressions(annotation);
-    List<TimeExpression> timeExpressions = new ArrayList<TimeExpression>(matchedExpressions.size());
+    List<TimeExpression> timeExpressions = new ArrayList<>(matchedExpressions.size());
     for (MatchedExpression expr:matchedExpressions) {
       if (expr instanceof TimeExpression) {
         timeExpressions.add((TimeExpression) expr);
@@ -151,7 +147,7 @@ public class TimeExpressionExtractorImpl implements TimeExpressionExtractor {
     }
     if (options.restrictToTimex3) {
       // Keep only TIMEX3 compatible timeExpressions
-      List<TimeExpression> kept = new ArrayList<TimeExpression>(timeExpressions.size());
+      List<TimeExpression> kept = new ArrayList<>(timeExpressions.size());
       for (TimeExpression te:timeExpressions) {
         if (te.getTemporal() != null && te.getTemporal().getTimexValue() != null) {
           kept.add(te);
@@ -176,7 +172,7 @@ public class TimeExpressionExtractorImpl implements TimeExpressionExtractor {
     // Add back nested time expressions for ranges....
     // For now only one level of nesting...
     if (options.includeNested) {
-      List<TimeExpression> nestedTimeExpressions = new ArrayList<TimeExpression>();
+      List<TimeExpression> nestedTimeExpressions = new ArrayList<>();
       for (TimeExpression te:timeExpressions) {
         if (te.isIncludeNested())  {
           List<? extends CoreMap> children = te.getAnnotation().get(TimeExpression.ChildrenAnnotation.class);
@@ -213,7 +209,7 @@ public class TimeExpressionExtractorImpl implements TimeExpressionExtractor {
         if (grounded == null) {
           logger.warning("Error resolving " + temporal + ", using docDate=" + docDate);
         }
-        if (grounded != temporal) {
+        if (!grounded.equals(temporal)) {
           te.origTemporal = temporal;
           te.setTemporal(grounded);
         }

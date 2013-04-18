@@ -56,7 +56,7 @@ public class WhitespaceTokenizer<T extends HasWord> extends AbstractTokenizer<T>
      * @return A TokenizerFactory that returns Word objects
      */
     public static TokenizerFactory<Word> newTokenizerFactory() {
-      return new WhitespaceTokenizerFactory<Word>(new WordTokenFactory(),
+      return new WhitespaceTokenizerFactory<>(new WordTokenFactory(),
                                                   false);
     }
 
@@ -82,7 +82,7 @@ public class WhitespaceTokenizer<T extends HasWord> extends AbstractTokenizer<T>
     }
 
     public Tokenizer<T> getTokenizer(Reader r) {
-      return new WhitespaceTokenizer<T>(factory, r, tokenizeNLs);
+      return new WhitespaceTokenizer<>(factory, r, tokenizeNLs);
     }
 
     public Tokenizer<T> getTokenizer(Reader r, String extraOptions) {
@@ -90,7 +90,7 @@ public class WhitespaceTokenizer<T extends HasWord> extends AbstractTokenizer<T>
       boolean tokenizeNewlines =
         PropertiesUtils.getBool(prop, "tokenizeNLs", this.tokenizeNLs);
 
-      return new WhitespaceTokenizer<T>(factory, r, tokenizeNewlines);
+      return new WhitespaceTokenizer<>(factory, r, tokenizeNewlines);
     }
 
 
@@ -101,11 +101,11 @@ public class WhitespaceTokenizer<T extends HasWord> extends AbstractTokenizer<T>
   } // end class WhitespaceTokenizerFactory
 
   public static WhitespaceTokenizerFactory<CoreLabel> newCoreLabelTokenizerFactory(String options) {
-    return new WhitespaceTokenizerFactory<CoreLabel>(new CoreLabelTokenFactory(), options);
+    return new WhitespaceTokenizerFactory<>(new CoreLabelTokenFactory(), options);
   }
 
   public static WhitespaceTokenizerFactory<CoreLabel> newCoreLabelTokenizerFactory() {
-    return new WhitespaceTokenizerFactory<CoreLabel>(new CoreLabelTokenFactory());
+    return new WhitespaceTokenizerFactory<>(new CoreLabelTokenFactory());
   }
 
   /**
@@ -152,11 +152,11 @@ public class WhitespaceTokenizer<T extends HasWord> extends AbstractTokenizer<T>
   }
 
   public static WhitespaceTokenizer<CoreLabel> newCoreLabelWhitespaceTokenizer(Reader r) {
-    return new WhitespaceTokenizer<CoreLabel>(new CoreLabelTokenFactory(), r, false);
+    return new WhitespaceTokenizer<>(new CoreLabelTokenFactory(), r, false);
   }
 
   public static WhitespaceTokenizer<CoreLabel> newCoreLabelWhitespaceTokenizer(Reader r, boolean tokenizeNLs) {
-    return new WhitespaceTokenizer<CoreLabel>(new CoreLabelTokenFactory(), r, tokenizeNLs);
+    return new WhitespaceTokenizer<>(new CoreLabelTokenFactory(), r, tokenizeNLs);
   }
 
   public static WhitespaceTokenizer<Word>
@@ -168,7 +168,7 @@ public class WhitespaceTokenizer<T extends HasWord> extends AbstractTokenizer<T>
   public static WhitespaceTokenizer<Word>
     newWordWhitespaceTokenizer(Reader r, boolean eolIsSignificant)
   {
-    return new WhitespaceTokenizer<Word>(new WordTokenFactory(), r,
+    return new WhitespaceTokenizer<>(new WordTokenFactory(), r,
                                          eolIsSignificant);
   }
 
@@ -181,12 +181,12 @@ public class WhitespaceTokenizer<T extends HasWord> extends AbstractTokenizer<T>
   ---- */
 
   public static TokenizerFactory<Word> factory() {
-    return new WhitespaceTokenizerFactory<Word>(new WordTokenFactory(),
+    return new WhitespaceTokenizerFactory<>(new WordTokenFactory(),
                                                 false);
   }
 
   public static TokenizerFactory<Word> factory(boolean eolIsSignificant) {
-    return new WhitespaceTokenizerFactory<Word>(new WordTokenFactory(),
+    return new WhitespaceTokenizerFactory<>(new WordTokenFactory(),
                                                 eolIsSignificant);
   }
 
@@ -195,22 +195,22 @@ public class WhitespaceTokenizer<T extends HasWord> extends AbstractTokenizer<T>
    * This is mainly as a testing aid, but it can also be quite useful
    * standalone to turn a corpus into a one token per line file of tokens.
    * <p/>
-   * Usage: <code>java edu.stanford.nlp.process.WhitespaceTokenizer filename
-   * </code>
+   * Usage: {@code java edu.stanford.nlp.process.WhitespaceTokenizer filename
+   * }
    *
    * @param args Command line arguments
    * @throws IOException If can't open files, etc.
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
 
-    boolean eolIsSignificant = (args.length > 0 && args[0].equals("-cr"));
-    Reader reader = ((args.length > 0 &&
-                      !args[args.length - 1].equals("-cr")) ?
+    boolean eolIsSignificant = args.length > 0 && args[0].equals("-cr");
+    Reader reader = args.length > 0 &&
+                      !args[args.length - 1].equals("-cr") ?
                      new InputStreamReader(new FileInputStream
                                            (args[args.length - 1]), "UTF-8") :
-                     new InputStreamReader(System.in, "UTF-8"));
+                     new InputStreamReader(System.in, "UTF-8");
     WhitespaceTokenizer<Word> tokenizer =
-      new WhitespaceTokenizer<Word>(new WordTokenFactory(), reader,
+      new WhitespaceTokenizer<>(new WordTokenFactory(), reader,
                                     eolIsSignificant);
     PrintWriter pw =
       new PrintWriter(new OutputStreamWriter(System.out, "UTF-8"), true);

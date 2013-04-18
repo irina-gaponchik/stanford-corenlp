@@ -31,7 +31,7 @@ class JFlexDummyLexer implements edu.stanford.nlp.io.Lexer {
    *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
-  private static final int ZZ_LEXSTATE[] = { 
+  private static final int[] ZZ_LEXSTATE = {
      0, 0
   };
 
@@ -62,7 +62,7 @@ class JFlexDummyLexer implements edu.stanford.nlp.io.Lexer {
     return result;
   }
 
-  private static int zzUnpackAction(String packed, int offset, int [] result) {
+  private static int zzUnpackAction(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -90,13 +90,13 @@ class JFlexDummyLexer implements edu.stanford.nlp.io.Lexer {
     return result;
   }
 
-  private static int zzUnpackRowMap(String packed, int offset, int [] result) {
+  private static int zzUnpackRowMap(String packed, int offset, int... result) {
     int i = 0;  /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
     while (i < l) {
-      int high = packed.charAt(i++) << 16;
-      result[j++] = high | packed.charAt(i++);
+      int high = (int) packed.charAt(i++) << 16;
+      result[j++] = high | (int) packed.charAt(i++);
     }
     return j;
   }
@@ -116,7 +116,7 @@ class JFlexDummyLexer implements edu.stanford.nlp.io.Lexer {
     return result;
   }
 
-  private static int zzUnpackTrans(String packed, int offset, int [] result) {
+  private static int zzUnpackTrans(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -136,14 +136,14 @@ class JFlexDummyLexer implements edu.stanford.nlp.io.Lexer {
   private static final int ZZ_PUSHBACK_2BIG = 2;
 
   /* error messages for the codes above */
-  private static final String ZZ_ERROR_MSG[] = {
+  private static final String[] ZZ_ERROR_MSG = {
     "Unkown internal scanner error",
     "Error: could not match input",
     "Error: pushback value was too large"
   };
 
   /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
    */
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
@@ -157,7 +157,7 @@ class JFlexDummyLexer implements edu.stanford.nlp.io.Lexer {
     return result;
   }
 
-  private static int zzUnpackAttribute(String packed, int offset, int [] result) {
+  private static int zzUnpackAttribute(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -176,11 +176,11 @@ class JFlexDummyLexer implements edu.stanford.nlp.io.Lexer {
   private int zzState;
 
   /** the current lexical state */
-  private int zzLexicalState = YYINITIAL;
+  private int zzLexicalState;
 
   /** this buffer contains the current text to be matched and is
       the source of the yytext() string */
-  private char zzBuffer[] = new char[ZZ_BUFFERSIZE];
+  private char[] zzBuffer = new char[ZZ_BUFFERSIZE];
 
   /** the textposition at the last accepting state */
   private int zzMarkedPos;
@@ -270,9 +270,9 @@ return YYEOF;
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
-   * 
-   * @exception   java.io.IOException  if any I/O-Error occurs
+   * @return      {@code false}, iff there was new input.
+   *
+   * @exception java.io.IOException  if any I/O-Error occurs
    */
   private boolean zzRefill() throws java.io.IOException {
 
@@ -292,7 +292,7 @@ return YYEOF;
     /* is the buffer big enough? */
     if (zzCurrentPos >= zzBuffer.length) {
       /* if not: blow it up */
-      char newBuffer[] = new char[zzCurrentPos*2];
+      char[] newBuffer = new char[(zzCurrentPos << 1)];
       System.arraycopy(zzBuffer, 0, newBuffer, 0, zzBuffer.length);
       zzBuffer = newBuffer;
     }
@@ -419,7 +419,7 @@ return YYEOF;
    *
    * @param   errorCode  the code of the errormessage to display
    */
-  private void zzScanError(int errorCode) {
+  private static void zzScanError(int errorCode) {
     String message;
     try {
       message = ZZ_ERROR_MSG[errorCode];
@@ -507,7 +507,7 @@ return YYEOF;
               zzInput = zzBufferL[zzCurrentPosL++];
             }
           }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+          int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 
@@ -525,14 +525,11 @@ return YYEOF;
       zzMarkedPos = zzMarkedPosL;
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
-        case 1: 
-          { return ACCEPT;
-          }
-        case 3: break;
-        case 2: 
-          { 
-          }
-        case 4: break;
+        case 1:
+            return ACCEPT;
+          case 3: break;
+        case 2:
+          case 4: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;
@@ -554,29 +551,26 @@ return YYEOF;
    * @param argv   the command line, contains the filenames to run
    *               the scanner on.
    */
-  public static void main(String argv[]) {
+  public static void main(String... argv) {
     if (argv.length == 0) {
       System.out.println("Usage : java JFlexDummyLexer <inputfile>");
     }
     else {
-      for (int i = 0; i < argv.length; i++) {
-        JFlexDummyLexer scanner = null;
-        try {
-          scanner = new JFlexDummyLexer( new java.io.FileReader(argv[i]) );
-          while ( !scanner.zzAtEOF ) scanner.yylex();
+        for (String anArgv : argv) {
+            JFlexDummyLexer scanner = null;
+            try {
+                scanner = new JFlexDummyLexer(new FileReader(anArgv));
+                while (!scanner.zzAtEOF) scanner.yylex();
+            } catch (FileNotFoundException e) {
+                System.out.println("File not found : \"" + anArgv + '"');
+            } catch (IOException e) {
+                System.out.println("IO error scanning file \"" + anArgv + '"');
+                System.out.println(e);
+            } catch (Exception e) {
+                System.out.println("Unexpected exception:");
+                e.printStackTrace();
+            }
         }
-        catch (java.io.FileNotFoundException e) {
-          System.out.println("File not found : \""+argv[i]+"\"");
-        }
-        catch (java.io.IOException e) {
-          System.out.println("IO error scanning file \""+argv[i]+"\"");
-          System.out.println(e);
-        }
-        catch (Exception e) {
-          System.out.println("Unexpected exception:");
-          e.printStackTrace();
-        }
-      }
     }
   }
 

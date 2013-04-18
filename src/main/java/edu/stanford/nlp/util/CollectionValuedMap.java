@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Serializable {
 
-  private static final long serialVersionUID = -9064664153962599076l;
+  private static final long serialVersionUID = -9064664153962599076L;
   private Map<K, Collection<V>> map;
   protected CollectionFactory<V> cf;
   private boolean treatCollectionsAsImmutable;
@@ -52,7 +52,7 @@ public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Seriali
   }
 
   /**
-   * The empty collection to be returned when a <code>get</code> doesn't find
+   * The empty collection to be returned when a {@code get} doesn't find
    * the key. The collection returned should be empty, such as
    * Collections.emptySet, for example.
    */
@@ -129,7 +129,7 @@ public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Seriali
         map.put(key, newCollection); // replacing the old collection
       } else {
         boolean needToAdd = false;
-        if (currentCollection == emptyValue) {
+        if (currentCollection.equals(emptyValue)) {
           currentCollection = cf.newCollection();
           needToAdd = true;
         }
@@ -310,8 +310,8 @@ public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Seriali
    * represented.
    */
   public CollectionValuedMap<K, V> deltaClone() {
-    CollectionValuedMap<K, V> result = new CollectionValuedMap<K, V>(null, cf, true);
-    result.map = new DeltaMap<K, Collection<V>>(this.map);
+    CollectionValuedMap<K, V> result = new CollectionValuedMap<>(null, cf, true);
+    result.map = new DeltaMap<>(this.map);
     return result;
   }
 
@@ -320,7 +320,7 @@ public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Seriali
    */
   @Override
   public CollectionValuedMap<K, V> clone() {
-    CollectionValuedMap<K, V> result = new CollectionValuedMap<K, V>(this);
+    CollectionValuedMap<K, V> result = new CollectionValuedMap<>(this);
     return result;
   }
 
@@ -338,7 +338,7 @@ public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Seriali
       Map.Entry<K, Collection<V>> e = i.next();
       K key = e.getKey();
       Collection<V> value = e.getValue();
-      buf.append(key == this ? "(this Map)" : key).append('=').append(value == this ? "(this Map)" : value);
+      buf.append(key.equals(this) ? "(this Map)" : key).append('=').append(value.equals(this) ? "(this Map)" : value);
 
       if (i.hasNext()) {
         buf.append(", ");
@@ -418,8 +418,8 @@ public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Seriali
    * @param args
    *          from command line
    */
-  public static void main(String[] args) {
-    CollectionValuedMap<Integer, Integer> originalMap = new CollectionValuedMap<Integer, Integer>();
+  public static void main(String... args) {
+    CollectionValuedMap<Integer, Integer> originalMap = new CollectionValuedMap<>();
     /*
         for (int i=0; i<4; i++) {
           for (int j=0; j<4; j++) {
@@ -433,27 +433,27 @@ public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Seriali
     */
     Random r = new Random();
     for (int i = 0; i < 800; i++) {
-      Integer rInt1 = Integer.valueOf(r.nextInt(400));
-      Integer rInt2 = Integer.valueOf(r.nextInt(400));
+      Integer rInt1 = r.nextInt(400);
+      Integer rInt2 = r.nextInt(400);
       originalMap.add(rInt1, rInt2);
       System.out.println("Adding " + rInt1 + ' ' + rInt2);
     }
-    CollectionValuedMap<Integer, Integer> originalCopyMap = new CollectionValuedMap<Integer, Integer>(originalMap);
-    CollectionValuedMap<Integer, Integer> deltaCopyMap = new CollectionValuedMap<Integer, Integer>(originalMap);
-    CollectionValuedMap<Integer, Integer> deltaMap = new DeltaCollectionValuedMap<Integer, Integer>(originalMap);
+    CollectionValuedMap<Integer, Integer> originalCopyMap = new CollectionValuedMap<>(originalMap);
+    CollectionValuedMap<Integer, Integer> deltaCopyMap = new CollectionValuedMap<>(originalMap);
+    CollectionValuedMap<Integer, Integer> deltaMap = new DeltaCollectionValuedMap<>(originalMap);
     // now make a lot of changes to deltaMap;
     // add and change some stuff
     for (int i = 0; i < 400; i++) {
-      Integer rInt1 = Integer.valueOf(r.nextInt(400));
-      Integer rInt2 = Integer.valueOf(r.nextInt(400) + 1000);
+      Integer rInt1 = r.nextInt(400);
+      Integer rInt2 = r.nextInt(400) + 1000;
       deltaMap.add(rInt1, rInt2);
       deltaCopyMap.add(rInt1, rInt2);
       System.out.println("Adding " + rInt1 + ' ' + rInt2);
     }
     // remove some stuff
     for (int i = 0; i < 400; i++) {
-      Integer rInt1 = Integer.valueOf(r.nextInt(1400));
-      Integer rInt2 = Integer.valueOf(r.nextInt(1400));
+      Integer rInt1 = r.nextInt(1400);
+      Integer rInt2 = r.nextInt(1400);
       deltaMap.removeMapping(rInt1, rInt2);
       deltaCopyMap.removeMapping(rInt1, rInt2);
       System.out.println("Removing " + rInt1 + ' ' + rInt2);

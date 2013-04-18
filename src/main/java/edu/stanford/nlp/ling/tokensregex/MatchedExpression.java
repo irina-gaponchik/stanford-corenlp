@@ -56,7 +56,7 @@ public class MatchedExpression {
     public List<Class> tokensResultAnnotationField;
     public List<Class> resultAnnotationField;  // Annotation field to put new annotation
     public Class resultNestedAnnotationField; // Annotation field for child/nested annotations
-    public boolean includeNested = false;
+    public boolean includeNested;
     public Function<CoreMap, Value> valueExtractor;
     public Function<MatchedExpression,?> resultAnnotationExtractor;
     public Map<Class, CoreMapAttributeAggregator> tokensAggregators;
@@ -65,7 +65,7 @@ public class MatchedExpression {
       return valueExtractor.apply(in);
     }
 
-    private void setAnnotations(CoreMap cm, List<Class> annotationKeys, Object obj) {
+    private static void setAnnotations(CoreMap cm, List<Class> annotationKeys, Object obj) {
       if (annotationKeys.size() > 1 && obj instanceof List) {
         // List of annotationKeys, obj also list, we should try to match the objects to annotationKeys
         List list = (List) obj;
@@ -112,7 +112,7 @@ public class MatchedExpression {
           // TODO: Should default result be the matchedExpression, value, object???
           //matchedExpression.annotation.set(resultAnnotationField, matchedExpression);
           Value v = matchedExpression.getValue();
-          setAnnotations(matchedExpression.annotation, resultAnnotationField, (v != null)? v.get():null);
+          setAnnotations(matchedExpression.annotation, resultAnnotationField, v != null ? v.get():null);
         }
       }
 
@@ -128,7 +128,7 @@ public class MatchedExpression {
           //matchedExpression.annotation.set(resultAnnotationField, matchedExpression);
           Value v = matchedExpression.getValue();
           for (CoreMap cm:tokens) {
-            setAnnotations(cm, tokensResultAnnotationField, (v != null)? v.get():null);
+            setAnnotations(cm, tokensResultAnnotationField, v != null ? v.get():null);
           }
         }
       }
@@ -284,14 +284,14 @@ public class MatchedExpression {
   {
     if (matchedExprs == null) return list;
     Collections.sort(matchedExprs, EXPR_TOKEN_OFFSET_COMPARATOR);
-    List<CoreMap> merged = new ArrayList<CoreMap>(list.size());   // Approximate size
+    List<CoreMap> merged = new ArrayList<>(list.size());   // Approximate size
     int last = 0;
     for (MatchedExpression expr:matchedExprs) {
       int start = expr.chunkOffsets.first();
       int end = expr.chunkOffsets.second();
       if (start >= last) {
         merged.addAll(list.subList(last,start));
-        CoreMap m = expr.getAnnotation();
+        CoreMap m = expr.annotation;
         merged.add(m);
         last = end;
       }
@@ -320,7 +320,7 @@ public class MatchedExpression {
       }
     }
     Collections.sort(matchedExprs, EXPR_TOKEN_OFFSET_COMPARATOR);
-    List<CoreMap> merged = new ArrayList<CoreMap>(list.size());   // Approximate size
+    List<CoreMap> merged = new ArrayList<>(list.size());   // Approximate size
     int last = 0;
     for (MatchedExpression expr:matchedExprs) {
       int start = expr.tokenOffsets.first();
@@ -330,7 +330,7 @@ public class MatchedExpression {
       if (istart != null && iend != null) {
         if (istart >= last) {
           merged.addAll(list.subList(last,istart));
-          CoreMap m = expr.getAnnotation();
+          CoreMap m = expr.annotation;
           merged.add(m);
           last = iend;
         }
@@ -345,15 +345,15 @@ public class MatchedExpression {
 
   public static <T extends MatchedExpression> List<T> removeNullValues(List<T> chunks)
   {
-    List<T> okayChunks = new ArrayList<T>(chunks.size());
-    for (int i = 0; i < chunks.size(); i++) {
-      Value v = chunks.get(i).value;
-      if (v == null || v.get() == null) {
-        //skip
-      } else {
-        okayChunks.add(chunks.get(i));
+    List<T> okayChunks = new ArrayList<>(chunks.size());
+      for (T chunk : chunks) {
+          Value v = chunk.value;
+          if (v == null || v.get() == null) {
+              //skip
+          } else {
+              okayChunks.add(chunk);
+          }
       }
-    }
     return okayChunks;
   }
 
@@ -381,7 +381,6 @@ public class MatchedExpression {
     }
   }
 
-  @SuppressWarnings("unused")
   public final static Function<CoreMap, Interval<Integer>> COREMAP_TO_TOKEN_OFFSETS_INTERVAL_FUNC =
     new Function<CoreMap, Interval<Integer>>() {
       public Interval<Integer> apply(CoreMap in) {
@@ -415,7 +414,7 @@ public class MatchedExpression {
       if (s1 == s2) {
         return 0;
       } else {
-        return (s1 > s2)? -1:1;
+        return s1 > s2 ? -1:1;
       }
     }
   };
@@ -428,7 +427,7 @@ public class MatchedExpression {
       if (s1 == s2) {
         return 0;
       } else {
-        return (s1 < s2)? -1:1;
+        return s1 < s2 ? -1:1;
       }
     }
   };
@@ -454,7 +453,7 @@ public class MatchedExpression {
         if (len1 == len2) {
           return 0;
         } else {
-          return (len1 > len2)? -1:1;
+          return len1 > len2 ? -1:1;
         }
       }
     };
@@ -462,7 +461,7 @@ public class MatchedExpression {
   public final static Comparator<MatchedExpression> EXPR_TOKEN_OFFSET_COMPARATOR =
     new Comparator<MatchedExpression>() {
       public int compare(MatchedExpression e1, MatchedExpression e2) {
-        return (e1.tokenOffsets.compareTo(e2.tokenOffsets));
+        return e1.tokenOffsets.compareTo(e2.tokenOffsets);
       }
     };
 
@@ -472,11 +471,7 @@ public class MatchedExpression {
         Interval.RelType rel = e1.tokenOffsets.getRelation(e2.tokenOffsets);
         if (rel.equals(Interval.RelType.CONTAIN)) {
           return 1;
-        } else if (rel.equals(Interval.RelType.INSIDE)) {
-          return -1;
-        } else {
-          return (e1.tokenOffsets.compareTo(e2.tokenOffsets));
-        }
+        } else return rel.equals(Interval.RelType.INSIDE) ? -1 : e1.tokenOffsets.compareTo(e2.tokenOffsets);
       }
     };
 

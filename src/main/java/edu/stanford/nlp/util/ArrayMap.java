@@ -21,9 +21,9 @@ public final class ArrayMap<K,V> extends AbstractMap<K,V> implements Serializabl
 
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+    @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private K key;
-    @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+    @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private V value;
 
     public K getKey() {
@@ -42,7 +42,7 @@ public final class ArrayMap<K,V> extends AbstractMap<K,V> implements Serializabl
 
     @Override
     public int hashCode() {
-      return (getKey() == null ? 0 : getKey().hashCode()) ^ (getValue() == null ? 0 : getValue().hashCode());
+      return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class ArrayMap<K,V> extends AbstractMap<K,V> implements Serializabl
         return false;
       }
       Entry e = (Entry) o;
-      return (getKey() == null ? e.getKey() == null : getKey().equals(e.getKey())) && (getValue() == null ? e.getValue() == null : getValue().equals(e.getValue()));
+      return (key == null ? e.key == null : key.equals(e.key)) && (value == null ? e.value == null : value.equals(e.value));
     }
 
 
@@ -92,7 +92,7 @@ public final class ArrayMap<K,V> extends AbstractMap<K,V> implements Serializabl
   }
 
   @SuppressWarnings("unchecked")
-  public ArrayMap(K[] keys, V[] values) {
+  public ArrayMap(K[] keys, V... values) {
     if (keys.length!=values.length) throw new IllegalArgumentException("different number of keys and values.");
     size = keys.length;
     capacity = size;
@@ -160,7 +160,7 @@ public final class ArrayMap<K,V> extends AbstractMap<K,V> implements Serializabl
     if (capacity <= size) {
       resize();
     }
-    entryArray[size] = new Entry<K,V>(key, val);
+    entryArray[size] = new Entry<>(key, val);
     size++;
     return null;
   }
@@ -216,17 +216,16 @@ public final class ArrayMap<K,V> extends AbstractMap<K,V> implements Serializabl
     }
     Map<K,V> m = (Map<K,V>) o;
     for (int i = 0; i < size; i++) {
-      Object mVal = m.get(entryArray[i].getKey());
-      if (mVal == null) {
-        if (entryArray[i] != null) {
-          return false;
+        Object mVal = m.get(entryArray[i].getKey());
+        if (mVal != null) {
+            if (!m.get(entryArray[i].getKey()).equals(entryArray[i].getValue())) {
+                return false;
+            }
         } else {
-          continue;
+            if (entryArray[i] != null) {
+                return false;
+            }
         }
-      }
-      if (!m.get(entryArray[i].getKey()).equals(entryArray[i].getValue())) {
-        return false;
-      }
     }
     return true;
   }

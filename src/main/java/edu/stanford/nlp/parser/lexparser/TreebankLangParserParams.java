@@ -166,7 +166,7 @@ public interface TreebankLangParserParams extends TreebankFactory, Serializable 
    * applied to each node in the tree (depth first, left-to-right),
    * so you shouldn't write this method to apply recursively to tree
    * members.  This method is allowed to (and in some cases does)
-   * destructively change the input tree <code>t</code>. It changes both
+   * destructively change the input tree {@code t}. It changes both
    * labels and the tree shape.
    *
    * @param t The input tree (with non-language specific annotation already

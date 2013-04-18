@@ -23,10 +23,10 @@ public abstract class AbstractCachingDiffFunction implements DiffFunction, HasIn
     return gradientCheck(100, 50, initial());
   }
 
-  public boolean gradientCheck(int numOfChecks, int numOfRandomChecks, double[] x) {
-    double epsilon = 1e-4;
-    double diffThreshold = 5e-2;
-    double diffPctThreshold = 1e-1;
+  public boolean gradientCheck(int numOfChecks, int numOfRandomChecks, double... x) {
+    double epsilon = 1.0e-4;
+    double diffThreshold = 5.0e-2;
+    double diffPctThreshold = 1.0e-1;
     double twoEpsilon = epsilon * 2;
     int xLen = x.length;
     derivativeAt(x);
@@ -34,7 +34,7 @@ public abstract class AbstractCachingDiffFunction implements DiffFunction, HasIn
     System.arraycopy(derivative, 0, savedDeriv, 0, derivative.length); 
     double oldX, plusVal, minusVal, appDeriv, calcDeriv, diff, pct = 0;
     int interval = x.length / numOfChecks;
-    List<Integer> indicesToCheck = new ArrayList<Integer>();
+    List<Integer> indicesToCheck = new ArrayList<>();
     for (int paramIndex = 0; paramIndex < xLen; paramIndex+=interval) {
       indicesToCheck.add(paramIndex);
     }
@@ -74,7 +74,7 @@ public abstract class AbstractCachingDiffFunction implements DiffFunction, HasIn
    *
    * @param x The point at which to calculate the function
    */
-  protected abstract void calculate(double[] x);
+  protected abstract void calculate(double... x);
 
   /**
    * Clears the cache in a way that doesn't require reallocation :-)
@@ -98,11 +98,11 @@ public abstract class AbstractCachingDiffFunction implements DiffFunction, HasIn
     return initial;
   }
 
-  protected static void copy(double[] copy, double[] orig) {
+  protected static void copy(double[] copy, double... orig) {
     System.arraycopy(orig, 0, copy, 0, orig.length);
   }
 
-  void ensure(double[] x) {
+  void ensure(double... x) {
     if (Arrays.equals(x, lastX)) {
       return;
     }
@@ -118,13 +118,13 @@ public abstract class AbstractCachingDiffFunction implements DiffFunction, HasIn
   }
 
   @Override
-  public double valueAt(double[] x) {
+  public double valueAt(double... x) {
     ensure(x);
     return value;
   }
 
   @Override
-  public double[] derivativeAt(double[] x) {
+  public double[] derivativeAt(double... x) {
     ensure(x);
     return derivative;
   }

@@ -15,14 +15,15 @@ import java.util.regex.Pattern;
 public class MultiWordStringMatcher {
 
   /**
-   * if <code>matchType</code> is <code>EXCT</code>: match exact string
-   * <br>if <code>matchType</code> is <code>EXCTWS</code>: match exact string, except whitespace can match multiple whitespaces
-   * <br>if <code>matchType</code> is <code>LWS</code>: match case insensitive string, except whitespace can match multiple whitespaces
-   * <br>if <code>matchType</code> is <code>LNRM</code>: disregards punctuation, does case insensitive match
-   * <br>if <code>matchType</code> is <code>REGEX</code>: interprets string as regex already
+   * if {@code matchType} is {@code EXCT}: match exact string
+   * <br>if {@code matchType} is {@code EXCTWS}: match exact string, except whitespace can match multiple whitespaces
+   * <br>if {@code matchType} is {@code LWS}: match case insensitive string, except whitespace can match multiple whitespaces
+   * <br>if {@code matchType} is {@code LNRM}: disregards punctuation, does case insensitive match
+   * <br>if {@code matchType} is {@code REGEX}: interprets string as regex already
    */
-  public static enum MatchType { EXCT, EXCTWS, LWS, LNRM, REGEX };
-  private boolean caseInsensitiveMatch = false;
+  public enum MatchType { EXCT, EXCTWS, LWS, LNRM, REGEX }
+
+    private boolean caseInsensitiveMatch;
   MatchType matchType = MatchType.EXCTWS;
 
   public MultiWordStringMatcher(MatchType matchType)
@@ -41,7 +42,7 @@ public class MultiWordStringMatcher {
   public void setMatchType(MatchType matchType)
   {
     this.matchType = matchType;
-    caseInsensitiveMatch = (matchType != MatchType.EXCT && matchType != MatchType.EXCTWS);
+    caseInsensitiveMatch = matchType != MatchType.EXCT && matchType != MatchType.EXCTWS;
     targetStringPatternCache.clear();
   }
 
@@ -56,7 +57,7 @@ public class MultiWordStringMatcher {
     return markTargetString(text, targetString, " ", " ", true);
   }
 
-  protected String markTargetString(String text, String targetString, String beginMark, String endMark, boolean markOnlyIfSpace)
+  protected static String markTargetString(String text, String targetString, String beginMark, String endMark, boolean markOnlyIfSpace)
   {
     StringBuilder sb = new StringBuilder(text);
     int i = sb.indexOf(targetString);
@@ -108,13 +109,13 @@ public class MultiWordStringMatcher {
    * @return list of integer pairs indicating the character offsets (begin, end - exclusive)
    *         at which the targetString can be find
    */
-  protected List<IntPair> findTargetStringOffsetsExct(String text, String targetString, int start, int end)
+  protected static List<IntPair> findTargetStringOffsetsExct(String text, String targetString, int start, int end)
   {
     if (start > text.length()) return null;
     if (end > text.length()) return null;
     List<IntPair> offsets = null;
     int i = text.indexOf(targetString, start);
-    if (i >= 0 && i < end) { offsets = new ArrayList<IntPair>(); }
+    if (i >= 0 && i < end) { offsets = new ArrayList<>(); }
     while (i >= 0 && i < end) {
       boolean matched = true;
       if (i > 0) {
@@ -140,7 +141,7 @@ public class MultiWordStringMatcher {
     return offsets;
   }
 
-  private CacheMap<String, Pattern> targetStringPatternCache = new CacheMap<String,Pattern>(5000);
+  private CacheMap<String, Pattern> targetStringPatternCache = new CacheMap<>(5000);
 
   public final static Comparator<String> LONGEST_STRING_COMPARATOR = new LongestStringComparator();
   public static class LongestStringComparator implements Comparator<String> {
@@ -150,24 +151,24 @@ public class MultiWordStringMatcher {
       if (l1 == l2) {
         return o1.compareTo(o2);
       } else {
-        return (l1 > l2)? -1:1;
+        return l1 > l2 ? -1:1;
       }
     }
   }
 
-  public Pattern getPattern(String[] targetStrings) {
+  public Pattern getPattern(String... targetStrings) {
     String regex = getRegex(targetStrings);
     return Pattern.compile(regex);
   }
 
-  public String getRegex(String[] targetStrings) {
+  public String getRegex(String... targetStrings) {
     List<String> strings = Arrays.asList(targetStrings);
     // Sort by longest string first
     Collections.sort(strings, LONGEST_STRING_COMPARATOR);
     StringBuilder sb = new StringBuilder();
     for (String s:strings) {
       if (sb.length() > 0) {
-        sb.append("|");
+        sb.append('|');
       }
       sb.append(getRegex(s));
     }
@@ -208,7 +209,7 @@ public class MultiWordStringMatcher {
 
   private static Pattern whitespacePattern = Pattern.compile("\\s+");
   private static final Pattern punctWhitespacePattern = Pattern.compile("\\s*(\\p{Punct})\\s*");
-  public String getExctWsRegex(String targetString)
+  public static String getExctWsRegex(String targetString)
   {
     StringBuilder sb = new StringBuilder();
     String[] fields = whitespacePattern.split(targetString);
@@ -240,7 +241,7 @@ public class MultiWordStringMatcher {
 
   private static final Pattern lnrmDelimPatternAny = Pattern.compile("(?:\\p{Punct}|\\s)*");
   private static final Pattern lnrmDelimPattern = Pattern.compile("(?:\\p{Punct}|\\s)+");
-  public String getLnrmRegex(String targetString)
+  public static String getLnrmRegex(String targetString)
   {
     StringBuilder sb = new StringBuilder("(?u)(?i)");
     String[] fields = lnrmDelimPattern.split(targetString);
@@ -300,8 +301,8 @@ public class MultiWordStringMatcher {
     Matcher matcher = pattern.matcher(text);
     List<IntPair> offsets = null;
     matcher.region(start,end);
-    int i = (matcher.find())? matcher.start():-1;
-    if (i >= 0 && i < end) { offsets = new ArrayList<IntPair>(); }
+    int i = matcher.find() ? matcher.start():-1;
+    if (i >= 0 && i < end) { offsets = new ArrayList<>(); }
     while (i >= 0 && i < end) {
       boolean matched = true;
       int matchEnd = matcher.end();
@@ -320,7 +321,7 @@ public class MultiWordStringMatcher {
       if (matched) {
         offsets.add(new IntPair(i, matchEnd));
       }
-      i = (matcher.find())? matcher.start():-1;
+      i = matcher.find() ? matcher.start():-1;
     }
     return offsets;
   }

@@ -61,7 +61,7 @@ public class UnaryRule implements Rule, Comparable<UnaryRule>, Serializable {
 
   @Override
   public int hashCode() {
-    return (parent << 16) ^ child;
+    return parent << 16 ^ child;
   }
 
   /** A UnaryRule is equal to another UnaryRule with the same parent and child.

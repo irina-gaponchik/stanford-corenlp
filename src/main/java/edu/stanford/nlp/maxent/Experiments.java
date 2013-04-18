@@ -70,7 +70,7 @@ public class Experiments {
   /**
    * v may hold the actual Experiments, i.e. Objects of type Experiments
    */
-  private ArrayList<Experiments> v = new ArrayList<Experiments>();
+  private ArrayList<Experiments> v = new ArrayList<>();
 
   /**
    * Maximum ySize.
@@ -108,7 +108,7 @@ public class Experiments {
    * then the possible classes for x are from 0 to maxYs[x]-1
    *
    */
-  public Experiments(int[][] vArray, int[] maxYs) {
+  public Experiments(int[][] vArray, int... maxYs) {
     this.vArray = vArray;
     ptilde();
     this.maxY = maxYs;
@@ -121,7 +121,7 @@ public class Experiments {
   }
 
   public Index<IntPair> createIndex() {
-    Index<IntPair> index = new HashIndex<IntPair>();
+    Index<IntPair> index = new HashIndex<>();
     for (int x = 0; x < px.length; x++) {
       int numberY = numY(x);
       for (int y = 0; y < numberY; y++) {
@@ -266,7 +266,7 @@ public class Experiments {
   } // end ptilde()
 
 
-  public void setMaxY(int[] maxY) {
+  public void setMaxY(int... maxY) {
     this.maxY = maxY;
   }
 
@@ -412,7 +412,7 @@ public class Experiments {
 
 
   /** Currently unused */
-  @SuppressWarnings({"UnusedDeclaration","unused"})
+  @SuppressWarnings({"UnusedDeclaration"})
   private void save(String filename) {
     try {
       OutDataStreamFile rF = new OutDataStreamFile(filename);
@@ -438,7 +438,6 @@ public class Experiments {
   }
 
   /** Currently unused */
-  @SuppressWarnings("unused")
   private void read(String filename) {
     try {
       InDataStreamFile rF = new InDataStreamFile(filename);

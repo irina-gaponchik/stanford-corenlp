@@ -17,7 +17,7 @@ import edu.stanford.nlp.util.Triple;
  * defined here are typesafe keys for getting and setting annotation
  * values. These classes need not be instantiated outside of this
  * class. e.g {@link TextAnnotation}.class serves as the key and a
- * <code>String</code> serves as the value containing the
+ * {@code String} serves as the value containing the
  * corresponding word.
  * </p>
  *

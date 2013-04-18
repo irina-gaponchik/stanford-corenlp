@@ -9,7 +9,7 @@ import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.LabelFactory;
 
 /**
- * A <code>LabeledScoredTreeNode</code> represents a tree composed of a root
+ * A {@code LabeledScoredTreeNode} represents a tree composed of a root
  * label, a score,
  * and an array of daughter parse trees.  A parse tree derived from a rule
  * provides information about the category of the root as well as a composite
@@ -24,17 +24,17 @@ public class LabeledScoredTreeNode extends Tree {
 	/**
 	 * Label of the parse tree.
 	 */
-	private Label label = null;
+	private Label label;
 
 	/**
-	 * Score of <code>TreeNode</code>
-	 */
+     * Score of {@code TreeNode}
+     */
 	private double score = Double.NaN;
 
 	/**
 	 * Daughters of the parse tree.
 	 */
-	private Tree[] daughterTrees = null;
+	private Tree[] daughterTrees;
 
 	/**
 	 * Create an empty parse tree.
@@ -44,22 +44,22 @@ public class LabeledScoredTreeNode extends Tree {
 	}
 
 	/**
-	 * Create a leaf parse tree with given word.
-	 *
-	 * @param label the <code>Label</code> representing the <i>word</i> for
-	 *              this new tree leaf.
-	 */
+     * Create a leaf parse tree with given word.
+     *
+     * @param label the {@code Label} representing the <i>word</i> for
+     *              this new tree leaf.
+     */
 	public LabeledScoredTreeNode(Label label) {
 		this(label, Double.NaN);
 	}
 
 	/**
-	 * Create a leaf parse tree with given word and score.
-	 *
-	 * @param label The <code>Label</code> representing the <i>word</i> for
-	 * @param score The score for the node
-	 *              this new tree leaf.
-	 */
+     * Create a leaf parse tree with given word and score.
+     *
+     * @param label The {@code Label} representing the <i>word</i> for
+     * @param score The score for the node
+     *              this new tree leaf.
+     */
 	public LabeledScoredTreeNode(Label label, double score) {
 		this();
 		this.label = label;
@@ -87,19 +87,15 @@ public class LabeledScoredTreeNode extends Tree {
 	}
 
 	/**
-	 * Sets the children of this <code>Tree</code>.  If given
-	 * <code>null</code>, this method sets the Tree's children to
-	 * the canonical zero-length Tree[] array.
-	 *
-	 * @param children An array of child trees
-	 */
+     * Sets the children of this {@code Tree}.  If given
+     * {@code null}, this method sets the Tree's children to
+     * the canonical zero-length Tree[] array.
+     *
+     * @param children An array of child trees
+     */
 	@Override
-	public void setChildren(Tree[] children) {
-		if (children == null) {
-			daughterTrees = EMPTY_TREE_ARRAY;
-		} else {
-			daughterTrees = children;
-		}
+	public void setChildren(Tree... children) {
+        daughterTrees = children == null ? EMPTY_TREE_ARRAY : children;
 	}
 
 	/**
@@ -115,7 +111,7 @@ public class LabeledScoredTreeNode extends Tree {
 	 * Sets the label associated with the current node, if there is one.
 	 */
 	@Override
-	public void setLabel(final Label label) {
+	public void setLabel(Label label) {
 		this.label = label;
 	}
 
@@ -137,24 +133,24 @@ public class LabeledScoredTreeNode extends Tree {
 	}
 
 	/**
-	 * Return a <code>TreeFactory</code> that produces trees of the
-	 * same type as the current <code>Tree</code>.  That is, this
-	 * implementation, will produce trees of type
-	 * <code>LabeledScoredTree(Node|Leaf)</code>.
-	 * The <code>Label</code> of <code>this</code>
-	 * is examined, and providing it is not <code>null</code>, a
-	 * <code>LabelFactory</code> which will produce that kind of
-	 * <code>Label</code> is supplied to the <code>TreeFactory</code>.
-	 * If the <code>Label</code> is <code>null</code>, a
-	 * <code>StringLabelFactory</code> will be used.
-	 * The factories returned on different calls a different: a new one is
-	 * allocated each time.
-	 *
-	 * @return a factory to produce labeled, scored trees
-	 */
+     * Return a {@code TreeFactory} that produces trees of the
+     * same type as the current {@code Tree}.  That is, this
+     * implementation, will produce trees of type
+     * {@code LabeledScoredTree(Node|Leaf)}.
+     * The {@code Label} of {@code this}
+     * is examined, and providing it is not {@code null}, a
+     * {@code LabelFactory} which will produce that kind of
+     * {@code Label} is supplied to the {@code TreeFactory}.
+     * If the {@code Label} is {@code null}, a
+     * {@code StringLabelFactory} will be used.
+     * The factories returned on different calls a different: a new one is
+     * allocated each time.
+     *
+     * @return a factory to produce labeled, scored trees
+     */
 	@Override
 	public TreeFactory treeFactory() {
-		LabelFactory lf = (label() == null) ? CoreLabel.factory() : label().labelFactory();
+		LabelFactory lf = label() == null ? CoreLabel.factory() : label().labelFactory();
 		return new LabeledScoredTreeFactory(lf);
 	}
 
@@ -164,26 +160,26 @@ public class LabeledScoredTreeNode extends Tree {
 	}
 
 	/**
-	 * Return a <code>TreeFactory</code> that produces trees of the
-	 * <code>LabeledScoredTree{Node|Leaf}</code> type.
-	 * The factory returned is always the same one (a singleton).
-	 *
-	 * @return a factory to produce labeled, scored trees
-	 */
+     * Return a {@code TreeFactory} that produces trees of the
+     * {@code LabeledScoredTree{Node|Leaf}} type.
+     * The factory returned is always the same one (a singleton).
+     *
+     * @return a factory to produce labeled, scored trees
+     */
 	public static TreeFactory factory() {
 		return TreeFactoryHolder.tf;
 	}
 
 	/**
-	 * Return a <code>TreeFactory</code> that produces trees of the
-	 * <code>LabeledScoredTree{Node|Leaf}</code> type, with
-	 * the <code>Label</code> made with the supplied
-	 * <code>LabelFactory</code>.
-	 * The factory returned is a different one each time
-	 *
-	 * @param lf The LabelFactory to use
-	 * @return a factory to produce labeled, scored trees
-	 */
+     * Return a {@code TreeFactory} that produces trees of the
+     * {@code LabeledScoredTree{Node|Leaf}} type, with
+     * the {@code Label} made with the supplied
+     * {@code LabelFactory}.
+     * The factory returned is a different one each time
+     *
+     * @param lf The LabelFactory to use
+     * @return a factory to produce labeled, scored trees
+     */
 	public static TreeFactory factory(LabelFactory lf) {
 		return new LabeledScoredTreeFactory(lf);
 	}
@@ -195,7 +191,7 @@ public class LabeledScoredTreeNode extends Tree {
 		StringBuilder buff = new StringBuilder();
 		buff.append(super.nodeString());
 		if ( ! Double.isNaN(score)) {
-			buff.append(" [").append(nf.format(-score)).append("]");
+			buff.append(" [").append(nf.format(-score)).append(']');
 		}
 		return buff.toString();
 	}

@@ -20,11 +20,11 @@ public class BiasedLogConditionalObjectiveFunction extends AbstractCachingDiffFu
 
   protected LogPrior prior;
 
-  protected int numFeatures = 0;
-  protected int numClasses = 0;
+  protected int numFeatures;
+  protected int numClasses;
 
-  protected int[][] data = null;
-  protected int[] labels = null;
+  protected int[][] data;
+  protected int[] labels;
 
   private double[][] confusionMatrix;
   
@@ -45,7 +45,7 @@ public class BiasedLogConditionalObjectiveFunction extends AbstractCachingDiffFu
     return f * numClasses + c;
   }
 
-  public double[][] to2D(double[] x) {
+  public double[][] to2D(double... x) {
     double[][] x2 = new double[numFeatures][numClasses];
     for (int i = 0; i < numFeatures; i++) {
       for (int j = 0; j < numClasses; j++) {
@@ -56,7 +56,7 @@ public class BiasedLogConditionalObjectiveFunction extends AbstractCachingDiffFu
   }
 
   @Override
-  protected void calculate(double[] x) {
+  protected void calculate(double... x) {
     
     if (derivative == null) {
       derivative = new double[x.length];
@@ -77,10 +77,10 @@ public class BiasedLogConditionalObjectiveFunction extends AbstractCachingDiffFu
       Arrays.fill(sums, 0.0);
 
       for (int c = 0; c < numClasses; c++) {
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          sums[c] += x[i];
-        }
+          for (int feature : features) {
+              int i = indexOf(feature, c);
+              sums[c] += x[i];
+          }
       }
 
       double total = ArrayMath.logSum(sums);
@@ -95,10 +95,10 @@ public class BiasedLogConditionalObjectiveFunction extends AbstractCachingDiffFu
       for (int c = 0; c < numClasses; c++) {
         probs[c] = Math.exp(sums[c] - total);
         weightedProbs[c] = Math.exp(weightedSums[c] - weightedTotal);
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          derivative[i] += probs[c] - weightedProbs[c];
-        }
+          for (int feature : features) {
+              int i = indexOf(feature, c);
+              derivative[i] += probs[c] - weightedProbs[c];
+          }
       }
 
       double tmpValue = 0.0;

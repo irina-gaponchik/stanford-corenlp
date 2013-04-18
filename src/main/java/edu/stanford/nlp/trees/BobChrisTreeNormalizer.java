@@ -77,18 +77,13 @@ public class BobChrisTreeNormalizer extends TreeNormalizer implements TreeTransf
   /**
    * Remove things like hyphened functional tags and equals from the
    * end of a node label.  This version always just returns the phrase
-   * structure category, or "ROOT" if the label was <code>null</code>.
+   * structure category, or "ROOT" if the label was {@code null}.
    *
    * @param label The label from the treebank
    * @return The cleaned up label (phrase structure category)
    */
-  protected String cleanUpLabel(final String label) {
-    if (label == null || label.length() == 0) {
-      return "ROOT";
-      // String constants are always interned
-    } else {
-      return tlp.basicCategory(label);
-    }
+  protected String cleanUpLabel(String label) {
+      return label == null || label.isEmpty() ? "ROOT" : tlp.basicCategory(label);
   }
 
 
@@ -125,7 +120,7 @@ public class BobChrisTreeNormalizer extends TreeNormalizer implements TreeTransf
       Tree[] kids = t.children();
       Label l = t.label();
       // Delete (return false for) empty/trace nodes (ones marked '-NONE-')
-      return ! ((l != null) && "-NONE-".equals(l.value()) && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf());
+      return ! (l != null && "-NONE-".equals(l.value()) && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf());
     }
 
       //    private static final long serialVersionUID = 1L;
@@ -143,13 +138,7 @@ public class BobChrisTreeNormalizer extends TreeNormalizer implements TreeTransf
         return true;
       }
       // The special switchboard non-terminals clause
-      if ("EDITED".equals(t.label().value()) || "CODE".equals(t.label().value())) {
-        return false;
-      }
-      if (t.numChildren() != 1) {
-        return true;
-      }
-      return ! (t.label() != null && t.label().value() != null && t.label().value().equals(t.getChild(0).label().value()));
+        return !("EDITED".equals(t.label().value()) || "CODE".equals(t.label().value())) && (t.numChildren() != 1 || !(t.label() != null && t.label().value() != null && t.label().value().equals(t.getChild(0).label().value())));
     }
 
     private static final long serialVersionUID = 1L;

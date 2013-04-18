@@ -42,7 +42,6 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
 
   /** Default constructor, calls super() */
   public CoreLabel() {
-    super();
   }
 
   /**
@@ -74,7 +73,7 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
    *
    * @param label The CoreMap to copy
    */
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public CoreLabel(CoreMap label) {
     super(label.size());
     for (Class key : label.keySet()) {
@@ -118,7 +117,7 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
    * @param keys Array of Strings that are class names
    * @param values Array of values (as String)
    */
-  public CoreLabel(String[] keys, String[] values) {
+  public CoreLabel(String[] keys, String... values) {
     super(keys.length);
     //this.map = new ArrayCoreMap();
     initFromStrings(keys, values);
@@ -131,14 +130,12 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
    */
   public static interface GenericAnnotation<T> extends CoreAnnotation<T> {  }
   //Unchecked is below because eclipse can't handle the level of type inference if we correctly parameterize GenericAnnotation with String
-  @SuppressWarnings("unchecked")
   public static final Map<String, Class<? extends GenericAnnotation>> genericKeys = Generics.newHashMap();
-  @SuppressWarnings("unchecked")
   public static final Map<Class<? extends GenericAnnotation>, String> genericValues = Generics.newHashMap();
 
 
   @SuppressWarnings("unchecked")
-  private void initFromStrings(String[] keys, String[] values) {
+  private void initFromStrings(String[] keys, String... values) {
     for (int i = 0; i < Math.min(keys.length, values.length); i++) {
       String key = keys[i];
       String value = values[i];
@@ -177,11 +174,11 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
           Class<?> valueClass = AnnotationLookup.getValueType(lookup.coreKey);
           if(valueClass.equals(String.class)) {
             this.set(lookup.coreKey, values[i]);
-          } else if(valueClass == Integer.class) {
+          } else if(valueClass.equals(Integer.class)) {
             this.set(lookup.coreKey, Integer.parseInt(values[i]));
-          } else if(valueClass == Double.class) {
+          } else if(valueClass.equals(Double.class)) {
             this.set(lookup.coreKey, Double.parseDouble(values[i]));
-          } else if(valueClass == Long.class) {
+          } else if(valueClass.equals(Long.class)) {
             this.set(lookup.coreKey, Long.parseLong(values[i]));
           }
         } catch (Exception e) {
@@ -274,7 +271,7 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
    *
    * @param <KEY> A key type with a String value
    * @param key The key to return the value of.
-   * @return "" if the key is not in the map or has the value <code>null</code>
+   * @return "" if the key is not in the map or has the value {@code null}
    *     and the String value of the key otherwise
    */
   public <KEY extends Key<String>> String getString(Class<KEY> key) {
@@ -551,15 +548,15 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
 
   /**
    * Returns a formatted string representing this label.  The
-   * desired format is passed in as a <code>String</code>.
+   * desired format is passed in as a {@code String}.
    * Currently supported formats include:
    * <ul>
    * <li>"value": just prints the value</li>
    * <li>"{map}": prints the complete map</li>
    * <li>"value{map}": prints the value followed by the contained
-   * map (less the map entry containing key <code>CATEGORY_KEY</code>)</li>
+   * map (less the map entry containing key {@code CATEGORY_KEY})</li>
    * <li>"value-index": extracts a value and an integer index from
-   * the contained map using keys  <code>INDEX_KEY</code>,
+   * the contained map using keys  {@code INDEX_KEY},
    * respectively, and prints them with a hyphen in between</li>
    * <li>"value-index{map}": a combination of the above; the index is
    * displayed first and then not shown in the map that is displayed</li>
@@ -571,60 +568,72 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
   @SuppressWarnings("unchecked")
   public String toString(String format) {
     StringBuilder buf = new StringBuilder();
-    if (format.equals("value")) {
-      buf.append(value());
-    } else if (format.equals("{map}")) {
-      Map map2 = new TreeMap();
-      for(Class key : this.keySet()) {
-        map2.put(key.getName(), get(key));
+      switch (format) {
+          case "value":
+              buf.append(value());
+              break;
+          case "{map}": {
+              Map map2 = new TreeMap();
+              for (Class key : this.keySet()) {
+                  map2.put(key.getName(), get(key));
+              }
+              buf.append(map2);
+              break;
+          }
+          case "value{map}": {
+              buf.append(value());
+              Map map2 = new TreeMap(asClassComparator);
+              for (Class key : this.keySet()) {
+                  map2.put(key, get(key));
+              }
+              map2.remove(CoreAnnotations.ValueAnnotation.class);
+              buf.append(map2);
+              break;
+          }
+          case "value-index": {
+              buf.append(value());
+              Integer index = this.get(CoreAnnotations.IndexAnnotation.class);
+              if (index != null) {
+                  buf.append('-').append(index.intValue());
+              }
+              buf.append(toPrimes());
+              break;
+          }
+          case "value-index{map}": {
+              buf.append(value());
+              Integer index = this.get(CoreAnnotations.IndexAnnotation.class);
+              if (index != null) {
+                  buf.append('-').append(index.intValue());
+              }
+              Map<String, Object> map2 = new TreeMap<>();
+              for (Class key : this.keySet()) {
+                  String cls = key.getName();
+                  // special shortening of all the Annotation classes
+                  int idx = cls.indexOf('$');
+                  if (idx >= 0) {
+                      cls = cls.substring(idx + 1);
+                  }
+                  map2.put(cls, this.get(key));
+              }
+              map2.remove("IndexAnnotation");
+              map2.remove("ValueAnnotation");
+              if (!map2.isEmpty()) {
+                  buf.append(map2);
+              }
+              break;
+          }
+          case "word":
+              buf.append(word());
+              break;
+          case "text-index":
+              buf.append(this.get(CoreAnnotations.TextAnnotation.class));
+              Integer index = this.get(CoreAnnotations.IndexAnnotation.class);
+              if (index != null) {
+                  buf.append('-').append(index.intValue());
+              }
+              buf.append(toPrimes());
+              break;
       }
-      buf.append(map2);
-    } else if (format.equals("value{map}")) {
-      buf.append(value());
-      Map map2 = new TreeMap(asClassComparator);
-      for(Class key : this.keySet()) {
-        map2.put(key, get(key));
-      }
-      map2.remove(CoreAnnotations.ValueAnnotation.class);
-      buf.append(map2);
-    } else if (format.equals("value-index")) {
-      buf.append(value());
-      Integer index = this.get(CoreAnnotations.IndexAnnotation.class);
-      if (index != null) {
-        buf.append('-').append((index).intValue());
-      }
-      buf.append(toPrimes());
-    } else if (format.equals("value-index{map}")) {
-      buf.append(value());
-      Integer index = this.get(CoreAnnotations.IndexAnnotation.class);
-      if (index != null) {
-        buf.append('-').append((index).intValue());
-      }
-      Map<String,Object> map2 = new TreeMap<String,Object>();
-      for(Class key : this.keySet()) {
-        String cls = key.getName();
-        // special shortening of all the Annotation classes
-        int idx = cls.indexOf('$');
-        if (idx >= 0) {
-          cls = cls.substring(idx + 1);
-        }
-        map2.put(cls, this.get(key));
-      }
-      map2.remove("IndexAnnotation");
-      map2.remove("ValueAnnotation");
-      if (!map2.isEmpty()) {
-        buf.append(map2);
-      }
-    } else if (format.equals("word")) {
-      buf.append(word());
-    } else if (format.equals("text-index")) {
-      buf.append(this.get(CoreAnnotations.TextAnnotation.class));
-      Integer index = this.get(CoreAnnotations.IndexAnnotation.class);
-      if (index != null) {
-        buf.append('-').append((index).intValue());
-      }
-      buf.append(toPrimes());
-    }
     return buf.toString();
   }
 

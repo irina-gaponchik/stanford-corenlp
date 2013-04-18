@@ -83,7 +83,7 @@ public class GeneralizedCounter<K> implements Serializable {
         }
         newKey[key.length] = finalKey;
         MutableDouble value = (MutableDouble) map.get(finalKey);
-        Double value1 = new Double(value.doubleValue());
+        Double value1 = value.doubleValue();
         if (useLists) {
           s.add(new Entry<Object,Double>(Arrays.asList(newKey), value1));
         } else {
@@ -187,17 +187,14 @@ public class GeneralizedCounter<K> implements Serializable {
       }
       Entry<K,V> e = ErasureUtils.<Entry<K,V>>uncheckedCast(o);
 
-      Object key1 = e.getKey();
+      Object key1 = e.key;
       if (!(key != null && key.equals(key1))) {
         return false;
       }
 
-      Object value1 = e.getValue();
-      if (!(value != null && value.equals(value1))) {
-        return false;
-      }
+      Object value1 = e.value;
+        return value != null && value.equals(value1);
 
-      return true;
     }
 
     @Override
@@ -210,7 +207,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
     @Override
     public String toString() {
-      return key.toString() + "=" + value.toString();
+      return key.toString() + '=' + value.toString();
     }
 
   } // end static class Entry
@@ -303,7 +300,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
 
   /**
-   * Equivalent to <code>{@link #getCounts}({o})</code>; works only
+   * Equivalent to {@code {@link #getCounts}({o})}; works only
    * for depth 1 GeneralizedCounters
    */
   public double getCount(Object o) {
@@ -311,16 +308,12 @@ public class GeneralizedCounter<K> implements Serializable {
       wrongDepth();
     }
     Number count = (Number) map.get(o);
-    if (count != null) {
-      return count.doubleValue();
-    } else {
-      return 0.0;
-    }
+      return count != null ? count.doubleValue() : 0.0;
   }
 
   /**
-   * A convenience method equivalent to <code>{@link
-   * #getCounts}({o1,o2})</code>; works only for depth 2
+   * A convenience method equivalent to {@code {@link
+   * #getCounts}({o1,o2})}; works only for depth 2
    * GeneralizedCounters
    */
   public double getCount(K o1, K o2) {
@@ -328,16 +321,12 @@ public class GeneralizedCounter<K> implements Serializable {
       wrongDepth();
     }
     GeneralizedCounter<K> gc1 = ErasureUtils.<GeneralizedCounter<K>>uncheckedCast(map.get(o1));
-    if (gc1 == null) {
-      return 0.0;
-    } else {
-      return gc1.getCount(o2);
-    }
+      return gc1 == null ? 0.0 : gc1.getCount(o2);
   }
 
   /**
-   * A convenience method equivalent to <code>{@link
-   * #getCounts}({o1,o2,o3})</code>; works only for depth 3
+   * A convenience method equivalent to {@code {@link
+   * #getCounts}({o1,o2,o3})}; works only for depth 3
    * GeneralizedCounters
    */
   public double getCount(K o1, K o2, K o3) {
@@ -345,11 +334,7 @@ public class GeneralizedCounter<K> implements Serializable {
       wrongDepth();
     }
     GeneralizedCounter<K> gc1 = ErasureUtils.<GeneralizedCounter<K>>uncheckedCast(map.get(o1));
-    if (gc1 == null) {
-      return 0.0;
-    } else {
-      return gc1.getCount(o2, o3);
-    }
+      return gc1 == null ? 0.0 : gc1.getCount(o2, o3);
   }
 
 
@@ -388,7 +373,7 @@ public class GeneralizedCounter<K> implements Serializable {
       GeneralizedCounter<K> next = ErasureUtils.<GeneralizedCounter<K>>uncheckedCast(map.get(o));
       if (next == null) // adds a new GeneralizedCounter if needed
       {
-        map.put(o, (next = new GeneralizedCounter<K>(depth - 1)));
+        map.put(o, next = new GeneralizedCounter<>(depth - 1));
       }
       return next;
     } else {
@@ -416,7 +401,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
   /**
    * Returns a GeneralizedCounter conditioned on the given top level object.
-   * This is just shorthand (and more efficient) for <code>conditionalize(new Object[] { o })</code>.
+   * This is just shorthand (and more efficient) for {@code conditionalize(new Object[] { o })}.
    */
   public GeneralizedCounter<K> conditionalizeOnce(K o) {
     if (depth() < 1) {
@@ -460,7 +445,7 @@ public class GeneralizedCounter<K> implements Serializable {
   }
 
   /**
-   * adds to count for the {@link #depth()}-dimensional key <code>l</code>.
+   * adds to count for the {@link #depth()}-dimensional key {@code l}.
    */
   public void incrementCount(List<K> l, double count) {
     if (l.size() != depth) {
@@ -525,7 +510,7 @@ public class GeneralizedCounter<K> implements Serializable {
   }
 
   // for more efficient memory usage
-  private transient MutableDouble tempMDouble = null;
+  private transient MutableDouble tempMDouble;
 
 
   /**
@@ -536,7 +521,7 @@ public class GeneralizedCounter<K> implements Serializable {
   }
 
   /**
-   * Equivalent to <code>{@link #incrementCount}({o}, count)</code>;
+   * Equivalent to {@code {@link #incrementCount}({o}, count)};
    * only works for a depth 1 GeneralizedCounter.
    */
   public void incrementCount1D(K o, double count) {
@@ -577,7 +562,7 @@ public class GeneralizedCounter<K> implements Serializable {
   }
 
   public GeneralizedCounter<K> reverseKeys() {
-    GeneralizedCounter<K> result = new GeneralizedCounter<K>();
+    GeneralizedCounter<K> result = new GeneralizedCounter<>();
     Set<Map.Entry<List<K>,Double>> entries = entrySet();
     for (Map.Entry<List<K>,Double> entry: entries) {
       List<K> list = entry.getKey();
@@ -596,7 +581,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
   /**
    * Returns a read-only synchronous view (not a snapshot) of
-   * <code>this</code> as a {@link ClassicCounter}.  Any calls to
+   * {@code this} as a {@link ClassicCounter}.  Any calls to
    * count-changing or entry-removing operations will result in an
    * {@link UnsupportedOperationException}.  At some point in the
    * future, this view may gain limited writable functionality.
@@ -630,11 +615,7 @@ public class GeneralizedCounter<K> implements Serializable {
     @Override
     public double getCount(Object o) {
       List<K> l = (List<K>)o;
-      if (l.size() != depth) {
-        return 0.0;
-      } else {
-        return GeneralizedCounter.this.getCounts(l)[depth];
-      }
+        return l.size() != depth ? 0.0 : GeneralizedCounter.this.getCounts(l)[depth];
     }
 
     @Override
@@ -678,15 +659,7 @@ public class GeneralizedCounter<K> implements Serializable {
         return true;
       }
       //return false;
-      if (!(o instanceof ClassicCounter)) {
-        return false;
-      } else {
-        // System.out.println("it's a counter!");
-        // Set e = entrySet();
-        // Set e1 = ((Counter) o).entrySet();
-        // System.out.println(e + "\n" + e1);
-        return entrySet().equals(((ClassicCounter<?>) o).entrySet());
-      }
+        return !(o instanceof ClassicCounter) ? false : entrySet().equals(((ClassicCounter<?>) o).entrySet());
     }
 
     @Override
@@ -700,15 +673,15 @@ public class GeneralizedCounter<K> implements Serializable {
 
     @Override
     public String toString() {
-      StringBuffer sb = new StringBuffer("{");
+      StringBuilder sb = new StringBuilder("{");
       for (Iterator<Map.Entry<List<K>, Double>> i = entrySet().iterator(); i.hasNext();) {
         Map.Entry<List<K>, Double> e = i.next();
         sb.append(e.toString());
         if (i.hasNext()) {
-          sb.append(",");
+          sb.append(',');
         }
       }
-      sb.append("}");
+      sb.append('}');
       return sb.toString();
     }
 
@@ -717,7 +690,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
   /**
    * Returns a read-only synchronous view (not a snapshot) of
-   * <code>this</code> as a {@link ClassicCounter}.  Works only with one-dimensional
+   * {@code this} as a {@link ClassicCounter}.  Works only with one-dimensional
    * GeneralizedCounters.  Exactly like {@link #counterView}, except
    * that {@link #getCount} operates on primitive objects of the counter instead
    * of singleton lists.  Any calls to
@@ -800,15 +773,7 @@ public class GeneralizedCounter<K> implements Serializable {
         return true;
       }
       //return false;
-      if (!(o instanceof ClassicCounter)) {
-        return false;
-      } else {
-        // System.out.println("it's a counter!");
-        // Set e = entrySet();
-        // Set e1 = ((Counter) o).map.entrySet();
-        // System.out.println(e + "\n" + e1);
-        return entrySet().equals(((ClassicCounter<?>) o).entrySet());
-      }
+        return !(o instanceof ClassicCounter) ? false : entrySet().equals(((ClassicCounter<?>) o).entrySet());
     }
 
     @Override
@@ -827,10 +792,10 @@ public class GeneralizedCounter<K> implements Serializable {
         Map.Entry<K, Double> e = i.next();
         sb.append(e.toString());
         if (i.hasNext()) {
-          sb.append(",");
+          sb.append(',');
         }
       }
-      sb.append("}");
+      sb.append('}');
       return sb.toString();
     }
 
@@ -843,50 +808,52 @@ public class GeneralizedCounter<K> implements Serializable {
   }
 
   public String toString(String param) {
-    if (param.equals("contingency")) {
-      StringBuilder sb = new StringBuilder();
-      for (K obj: ErasureUtils.sortedIfPossible(topLevelKeySet())) {
-        sb.append(obj);
-        sb.append(" = ");
-        GeneralizedCounter<K> gc = conditionalizeOnce(obj);
-        sb.append(gc);
-        sb.append("\n");
+      switch (param) {
+          case "contingency": {
+              StringBuilder sb = new StringBuilder();
+              for (K obj : ErasureUtils.sortedIfPossible(topLevelKeySet())) {
+                  sb.append(obj);
+                  sb.append(" = ");
+                  GeneralizedCounter<K> gc = conditionalizeOnce(obj);
+                  sb.append(gc);
+                  sb.append('\n');
+              }
+              return sb.toString();
+          }
+          case "sorted":
+              StringBuilder sb = new StringBuilder();
+              sb.append("{\n");
+              for (K obj : ErasureUtils.sortedIfPossible(topLevelKeySet())) {
+                  sb.append(obj);
+                  sb.append(" = ");
+                  GeneralizedCounter<K> gc = conditionalizeOnce(obj);
+                  sb.append(gc);
+                  sb.append('\n');
+              }
+              sb.append("}\n");
+              return sb.toString();
+          default:
+              return toString();
       }
-      return sb.toString();
-    } else if (param.equals("sorted")) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("{\n");
-      for (K obj: ErasureUtils.sortedIfPossible(topLevelKeySet())) {
-        sb.append(obj);
-        sb.append(" = ");
-        GeneralizedCounter<K> gc = conditionalizeOnce(obj);
-        sb.append(gc);
-        sb.append("\n");
-      }
-      sb.append("}\n");
-      return sb.toString();
-    } else {
-      return toString();
-    }
   }
 
 
   /**
    * for testing purposes only
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
-    Object[] a1 = new Object[]{"a", "b"};
-    Object[] a2 = new Object[]{"a", "b"};
+    Object[] a1 = {"a", "b"};
+    Object[] a2 = {"a", "b"};
 
     System.out.println(Arrays.equals(a1, a2));
 
 
-    GeneralizedCounter<String> gc = new GeneralizedCounter<String>(3);
-    gc.incrementCount(Arrays.asList(new String[]{"a", "j", "x"}), 3.0);
-    gc.incrementCount(Arrays.asList(new String[]{"a", "l", "x"}), 3.0);
-    gc.incrementCount(Arrays.asList(new String[]{"b", "k", "y"}), 3.0);
-    gc.incrementCount(Arrays.asList(new String[]{"b", "k", "z"}), 3.0);
+    GeneralizedCounter<String> gc = new GeneralizedCounter<>(3);
+    gc.incrementCount(Arrays.asList("a", "j", "x"), 3.0);
+    gc.incrementCount(Arrays.asList("a", "l", "x"), 3.0);
+    gc.incrementCount(Arrays.asList("b", "k", "y"), 3.0);
+    gc.incrementCount(Arrays.asList("b", "k", "z"), 3.0);
 
     System.out.println("incremented counts.");
 
@@ -901,15 +868,15 @@ public class GeneralizedCounter<K> implements Serializable {
     System.out.println("entry set:\n" + gc.entrySet());
 
 
-    arrayPrintDouble(gc.getCounts(Arrays.asList(new String[]{"a", "j", "x"})));
-    arrayPrintDouble(gc.getCounts(Arrays.asList(new String[]{"a", "j", "z"})));
-    arrayPrintDouble(gc.getCounts(Arrays.asList(new String[]{"b", "k", "w"})));
-    arrayPrintDouble(gc.getCounts(Arrays.asList(new String[]{"b", "k", "z"})));
+    arrayPrintDouble(gc.getCounts(Arrays.asList("a", "j", "x")));
+    arrayPrintDouble(gc.getCounts(Arrays.asList("a", "j", "z")));
+    arrayPrintDouble(gc.getCounts(Arrays.asList("b", "k", "w")));
+    arrayPrintDouble(gc.getCounts(Arrays.asList("b", "k", "z")));
 
-    GeneralizedCounter<String> gc1 = gc.conditionalize(Arrays.asList(new String[]{"a"}));
-    gc1.incrementCount(Arrays.asList(new String[]{"j", "x"}));
+    GeneralizedCounter<String> gc1 = gc.conditionalize(Arrays.asList("a"));
+    gc1.incrementCount(Arrays.asList("j", "x"));
     gc1.incrementCount2D("j", "z");
-    GeneralizedCounter<String> gc2 = gc1.conditionalize(Arrays.asList(new String[]{"j"}));
+    GeneralizedCounter<String> gc2 = gc1.conditionalize(Arrays.asList("j"));
     gc2.incrementCount1D("x");
     System.out.println("Pretty-printing gc after incrementing gc1:");
     gc.prettyPrint();
@@ -924,15 +891,15 @@ public class GeneralizedCounter<K> implements Serializable {
     System.out.println("string representation of counter view:");
     System.out.println(c.toString());
 
-    double d1 = c.getCount(Arrays.asList(new String[]{"a", "j", "x"}));
-    double d2 = c.getCount(Arrays.asList(new String[]{"a", "j", "w"}));
+    double d1 = c.getCount(Arrays.asList("a", "j", "x"));
+    double d2 = c.getCount(Arrays.asList("a", "j", "w"));
 
     System.out.println(d1 + " " + d2);
 
 
     ClassicCounter<List<String>> c1 = gc1.counterView();
 
-    System.out.println("Count of {j,x} -- should be 3.0\t" + c1.getCount(Arrays.asList(new String[]{"j", "x"})));
+    System.out.println("Count of {j,x} -- should be 3.0\t" + c1.getCount(Arrays.asList("j", "x")));
 
 
     System.out.println(c.keySet() + " size " + c.keySet().size());
@@ -944,8 +911,8 @@ public class GeneralizedCounter<K> implements Serializable {
 
     System.out.println("### testing equality of regular Counter...");
 
-    ClassicCounter<String> z1 = new ClassicCounter<String>();
-    ClassicCounter<String> z2 = new ClassicCounter<String>();
+    ClassicCounter<String> z1 = new ClassicCounter<>();
+    ClassicCounter<String> z2 = new ClassicCounter<>();
 
     z1.incrementCount("a1");
     z1.incrementCount("a2");
@@ -973,10 +940,10 @@ public class GeneralizedCounter<K> implements Serializable {
   }
 
 
-  private static void arrayPrintDouble(double[] o) {
-    for (int i = 0, n = o.length; i < n; i++) {
-      System.out.print(o[i] + "\t");
-    }
+  private static void arrayPrintDouble(double... o) {
+      for (double anO : o) {
+          System.out.print(anO + "\t");
+      }
     System.out.println();
   }
 
@@ -1010,12 +977,12 @@ public class GeneralizedCounter<K> implements Serializable {
       for (Map.Entry<?, Double> e: entrySet()) {
         Object key = e.getKey();
         double count = e.getValue();
-        pw.println(buffer + key + "\t" + count);
+        pw.println(buffer + key + '\t' + count);
       }
     } else {
       for (K key: topLevelKeySet()) {
         GeneralizedCounter<K> gc1 = conditionalize(Arrays.asList(ErasureUtils.<K[]>uncheckedCast(new Object[]{key})));
-        pw.println(buffer + key + "\t" + gc1.totalCount());
+        pw.println(buffer + key + '\t' + gc1.totalCount());
         gc1.prettyPrint(pw, buffer + bufferIncrement, bufferIncrement);
       }
     }

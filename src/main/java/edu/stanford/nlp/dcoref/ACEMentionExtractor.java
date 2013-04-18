@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.classify.LogisticClassifier;
 import edu.stanford.nlp.ie.machinereading.domains.ace.AceReader;
@@ -61,10 +62,13 @@ import edu.stanford.nlp.util.Generics;
  * @author Heeyoung Lee
  */
 public class ACEMentionExtractor extends MentionExtractor {
-  private AceReader aceReader;
+    private static final Pattern COMPILE = Pattern.compile("-");
+    private static final Pattern PATTERN = Pattern.compile("-E");
+    private static final Pattern COMPILE1 = Pattern.compile(" ");
+    private AceReader aceReader;
 
   private String corpusPath;
-  protected int fileIndex = 0;
+  protected int fileIndex;
   protected String[] files;
 
   private static final Logger logger = SieveCoreferenceSystem.logger;
@@ -75,8 +79,7 @@ public class ACEMentionExtractor extends MentionExtractor {
       if(m1.getExtentTokenStart() > m2.getExtentTokenStart()) return 1;
       else if(m1.getExtentTokenStart() < m2.getExtentTokenStart()) return -1;
       else if(m1.getExtentTokenEnd() > m2.getExtentTokenEnd()) return -1;
-      else if(m1.getExtentTokenEnd() < m2.getExtentTokenEnd()) return 1;
-      else return 0;
+      else return m1.getExtentTokenEnd() < m2.getExtentTokenEnd() ? 1 : 0;
     }
   }
 
@@ -111,10 +114,10 @@ public class ACEMentionExtractor extends MentionExtractor {
   }
 
   public Document nextDoc() throws Exception {
-    List<List<CoreLabel>> allWords = new ArrayList<List<CoreLabel>>();
-    List<List<Mention>> allGoldMentions = new ArrayList<List<Mention>>();
+    List<List<CoreLabel>> allWords = new ArrayList<>();
+    List<List<Mention>> allGoldMentions = new ArrayList<>();
     List<List<Mention>> allPredictedMentions;
-    List<Tree> allTrees = new ArrayList<Tree>();
+    List<Tree> allTrees = new ArrayList<>();
 
     Annotation anno;
 
@@ -131,7 +134,7 @@ public class ACEMentionExtractor extends MentionExtractor {
           filename="";
         }
       }
-      if(files.length <= fileIndex && filename.equals("")) return null;
+      if(files.length <= fileIndex && filename.isEmpty()) return null;
 
       anno = aceReader.parse(corpusPath+filename);
       stanfordProcessor.annotate(anno);
@@ -153,8 +156,7 @@ public class ACEMentionExtractor extends MentionExtractor {
         extractGoldMentions(s, allGoldMentions, comparator);
       }
 
-      if(Constants.USE_GOLD_MENTIONS) allPredictedMentions = allGoldMentions;
-      else allPredictedMentions = mentionFinder.extractPredictedMentions(anno, maxID, dictionaries);
+        allPredictedMentions = Constants.USE_GOLD_MENTIONS ? allGoldMentions : mentionFinder.extractPredictedMentions(anno, maxID, dictionaries);
 
       printRawDoc(sentences, allGoldMentions, filename, true);
       printRawDoc(sentences, allPredictedMentions, filename, false);
@@ -166,12 +168,12 @@ public class ACEMentionExtractor extends MentionExtractor {
   }
 
   private void extractGoldMentions(CoreMap s, List<List<Mention>> allGoldMentions, EntityComparator comparator) {
-    List<Mention> goldMentions = new ArrayList<Mention>();
+    List<Mention> goldMentions = new ArrayList<>();
     allGoldMentions.add(goldMentions);
     List<EntityMention> goldMentionList = s.get(MachineReadingAnnotations.EntityMentionsAnnotation.class);
     List<CoreLabel> words = s.get(CoreAnnotations.TokensAnnotation.class);
 
-    TreeSet<EntityMention> treeForSortGoldMentions = new TreeSet<EntityMention>(comparator);
+    TreeSet<EntityMention> treeForSortGoldMentions = new TreeSet<>(comparator);
     if(goldMentionList!=null) treeForSortGoldMentions.addAll(goldMentionList);
     if(!treeForSortGoldMentions.isEmpty()){
       for(EntityMention e : treeForSortGoldMentions){
@@ -180,9 +182,9 @@ public class ACEMentionExtractor extends MentionExtractor {
         men.startIndex = e.getExtentTokenStart();
         men.endIndex = e.getExtentTokenEnd();
 
-        String[] parseID = e.getObjectId().split("-");
+        String[] parseID = COMPILE.split(e.getObjectId());
         men.mentionID = Integer.parseInt(parseID[parseID.length-1]);
-        String[] parseCorefID = e.getCorefID().split("-E");
+        String[] parseCorefID = PATTERN.split(e.getCorefID());
         men.goldCorefClusterID = Integer.parseInt(parseCorefID[parseCorefID.length-1]);
         men.originalRef = -1;
 
@@ -201,7 +203,7 @@ public class ACEMentionExtractor extends MentionExtractor {
         // set ner type
         for(int j = e.getExtentTokenStart() ; j < e.getExtentTokenEnd() ; j++){
           CoreLabel word = words.get(j);
-          String ner = e.getType() +"-"+ e.getSubType();
+          String ner = e.getType() + '-' + e.getSubType();
           if(Constants.USE_GOLD_NE){
             word.set(CoreAnnotations.EntityTypeAnnotation.class, e.getMentionType());
             if(e.getMentionType().equals("NAM")) word.set(CoreAnnotations.NamedEntityTagAnnotation.class, ner);
@@ -214,7 +216,7 @@ public class ACEMentionExtractor extends MentionExtractor {
   private static void printRawDoc(List<CoreMap> sentences, List<List<Mention>> allMentions, String filename, boolean gold) throws FileNotFoundException {
     StringBuilder doc = new StringBuilder();
     int previousOffset = 0;
-    Counter<Integer> mentionCount = new ClassicCounter<Integer>();
+    Counter<Integer> mentionCount = new ClassicCounter<>();
     for(List<Mention> l : allMentions) {
       for(Mention m : l) {
         mentionCount.incrementCount(m.goldCorefClusterID);
@@ -225,13 +227,13 @@ public class ACEMentionExtractor extends MentionExtractor {
       CoreMap sentence = sentences.get(i);
       List<Mention> mentions = allMentions.get(i);
 
-      String[] tokens = sentence.get(CoreAnnotations.TextAnnotation.class).split(" ");
+      String[] tokens = COMPILE1.split(sentence.get(CoreAnnotations.TextAnnotation.class));
       String sent = "";
       List<CoreLabel> t = sentence.get(CoreAnnotations.TokensAnnotation.class);
       if(previousOffset+2 < t.get(0).get(CoreAnnotations.CharacterOffsetBeginAnnotation.class)) sent += "\n";
       previousOffset = t.get(t.size()-1).get(CoreAnnotations.CharacterOffsetEndAnnotation.class);
-      Counter<Integer> startCounts = new ClassicCounter<Integer>();
-      Counter<Integer> endCounts = new ClassicCounter<Integer>();
+      Counter<Integer> startCounts = new ClassicCounter<>();
+      Counter<Integer> endCounts = new ClassicCounter<>();
       Map<Integer, Set<Integer>> endID = Generics.newHashMap();
       for (Mention m : mentions) {
         startCounts.incrementCount(m.startIndex);
@@ -242,12 +244,11 @@ public class ACEMentionExtractor extends MentionExtractor {
       for (int j = 0 ; j < tokens.length; j++){
         if(endID.containsKey(j)) {
           for(Integer id : endID.get(j)){
-            if(mentionCount.getCount(id)!=1 && gold) sent += "]_"+id;
-            else sent += "]";
+              sent += mentionCount.getCount(id) != 1 && gold ? "]_" + id : "]";
           }
         }
         for (int k = 0 ; k < startCounts.getCount(j) ; k++) {
-          if(!sent.endsWith("[")) sent += " ";
+          if(!(!sent.isEmpty() && sent.charAt(sent.length() - 1) == '[')) sent += " ";
           sent += "[";
         }
         sent += " ";

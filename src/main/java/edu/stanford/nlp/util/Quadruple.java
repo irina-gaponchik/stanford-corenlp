@@ -76,7 +76,7 @@ public class Quadruple<T1,T2,T3,T4> implements Comparable<Quadruple<T1,T2,T3,T4>
       return false;
     }
 
-    final Quadruple<T1,T2,T3,T4> quadruple = ErasureUtils.uncheckedCast(o);
+    Quadruple<T1,T2,T3,T4> quadruple = ErasureUtils.uncheckedCast(o);
 
     if (first != null ? !first.equals(quadruple.first) : quadruple.first != null) {
       return false;
@@ -87,17 +87,14 @@ public class Quadruple<T1,T2,T3,T4> implements Comparable<Quadruple<T1,T2,T3,T4>
     if (third != null ? !third.equals(quadruple.third) : quadruple.third != null) {
       return false;
     }
-    if (fourth != null ? !fourth.equals(quadruple.fourth) : quadruple.fourth != null) {
-      return false;
-    }
+      return !(fourth != null ? !fourth.equals(quadruple.fourth) : quadruple.fourth != null);
 
-    return true;
   }
 
   @Override
   public int hashCode() {
     int result = 17;
-    result = (first != null ? first.hashCode() : 0);
+    result = first != null ? first.hashCode() : 0;
     result = 29 * result + (second != null ? second.hashCode() : 0);
     result = 29 * result + (third != null ? third.hashCode() : 0);
     result = 29 * result + (fourth != null ? fourth.hashCode() : 0);
@@ -106,7 +103,7 @@ public class Quadruple<T1,T2,T3,T4> implements Comparable<Quadruple<T1,T2,T3,T4>
 
   @Override
   public String toString() {
-    return "(" + first + "," + second + "," + third + "," + fourth + ")";
+    return "(" + first + ',' + second + ',' + third + ',' + fourth + ')';
   }
 
   /**
@@ -115,7 +112,7 @@ public class Quadruple<T1,T2,T3,T4> implements Comparable<Quadruple<T1,T2,T3,T4>
    * don't have to write out potentially long class names.
    */
   public static <T1, T2, T3, T4> Quadruple<T1, T2, T3, T4> makeQuadruple(T1 t1, T2 t2, T3 t3, T4 t4) {
-    return new Quadruple<T1, T2, T3, T4>(t1, t2, t3, t4);
+    return new Quadruple<>(t1, t2, t3, t4);
   }
 
   public List<Object> asList() {
@@ -134,11 +131,7 @@ public class Quadruple<T1,T2,T3,T4> implements Comparable<Quadruple<T1,T2,T3,T4>
         return comp;
       } else {
         comp = ((Comparable<T3>) third()).compareTo(another.third());
-        if (comp != 0) {
-          return comp;
-        } else {
-          return ((Comparable<T4>) fourth()).compareTo(another.fourth());
-        }
+          return comp != 0 ? comp : ((Comparable<T4>) fourth()).compareTo(another.fourth());
       }
     }
   }

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.ie.crf.CRFBiasedClassifier;
 import edu.stanford.nlp.io.IOUtils;
@@ -21,8 +22,8 @@ import edu.stanford.nlp.util.Generics;
 
 public class TrueCaseAnnotator implements Annotator {
 
-  @SuppressWarnings("unchecked")
-  private CRFBiasedClassifier trueCaser;
+    private static final Pattern COMPILE = Pattern.compile("\\s+");
+    private CRFBiasedClassifier trueCaser;
   
   private Map<String,String> mixedCaseMap = Generics.newHashMap();
   
@@ -41,8 +42,7 @@ public class TrueCaseAnnotator implements Annotator {
         verbose);
   }
 
-  @SuppressWarnings("unchecked")
-  public TrueCaseAnnotator(String modelLoc, 
+  public TrueCaseAnnotator(String modelLoc,
       String classBias,
       String mixedCaseFileName,
       boolean verbose){
@@ -61,9 +61,9 @@ public class TrueCaseAnnotator implements Annotator {
     }
     
     if(classBias != null) {
-      StringTokenizer biases = new java.util.StringTokenizer(classBias,",");
+      StringTokenizer biases = new StringTokenizer(classBias,",");
       while (biases.hasMoreTokens()) {
-        StringTokenizer bias = new java.util.StringTokenizer(biases.nextToken(),":");
+        StringTokenizer bias = new StringTokenizer(biases.nextToken(),":");
         String cname = bias.nextToken();
         double w = Double.parseDouble(bias.nextToken());
         trueCaser.setBiasWeight(cname,w);
@@ -103,18 +103,23 @@ public class TrueCaseAnnotator implements Annotator {
     String trueCase = l.getString(CoreAnnotations.TrueCaseAnnotation.class);
     String text = l.word();
     String trueCaseText = text;
-    
-    if (trueCase.equals("UPPER")) {
-      trueCaseText = text.toUpperCase();
-    } else if (trueCase.equals("LOWER")) {
-      trueCaseText = text.toLowerCase();
-    } else if (trueCase.equals("INIT_UPPER")) {
-      trueCaseText = text.substring(0,1).toUpperCase() + text.substring(1);
-    } else if (trueCase.equals("O")) {
-      // The model predicted mixed case, so lookup the map:
-      if(mixedCaseMap.containsKey(text))
-        trueCaseText = mixedCaseMap.get(text);
-    }
+
+      switch (trueCase) {
+          case "UPPER":
+              trueCaseText = text.toUpperCase();
+              break;
+          case "LOWER":
+              trueCaseText = text.toLowerCase();
+              break;
+          case "INIT_UPPER":
+              trueCaseText = text.substring(0, 1).toUpperCase() + text.substring(1);
+              break;
+          case "O":
+              // The model predicted mixed case, so lookup the map:
+              if (mixedCaseMap.containsKey(text))
+                  trueCaseText = mixedCaseMap.get(text);
+              break;
+      }
     
     l.set(CoreAnnotations.TrueCaseTextAnnotation.class, trueCaseText);
   }
@@ -126,7 +131,7 @@ public class TrueCaseAnnotator implements Annotator {
       BufferedReader br = new BufferedReader(new InputStreamReader(is));
       for(String line : ObjectBank.getLineIterator(br)) {
         line = line.trim();
-        String[] els = line.split("\\s+");
+        String[] els = COMPILE.split(line);
         if(els.length != 2) 
           throw new RuntimeException("Wrong format: "+mapFile);
         map.put(els[0],els[1]);

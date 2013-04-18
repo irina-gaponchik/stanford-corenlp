@@ -44,11 +44,11 @@ public class CharniakScoredParsesReaderWriter {
    * @param filename  - File to read parses from
    * @return iterable with list of scored parse trees
    */
-  public Iterable<List<ScoredObject<Tree>>> readScoredTrees(String filename)
+  public static Iterable<List<ScoredObject<Tree>>> readScoredTrees(String filename)
   {
     try {
       ScoredParsesIterator iter = new ScoredParsesIterator(filename);
-      return new IterableIterator<List<ScoredObject<Tree>>>(iter);
+      return new IterableIterator<>(iter);
     } catch (IOException ex) {
       throw new RuntimeException(ex);
     }
@@ -61,10 +61,10 @@ public class CharniakScoredParsesReaderWriter {
    * @param br - input reader
    * @return iterable with list of scored parse trees
    */
-  public Iterable<List<ScoredObject<Tree>>> readScoredTrees(String inputDesc, BufferedReader br)
+  public static Iterable<List<ScoredObject<Tree>>> readScoredTrees(String inputDesc, BufferedReader br)
   {
     ScoredParsesIterator iter = new ScoredParsesIterator(inputDesc, br);
-    return new IterableIterator<List<ScoredObject<Tree>>>(iter);
+    return new IterableIterator<>(iter);
   }
 
   /**
@@ -135,7 +135,7 @@ public class CharniakScoredParsesReaderWriter {
    * @param id - sentence id
    * @param trees - trees to output
    */
-  public void printScoredTrees(PrintWriter pw, int id, List<ScoredObject<Tree>> trees)
+  public static void printScoredTrees(PrintWriter pw, int id, List<ScoredObject<Tree>> trees)
   {
     pw.println(trees.size() + "\t" + id);
     for (ScoredObject<Tree> scoredTree:trees) {
@@ -150,8 +150,8 @@ public class CharniakScoredParsesReaderWriter {
     BufferedReader br;
     List<ScoredObject<Tree>> next;
     Timing timing;
-    int processed = 0;
-    boolean done = false;
+    int processed;
+    boolean done;
     boolean closeBufferNeeded = true;
     boolean expectConsecutiveSentenceIds = true;
     int lastSentenceId = -1;
@@ -181,7 +181,7 @@ public class CharniakScoredParsesReaderWriter {
         List<ScoredObject<Tree>> curParses = null;
         while ((line = br.readLine()) != null) {
           line = line.trim();
-          if (line.length() > 0) {
+          if (!line.isEmpty()) {
             if (parsesExpected == 0) {
               // Finished processing parses
               String[] fields = wsDelimiter.split(line, 2);
@@ -192,22 +192,22 @@ public class CharniakScoredParsesReaderWriter {
                   if (lastSentenceId < sentenceId) {
                     StringBuilder sb = new StringBuilder("Missing sentences");
                     for (int i = lastSentenceId+1; i < sentenceId; i++) {
-                      sb.append(" ").append(i);
+                      sb.append(' ').append(i);
                     }
                     logger.warning(sb.toString());
                   } else {
                     logger.warning("sentenceIds are not increasing (last="
-                          + lastSentenceId + ", curr=" + sentenceId + ")");
+                          + lastSentenceId + ", curr=" + sentenceId + ')');
                   }
                 }
               }
               lastSentenceId = sentenceId;
-              curParses = new ArrayList<ScoredObject<Tree>>(parsesExpected);
+              curParses = new ArrayList<>(parsesExpected);
             } else {
               if (curParse == null) {
                 // read score
                 double score = Double.parseDouble(line);
-                curParses.add(curParse = new ScoredObject<Tree>(null, score));
+                curParses.add(curParse = new ScoredObject<>(null, score));
               } else {
                 // Reading a parse
                 curParse.setObject(Trees.readTree(line));
@@ -242,7 +242,7 @@ public class CharniakScoredParsesReaderWriter {
                   + inputDesc + " in " + timing.toSecondsString() + " secs");
           done = true;
           if (closeBufferNeeded) {
-            try { br.close();  } catch (IOException ex) {};
+            try { br.close();  } catch (IOException ex) {}
           }
         }
         return cur;

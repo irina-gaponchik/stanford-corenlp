@@ -46,7 +46,7 @@ public final class DFSA<T,S> implements Scored {
 
   public Set<DFSAState<T, S>> states() {
     Set<DFSAState<T, S>> visited = Generics.newHashSet();
-    List<DFSAState<T,S>> toVisit = new ArrayList<DFSAState<T,S>>();
+    List<DFSAState<T,S>> toVisit = new ArrayList<>();
     toVisit.add(initialState());
     exploreStates(toVisit, visited);
     return visited;
@@ -94,7 +94,7 @@ public final class DFSA<T,S> implements Scored {
   }
 
   public void printAttFsmFormat(Writer w) throws IOException {
-    Queue<DFSAState<T,S>> q = new LinkedList<DFSAState<T,S>>();
+    Queue<DFSAState<T,S>> q = new LinkedList<>();
     Set<DFSAState<T,S>> visited = Generics.newHashSet();
     q.offer(initialState);
     while(q.peek() != null) {
@@ -103,16 +103,16 @@ public final class DFSA<T,S> implements Scored {
         continue;
       visited.add(state);
       if (state.isAccepting()) {
-        w.write(state.toString()+"\t"+state.score()+"\n");
+        w.write(state.toString()+ '\t' +state.score()+ '\n');
         continue;
       }
-      TreeSet<T> inputs = new TreeSet<T>(state.continuingInputs());
+      TreeSet<T> inputs = new TreeSet<>(state.continuingInputs());
       for (T input : inputs) {
         DFSATransition<T, S> transition = state.transition(input);
         DFSAState<T,S> target = transition.target();
         if(!visited.contains(target))
           q.add(target);
-        w.write(state.toString()+"\t"+target.toString()+"\t"+transition.getInput()+"\t"+transition.score()+"\n");
+        w.write(state.toString()+ '\t' +target.toString()+ '\t' +transition.getInput()+ '\t' +transition.score()+ '\n');
       }
     }
   }
@@ -132,15 +132,15 @@ public final class DFSA<T,S> implements Scored {
         DFSAState<T, S> target2 = transition2.target();
         if (target2.isAccepting()) {
           // it's a binary end rule.  Print it.
-          w.write(prefix + " --> " + input + " " + input2 + "\n");
+          w.write(prefix + " --> " + input + ' ' + input2 + '\n');
         } else {
           allTerminate = false;
         }
       }
       if (!allTerminate) {
         // there are some longer continuations.  Print continuation rule
-        String newPrefix = prefix + "_" + input;
-        w.write(prefix + " --> " + input + " " + newPrefix + "\n");
+        String newPrefix = prefix + '_' + input;
+        w.write(prefix + " --> " + input + ' ' + newPrefix + '\n');
         printTrieAsRulesHelper(transition.target(), newPrefix, w);
       }
     }

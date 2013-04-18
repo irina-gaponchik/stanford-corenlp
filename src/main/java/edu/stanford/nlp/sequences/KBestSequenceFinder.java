@@ -19,14 +19,14 @@ public class KBestSequenceFinder implements BestSequenceFinder {
     return Counters.argmax(kBestSequences(ts, 1));
   }
   
-  public ClassicCounter<int[]> kBestSequences(SequenceModel ts, int k) {
+  public static ClassicCounter<int[]> kBestSequences(SequenceModel ts, int k) {
 
     // Set up tag options
     int length = ts.length();
     int leftWindow = ts.leftWindow();
     int rightWindow = ts.rightWindow();
 
-    assert (rightWindow == 0);
+    assert rightWindow == 0;
     
     int padLength = length + leftWindow + rightWindow;
 
@@ -203,7 +203,7 @@ public class KBestSequenceFinder implements BestSequenceFinder {
       }
     }
 
-    ClassicCounter<int[]> kBestWithScores = new ClassicCounter<int[]>();
+    ClassicCounter<int[]> kBestWithScores = new ClassicCounter<>();
     for (int i = 0; i < kBest.length; i++) {
       if(bestFinalScores[i] > Double.NEGATIVE_INFINITY) {
         kBestWithScores.setCount(kBest[i], bestFinalScores[i]);

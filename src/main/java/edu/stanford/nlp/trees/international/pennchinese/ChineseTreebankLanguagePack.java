@@ -27,18 +27,14 @@ public class ChineseTreebankLanguagePack extends AbstractTreebankLanguagePack {
 
   @Override
   public TokenizerFactory<? extends HasWord> getTokenizerFactory() {
-    if (tf != null) {
-      return tf;
-    } else {
-      return super.getTokenizerFactory();
-    }
+      return tf != null ? tf : super.getTokenizerFactory();
   }
 
   public static final String ENCODING = "utf-8";
 
   /**
    * Return the input Charset encoding for the Treebank.
-   * See documentation for the <code>Charset</code> class.
+   * See documentation for the {@code Charset} class.
    *
    * @return Name of Charset
    */
@@ -212,7 +208,7 @@ public class ChineseTreebankLanguagePack extends AbstractTreebankLanguagePack {
   private static final String[] punctWords;
 
   static {
-    final int n = comma.length + endSentence.length + douHao.length + quoteMark.length + parenthesis.length + colon.length + dash.length +
+    int n = comma.length + endSentence.length + douHao.length + quoteMark.length + parenthesis.length + colon.length + dash.length +
             other.length + leftQuoteMark.length + rightQuoteMark.length + leftParenthesis.length + rightParenthesis.length;
     punctWords = new String[n];
     int m = 0;
@@ -309,7 +305,7 @@ public class ChineseTreebankLanguagePack extends AbstractTreebankLanguagePack {
 
   @Override
   public TreeReaderFactory treeReaderFactory() {
-    final TreeNormalizer tn = new BobChrisTreeNormalizer();
+    TreeNormalizer tn = new BobChrisTreeNormalizer();
     return new CTBTreeReaderFactory(tn);
   }
 

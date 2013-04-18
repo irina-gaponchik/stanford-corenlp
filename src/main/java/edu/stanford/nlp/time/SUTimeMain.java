@@ -21,6 +21,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.LogManager;
+import java.util.regex.Pattern;
 
 import static edu.stanford.nlp.time.SUTimeMain.InputType.TIMEBANK_CSV;
 
@@ -149,7 +150,19 @@ import static edu.stanford.nlp.time.SUTimeMain.InputType.TIMEBANK_CSV;
  */
 public class SUTimeMain {
 
-  private SUTimeMain() {} // static class
+    private static final Pattern COMPILE = Pattern.compile("\t");
+    private static final Pattern PATTERN = Pattern.compile("\t");
+    private static final Pattern COMPILE1 = Pattern.compile("\t");
+    private static final Pattern COMPILE2 = Pattern.compile("[0-9X]{4}W[0-9X]{2}.*");
+    private static final Pattern COMPILE3 = Pattern.compile("\\d\\d\\d\\d..");
+    private static final Pattern COMPILE4 = Pattern.compile("\\d{8}");
+    private static final Pattern COMPILE5 = Pattern.compile("\\d{8}T.*");
+    private static final Pattern COMPILE6 = Pattern.compile("T\\d{4}");
+    private static final Pattern COMPILE7 = Pattern.compile("#+ BEGIN DATA #+");
+    private static final Pattern COMPILE8 = Pattern.compile("\\s+");
+    private static final Pattern COMPILE9 = Pattern.compile("\\s+");
+
+    private SUTimeMain() {} // static class
 
 
   /*
@@ -180,26 +193,26 @@ public class SUTimeMain {
       this.timexVal = timexVal;
       this.timexOrigVal = timexOrigVal;
       this.timexStr = timexStr;
-      if (timexId != null && timexId.length() > 0) {
+      if (timexId != null && !timexId.isEmpty()) {
         tid = Integer.parseInt(timexId);
       }
     }
   }
 
   private static class TimebankSent {
-    boolean initialized = false;
+      private static final Pattern COMPILE10 = Pattern.compile("\\s*\\|\\s*");
+      boolean initialized;
     String docId;
-    @SuppressWarnings("unused")
     String docFilename;
     String docPubDate;
     String sentId;
     String text;
-    List<TimebankTimex> timexes = new ArrayList<TimebankTimex>();
+    List<TimebankTimex> timexes = new ArrayList<>();
 
-    List<String> origItems =  new ArrayList<String>();
+    List<String> origItems =  new ArrayList<>();
 
     public boolean add(String item) {
-      String[] fields = item.split("\\s*\\|\\s*", 9);
+      String[] fields = COMPILE10.split(item, 9);
       String docId = fields[0];
       String docFilename = fields[1];
       String docPubDate = fields[2];
@@ -224,7 +237,7 @@ public class SUTimeMain {
       String timexVal = fields[5];
       String timexOrigVal = fields[6];
       String timexStr = fields[7];
-      if (timexId != null && timexId.length() > 0) {
+      if (timexId != null && !timexId.isEmpty()) {
         timexes.add(new TimebankTimex(timexId, timexVal, timexOrigVal, timexStr));
       }
       return true;
@@ -243,7 +256,7 @@ public class SUTimeMain {
       Collections.sort(sent.timexes, new Comparator<TimebankTimex>() {
         public int compare(TimebankTimex o1, TimebankTimex o2) {
           if (o1.tid == o2.tid) { return 0; }
-          else return (o1.tid < o2.tid)? -1:1;
+          else return o1.tid < o2.tid ? -1:1;
         }
       });
       pw.println();
@@ -262,8 +275,8 @@ public class SUTimeMain {
           String res;
           TimebankTimex goldTimex = sent.timexes.get(i);
           Timex guessTimex = t.get(TimeAnnotations.TimexAnnotation.class);
-          String s1 = goldTimex.timexStr.replaceAll("\\s+", "");
-          String s2 = guessTimex.text().replaceAll("\\s+", "");
+          String s1 = COMPILE9.matcher(goldTimex.timexStr).replaceAll("");
+          String s2 = COMPILE8.matcher(guessTimex.text()).replaceAll("");
           if (s1.equals(s2)) {
             evalStats.estPrStats.incrementTP();
             res = "OK";
@@ -330,7 +343,7 @@ public class SUTimeMain {
   public static void processTimebankCsv(AnnotationPipeline pipeline, String in, String out, String eval) throws IOException
   {
     BufferedReader br = IOUtils.getBufferedFileReader(in);
-    PrintWriter pw = (out != null)? IOUtils.getPrintWriter(out):new PrintWriter(System.out);
+    PrintWriter pw = out != null ? IOUtils.getPrintWriter(out):new PrintWriter(System.out);
     String line;
 //    boolean dataStarted = false;
     boolean dataStarted = true;
@@ -339,7 +352,7 @@ public class SUTimeMain {
     EvalStats evalStats = new EvalStats();
     line = br.readLine(); // Skip first line
     while ((line = br.readLine()) != null) {
-      if (line.trim().length() == 0) continue;
+      if (line.trim().isEmpty()) continue;
       if (dataStarted) {
         if (line.contains("|")) {
           if (item != null) {
@@ -352,10 +365,10 @@ public class SUTimeMain {
           }
           item = line;
         } else {
-          item += " " + line;
+          item += ' ' + line;
         }
       } else {
-        if (line.matches("#+ BEGIN DATA #+")) {
+        if (COMPILE7.matcher(line).matches()) {
           dataStarted = true;
         }
       }
@@ -379,7 +392,7 @@ public class SUTimeMain {
   public static String joinWordTags(List<? extends CoreMap> l, String glue, int start, int end) {
     return StringUtils.join(l, glue, new Function<CoreMap, String>() {
       public String apply(CoreMap in) {
-        return in.get(CoreAnnotations.TextAnnotation.class) + "/" + in.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+        return in.get(CoreAnnotations.TextAnnotation.class) + '/' + in.get(CoreAnnotations.PartOfSpeechAnnotation.class);
       }
     }, start, end);
   }
@@ -478,28 +491,24 @@ public class SUTimeMain {
                   "type",
                   tmx.timexType(),
             };
-            attrPw.println(extString + "\t" + StringUtils.join(attrFields, "\t"));
+            attrPw.println(extString + '\t' + StringUtils.join(attrFields, "\t"));
             if (tmx.value() != null) {
               String val = tmx.value();
               // Fix up expression values (needed for GUTime)
               if (useGUTime) {
                 if ("TIME".equals(tmx.timexType())) {
-                  if (val.matches("T\\d{4}")) {
-                    val = "T" + val.substring(1,3) + ":" + val.substring(3,5);
+                  if (COMPILE6.matcher(val).matches()) {
+                    val = 'T' + val.substring(1,3) + ':' + val.substring(3,5);
                   }
                 } else if ("DATE".equals(tmx.timexType())) {
-                  if (val.matches("\\d{8}T.*")) {
-                    val = val.substring(0,4) + "-" + val.substring(4,6) + "-" + val.substring(6);
-                  } else if (val.matches("\\d{8}")) {
-                    val = val.substring(0,4) + "-" + val.substring(4,6) + "-" + val.substring(6,8);
-                  } else if (val.matches("\\d\\d\\d\\d..")) {
-                    val = val.substring(0,4) + "-" + val.substring(4,6);
-                  } else if (val.matches("[0-9X]{4}W[0-9X]{2}.*")) {
-                    if (val.length() > 7) {
-                      val = val.substring(0,4) + "-" + val.substring(4,7) + "-" + val.substring(7);
-                    } else {
-                      val = val.substring(0,4) + "-" + val.substring(4,7);
-                    }
+                  if (COMPILE5.matcher(val).matches()) {
+                    val = val.substring(0,4) + '-' + val.substring(4,6) + '-' + val.substring(6);
+                  } else if (COMPILE4.matcher(val).matches()) {
+                    val = val.substring(0,4) + '-' + val.substring(4,6) + '-' + val.substring(6,8);
+                  } else if (COMPILE3.matcher(val).matches()) {
+                    val = val.substring(0,4) + '-' + val.substring(4,6);
+                  } else if (COMPILE2.matcher(val).matches()) {
+                      val = val.length() > 7 ? val.substring(0, 4) + '-' + val.substring(4, 7) + '-' + val.substring(7) : val.substring(0, 4) + '-' + val.substring(4, 7);
                   }
                 }
               } /*else {
@@ -513,7 +522,7 @@ public class SUTimeMain {
               attrFields[0] = "value";
               attrFields[1] = val;
 
-              attrPw.println(extString + "\t" + StringUtils.join(attrFields, "\t"));
+              attrPw.println(extString + '\t' + StringUtils.join(attrFields, "\t"));
             }
           }
           tokenIndex++;
@@ -529,7 +538,7 @@ public class SUTimeMain {
   {
     String sentText = StringUtils.join(sentWords, " ");
     Annotation sentence = new Annotation(sentText);
-    List<CoreLabel> tokens = new ArrayList<CoreLabel>(sentWords.size());
+    List<CoreLabel> tokens = new ArrayList<>(sentWords.size());
     for (String text:sentWords) {
       CoreLabel token = tokenFactory.makeToken();
       token.set(CoreAnnotations.TextAnnotation.class, text);
@@ -548,7 +557,7 @@ public class SUTimeMain {
     document.set(CoreAnnotations.SentencesAnnotation.class, sentences);
 
     // Accumulate docTokens and label sentence with overall token begin/end, and sentence index annotations
-    List<CoreLabel> docTokens = new ArrayList<CoreLabel>();
+    List<CoreLabel> docTokens = new ArrayList<>();
     int sentenceIndex = 0;
     int tokenBegin = 0;
     for (CoreMap sentenceAnnotation:sentences) {
@@ -658,9 +667,9 @@ public class SUTimeMain {
     String lastDocId = null;
     TimexAttributes lastTimex = null;
     while ((line = extBr.readLine()) != null) {
-      if (line.trim().length() == 0) continue;
+      if (line.trim().isEmpty()) continue;
       // Simple tab delimited file
-      String[] fields = line.split("\t");
+      String[] fields = COMPILE1.split(line);
       String docName = fields[0];
       int sentNo = Integer.parseInt(fields[1]);
       int tokenNo = Integer.parseInt(fields[2]);
@@ -668,14 +677,14 @@ public class SUTimeMain {
 
       if (lastDocId != null && lastDocId.equals(docName) && lastTimex != null && lastTimex.tid.equals(tid)) {
         // Expand previous
-        assert(lastTimex.sentIndex == sentNo);
+        assert lastTimex.sentIndex == sentNo;
         lastTimex.tokenEnd = tokenNo + 1;
       } else {
         lastDocId = docName;
         lastTimex = new TimexAttributes(tid, sentNo, tokenNo);
         List<TimexAttributes> list = timexMap.get(docName);
         if (list == null) {
-          timexMap.put(docName, list = new ArrayList<TimexAttributes>());
+          timexMap.put(docName, list = new ArrayList<>());
         }
         list.add(lastTimex);
       }
@@ -684,9 +693,9 @@ public class SUTimeMain {
 
     BufferedReader attrBr = IOUtils.getBufferedFileReader(attrsFile);
     while ((line = attrBr.readLine()) != null) {
-      if (line.trim().length() == 0) continue;
+      if (line.trim().isEmpty()) continue;
       // Simple tab delimited file
-      String[] fields = line.split("\t");
+      String[] fields = PATTERN.split(line);
       String docName = fields[0];
       int sentNo = Integer.parseInt(fields[1]);
       int tokenNo = Integer.parseInt(fields[2]);
@@ -696,19 +705,22 @@ public class SUTimeMain {
 
       // Find entry
       TimexAttributes timex = findTimex(timexMap, docName, tid);
-      assert(timex.sentIndex == sentNo);
-      assert(timex.tokenStart <= tokenNo && timex.tokenEnd > tokenNo);
+      assert timex.sentIndex == sentNo;
+      assert timex.tokenStart <= tokenNo && timex.tokenEnd > tokenNo;
 
-      if ("type".equals(attrname)) {
-        assert(timex.type == null || timex.type.equals(attrvalue));
-        timex.type = attrvalue;
-      } else if ("value".equals(attrname)) {
-        assert(timex.value == null || timex.value.equals(attrvalue));
-        timex.value = attrvalue;
-      } else {
-        throw new RuntimeException("Error processing " + attrsFile + ":" +
-                "Unknown attribute " + attrname + ": from line " + line);
-      }
+        switch (attrname) {
+            case "type":
+                assert timex.type == null || timex.type.equals(attrvalue);
+                timex.type = attrvalue;
+                break;
+            case "value":
+                assert timex.value == null || timex.value.equals(attrvalue);
+                timex.value = attrvalue;
+                break;
+            default:
+                throw new RuntimeException("Error processing " + attrsFile + ':' +
+                        "Unknown attribute " + attrname + ": from line " + line);
+        }
     }
     attrBr.close();
     return timexMap;
@@ -729,9 +741,9 @@ public class SUTimeMain {
     List<String> tokens = null;
     List<CoreMap> sentences = null;
     while ((line = br.readLine()) != null) {
-      if (line.trim().length() == 0) continue;
+      if (line.trim().isEmpty()) continue;
       // Simple tab delimited file
-      String[] fields = line.split("\t");
+      String[] fields = COMPILE.split(line);
       String docName = fields[0];
       int sentNo = Integer.parseInt(fields[1]);
       //int tokenNo = Integer.parseInt(fields[2]);
@@ -748,12 +760,12 @@ public class SUTimeMain {
           curDocName = null;
         }
         // New doc
-        tokens = new ArrayList<String>();
-        sentences = new ArrayList<CoreMap>();
+        tokens = new ArrayList<>();
+        sentences = new ArrayList<>();
       } else if (curSentNo != sentNo) {
         CoreMap lastSentence = wordsToSentence(tokens);
         sentences.add(lastSentence);
-        tokens = new ArrayList<String>();
+        tokens = new ArrayList<>();
       }
       tokens.add(tokenText);
       curDocName = docName;
@@ -777,14 +789,14 @@ public class SUTimeMain {
 
   public static void processTempEval2(AnnotationPipeline pipeline, String in, String out, String eval, String dct) throws IOException, ParseException
   {
-    Map<String,String> docDates = (dct != null)? IOUtils.readMap(dct):IOUtils.readMap(in + "/dct.txt");
+    Map<String,String> docDates = dct != null ? IOUtils.readMap(dct):IOUtils.readMap(in + "/dct.txt");
     if (requiredDocDateFormat != null) {
       // convert from yyyMMdd to requiredDocDateFormat
       DateFormat defaultFormatter = new SimpleDateFormat("yyyyMMdd");
       DateFormat requiredFormatter = new SimpleDateFormat(requiredDocDateFormat);
-      for (String docId:docDates.keySet()) {
-        Date date = defaultFormatter.parse(docDates.get(docId));
-        docDates.put(docId, requiredFormatter.format(date));
+      for (Map.Entry<String, String> stringStringEntry : docDates.entrySet()) {
+        Date date = defaultFormatter.parse(stringStringEntry.getValue());
+        docDates.put(stringStringEntry.getKey(), requiredFormatter.format(date));
       }
     }
     processTempEval2Tab(pipeline, in, out, docDates);
@@ -802,7 +814,7 @@ public class SUTimeMain {
   }
 
   private static String requiredDocDateFormat;
-  private static boolean useGUTime = false;
+  private static boolean useGUTime;
   public static AnnotationPipeline getPipeline(Properties props, boolean tokenize) throws Exception
   {
 //    useGUTime = Boolean.parseBoolean(props.getProperty("gutime", "false"));
@@ -815,17 +827,21 @@ public class SUTimeMain {
 //    pipeline.addAnnotator(new NumberAnnotator(false));
 //    pipeline.addAnnotator(new QuantifiableEntityNormalizingAnnotator(false, false));
     String timeAnnotator = props.getProperty("timeAnnotator", "sutime");
-    if ("gutime".equals(timeAnnotator)) {
-      useGUTime = true;
-      pipeline.addAnnotator(new GUTimeAnnotator());
-    } else if ("heideltime".equals(timeAnnotator)) {
-      requiredDocDateFormat = "yyyy-MM-dd";
-      pipeline.addAnnotator(new HeidelTimeAnnotator("heideltime", props));
-    } else if ("sutime".equals(timeAnnotator)){
-      pipeline.addAnnotator(new TimeAnnotator("sutime", props));
-    } else {
-      throw new IllegalArgumentException("Unknown timeAnnotator: " + timeAnnotator);
-    }
+      switch (timeAnnotator) {
+          case "gutime":
+              useGUTime = true;
+              pipeline.addAnnotator(new GUTimeAnnotator());
+              break;
+          case "heideltime":
+              requiredDocDateFormat = "yyyy-MM-dd";
+              pipeline.addAnnotator(new HeidelTimeAnnotator("heideltime", props));
+              break;
+          case "sutime":
+              pipeline.addAnnotator(new TimeAnnotator("sutime", props));
+              break;
+          default:
+              throw new IllegalArgumentException("Unknown timeAnnotator: " + timeAnnotator);
+      }
     return pipeline;
   }
 
@@ -843,14 +859,14 @@ public class SUTimeMain {
     sb.append("java.util.logging.ConsoleHandler.level=SEVERE\n");
     sb.append("java.util.logging.FileHandler.formatter=java.util.logging.SimpleFormatter\n");
     sb.append("java.util.logging.FileHandler.level=INFO\n");
-    sb.append("java.util.logging.FileHandler.pattern=" + out + "/err.log" + "\n");
+    sb.append("java.util.logging.FileHandler.pattern=").append(out).append("/err.log").append('\n');
     LogManager.getLogManager().readConfiguration(new ReaderInputStream(new StringReader(sb.toString())));
   }
 
   private static List<Node> createTimexNodes(String str, Integer charBeginOffset, List<CoreMap> timexAnns) {
-    List<ValuedInterval<CoreMap,Integer>> timexList = new ArrayList<ValuedInterval<CoreMap,Integer>>(timexAnns.size());
+    List<ValuedInterval<CoreMap,Integer>> timexList = new ArrayList<>(timexAnns.size());
     for (CoreMap timexAnn:timexAnns) {
-      timexList.add(new ValuedInterval<CoreMap, Integer>(timexAnn,
+      timexList.add(new ValuedInterval<>(timexAnn,
               MatchedExpression.COREMAP_TO_CHAR_OFFSETS_INTERVAL_FUNC.apply(timexAnn)));
     }
     Collections.sort(timexList, HasInterval.CONTAINS_FIRST_ENDPOINTS_COMPARATOR );
@@ -859,12 +875,12 @@ public class SUTimeMain {
 
   private static List<Node> createTimexNodesPresorted(String str, Integer charBeginOffset, List<ValuedInterval<CoreMap,Integer>> timexList) {
     if (charBeginOffset == null) charBeginOffset = 0;
-    List<Node> nodes = new ArrayList<Node>();
+    List<Node> nodes = new ArrayList<>();
     int previousEnd = 0;
-    List<Element> timexElems = new ArrayList<Element>();
-    List<ValuedInterval<CoreMap,Integer>> processed = new ArrayList<ValuedInterval<CoreMap,Integer>>();
+    List<Element> timexElems = new ArrayList<>();
+    List<ValuedInterval<CoreMap,Integer>> processed = new ArrayList<>();
     CollectionValuedMap<Integer, ValuedInterval<CoreMap,Integer>> unprocessed =
-            new CollectionValuedMap<Integer, ValuedInterval<CoreMap,Integer>>(CollectionFactory.<ValuedInterval<CoreMap,Integer>>arrayListFactory());
+            new CollectionValuedMap<>(CollectionFactory.<ValuedInterval<CoreMap,Integer>>arrayListFactory());
     for (ValuedInterval<CoreMap,Integer> v:timexList) {
       CoreMap timexAnn = v.getValue();
       int begin = timexAnn.get(CoreAnnotations.CharacterOffsetBeginAnnotation.class) - charBeginOffset;
@@ -905,7 +921,7 @@ public class SUTimeMain {
   public static void processTextFile(AnnotationPipeline pipeline, String in, String out, String date) throws IOException
   {
     String text = IOUtils.slurpFile(in);
-    PrintWriter pw = (out != null)? IOUtils.getPrintWriter(out):new PrintWriter(System.out);
+    PrintWriter pw = out != null ? IOUtils.getPrintWriter(out):new PrintWriter(System.out);
     String string = textToAnnotatedXml(pipeline, text, date);
     pw.println(string);
     pw.flush();
@@ -914,7 +930,7 @@ public class SUTimeMain {
 
   public static void processText(AnnotationPipeline pipeline, String text, String out, String date) throws IOException
   {
-    PrintWriter pw = (out != null)? IOUtils.getPrintWriter(out):new PrintWriter(System.out);
+    PrintWriter pw = out != null ? IOUtils.getPrintWriter(out):new PrintWriter(System.out);
     String string = textToAnnotatedXml(pipeline, text, date);
     pw.println(string);
     pw.flush();
@@ -959,7 +975,7 @@ public class SUTimeMain {
     return annotation;
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     // Process arguments
     Properties props = StringUtils.argsToProperties(args);
 

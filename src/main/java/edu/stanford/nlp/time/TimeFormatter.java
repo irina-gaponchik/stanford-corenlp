@@ -3,7 +3,6 @@ package edu.stanford.nlp.time;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.tokensregex.*;
 import edu.stanford.nlp.ling.tokensregex.types.Expressions;
-import edu.stanford.nlp.ling.tokensregex.SequenceMatchRules;
 import edu.stanford.nlp.ling.tokensregex.types.Value;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Function;
@@ -73,30 +72,30 @@ public class TimeFormatter {
   }
 
   static class TimePatternExtractRuleCreator extends SequenceMatchRules.AnnotationExtractRuleCreator {
-    protected void updateExtractRule(SequenceMatchRules.AnnotationExtractRule r,
-                                     Env env,
-                                     Pattern pattern,
-                                     Function<String, Value> extractor)
+    protected static void updateExtractRule(SequenceMatchRules.AnnotationExtractRule r,
+                                            Env env,
+                                            Pattern pattern,
+                                            Function<String, Value> extractor)
     {
       MatchedExpression.SingleAnnotationExtractor valueExtractor = SequenceMatchRules.createAnnotationExtractor(env,r);
       valueExtractor.valueExtractor =
-              new SequenceMatchRules.CoreMapFunctionApplier< String, Value>(
+              new SequenceMatchRules.CoreMapFunctionApplier<>(
                       r.annotationField,
                       extractor);
-      r.extractRule = new SequenceMatchRules.CoreMapExtractRule< String, MatchedExpression >(
+      r.extractRule = new SequenceMatchRules.CoreMapExtractRule<>(
               r.annotationField,
-              new SequenceMatchRules.StringPatternExtractRule<MatchedExpression>(pattern,
+              new SequenceMatchRules.StringPatternExtractRule<>(pattern,
                       new SequenceMatchRules.StringMatchedExpressionExtractor( valueExtractor, r.matchedExpressionGroup)));
       r.filterRule = new SequenceMatchRules.AnnotationMatchedFilter(valueExtractor);
     }
 
-    protected void updateExtractRule(SequenceMatchRules.AnnotationExtractRule r,
-                                     Env env,
-                                     Function<CoreMap, Value> extractor)
+    protected static void updateExtractRule(SequenceMatchRules.AnnotationExtractRule r,
+                                            Env env,
+                                            Function<CoreMap, Value> extractor)
     {
       MatchedExpression.SingleAnnotationExtractor valueExtractor = SequenceMatchRules.createAnnotationExtractor(env,r);
       valueExtractor.valueExtractor = extractor;
-      r.extractRule = new SequenceMatchRules.CoreMapExtractRule<List<? extends CoreMap>, MatchedExpression >(
+      r.extractRule = new SequenceMatchRules.CoreMapExtractRule<>(
               r.annotationField,
               new SequenceMatchRules.BasicSequenceExtractRule(valueExtractor));
       r.filterRule = new SequenceMatchRules.AnnotationMatchedFilter(valueExtractor);
@@ -201,26 +200,22 @@ public class TimeFormatter {
   private abstract static class FormatComponent
   {
     int group = -1;
-    String quantifier = null;
+    String quantifier;
     
     public void appendQuantifier(String str) {
-      if (quantifier != null) {
-        quantifier = quantifier + str;
-      } else {
-        quantifier = str;
-      }
+        quantifier = quantifier != null ? quantifier + str : str;
     }
     
     public StringBuilder appendRegex(StringBuilder sb) {
       if (group > 0) {
-        sb.append("(");
+        sb.append('(');
       }
       appendRegex0(sb);
       if (quantifier != null) {
         sb.append(quantifier);
       }
       if (group > 0) {
-        sb.append(")");
+        sb.append(')');
       }
       return sb;
     }
@@ -238,7 +233,7 @@ public class TimeFormatter {
     public DateTimeFieldType getDateTimeFieldType() { return fieldType; }
 
     public SUTime.Temporal updateTemporal(SUTime.Temporal t, String fieldValueStr) {
-      DateTimeFieldType dt = getDateTimeFieldType();
+      DateTimeFieldType dt = fieldType;
       if (fieldValueStr != null && dt != null) {
         Integer v = parseValue(fieldValueStr);
         if (v != null) {
@@ -273,7 +268,7 @@ public class TimeFormatter {
 
     protected StringBuilder appendRegex0(StringBuilder sb) {
       if (maxDigits > 5 || minDigits != maxDigits) {
-        sb.append("\\d{").append(minDigits).append(",").append(maxDigits).append("}");
+        sb.append("\\d{").append(minDigits).append(',').append(maxDigits).append('}');
       } else {
         for (int i = 0; i < minDigits; i++) {
           sb.append("\\d");
@@ -284,11 +279,7 @@ public class TimeFormatter {
     
     public Integer parseValue(String str) {
       int v = Integer.valueOf(str);
-      if (v >= minValue && v <= maxValue) {
-        return v;
-      } else {
-        return null;
-      }
+        return v >= minValue && v <= maxValue ? v : null;
     }
   }
 
@@ -310,7 +301,7 @@ public class TimeFormatter {
 
     protected StringBuilder appendRegex0(StringBuilder sb) {
       if (maxDigits > 5 || minDigits != maxDigits) {
-        sb.append("\\d{").append(minDigits).append(",").append(maxDigits).append("}");
+        sb.append("\\d{").append(minDigits).append(',').append(maxDigits).append('}');
       } else {
         for (int i = 0; i < minDigits; i++) {
           sb.append("\\d");
@@ -337,10 +328,7 @@ public class TimeFormatter {
   private static final Comparator<String> STRING_LENGTH_REV_COMPARATOR = new Comparator<String>()  {
     public int compare(String o1, String o2) {
       if (o1.length() > o2.length()) return -1;
-      else if (o1.length() < o2.length()) return 1;
-      else {
-        return o1.compareToIgnoreCase(o2);
-      }
+      else return o1.length() < o2.length() ? 1 : o1.compareToIgnoreCase(o2);
     }
   };
 
@@ -365,7 +353,7 @@ public class TimeFormatter {
       MutableDateTime.Property property = dt.property(fieldType);
       minValue = property.getMinimumValueOverall();
       maxValue = property.getMaximumValueOverall();
-      this.validValues = new ArrayList<String>(maxValue-minValue+1);
+      this.validValues = new ArrayList<>(maxValue-minValue+1);
       this.valueMapping = Generics.newHashMap();
       for (int i = minValue; i <= maxValue; i++) {
         property.set(i);
@@ -401,7 +389,7 @@ public class TimeFormatter {
         if (first) {
           first = false;
         } else {
-          sb.append("|");
+          sb.append('|');
         }
         sb.append(Pattern.quote(v));
       }
@@ -429,7 +417,7 @@ public class TimeFormatter {
     protected StringBuilder appendRegex0(StringBuilder sb) {
       sb.append("[+-]\\d\\d(?::?\\d\\d(?::?\\d\\d(?:[.,]?\\d{1,3})?)?)?");
       if (zeroOffsetParseText != null) {
-        sb.append("|").append(Pattern.quote(zeroOffsetParseText));
+        sb.append('|').append(Pattern.quote(zeroOffsetParseText));
       }
       return sb;
     }
@@ -444,8 +432,8 @@ public class TimeFormatter {
         return offset;
       }
       boolean negative = false;
-      if (str.startsWith("+")) {
-      } else if (str.startsWith("-")) {
+      if (!str.isEmpty() && str.charAt(0) == '+') {
+      } else if (!str.isEmpty() && str.charAt(0) == '-') {
         negative = true;
       } else {
         throw new IllegalArgumentException("Invalid date time zone offset " + str);
@@ -499,7 +487,7 @@ public class TimeFormatter {
     static Map<String, DateTimeZone> valueMapping;
     static List<String> validValues;
     static {
-      validValues = new ArrayList<String>(DateTimeZone.getAvailableIDs());
+      validValues = new ArrayList<>(DateTimeZone.getAvailableIDs());
       valueMapping = Generics.newHashMap();
       for (String str:validValues) {
         valueMapping.put(str.toLowerCase(), DateTimeZone.forID(str));
@@ -524,7 +512,7 @@ public class TimeFormatter {
         if (first) {
           first = false;
         } else {
-          sb.append("|");
+          sb.append('|');
         }
         sb.append(Pattern.quote(v));
       }
@@ -573,8 +561,8 @@ public class TimeFormatter {
     boolean useRelaxedHour = true;
     Locale locale;
     DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
-    List<FormatComponent> pieces = new ArrayList<FormatComponent>();
-    int curGroup = 0;
+    List<FormatComponent> pieces = new ArrayList<>();
+    int curGroup;
 
     public DateTimeFormatter toFormatter() {
       return builder.toFormatter();
@@ -755,7 +743,7 @@ public class TimeFormatter {
     }
 
     protected void appendQuantifier(String str) {
-      if (pieces.size() > 0) {
+      if (!pieces.isEmpty()) {
         FormatComponent last = pieces.get(pieces.size() - 1);
         last.appendQuantifier(str);
       } else {
@@ -946,7 +934,7 @@ public class TimeFormatter {
           } else {
             // Create copy of sub since otherwise the temporary quoted
             // string would still be referenced internally.
-            builder.appendLiteral(new String(sub));
+            builder.appendLiteral(sub);
           }
           break;
         default:
@@ -956,12 +944,12 @@ public class TimeFormatter {
     }
   }
   
-  private final static char[] SPECIAL_REGEX_CHARS = new char[]{'[', ']', '(', ')', '{', '}', '?', '*', '.', '|','\\'};
+  private final static char[] SPECIAL_REGEX_CHARS = {'[', ']', '(', ')', '{', '}', '?', '*', '.', '|','\\'};
   private static boolean isSpecialRegexChar(char c)
   {
-    for (int i = 0; i < SPECIAL_REGEX_CHARS.length; i++) {
-      if (c == SPECIAL_REGEX_CHARS[i]) return true;
-    }
+      for (char SPECIAL_REGEX_CHAR : SPECIAL_REGEX_CHARS) {
+          if (c == SPECIAL_REGEX_CHAR) return true;
+      }
     return false;
   }
 
@@ -973,8 +961,8 @@ public class TimeFormatter {
    *  location and the output is the location after parsing the token
    * @return the parsed token
    */
-  private static String parseToken(String pattern, int[] indexRef) {
-    StringBuffer buf = new StringBuffer();
+  private static String parseToken(String pattern, int... indexRef) {
+    StringBuilder buf = new StringBuilder();
 
     int i = indexRef[0];
     int length = pattern.length();
@@ -1045,7 +1033,7 @@ public class TimeFormatter {
           }
         } else if (!inLiteral &&
                 (isSpecialRegexChar(c) ||
-                (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z'))) {
+                        c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z')) {
           i--;
           break;
         } else {

@@ -10,7 +10,7 @@ import edu.stanford.nlp.trees.tregex.TregexMatcher;
  */
 class PruneNode extends TsurgeonPattern {
 
-  public PruneNode(TsurgeonPattern[] children) {
+  public PruneNode(TsurgeonPattern... children) {
     super("prune", children );
   }
 
@@ -22,20 +22,24 @@ class PruneNode extends TsurgeonPattern {
   public Tree evaluate(Tree t, TregexMatcher m) {
     boolean prunedWholeTree = false;
     for(TsurgeonPattern child : children) {
-      final Tree nodeToPrune = child.evaluate(t,m);
+      Tree nodeToPrune = child.evaluate(t,m);
       if(pruneHelper(t,nodeToPrune) == null)
         prunedWholeTree = true;
     }
     return prunedWholeTree ? null : t;
   }
 
-  private static Tree pruneHelper(Tree root, Tree nodeToPrune) {
-    if(nodeToPrune==root)
-      return null;
-    Tree parent = nodeToPrune.parent(root);
-    parent.removeChild(Trees.objectEqualityIndexOf(parent,nodeToPrune));
-    if(parent.children().length==0)
-      return pruneHelper(root,parent);
-    return root;
-  }
+    private static Tree pruneHelper(Tree root, Tree nodeToPrune) {
+        while (true) {
+            if (nodeToPrune.equals(root))
+                return null;
+            Tree parent = nodeToPrune.parent(root);
+            parent.removeChild(Trees.objectEqualityIndexOf(parent, nodeToPrune));
+            if (parent.children().length == 0) {
+                nodeToPrune = parent;
+                continue;
+            }
+            return root;
+        }
+    }
 }

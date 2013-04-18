@@ -5,11 +5,11 @@ import edu.stanford.nlp.ling.Label;
 import java.util.Collection;
 
 /**
- * Interface for Objects which have a <code>Label</code>.
+ * Interface for Objects which have a {@code Label}.
  * For instance, they may be hand-classified with one or more tags.
  * Note that it is for things that possess
  * a label via composition, rather than for things that implement
- * the <code>Label</code> interface.
+ * the {@code Label} interface.
  * An implementor might choose to be read-only and throw an
  * UnsupportedOperationException on the setLabel(s)() commands, but should
  * minimally implement both commands to return Label(s).
@@ -38,7 +38,7 @@ public interface Labeled {
    * @param label The Label value
    */
 
-  public void setLabel(final Label label);
+  public void setLabel(Label label);
 
 
   /**
@@ -57,6 +57,6 @@ public interface Labeled {
    * @param labels The set of Label values
    */
 
-  public void setLabels(final Collection<Label> labels);
+  public void setLabels(Collection<Label> labels);
 
 }

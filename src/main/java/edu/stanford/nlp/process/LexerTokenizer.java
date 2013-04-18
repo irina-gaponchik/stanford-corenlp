@@ -32,13 +32,9 @@ public class LexerTokenizer extends AbstractTokenizer<String> {
     try {
       int a = Lexer.IGNORE;
       while ((a = lexer.yylex()) == Lexer.IGNORE) {
-        ; // skip tokens to be ignored
+          // skip tokens to be ignored
       }
-      if (a == lexer.getYYEOF()) {
-        token = null;
-      } else {
-        token = lexer.yytext();
-      }
+        token = a == lexer.getYYEOF() ? null : lexer.yytext();
     } catch (IOException e) {
       // do nothing, return null
     }
@@ -74,7 +70,7 @@ public class LexerTokenizer extends AbstractTokenizer<String> {
   /**
    * for testing only
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     Tokenizer<String> t = new LexerTokenizer(new JFlexDummyLexer((Reader) null), new BufferedReader(new FileReader(args[0])));
     while (t.hasNext()) {
       System.out.println("token " + t.next());

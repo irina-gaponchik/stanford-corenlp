@@ -6,13 +6,12 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.MutableInteger;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.ling.*;
-import edu.stanford.nlp.ling.CoreAnnotations;
 
 import java.util.*;
 import java.io.*;
 
 /**
- * Various static utilities for the <code>Tree</code> class.
+ * Various static utilities for the {@code Tree} class.
  *
  * @author Roger Levy
  * @author Dan Klein
@@ -41,7 +40,7 @@ public class Trees {
   }
 
   static boolean leftEdge(Tree t, Tree t1, MutableInteger i) {
-    if (t == t1) {
+    if (t.equals(t1)) {
       return true;
     } else if (t1.isLeaf()) {
       int j = t1.yield().size(); // so that empties don't add size
@@ -74,7 +73,7 @@ public class Trees {
   }
 
   static boolean rightEdge(Tree t, Tree t1, MutableInteger i) {
-    if (t == t1) {
+    if (t.equals(t1)) {
       return true;
     } else if (t1.isLeaf()) {
       int j = t1.yield().size(); // so that empties don't add size
@@ -108,7 +107,7 @@ public class Trees {
    * returns the leaves in a Tree in the order that they're found.
    */
   public static List<Tree> leaves(Tree t) {
-    List<Tree> l = new ArrayList<Tree>();
+    List<Tree> l = new ArrayList<>();
     leaves(t, l);
     return l;
   }
@@ -124,7 +123,7 @@ public class Trees {
   }
 
   public static List<Tree> preTerminals(Tree t) {
-    List<Tree> l = new ArrayList<Tree>();
+    List<Tree> l = new ArrayList<>();
     preTerminals(t, l);
     return l;
   }
@@ -144,7 +143,7 @@ public class Trees {
    * returns the labels of the leaves in a Tree in the order that they're found.
    */
   public static List<Label> leafLabels(Tree t) {
-    List<Label> l = new ArrayList<Label>();
+    List<Label> l = new ArrayList<>();
     leafLabels(t, l);
     return l;
   }
@@ -164,7 +163,7 @@ public class Trees {
    * the labels are CoreLabels.
    */
   public static List<CoreLabel> taggedLeafLabels(Tree t) {
-    List<CoreLabel> l = new ArrayList<CoreLabel>();
+    List<CoreLabel> l = new ArrayList<>();
     taggedLeafLabels(t, l);
     return l;
   }
@@ -183,18 +182,18 @@ public class Trees {
 
 
   /**
-   * returns the maximal projection of <code>head</code> in
-   * <code>root</code> given a {@link HeadFinder}
+   * returns the maximal projection of {@code head} in
+   * {@code root} given a {@link HeadFinder}
    */
   public static Tree maximalProjection(Tree head, Tree root, HeadFinder hf) {
     Tree projection = head;
-    if (projection == root) {
+    if (projection.equals(root)) {
       return root;
     }
     Tree parent = projection.parent(root);
-    while (hf.determineHead(parent) == projection) {
+    while (hf.determineHead(parent).equals(projection)) {
       projection = parent;
-      if (projection == root) {
+      if (projection.equals(root)) {
         return root;
       }
       parent = projection.parent(root);
@@ -209,17 +208,17 @@ public class Trees {
   public static Tree applyToProjections(TreeVisitor v, Tree head, Tree root, HeadFinder hf) {
     Tree projection = head;
     Tree parent = projection.parent(root);
-    if (parent == null && projection != root) {
+    if (parent == null && !projection.equals(root)) {
       return null;
     }
     v.visitTree(projection);
-    if (projection == root) {
+    if (projection.equals(root)) {
       return root;
     }
-    while (hf.determineHead(parent) == projection) {
+    while (hf.determineHead(parent).equals(projection)) {
       projection = parent;
       v.visitTree(projection);
-      if (projection == root) {
+      if (projection.equals(root)) {
         return root;
       }
       parent = projection.parent(root);
@@ -228,7 +227,7 @@ public class Trees {
   }
 
   /**
-   * gets the <code>n</code>th terminal in <code>tree</code>.  The first terminal is number zero.
+   * gets the {@code n}th terminal in {@code tree}.  The first terminal is number zero.
    */
   public static Tree getTerminal(Tree tree, int n) {
     return getTerminal(tree, new MutableInteger(0), n);
@@ -236,11 +235,7 @@ public class Trees {
 
   static Tree getTerminal(Tree tree, MutableInteger i, int n) {
     if (i.intValue() == n) {
-      if (tree.isLeaf()) {
-        return tree;
-      } else {
-        return getTerminal(tree.children()[0], i, n);
-      }
+        return tree.isLeaf() ? tree : getTerminal(tree.children()[0], i, n);
     } else {
       if (tree.isLeaf()) {
         i.set(i.intValue() + tree.yield().size());
@@ -258,7 +253,7 @@ public class Trees {
   }
 
   /**
-   * gets the <code>n</code>th preterminal in <code>tree</code>.  The first terminal is number zero.
+   * gets the {@code n}th preterminal in {@code tree}.  The first terminal is number zero.
    */
   public static Tree getPreTerminal(Tree tree, int n) {
     return getPreTerminal(tree, new MutableInteger(0), n);
@@ -266,11 +261,7 @@ public class Trees {
 
   static Tree getPreTerminal(Tree tree, MutableInteger i, int n) {
     if (i.intValue() == n) {
-      if (tree.isPreTerminal()) {
-        return tree;
-      } else {
-        return getPreTerminal(tree.children()[0], i, n);
-      }
+        return tree.isPreTerminal() ? tree : getPreTerminal(tree.children()[0], i, n);
     } else {
       if (tree.isPreTerminal()) {
         i.set(i.intValue() + tree.yield().size());
@@ -291,7 +282,7 @@ public class Trees {
    * returns the syntactic category of the tree as a list of the syntactic categories of the mother and the daughters
    */
   public static List<String> localTreeAsCatList(Tree t) {
-    List<String> l = new ArrayList<String>(t.children().length + 1);
+    List<String> l = new ArrayList<>(t.children().length + 1);
     l.add(t.label().value());
     for (int i = 0; i < t.children().length; i++) {
       l.add(t.children()[i].label().value());
@@ -300,12 +291,12 @@ public class Trees {
   }
 
   /**
-   * Returns the index of <code>daughter</code> in <code>parent</code> by ==.
-   * Returns -1 if <code>daughter</code> not found.
+   * Returns the index of {@code daughter} in {@code parent} by ==.
+   * Returns -1 if {@code daughter} not found.
    */
   public static int objectEqualityIndexOf(Tree parent, Tree daughter) {
     for (int i = 0; i < parent.children().length; i++) {
-      if (daughter == parent.children()[i]) {
+      if (daughter.equals(parent.children()[i])) {
         return i;
       }
     }
@@ -421,7 +412,7 @@ public class Trees {
    *  @return The one phrasal level Tree
    */
   public static Tree toFlatTree(List<? extends HasWord> s, LabelFactory lf) {
-    List<Tree> daughters = new ArrayList<Tree>(s.size());
+    List<Tree> daughters = new ArrayList<>(s.size());
     for (HasWord word : s) {
       Tree wordNode = new LabeledScoredTreeNode(lf.newLabel(word.word()));
       if (word instanceof TaggedWord) {
@@ -516,7 +507,7 @@ public class Trees {
   }
 
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     int i = 0;
     while (i < args.length) {
       Tree tree = Tree.valueOf(args[i]);
@@ -530,9 +521,9 @@ public class Trees {
       i++;
     }
     if (i == 0) {
-      Tree tree = (new PennTreeReader(new BufferedReader(new
+      Tree tree = new PennTreeReader(new BufferedReader(new
               InputStreamReader(System.in)), new LabeledScoredTreeFactory(new
-              StringLabelFactory()))).readTree();
+              StringLabelFactory())).readTree();
       System.out.println(escape(texTree(tree)));
     }
   }
@@ -553,7 +544,7 @@ public class Trees {
    * Gets the <i>i</i>th leaf of a tree from the left.
    * The leftmost leaf is numbered 0.
    *
-   * @return The <i>i</i><sup>th</sup> leaf as a Tree, or <code>null</code>
+   * @return The <i>i</i><sup>th</sup> leaf as a Tree, or {@code null}
    *     if there is no such leaf.
    */
   public static Tree getLeaf(Tree tree, int i) {
@@ -574,7 +565,7 @@ public class Trees {
    * Get lowest common ancestor of all the nodes in the list with the tree rooted at root
    */
   public static Tree getLowestCommonAncestor(List<Tree> nodes, Tree root) {
-    List<List<Tree>> paths = new ArrayList<List<Tree>>();
+    List<List<Tree>> paths = new ArrayList<>();
     int min = Integer.MAX_VALUE;
     for (Tree t : nodes) {
       List<Tree> path = pathFromRoot(t, root);
@@ -633,7 +624,7 @@ public class Trees {
 
     //System.out.println(treeListToCatList(fromPath));
     //System.out.println(treeListToCatList(toPath));
-    List<String> totalPath = new ArrayList<String>();
+    List<String> totalPath = new ArrayList<>();
 
     for (int i = fromPath.size() - 1; i >= last; i--) {
       Tree t = fromPath.get(i);
@@ -669,9 +660,9 @@ public class Trees {
    * t. Returns null if tree not found dominated by root
    */
   public static List<Tree> pathFromRoot(Tree t, Tree root) {
-    if (t == root) {
+    if (t.equals(root)) {
       //if (t.equals(root)) {
-      List<Tree> l = new ArrayList<Tree>(1);
+      List<Tree> l = new ArrayList<>(1);
       l.add(t);
       return l;
     } else if (root == null) {
@@ -689,9 +680,9 @@ public class Trees {
     if (t.isLeaf())
       return;
     Tree[] kids = t.children();
-    List<Tree> newKids = new ArrayList<Tree>(kids.length);
+    List<Tree> newKids = new ArrayList<>(kids.length);
     for (Tree kid : kids) {
-      if (kid != node) {
+      if (!kid.equals(node)) {
         newKids.add(kid);
         replaceNode(node, node1, kid);
       } else {

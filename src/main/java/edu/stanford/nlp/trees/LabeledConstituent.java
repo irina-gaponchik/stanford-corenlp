@@ -5,8 +5,8 @@ import edu.stanford.nlp.ling.LabelFactory;
 import edu.stanford.nlp.ling.StringLabel;
 
 /**
- * A <code>LabeledConstituent</code> object represents a single bracketing in
- * a derivation, including start and end points and <code>Label</code>
+ * A {@code LabeledConstituent} object represents a single bracketing in
+ * a derivation, including start and end points and {@code Label}
  * information, but excluding probabilistic information.  It is used
  * to represent the basic information that is accumulated in exploring parses.
  *
@@ -23,7 +23,7 @@ public class LabeledConstituent extends SimpleConstituent
 
 
   /**
-   * Create an empty <code>LabeledConstituent</code> object.
+   * Create an empty {@code LabeledConstituent} object.
    */
   public LabeledConstituent() {
     // implicitly super();
@@ -31,7 +31,7 @@ public class LabeledConstituent extends SimpleConstituent
 
 
   /**
-   * Create a <code>LabeledConstituent</code> object with given
+   * Create a {@code LabeledConstituent} object with given
    * values.
    *
    * @param start Start node of edge
@@ -43,11 +43,11 @@ public class LabeledConstituent extends SimpleConstituent
 
 
   /**
-   * Create a <code>LabeledConstituent</code> object with given values.
+   * Create a {@code LabeledConstituent} object with given values.
    *
    * @param start Start node of edge
    * @param end   End node of edge
-   * @param label The label of the <code>Constituent</code>
+   * @param label The label of the {@code Constituent}
    */
   public LabeledConstituent(int start, int end, Label label) {
     super(start, end);
@@ -56,11 +56,11 @@ public class LabeledConstituent extends SimpleConstituent
 
 
   /**
-   * Create a <code>LabeledConstituent</code> object with given values.
+   * Create a {@code LabeledConstituent} object with given values.
    *
    * @param start       Start node of edge
    * @param end         End node of edge
-   * @param stringValue The name of the <code>Constituent</code>
+   * @param stringValue The name of the {@code Constituent}
    */
   public LabeledConstituent(int start, int end, String stringValue) {
     super(start, end);
@@ -84,50 +84,50 @@ public class LabeledConstituent extends SimpleConstituent
   }
 
   /**
-   * A <code>LabeledConstituentLabelFactory</code> object makes a
-   * <code>StringLabel</code> <code>LabeledScoredConstituent</code>.
+   * A {@code LabeledConstituentLabelFactory} object makes a
+   * {@code StringLabel} {@code LabeledScoredConstituent}.
    */
   private static class LabeledConstituentLabelFactory implements LabelFactory {
 
     /**
-     * Make a new <code>LabeledConstituent</code>.
+     * Make a new {@code LabeledConstituent}.
      *
      * @param labelStr A string.
      * @return The created label
      */
-    public Label newLabel(final String labelStr) {
+    public Label newLabel(String labelStr) {
       return new LabeledConstituent(0, 0, new StringLabel(labelStr));
     }
 
 
     /**
-     * Make a new <code>LabeledConstituent</code>.
+     * Make a new {@code LabeledConstituent}.
      *
      * @param labelStr A string.
      * @param options  The options are ignored.
      * @return The created label
      */
-    public Label newLabel(final String labelStr, final int options) {
+    public Label newLabel(String labelStr, int options) {
       return newLabel(labelStr);
     }
 
 
     /**
-     * Make a new <code>LabeledConstituent</code>.
+     * Make a new {@code LabeledConstituent}.
      *
      * @param labelStr A string.
      * @return The created label
      */
-    public Label newLabelFromString(final String labelStr) {
+    public Label newLabelFromString(String labelStr) {
       return newLabel(labelStr);
     }
 
 
     /**
-     * Create a new <code>LabeledConstituent</code>.
+     * Create a new {@code LabeledConstituent}.
      *
-     * @param oldLabel A <code>Label</code>.
-     * @return A new <code>LabeledConstituent</code>
+     * @param oldLabel A {@code Label}.
+     * @return A new {@code LabeledConstituent}
      */
     public Label newLabel(Label oldLabel) {
       return new LabeledConstituent(0, 0, oldLabel);
@@ -157,8 +157,8 @@ public class LabeledConstituent extends SimpleConstituent
   private static class ConstituentFactoryHolder {
 
     /**
-     * A <code>LabeledConstituentFactory</code> acts as a factory for
-     * creating objects of class <code>LabeledConstituent</code>.
+     * A {@code LabeledConstituentFactory} acts as a factory for
+     * creating objects of class {@code LabeledConstituent}.
      */
     private static class LabeledConstituentFactory implements ConstituentFactory {
 

@@ -29,13 +29,10 @@ public class Dictionary {
   private static final String naWord = "NA";
   private static final boolean VERBOSE = false;
 
-  public Dictionary() {
-  }
-
-  void fillWordTagCounts(Map<String, IntCounter<String>> wordTagCounts) {
-    for (String word : wordTagCounts.keySet()) {
-      TagCount count = new TagCount(wordTagCounts.get(word));
-      dict.put(word, count);
+    void fillWordTagCounts(Map<String, IntCounter<String>> wordTagCounts) {
+    for (Map.Entry<String, IntCounter<String>> stringIntCounterEntry : wordTagCounts.entrySet()) {
+      TagCount count = new TagCount(stringIntCounterEntry.getValue());
+      dict.put(stringIntCounterEntry.getKey(), count);
     }
   }
 
@@ -119,11 +116,7 @@ public class Dictionary {
 
   protected int getCount(String word, String tag) {
     TagCount count = dict.get(word);
-    if (count == null) {
-      return 0;
-    } else {
-      return count.get(tag);
-    }
+      return count == null ? 0 : count.get(tag);
   }
 
 
@@ -347,7 +340,7 @@ public class Dictionary {
     return get(word).getAmbClassId();
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     String s = "word";
     String tag = "tag";
     Dictionary d = new Dictionary();

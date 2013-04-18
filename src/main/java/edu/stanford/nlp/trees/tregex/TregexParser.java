@@ -11,12 +11,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-class TregexParser implements TregexParserConstants {
+class TregexParser {
 
   // this is so we can tell, at any point during the parse
   // whether we are under a negation, which we need to know
   // because labeling nodes under negation is illegal
-  private boolean underNegation = false;
+  private boolean underNegation;
 
   private Function<String, String> basicCatFunction =
     TregexPatternCompiler.DEFAULT_BASIC_CAT_FUNCTION;
@@ -47,23 +47,23 @@ class TregexParser implements TregexParserConstants {
   TregexPattern node;
     node = SubNode(Relation.ROOT);
     jj_consume_token(11);
-    {if (true) return node;}
-    throw new Error("Missing return statement in function");
+      if (true) return node;
+      throw new Error("Missing return statement in function");
   }
 
 // passing arguments down the tree - in this case the relation that
 // pertains to this node gets passed all the way down to the Description node
   final public TregexPattern Node(Relation r) throws ParseException {
   TregexPattern node;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case 12:
       jj_consume_token(12);
       node = SubNode(r);
       jj_consume_token(13);
       break;
-    case IDENTIFIER:
-    case BLANK:
-    case REGEX:
+    case TregexParserConstants.IDENTIFIER:
+    case TregexParserConstants.BLANK:
+    case TregexParserConstants.REGEX:
     case 14:
     case 15:
     case 18:
@@ -75,21 +75,21 @@ class TregexParser implements TregexParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-    {if (true) return node;}
-    throw new Error("Missing return statement in function");
+      if (true) return node;
+      throw new Error("Missing return statement in function");
   }
 
   final public DescriptionPattern SubNode(Relation r) throws ParseException {
   DescriptionPattern result = null;
   TregexPattern child = null;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case 12:
       jj_consume_token(12);
       result = SubNode(r);
       jj_consume_token(13);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case RELATION:
-      case REL_W_STR_ARG:
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+      case TregexParserConstants.RELATION:
+      case TregexParserConstants.REL_W_STR_ARG:
       case 14:
       case 22:
       case 23:
@@ -97,27 +97,26 @@ class TregexParser implements TregexParserConstants {
         break;
       default:
         jj_la1[1] = jj_gen;
-        ;
       }
       if(child != null) {
-        List<TregexPattern> newChildren = new ArrayList<TregexPattern>();
+        List<TregexPattern> newChildren = new ArrayList<>();
         newChildren.addAll(result.getChildren());
         newChildren.add(child);
         result.setChild(new CoordinationPattern(newChildren,true));
       }
-      {if (true) return result;}
-      break;
-    case IDENTIFIER:
-    case BLANK:
-    case REGEX:
+        if (true) return result;
+        break;
+    case TregexParserConstants.IDENTIFIER:
+    case TregexParserConstants.BLANK:
+    case TregexParserConstants.REGEX:
     case 14:
     case 15:
     case 18:
     case 19:
       result = ModDescription(r);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case RELATION:
-      case REL_W_STR_ARG:
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+      case TregexParserConstants.RELATION:
+      case TregexParserConstants.REL_W_STR_ARG:
       case 14:
       case 22:
       case 23:
@@ -125,11 +124,10 @@ class TregexParser implements TregexParserConstants {
         break;
       default:
         jj_la1[2] = jj_gen;
-        ;
       }
       if (child != null) result.setChild(child);
-      {if (true) return result;}
-      break;
+        if (true) return result;
+        break;
     default:
       jj_la1[3] = jj_gen;
       jj_consume_token(-1);
@@ -141,27 +139,25 @@ class TregexParser implements TregexParserConstants {
   final public DescriptionPattern ModDescription(Relation r) throws ParseException {
   DescriptionPattern node;
   boolean neg = false, cat = false;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case 14:
       jj_consume_token(14);
              neg = true;
       break;
     default:
       jj_la1[4] = jj_gen;
-      ;
     }
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case 15:
       jj_consume_token(15);
                                       cat = true;
       break;
     default:
       jj_la1[5] = jj_gen;
-      ;
     }
     node = Description(r, neg, cat);
-    {if (true) return node;}
-    throw new Error("Missing return statement in function");
+      if (true) return node;
+      throw new Error("Missing return statement in function");
   }
 
   final public DescriptionPattern Description(Relation r, boolean negateDesc, boolean cat) throws ParseException {
@@ -171,20 +167,20 @@ class TregexParser implements TregexParserConstants {
   boolean link = false;
   Token groupNum;
   Token groupVar;
-  List<Pair<Integer,String>> varGroups = new ArrayList<Pair<Integer,String>>();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case IDENTIFIER:
-    case BLANK:
-    case REGEX:
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case IDENTIFIER:
-        desc = jj_consume_token(IDENTIFIER);
+  List<Pair<Integer,String>> varGroups = new ArrayList<>();
+    switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+    case TregexParserConstants.IDENTIFIER:
+    case TregexParserConstants.BLANK:
+    case TregexParserConstants.REGEX:
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+      case TregexParserConstants.IDENTIFIER:
+        desc = jj_consume_token(TregexParserConstants.IDENTIFIER);
         break;
-      case REGEX:
-        desc = jj_consume_token(REGEX);
+      case TregexParserConstants.REGEX:
+        desc = jj_consume_token(TregexParserConstants.REGEX);
         break;
-      case BLANK:
-        desc = jj_consume_token(BLANK);
+      case TregexParserConstants.BLANK:
+        desc = jj_consume_token(TregexParserConstants.BLANK);
         break;
       default:
         jj_la1[6] = jj_gen;
@@ -193,26 +189,25 @@ class TregexParser implements TregexParserConstants {
       }
       label_1:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
         case 16:
-          ;
-          break;
+            break;
         default:
           jj_la1[7] = jj_gen;
           break label_1;
         }
         jj_consume_token(16);
-        groupNum = jj_consume_token(NUMBER);
+        groupNum = jj_consume_token(TregexParserConstants.NUMBER);
         jj_consume_token(17);
-        groupVar = jj_consume_token(IDENTIFIER);
-        varGroups.add(new Pair<Integer,String>(Integer.parseInt(groupNum.image),groupVar.image));
+        groupVar = jj_consume_token(TregexParserConstants.IDENTIFIER);
+        varGroups.add(new Pair<>(Integer.parseInt(groupNum.image),groupVar.image));
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
       case 18:
         jj_consume_token(18);
-        name = jj_consume_token(IDENTIFIER);
+        name = jj_consume_token(TregexParserConstants.IDENTIFIER);
           if (knownVariables.contains(name.image)) {
-            {if (true) throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");}
+              if (true) throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");
           } else {
             knownVariables.add(name.image);
           }
@@ -221,28 +216,26 @@ class TregexParser implements TregexParserConstants {
         break;
       default:
         jj_la1[8] = jj_gen;
-        ;
       }
       break;
     case 19:
       jj_consume_token(19);
-      linkedName = jj_consume_token(IDENTIFIER);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      linkedName = jj_consume_token(TregexParserConstants.IDENTIFIER);
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
       case 18:
         jj_consume_token(18);
-        name = jj_consume_token(IDENTIFIER);
+        name = jj_consume_token(TregexParserConstants.IDENTIFIER);
         break;
       default:
         jj_la1[9] = jj_gen;
-        ;
       }
         if (!knownVariables.contains(linkedName.image)) {
-          {if (true) throw new ParseException("Variable " + linkedName.image +
-                                   " was referenced before it was declared");}
+            if (true) throw new ParseException("Variable " + linkedName.image +
+                                     " was referenced before it was declared");
         }
         if (name != null) {
           if (knownVariables.contains(name.image)) {
-            {if (true) throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");}
+              if (true) throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");
           } else {
             knownVariables.add(name.image);
           }
@@ -251,10 +244,10 @@ class TregexParser implements TregexParserConstants {
       break;
     case 18:
       jj_consume_token(18);
-      name = jj_consume_token(IDENTIFIER);
+      name = jj_consume_token(TregexParserConstants.IDENTIFIER);
         if (!knownVariables.contains(name.image)) {
-          {if (true) throw new ParseException("Variable " + name.image +
-                                   " was referenced before it was declared");}
+            if (true) throw new ParseException("Variable " + name.image +
+                                     " was referenced before it was declared");
         }
       break;
     default:
@@ -263,13 +256,13 @@ class TregexParser implements TregexParserConstants {
       throw new ParseException();
     }
     DescriptionPattern ret = new DescriptionPattern(r, negateDesc, desc != null ? desc.image : null, name != null ? name.image : null, cat, basicCatFunction, varGroups, link, linkedName != null ? linkedName.image : null);
-    {if (true) return ret;}
-    throw new Error("Missing return statement in function");
+      if (true) return ret;
+      throw new Error("Missing return statement in function");
   }
 
   final public TregexPattern ChildrenDisj() throws ParseException {
   TregexPattern child;
-  List<TregexPattern> children = new ArrayList<TregexPattern>();
+  List<TregexPattern> children = new ArrayList<>();
   // When we keep track of the known variables to assert that
   // variables are not redefined, or that links are only set to known
   // variables, we want to separate those done in different parts of the
@@ -284,10 +277,9 @@ class TregexParser implements TregexParserConstants {
       allKnownVariables.addAll(knownVariables);
     label_2:
     while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
       case 20:
-        ;
-        break;
+          break;
       default:
         jj_la1[11] = jj_gen;
         break label_2;
@@ -299,57 +291,49 @@ class TregexParser implements TregexParserConstants {
       allKnownVariables.addAll(knownVariables);
     }
     knownVariables = allKnownVariables;
-    if (children.size() == 1)
-      {if (true) return child;}
-    else
-      {if (true) return new CoordinationPattern(children, false);}
-    throw new Error("Missing return statement in function");
+      if (true) return child;
+      throw new Error("Missing return statement in function");
   }
 
   final public TregexPattern ChildrenConj() throws ParseException {
   TregexPattern child;
-  List<TregexPattern> children = new ArrayList<TregexPattern>();
+  List<TregexPattern> children = new ArrayList<>();
     child = ModChild();
                              children.add(child);
     label_3:
     while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case RELATION:
-      case REL_W_STR_ARG:
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+      case TregexParserConstants.RELATION:
+      case TregexParserConstants.REL_W_STR_ARG:
       case 14:
       case 21:
       case 22:
       case 23:
-        ;
-        break;
+          break;
       default:
         jj_la1[12] = jj_gen;
         break label_3;
       }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
       case 21:
         jj_consume_token(21);
         break;
       default:
         jj_la1[13] = jj_gen;
-        ;
       }
       child = ModChild();
                                       children.add(child);
     }
-    if (children.size() == 1)
-        {if (true) return child;}
-      else
-        {if (true) return new CoordinationPattern(children, true);}
-    throw new Error("Missing return statement in function");
+      if (true) return child;
+      throw new Error("Missing return statement in function");
   }
 
   final public TregexPattern ModChild() throws ParseException {
   TregexPattern child;
   boolean startUnderNeg;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case RELATION:
-    case REL_W_STR_ARG:
+    switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+    case TregexParserConstants.RELATION:
+    case TregexParserConstants.REL_W_STR_ARG:
     case 23:
       child = Child();
       break;
@@ -371,20 +355,20 @@ class TregexParser implements TregexParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-    {if (true) return child;}
-    throw new Error("Missing return statement in function");
+      if (true) return child;
+      throw new Error("Missing return statement in function");
   }
 
   final public TregexPattern Child() throws ParseException {
   TregexPattern child;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case 23:
       jj_consume_token(23);
       child = ChildrenDisj();
       jj_consume_token(24);
       break;
-    case RELATION:
-    case REL_W_STR_ARG:
+    case TregexParserConstants.RELATION:
+    case TregexParserConstants.REL_W_STR_ARG:
       child = Relation();
       break;
     default:
@@ -392,8 +376,8 @@ class TregexParser implements TregexParserConstants {
       jj_consume_token(-1);
       throw new ParseException();
     }
-    {if (true) return child;}
-    throw new Error("Missing return statement in function");
+      if (true) return child;
+      throw new Error("Missing return statement in function");
   }
 
   final public TregexPattern Relation() throws ParseException {
@@ -402,48 +386,45 @@ class TregexParser implements TregexParserConstants {
   // is to set the token to null and then check it later
   Relation r;
   TregexPattern child;
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case RELATION:
-      t = jj_consume_token(RELATION);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case NUMBER:
-        numArg = jj_consume_token(NUMBER);
+    switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+    case TregexParserConstants.RELATION:
+      t = jj_consume_token(TregexParserConstants.RELATION);
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+      case TregexParserConstants.NUMBER:
+        numArg = jj_consume_token(TregexParserConstants.NUMBER);
         break;
       default:
         jj_la1[16] = jj_gen;
-        ;
       }
       break;
-    case REL_W_STR_ARG:
-      t = jj_consume_token(REL_W_STR_ARG);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TregexParserConstants.REL_W_STR_ARG:
+      t = jj_consume_token(TregexParserConstants.REL_W_STR_ARG);
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
       case 12:
         jj_consume_token(12);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
         case 14:
           negation = jj_consume_token(14);
           break;
         default:
           jj_la1[17] = jj_gen;
-          ;
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
         case 15:
           cat = jj_consume_token(15);
           break;
         default:
           jj_la1[18] = jj_gen;
-          ;
         }
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case REGEX:
-          strArg = jj_consume_token(REGEX);
+        switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+        case TregexParserConstants.REGEX:
+          strArg = jj_consume_token(TregexParserConstants.REGEX);
           break;
-        case IDENTIFIER:
-          strArg = jj_consume_token(IDENTIFIER);
+        case TregexParserConstants.IDENTIFIER:
+          strArg = jj_consume_token(TregexParserConstants.IDENTIFIER);
           break;
-        case BLANK:
-          strArg = jj_consume_token(BLANK);
+        case TregexParserConstants.BLANK:
+          strArg = jj_consume_token(TregexParserConstants.BLANK);
           break;
         default:
           jj_la1[19] = jj_gen;
@@ -452,17 +433,16 @@ class TregexParser implements TregexParserConstants {
         }
         jj_consume_token(13);
         break;
-      case REGEX:
+      case TregexParserConstants.REGEX:
       case 14:
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
         case 14:
           negation = jj_consume_token(14);
           break;
         default:
           jj_la1[20] = jj_gen;
-          ;
         }
-        strArg = jj_consume_token(REGEX);
+        strArg = jj_consume_token(TregexParserConstants.REGEX);
         break;
       default:
         jj_la1[21] = jj_gen;
@@ -481,9 +461,9 @@ class TregexParser implements TregexParserConstants {
         r = Relation.getRelation(t.image, negStr + catStr + strArg.image,
                                  basicCatFunction, headFinder);
       } else if (numArg != null) {
-        if (t.image.endsWith("-")) {
+        if (!t.image.isEmpty() && t.image.charAt(t.image.length() - 1) == '-') {
           t.image = t.image.substring(0, t.image.length()-1);
-          numArg.image = "-" + numArg.image;
+          numArg.image = '-' + numArg.image;
         }
         r = Relation.getRelation(t.image, numArg.image,
                                  basicCatFunction, headFinder);
@@ -491,8 +471,8 @@ class TregexParser implements TregexParserConstants {
         r = Relation.getRelation(t.image, basicCatFunction, headFinder);
       }
     child = Node(r);
-    {if (true) return child;}
-    throw new Error("Missing return statement in function");
+      if (true) return child;
+      throw new Error("Missing return statement in function");
   }
 
   /** Generated Token Manager. */
@@ -581,8 +561,7 @@ class TregexParser implements TregexParserConstants {
 
   private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
-    if ((oldToken = token).next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
+      token = (oldToken = token).next != null ? token.next : (token.next = token_source.getNextToken());
     jj_ntk = -1;
     if (token.kind == kind) {
       jj_gen++;
@@ -596,8 +575,7 @@ class TregexParser implements TregexParserConstants {
 
 /** Get the next Token. */
   final public Token getNextToken() {
-    if (token.next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
+      token = token.next != null ? token.next : (token.next = token_source.getNextToken());
     jj_ntk = -1;
     jj_gen++;
     return token;
@@ -607,20 +585,16 @@ class TregexParser implements TregexParserConstants {
   final public Token getToken(int index) {
     Token t = token;
     for (int i = 0; i < index; i++) {
-      if (t.next != null) t = t.next;
-      else t = t.next = token_source.getNextToken();
+        t = t.next != null ? t.next : (t.next = token_source.getNextToken());
     }
     return t;
   }
 
   private int jj_ntk() {
-    if ((jj_nt=token.next) == null)
-      return (jj_ntk = (token.next=token_source.getNextToken()).kind);
-    else
-      return (jj_ntk = jj_nt.kind);
+      return (jj_nt = token.next) == null ? (jj_ntk = (token.next = token_source.getNextToken()).kind) : (jj_ntk = jj_nt.kind);
   }
 
-  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<>();
   private int[] jj_expentry;
   private int jj_kind = -1;
 
@@ -635,7 +609,7 @@ class TregexParser implements TregexParserConstants {
     for (int i = 0; i < 23; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
-          if ((jj_la1_0[i] & (1<<j)) != 0) {
+          if ((jj_la1_0[i] & 1<<j) != 0) {
             la1tokens[j] = true;
           }
         }
@@ -652,7 +626,7 @@ class TregexParser implements TregexParserConstants {
     for (int i = 0; i < jj_expentries.size(); i++) {
       exptokseq[i] = jj_expentries.get(i);
     }
-    return new ParseException(token, exptokseq, tokenImage);
+    return new ParseException(token, exptokseq, TregexParserConstants.tokenImage);
   }
 
   /** Enable tracing. */

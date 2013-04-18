@@ -25,7 +25,7 @@ public class NonLinearSecondOrderCliquePotentialFunction implements CliquePotent
   }
 
   @Override
-  public double computeCliquePotential(int cliqueSize, int labelIndex, int[] cliqueFeatures, double[] featureVal) {
+  public double computeCliquePotential(int cliqueSize, int labelIndex, int[] cliqueFeatures, double... featureVal) {
     double output = 0.0;
     double[][] inputWeights, outputWeights = null;
     if (cliqueSize > 1) {
@@ -42,11 +42,7 @@ public class NonLinearSecondOrderCliquePotentialFunction implements CliquePotent
     // transform the hidden layer to output layer through linear transformation
     if (flags.useOutputLayer) {
       double[] outputWs = null;
-      if (flags.tieOutputLayer) {
-        outputWs = outputWeights[0];
-      } else {
-        outputWs = outputWeights[labelIndex];
-      }
+        outputWs = flags.tieOutputLayer ? outputWeights[0] : outputWeights[labelIndex];
       if (flags.softmaxOutputLayer) {
         outputWs = ArrayMath.softmax(outputWs);
       }

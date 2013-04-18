@@ -11,9 +11,7 @@ import java.io.OutputStream;
  *
  * @author John Bauer
  */
-public class TeeStream extends OutputStream 
-  implements Closeable, Flushable
-{
+public class TeeStream extends OutputStream {
   public TeeStream(OutputStream s1, OutputStream s2) {
     this.s1 = s1;
     this.s2 = s2;

@@ -14,7 +14,7 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
   private final int[][] data;
   private final double[][] dataValues;
   private final int[] labels;
-  protected float[] dataweights = null;
+  protected float[] dataweights;
   private final LogPrior prior;
   double probCorrect = 0.7;
 
@@ -24,7 +24,7 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
   }
 
   @Override
-  protected void calculate(double[] x) {
+  protected void calculate(double... x) {
 
     if (dataValues != null) {
       throw new RuntimeException();
@@ -37,9 +37,9 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
       int[] features = data[d];
       double sum = 0;
 
-      for (int f = 0; f < features.length; f++) {
-        sum += x[features[f]];
-      }
+        for (int feature1 : features) {
+            sum += x[feature1];
+        }
 
       double expSum, derivativeIncrement;
 
@@ -49,9 +49,9 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
 
       if (labels[d] == 1) {
         expSum = Math.exp(-sum);
-        double g = (1 / (1 + expSum));
+        double g = 1 / (1 + expSum);
         value -= Math.log(g);
-        derivativeIncrement = (g-1);
+        derivativeIncrement = g-1;
       } else {
 //         expSum = Math.exp(-sum);
 //         double g = (1 / (1 + expSum));
@@ -59,21 +59,21 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
 //         derivativeIncrement = (g);
 //       }
         expSum = Math.exp(-sum);
-        double g = (1 / (1 + expSum));
-        double e = (1-probCorrect) * g + (probCorrect)*(1 - g);
+        double g = 1 / (1 + expSum);
+        double e = (1-probCorrect) * g + probCorrect *(1 - g);
         value -= Math.log(e);
-        derivativeIncrement = -(g*(1-g)*(1-2*probCorrect)) / (e);
+        derivativeIncrement = -(g*(1-g)*(1-2*probCorrect)) / e;
       }
 
-      for (int f = 0; f < features.length; f++) {
-        derivative[features[f]] += derivativeIncrement;
-      }
+        for (int feature : features) {
+            derivative[feature] += derivativeIncrement;
+        }
     }
 
     value += prior.compute(x, derivative);
   }
 
-  protected void calculateRVF(double[] x) {
+  protected void calculateRVF(double... x) {
 
     value = 0.0;
     Arrays.fill(derivative, 0.0);
@@ -83,18 +83,18 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
       double[] values = dataValues[d];
       double sum = 0;
 
-      for (int f = 0; f < features.length; f++) {
-        sum += x[features[f]]*values[features[f]];
-      }
+        for (int feature1 : features) {
+            sum += x[feature1] * values[feature1];
+        }
 
       double expSum, derivativeIncrement;
 
       if (labels[d] == 0) {
         expSum = Math.exp(sum);
-        derivativeIncrement = 1.0 / (1.0 + (1.0 / expSum));
+        derivativeIncrement = 1.0 / (1.0 + 1.0 / expSum);
       } else {
         expSum = Math.exp(-sum);
-        derivativeIncrement = -1.0 / (1.0 + (1.0 / expSum));
+        derivativeIncrement = -1.0 / (1.0 + 1.0 / expSum);
       }
 
       if (dataweights == null) {
@@ -104,16 +104,16 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
         derivativeIncrement *= dataweights[d];
       }
 
-      for (int f = 0; f < features.length; f++) {
-        derivative[features[f]] += values[features[f]]*derivativeIncrement;
-      }
+        for (int feature : features) {
+            derivative[feature] += values[feature] * derivativeIncrement;
+        }
     }
 
     value += prior.compute(x, derivative);
   }
 
 
-  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, int[] labels) {
+  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, int... labels) {
     this(numFeatures, data, labels, new LogPrior(LogPrior.LogPriorType.QUADRATIC));
   }
 
@@ -121,14 +121,14 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
     this(numFeatures, data, labels, prior, null);
   }
 
-  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, int[] labels, float[] dataweights) {
+  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, int[] labels, float... dataweights) {
     this(numFeatures, data, labels, new LogPrior(LogPrior.LogPriorType.QUADRATIC), dataweights);
   }
-  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, int[] labels, LogPrior prior, float[] dataweights) {
+  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, int[] labels, LogPrior prior, float... dataweights) {
     this(numFeatures, data, null, labels, prior, dataweights);
   }
 
-  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, double[][] values, int[] labels) {
+  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, double[][] values, int... labels) {
     this(numFeatures, data, values, labels, new LogPrior(LogPrior.LogPriorType.QUADRATIC));
   }
 
@@ -136,7 +136,7 @@ public class BiasedLogisticObjectiveFunction extends AbstractCachingDiffFunction
     this(numFeatures, data, values, labels, prior, null);
   }
 
-  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, double[][] values, int[] labels, LogPrior prior, float[] dataweights) {
+  public BiasedLogisticObjectiveFunction(int numFeatures, int[][] data, double[][] values, int[] labels, LogPrior prior, float... dataweights) {
     this.numFeatures = numFeatures;
     this.data = data;
     this.labels = labels;

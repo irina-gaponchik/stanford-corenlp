@@ -8,7 +8,7 @@ public class FactoredSequenceListener implements SequenceListener {
 
   SequenceListener model1;
   SequenceListener model2;
-  SequenceListener[] models = null;
+  SequenceListener[] models;
 
   /**
    * Informs this sequence model that the value of the element at position pos has changed.
@@ -17,8 +17,7 @@ public class FactoredSequenceListener implements SequenceListener {
    */
   public void updateSequenceElement(int[] sequence, int pos, int oldVal) {
     if(models != null){
-      for(int i = 0; i < models.length; i++)
-        models[i].updateSequenceElement(sequence, pos, oldVal);
+        for (SequenceListener model : models) model.updateSequenceElement(sequence, pos, oldVal);
       return; 
     }
     model1.updateSequenceElement(sequence, pos, oldVal);
@@ -29,10 +28,9 @@ public class FactoredSequenceListener implements SequenceListener {
    * Informs this sequence model that the value of the whole sequence is initialized to sequence
    *
    */
-  public void setInitialSequence(int[] sequence) {
+  public void setInitialSequence(int... sequence) {
     if(models != null){
-      for(int i = 0; i < models.length; i++)
-        models[i].setInitialSequence(sequence);
+        for (SequenceListener model : models) model.setInitialSequence(sequence);
       return;
     }
     model1.setInitialSequence(sequence);
@@ -45,7 +43,7 @@ public class FactoredSequenceListener implements SequenceListener {
   }
   
   
-  public FactoredSequenceListener(SequenceListener[] models){
+  public FactoredSequenceListener(SequenceListener... models){
     this.models = models;
   }
 }

@@ -17,17 +17,17 @@ public class PrecisionRecallStats {
   /**
    * Count of true positives.
    */
-  protected int tpCount = 0;
+  protected int tpCount;
 
   /**
    * Count of false positives.
    */
-  protected int fpCount = 0;
+  protected int fpCount;
 
   /**
    * Count of false negatives.
    */
-  protected int fnCount = 0;
+  protected int fnCount;
 
   /**
    * Constructs a new PrecisionRecallStats with initially 0 counts.
@@ -64,21 +64,21 @@ public class PrecisionRecallStats {
    * Returns the current count of true positives.
    */
   public int getTP() {
-    return (tpCount);
+    return tpCount;
   }
 
   /**
    * Returns the current count of false positives.
    */
   public int getFP() {
-    return (fpCount);
+    return fpCount;
   }
 
   /**
    * Returns the current count of false negatives.
    */
   public int getFN() {
-    return (fnCount);
+    return fnCount;
   }
 
   /**
@@ -127,9 +127,9 @@ public class PrecisionRecallStats {
    * Adds the counts from the given stats to the counts of this stats.
    */
   public void addCounts(PrecisionRecallStats prs) {
-    addTP(prs.getTP());
-    addFP(prs.getFP());
-    addFN(prs.getFN());
+    addTP(prs.tpCount);
+    addFP(prs.fpCount);
+    addFN(prs.fnCount);
   }
 
   /**
@@ -138,9 +138,9 @@ public class PrecisionRecallStats {
    */
   public double getPrecision() {
     if (tpCount == 0 && fpCount == 0) {
-      return (1.0);
+      return 1.0;
     }
-    return (((double) tpCount) / (tpCount + fpCount));
+    return (double) tpCount / (tpCount + fpCount);
   }
 
   /**
@@ -149,7 +149,7 @@ public class PrecisionRecallStats {
   public String getPrecisionDescription(int numDigits) {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setMaximumFractionDigits(numDigits);
-    return nf.format(getPrecision()) + "  (" + tpCount + "/" + (tpCount + fpCount) + ")";
+    return nf.format(getPrecision()) + "  (" + tpCount + '/' + (tpCount + fpCount) + ')';
   }
 
   /**
@@ -158,9 +158,9 @@ public class PrecisionRecallStats {
    */
   public double getRecall() {
     if (tpCount == 0 && fnCount == 0) {
-      return (1.0);
+      return 1.0;
     }
-    return (((double) tpCount) / (tpCount + fnCount));
+    return (double) tpCount / (tpCount + fnCount);
   }
 
   /**
@@ -169,14 +169,14 @@ public class PrecisionRecallStats {
   public String getRecallDescription(int numDigits) {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setMaximumFractionDigits(numDigits);
-    return nf.format(getRecall()) + "  (" + tpCount + "/" + (tpCount + fnCount) + ")";
+    return nf.format(getRecall()) + "  (" + tpCount + '/' + (tpCount + fnCount) + ')';
   }
 
   /**
    * Returns the current F1 measure (<tt>alpha=0.5</tt>).
    */
   public double getFMeasure() {
-    return (getFMeasure(0.5));
+    return getFMeasure(0.5);
   }
 
   /**
@@ -188,9 +188,9 @@ public class PrecisionRecallStats {
     double pr = getPrecision();
     double re = getRecall();
     if (pr == 0 || re == 0) {
-      return (0.0);
+      return 0.0;
     }
-    return (1.0 / ((alpha / pr) + (1.0 - alpha) / re));
+    return 1.0 / (alpha / pr + (1.0 - alpha) / re);
   }
 
   /**
@@ -207,12 +207,12 @@ public class PrecisionRecallStats {
    */
   @Override
   public String toString() {
-    return ("PrecisionRecallStats[tp=" + getTP() + ",fp=" + getFP() + ",fn=" + getFN() + "]");
+    return "PrecisionRecallStats[tp=" + tpCount + ",fp=" + fpCount + ",fn=" + fnCount + ']';
   }
 
   public String toString(int numDigits) {
-    return ("PrecisionRecallStats[tp=" + getTP() + ",fp=" + getFP() + ",fn=" + getFN() +
+    return "PrecisionRecallStats[tp=" + tpCount + ",fp=" + fpCount + ",fn=" + fnCount +
             ",p=" + getPrecisionDescription(numDigits) + ",r=" + getRecallDescription(numDigits) +
-            ",f1=" + getF1Description(numDigits) + "]");
+            ",f1=" + getF1Description(numDigits) + ']';
   }
 }

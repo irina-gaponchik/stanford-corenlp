@@ -36,7 +36,7 @@ public abstract class AbstractStochasticCachingDiffUpdateFunction
    * @param batch indices of which samples to compute function over
    * @return value of function at specified x (scaled by xScale) for samples
    */
-  public abstract double valueAt(double[] x, double xScale, int[] batch);
+  public abstract double valueAt(double[] x, double xScale, int... batch);
 
   /**
    * Performs stochastic update of weights x (scaled by xScale) based

@@ -34,16 +34,18 @@ import edu.stanford.nlp.util.Pair;
 public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
 
   private static final long serialVersionUID = 8853426784197984653L;
+    private static final Pattern COMPILE = Pattern.compile("VB[^P].*PRD.*");
+    private static final Pattern PATTERN = Pattern.compile(",");
 
-  private final StringBuilder optionsString;
+    private final StringBuilder optionsString;
 
-  private boolean retainNPTmp = false;
-  private boolean retainNPSbj = false;
-  private boolean retainPRD = false;
-  private boolean retainPPClr = false;
-  private boolean changeNoLabels = false;
-  private boolean collinizerRetainsPunctuation = false;
-  private boolean discardX = false;
+  private boolean retainNPTmp;
+  private boolean retainNPSbj;
+  private boolean retainPRD;
+  private boolean retainPPClr;
+  private boolean changeNoLabels;
+  private boolean collinizerRetainsPunctuation;
+  private boolean discardX;
 
   private HeadFinder headFinder;
   private final Map<String,Pair<TregexPattern,Function<TregexMatcher,String>>> annotationPatterns;
@@ -51,7 +53,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
 
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-  private MorphoFeatureSpecification morphoSpec = null;
+  private MorphoFeatureSpecification morphoSpec;
   
   public ArabicTreebankParserParams() {
     super(new ArabicTreebankLanguagePack());
@@ -60,7 +62,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     optionsString.append("ArabicTreebankParserParams\n");
 
     annotationPatterns = Generics.newHashMap();
-    activeAnnotations = new ArrayList<Pair<TregexPattern,Function<TregexMatcher,String>>>();
+    activeAnnotations = new ArrayList<>();
 
     //Initialize the headFinder here
     headFinder = headFinder();
@@ -69,10 +71,10 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
   }
 
   /**
-   * Creates an {@link ArabicTreeReaderFactory} with parameters set
+   * Creates an {@link edu.stanford.nlp.trees.international.arabic.ArabicTreeReaderFactory} with parameters set
    * via options passed in from the command line.
    *
-   * @return An {@link ArabicTreeReaderFactory}
+   * @return An {@link edu.stanford.nlp.trees.international.arabic.ArabicTreeReaderFactory}
    */
   public TreeReaderFactory treeReaderFactory() {
     return new ArabicTreeReaderFactory(retainNPTmp, retainPRD,
@@ -149,7 +151,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
           s = "NP-TMP";
         } else if(retainNPSbj && s.startsWith("NP-SBJ")) {
           s = "NP-SBJ";
-        } else if(retainPRD && s.matches("VB[^P].*PRD.*")) {
+        } else if(retainPRD && COMPILE.matcher(s).matches()) {
           s = tlp.basicCategory(s);
           s += "-PRD";
         } else {
@@ -166,7 +168,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
       }
 
       // Recursively process children depth-first
-      List<Tree> children = new ArrayList<Tree>(tree.numChildren());
+      List<Tree> children = new ArrayList<>(tree.numChildren());
       for (Tree child : tree.getChildrenAsList()) {
         Tree newChild = transformTree(child);
         children.add(newChild);
@@ -187,9 +189,9 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
    * Returns a TreeTransformer that retains categories
    * according to the following options supported by setOptionFlag:
    * <p>
-   * <code>-retainNPTmp</code> Retain temporal NP marking on NPs.
-   * <code>-retainNPSbj</code> Retain NP subject function tags
-   * <code>-markPRDverbs</code> Retain PRD verbs.
+   * {@code -retainNPTmp} Retain temporal NP marking on NPs.
+   * {@code -retainNPSbj} Retain NP subject function tags
+   * {@code -markPRDverbs} Retain PRD verbs.
    * </p>
    */
   //NOTE (WSG): This is applied to both the best parse by getBestParse()
@@ -252,7 +254,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     }
 
     //Update the label(s)
-    String newCat = baseCat + newCategory.toString();
+    String newCat = baseCat + newCategory;
     t.setValue(newCat);
     if (t.isPreTerminal() && t.label() instanceof HasTag)
       ((HasTag) t.label()).setTag(newCat);
@@ -263,7 +265,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
   /**
    * These are the annotations included when the user selects the -arabicFactored option.
    */
-  private final List<String> baselineFeatures = new ArrayList<String>();
+  private final List<String> baselineFeatures = new ArrayList<>();
   {
     baselineFeatures.add("-markNounNPargTakers");
     baselineFeatures.add("-genitiveMark");
@@ -281,12 +283,12 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     baselineFeatures.add("-mwe");
     baselineFeatures.add("-mweContainsVerb");
   }
-  private final List<String> additionalFeatures = new ArrayList<String>();
+  private final List<String> additionalFeatures = new ArrayList<>();
 
   private void initializeAnnotationPatterns() {
     //This doesn't/can't really pick out genitives, but just any NP following an NN head.
     //wsg2011: In particular, it doesn't select NP complements of PPs, which are also genitive.
-    final String genitiveNodeTregexString = "@NP > @NP $- /^N/";
+    String genitiveNodeTregexString = "@NP > @NP $- /^N/";
 
     TregexPatternCompiler tregexPatternCompiler =
       new TregexPatternCompiler(headFinder());
@@ -411,7 +413,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
 
     } catch (TregexParseException e) {
       int nth = annotationPatterns.size() + 1;
-      String nthStr = (nth == 1) ? "1st": ((nth == 2) ? "2nd": nth + "th");
+      String nthStr = nth == 1 ? "1st": nth == 2 ? "2nd": nth + "th";
       System.err.println("Parse exception on " + nthStr + " annotation pattern initialization:" + e);
       throw e;
     }
@@ -441,7 +443,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     private String annotationMark;
     private String key;
     private String key2;
-    private boolean doBasicCat = false;
+    private boolean doBasicCat;
 
     private static final TreebankLanguagePack tlp = new ArabicTreebankLanguagePack();
 
@@ -459,20 +461,17 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
 
     public String apply(TregexMatcher m) {
       if(key2 == null)
-        return annotationMark + ((doBasicCat) ? tlp.basicCategory(m.getNode(key).label().value()) : m.getNode(key).label().value());
+        return annotationMark + (doBasicCat ? tlp.basicCategory(m.getNode(key).label().value()) : m.getNode(key).label().value());
       else {
-        String annot1 = (doBasicCat) ? tlp.basicCategory(m.getNode(key).label().value()) : m.getNode(key).label().value();
-        String annot2 = (doBasicCat) ? tlp.basicCategory(m.getNode(key2).label().value()) : m.getNode(key2).label().value();
+        String annot1 = doBasicCat ? tlp.basicCategory(m.getNode(key).label().value()) : m.getNode(key).label().value();
+        String annot2 = doBasicCat ? tlp.basicCategory(m.getNode(key2).label().value()) : m.getNode(key2).label().value();
         return annotationMark + annot1 + annotationMark + annot2;
       }
     }
 
     @Override
     public String toString() {
-      if(key2 == null)
-        return "AddRelativeNodeFunction[" + annotationMark + ',' + key + ']';
-      else
-        return "AddRelativeNodeFunction[" + annotationMark + ',' + key + ',' + key2 + ']';
+        return key2 == null ? "AddRelativeNodeFunction[" + annotationMark + ',' + key + ']' : "AddRelativeNodeFunction[" + annotationMark + ',' + key + ',' + key2 + ']';
     }
 
     private static final long serialVersionUID = 1L;
@@ -486,7 +485,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     private String key;
     private Pattern pattern;
 
-    private String key2 = null;
+    private String key2;
     private Pattern pattern2;
 
     public AddRelativeNodeRegexFunction(String annotationMark, String key, String regex) {
@@ -513,11 +512,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
       if(key2 != null && pattern2 != null) {
         String val2 = m.getNode(key2).label().value();
         Matcher mat2 = pattern2.matcher(val2);
-        if(mat2.find()) {
-          val = val + annotationMark + mat2.group(1);
-        } else {
-          val = val + annotationMark + val2;
-        }
+          val = mat2.find() ? val + annotationMark + mat2.group(1) : val + annotationMark + val2;
       }
 
       return annotationMark + val;
@@ -546,13 +541,9 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
 
     public String apply(TregexMatcher m) {
       String node = m.getNode(key).label().value();
-      if (node.startsWith("S")) {
+      if (!node.isEmpty() && node.charAt(0) == 'S') {
         return annotationMark + 'S';
-      } else if (node.startsWith("V")) {
-        return annotationMark + 'V';
-      } else {
-        return "";
-      }
+      } else return !node.isEmpty() && node.charAt(0) == 'V' ? annotationMark + 'V' : "";
     }
 
     @Override
@@ -576,11 +567,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     public String apply(TregexMatcher m) {
       String node = m.getNode(key).label().value();
       // We also tried if (node.startsWith("V")) [var2] and if (node.startsWith("V") || node.startsWith("S")) [var3]. Both seemed markedly worse than the basic function or this var form (which seems a bit better than the basic equiv option).
-      if (node.startsWith("S") || node.startsWith("V") || node.startsWith("A")) {
-        return annotationMark + "VSA";
-      } else {
-        return "";
-      }
+        return !node.isEmpty() && node.charAt(0) == 'S' || !node.isEmpty() && node.charAt(0) == 'V' || !node.isEmpty() && node.charAt(0) == 'A' ? annotationMark + "VSA" : "";
     }
 
     @Override
@@ -596,7 +583,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
 
     public String apply(TregexMatcher m) {
 
-      final String punc = m.getNode(key).value();
+      String punc = m.getNode(key).value();
 
       if (punc.equals("."))
         return "-fs";
@@ -634,17 +621,20 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
 
   private static class AddEquivalencedConjNode implements SerializableFunction<TregexMatcher,String> {
 
-    private String annotationMark;
+      private static final Pattern PATTERN = Pattern.compile("\\s+");
+      private static final Pattern COMPILE1 = Pattern.compile("\\s+");
+      private static final Pattern COMPILE2 = Pattern.compile("\\s+");
+      private String annotationMark;
     private String key;
 
     private static final String nnTags = "DTNN DTNNP DTNNPS DTNNS NN NNP NNS NNPS";
-    private static final Set<String> nnTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(nnTags.split("\\s+"))));
+    private static final Set<String> nnTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(PATTERN.split(nnTags))));
 
     private static final String jjTags = "ADJ_NUM DTJJ DTJJR JJ JJR";
-    private static final Set<String> jjTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(jjTags.split("\\s+"))));
+    private static final Set<String> jjTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(COMPILE1.split(jjTags))));
 
     private static final String vbTags = "VBD VBP";
-    private static final Set<String> vbTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(vbTags.split("\\s+"))));
+    private static final Set<String> vbTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(COMPILE2.split(vbTags))));
 
     private static final TreebankLanguagePack tlp = new ArabicTreebankLanguagePack();
 
@@ -707,7 +697,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
    *
    */
   private String setupMorphoFeatures(String activeFeats) {
-    String[] feats = activeFeats.split(",");
+    String[] feats = PATTERN.split(activeFeats);
     morphoSpec = tlp.morphFeatureSpec();
     for(String feat : feats) {
       MorphoFeatureType fType = MorphoFeatureType.valueOf(feat.trim());
@@ -732,10 +722,10 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
   /** Some options for setOptionFlag:
    *
    * <p>
-   * <code>-retainNPTmp</code> Retain temporal NP marking on NPs.
-   * <code>-retainNPSbj</code> Retain NP subject function tags
-   * <code>-markGappedVP</code> marked gapped VPs.
-   * <code>-collinizerRetainsPunctuation</code> does what it says.
+   * {@code -retainNPTmp} Retain temporal NP marking on NPs.
+   * {@code -retainNPSbj} Retain NP subject function tags
+   * {@code -markGappedVP} marked gapped VPs.
+   * {@code -collinizerRetainsPunctuation} does what it says.
    * </p>
    *
    * @param args flag arguments (usually from commmand line
@@ -752,7 +742,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
       if(!baselineFeatures.contains(args[i])) additionalFeatures.add(args[i]);
       Pair<TregexPattern,Function<TregexMatcher,String>> p = annotationPatterns.get(args[i]);
       activeAnnotations.add(p);
-      optionsString.append("Option " + args[i] + " added annotation pattern " + p.first() + " with annotation " + p.second() + '\n');
+      optionsString.append("Option ").append(args[i]).append(" added annotation pattern ").append(p.first()).append(" with annotation ").append(p.second()).append('\n');
       didSomething = true;
 
     } else if (args[i].equals("-retainNPTmp")) {
@@ -797,11 +787,11 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
       }
       didSomething = true;
 
-    } else if (args[i].equalsIgnoreCase("-headFinder") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-headFinder") && i + 1 < args.length) {
       try {
         HeadFinder hf = (HeadFinder) Class.forName(args[i + 1]).newInstance();
         setHeadFinder(hf);
-        optionsString.append("HeadFinder: " + args[i + 1] + "\n");
+        optionsString.append("HeadFinder: ").append(args[i + 1]).append('\n');
 
       } catch (Exception e) {
         System.err.println(e);
@@ -811,7 +801,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
       i++;
       didSomething = true;
 
-    } else if(args[i].equals("-factlex") && (i + 1 < args.length)) {
+    } else if(args[i].equals("-factlex") && i + 1 < args.length) {
       String activeFeats = setupMorphoFeatures(args[++i]);
       optionsString.append("Factored Lexicon: active features: ").append(activeFeats);
 //
@@ -856,7 +846,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
    *
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if(args.length != 1) {
       System.exit(-1);
     }

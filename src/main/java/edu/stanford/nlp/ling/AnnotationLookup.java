@@ -64,7 +64,7 @@ public class AnnotationLookup {
     public final Class coreKey;
     public final String oldKey;
 
-    private <T> KeyLookup(Class<? extends CoreAnnotation<T>> coreKey, String oldKey) {
+    <T> KeyLookup(Class<? extends CoreAnnotation<T>> coreKey, String oldKey) {
       this.coreKey = coreKey;
       this.oldKey = oldKey;
     }
@@ -74,7 +74,7 @@ public class AnnotationLookup {
      * This is useful because we can then create distributions that do not have
      * all of the classes required for all the old keys (such as trees package classes).
      */
-    private KeyLookup(String className, String oldKey) {
+    KeyLookup(String className, String oldKey) {
       Class<?> keyClass;
       try {
        keyClass = Class.forName(className);
@@ -174,9 +174,6 @@ public class AnnotationLookup {
     public static final String BEGIN_POSITION_KEY = "BEGIN_POS";
     public static final String END_POSITION_KEY = "END_POS";
 
-
-    private OldFeatureLabelKeys() {
-    }
 
   } // end static class OldFeatureLabelKeys
 

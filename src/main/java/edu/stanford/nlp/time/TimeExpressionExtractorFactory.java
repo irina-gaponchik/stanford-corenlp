@@ -44,11 +44,7 @@ public class TimeExpressionExtractorFactory implements Factory<TimeExpressionExt
       Class clazz = Class.forName(className);
       TimeExpressionExtractor extractor = (TimeExpressionExtractor) clazz.newInstance();
       return extractor;
-    } catch (ClassNotFoundException ex) {
-      throw new RuntimeException(ex);
-    } catch (InstantiationException ex) {
-      throw new RuntimeException(ex);
-    } catch (IllegalAccessException ex) {
+    } catch (ClassNotFoundException | IllegalAccessException | InstantiationException ex) {
       throw new RuntimeException(ex);
     }
   }

@@ -3,7 +3,7 @@ package edu.stanford.nlp.math;
 import java.util.Collection;
 
 /**
- * The class <code>SloppyMath</code> contains methods for performing basic
+ * The class {@code SloppyMath} contains methods for performing basic
  * numeric operations.  In some cases, such as max and min, they cut a few
  * corners in
  * the implementation for the sake of efficiency.  In particular, they may
@@ -69,48 +69,48 @@ public final class SloppyMath {
   }
 
   /**
-   * Returns the greater of two <code>int</code> values.  That
+   * Returns the greater of two {@code int} values.  That
    * is, the result is the argument closer to positive infinity. If
    * the arguments have the same value, the result is that same
    * value.  Does none of the special checks for NaN or -0.0f that
-   * <code>Math.max</code> does.
+   * {@code Math.max} does.
    *
    * @param a an argument.
    * @param b another argument.
-   * @return the larger of <code>a</code> and <code>b</code>.
+   * @return the larger of {@code a} and {@code b}.
    */
   public static int max(int a, int b) {
-    return (a >= b) ? a : b;
+    return a >= b ? a : b;
   }
 
   /**
-   * Returns the greater of two <code>float</code> values.  That is,
+   * Returns the greater of two {@code float} values.  That is,
    * the result is the argument closer to positive infinity. If the
    * arguments have the same value, the result is that same
    * value.  Does none of the special checks for NaN or -0.0f that
-   * <code>Math.max</code> does.
+   * {@code Math.max} does.
    *
    * @param a an argument.
    * @param b another argument.
-   * @return the larger of <code>a</code> and <code>b</code>.
+   * @return the larger of {@code a} and {@code b}.
    */
   public static float max(float a, float b) {
-    return (a >= b) ? a : b;
+    return a >= b ? a : b;
   }
 
   /**
-   * Returns the greater of two <code>double</code> values.  That
+   * Returns the greater of two {@code double} values.  That
    * is, the result is the argument closer to positive infinity. If
    * the arguments have the same value, the result is that same
    * value.  Does none of the special checks for NaN or -0.0f that
-   * <code>Math.max</code> does.
+   * {@code Math.max} does.
    *
    * @param a an argument.
    * @param b another argument.
-   * @return the larger of <code>a</code> and <code>b</code>.
+   * @return the larger of {@code a} and {@code b}.
    */
   public static double max(double a, double b) {
-    return (a >= b) ? a : b;
+    return a >= b ? a : b;
   }
 
   /**
@@ -130,34 +130,34 @@ public final class SloppyMath {
   }
 
   /**
-   * Returns the smaller of two <code>float</code> values.  That is,
+   * Returns the smaller of two {@code float} values.  That is,
    * the result is the value closer to negative infinity. If the
    * arguments have the same value, the result is that same
    * value.  Does none of the special checks for NaN or -0.0f that
-   * <code>Math.max</code> does.
+   * {@code Math.max} does.
    *
    * @param a an argument.
    * @param b another argument.
-   * @return the smaller of <code>a</code> and <code>b.</code>
+   * @return the smaller of {@code a} and {@code b.}
    */
   public static float min(float a, float b) {
-    return (a <= b) ? a : b;
+    return a <= b ? a : b;
   }
 
 
   /**
-   * Returns the smaller of two <code>double</code> values.  That
+   * Returns the smaller of two {@code double} values.  That
    * is, the result is the value closer to negative infinity. If the
    * arguments have the same value, the result is that same
    * value.  Does none of the special checks for NaN or -0.0f that
-   * <code>Math.max</code> does.
+   * {@code Math.max} does.
    *
    * @param a an argument.
    * @param b another argument.
-   * @return the smaller of <code>a</code> and <code>b</code>.
+   * @return the smaller of {@code a} and {@code b}.
    */
   public static double min(double a, double b) {
-    return (a <= b) ? a : b;
+    return a <= b ? a : b;
   }
 
   /**
@@ -172,7 +172,7 @@ public final class SloppyMath {
       0.1208650973866179e-2,-0.5395239384953e-5};
     double xxx = x;
     double tmp = x + 5.5;
-    tmp -= ((x + 0.5) * Math.log(tmp));
+    tmp -= (x + 0.5) * Math.log(tmp);
     double ser = 1.000000000190015;
     for (int j = 0; j < 6; j++) {
       xxx++;
@@ -198,11 +198,7 @@ public final class SloppyMath {
   }
 
   public static boolean isCloseTo(double a, double b) {
-    if (a>b) {
-      return (a-b)<1e-4;
-    } else {
-      return (b-a)<1e-4;
-    }
+      return a > b ? a - b < 1.0e-4 : b - a < 1.0e-4;
   }
 
   /**
@@ -214,7 +210,7 @@ public final class SloppyMath {
   static final float LOGTOLERANCE_F = 20.0f;
 
   public static double gamma(double n) {
-    return Math.sqrt(2.0*Math.PI/n) * Math.pow((n/Math.E)*Math.sqrt(n*Math.sinh((1.0/n)+(1/810*Math.pow(n,6)))),n);
+    return Math.sqrt(2.0*Math.PI/n) * Math.pow(n/Math.E *Math.sqrt(n*Math.sinh(1.0/n + 1/810*Math.pow(n,6))),n);
   }
 
   /**
@@ -248,11 +244,7 @@ public final class SloppyMath {
     }
     if (max == Double.NEGATIVE_INFINITY) {
       return max;
-    } else if (negDiff < -LOGTOLERANCE_F) {
-      return max;
-    } else {
-      return max + (float) Math.log(1.0 + Math.exp(negDiff));
-    }
+    } else return negDiff < -LOGTOLERANCE_F ? max : max + (float) Math.log(1.0 + Math.exp(negDiff));
   }
 
   /**
@@ -279,11 +271,7 @@ public final class SloppyMath {
     }
     if (max == Double.NEGATIVE_INFINITY) {
       return max;
-    } else if (negDiff < -LOGTOLERANCE) {
-      return max;
-    } else {
-      return max + Math.log(1.0 + Math.exp(negDiff));
-    }
+    } else return negDiff < -LOGTOLERANCE ? max : max + Math.log(1.0 + Math.exp(negDiff));
   }
 
   /**
@@ -299,7 +287,7 @@ public final class SloppyMath {
     }
     int accum = n;
     for (int i = 1; i < k; i++) {
-      accum *= (n - i);
+      accum *= n - i;
       accum /= i;
     }
     return accum / k;
@@ -310,10 +298,10 @@ public final class SloppyMath {
    * with a margin of error possibly around ~10%.  From
    * http://martin.ankerl.com/2007/10/04/optimized-pow-approximation-for-java-and-c-c/
    */
-  public static double pow(final double a, final double b) {
-    final int x = (int) (Double.doubleToLongBits(a) >> 32);
-    final int y = (int) (b * (x - 1072632447) + 1072632447);
-    return Double.longBitsToDouble(((long) y) << 32);
+  public static double pow(double a, double b) {
+    int x = (int) (Double.doubleToLongBits(a) >> 32);
+    int y = (int) (b * (x - 1072632447) + 1072632447);
+    return Double.longBitsToDouble((long) y << 32);
   }
 
   /**
@@ -428,7 +416,7 @@ public final class SloppyMath {
     }
     // now we have that k <= m <= r <= n/2
 
-    if (k < (m + r) - n || k > m) {
+    if (k < m + r - n || k > m) {
       return 0.0;
     }
 
@@ -437,38 +425,22 @@ public final class SloppyMath {
     // numerical errors when the numbers seemed off, but actually there
     // was a bug in the Fisher's exact routine.
     if (r == n) {
-      if (k == m) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
+        return k == m ? 1.0 : 0.0;
     } else if (r == n - 1) {
       if (k == m) {
         return (n - m) / (double) n;
-      } else if (k == m - 1) {
-        return m / (double) n;
-      } else {
-        return 0.0;
-      }
+      } else return k == m - 1 ? m / (double) n : 0.0;
     } else if (m == 1) {
       if (k == 0) {
         return (n - r) / (double) n;
-      } else if (k == 1) {
-        return r / (double) n;
-      } else {
-        return 0.0;
-      }
+      } else return k == 1 ? r / (double) n : 0.0;
     } else if (m == 0) {
-      if (k == 0) {
-        return 1.0;
-      } else {
-        return 0.0;
-      }
+        return k == 0 ? 1.0 : 0.0;
     } else if (k == 0) {
       double ans = 1.0;
       for (int m0 = 0; m0 < m; m0++) {
-        ans *= ((n - r) - m0);
-        ans /= (n - m0);
+        ans *= n - r - m0;
+        ans /= n - m0;
       }
       return ans;
     }
@@ -477,7 +449,7 @@ public final class SloppyMath {
     // do (n-r)x...x((n-r)-((m-k)-1))/n x...x (n-((m-k-1)))
     // leaving rest of denominator to get to multimply by (n-(m-1))
     // that's k things which goes into next loop
-    for (int nr = n - r, n0 = n; nr > (n - r) - (m - k); nr--, n0--) {
+    for (int nr = n - r, n0 = n; nr > n - r - (m - k); nr--, n0--) {
       // System.out.println("Multiplying by " + nr);
       ans *= nr;
       // System.out.println("Dividing by " + n0);
@@ -485,13 +457,13 @@ public final class SloppyMath {
     }
     // System.out.println("Done phase 1");
     for (int k0 = 0; k0 < k; k0++) {
-      ans *= (m - k0);
+      ans *= m - k0;
       // System.out.println("Multiplying by " + (m-k0));
-      ans /= ((n - (m - k0)) + 1);
+      ans /= n - (m - k0) + 1;
       // System.out.println("Dividing by " + ((n-(m+k0)+1)));
-      ans *= (r - k0);
+      ans *= r - k0;
       // System.out.println("Multiplying by " + (r-k0));
-      ans /= (k0 + 1);
+      ans /= k0 + 1;
       // System.out.println("Dividing by " + (k0+1));
     }
     return ans;
@@ -511,7 +483,7 @@ public final class SloppyMath {
     for (int m = k; m <= n; m++) {
       double nChooseM = 1.0;
       for (int r = 1; r <= m; r++) {
-        nChooseM *= (n - r) + 1;
+        nChooseM *= n - r + 1;
         nChooseM /= r;
       }
       // System.out.println(n + " choose " + m + " is " + nChooseM);
@@ -538,8 +510,8 @@ public final class SloppyMath {
    * @return The Fisher's exact p-value
    */
   public static double oneTailedFishersExact(int k, int n, int r, int m) {
-    if (k < 0 || k < (m + r) - n || k > r || k > m || r > n || m > n) {
-      throw new IllegalArgumentException("Invalid Fisher's exact: " + "k=" + k + " n=" + n + " r=" + r + " m=" + m + " k<0=" + (k < 0) + " k<(m+r)-n=" + (k < (m + r) - n) + " k>r=" + (k > r) + " k>m=" + (k > m) + " r>n=" + (r > n) + "m>n=" + (m > n));
+    if (k < 0 || k < m + r - n || k > r || k > m || r > n || m > n) {
+      throw new IllegalArgumentException("Invalid Fisher's exact: " + "k=" + k + " n=" + n + " r=" + r + " m=" + m + " k<0=" + (k < 0) + " k<(m+r)-n=" + (k < m + r - n) + " k>r=" + (k > r) + " k>m=" + (k > m) + " r>n=" + (r > n) + "m>n=" + (m > n));
     }
     // exploit symmetry of problem
     if (m > n / 2) {
@@ -567,7 +539,7 @@ public final class SloppyMath {
       }
     } else {
       // sum from max(0, (m+r)-n) to k-1, and then subtract from 1
-      int min = Math.max(0, (m + r) - n);
+      int min = Math.max(0, m + r - n);
       for (int k0 = min; k0 < k; k0++) {
         // System.out.println("Calling hypg(" + k0 + "; " + n +
         // 		   ", " + r + ", " + m + ")");
@@ -589,7 +561,7 @@ public final class SloppyMath {
    * @return The Fisher's exact p-value
    */
   public static double chiSquare2by2(int k, int n, int r, int m) {
-    int[][] cg = {{k, r - k}, {m - k, n - (k + (r - k) + (m - k))}};
+    int[][] cg = {{k, r - k}, {m - k, n - (k + r - k + m - k)}};
     int[] cgr = {r, n - r};
     int[] cgc = {m, n - m};
     double total = 0.0;
@@ -623,8 +595,8 @@ public final class SloppyMath {
 
   public static double poisson(int x, double lambda) {
     if (x<0 || lambda<=0.0) throw new RuntimeException("Bad arguments: " + x + " and " + lambda);
-    double p = (Math.exp(-lambda) * Math.pow(lambda, x)) / factorial(x);
-    if (Double.isInfinite(p) || p<=0.0) throw new RuntimeException(Math.exp(-lambda) +" "+ Math.pow(lambda, x) +" "+ factorial(x));
+    double p = Math.exp(-lambda) * Math.pow(lambda, x) / factorial(x);
+    if (Double.isInfinite(p) || p<=0.0) throw new RuntimeException(Math.exp(-lambda) +" "+ Math.pow(lambda, x) + ' ' + factorial(x));
     return p;
   }
 
@@ -648,7 +620,7 @@ public final class SloppyMath {
    * @param args Either none, and the log add rountines are tested, or the
    *             following 4 arguments: k (cell), n (total), r (row), m (col)
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if (args.length == 0) {
       System.err.println("Usage: java edu.stanford.nlp.math.SloppyMath " + "[-logAdd|-fishers k n r m|-binomial r n p");
     } else if (args[0].equals("-logAdd")) {

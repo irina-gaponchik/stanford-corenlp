@@ -31,7 +31,6 @@ public class ReflectionLoading {
    * <br>
    * and it will compile just fine, but will result in a ClassCastException.
    */
-  @SuppressWarnings("unchecked")
   public static <T> T loadByReflection(String className,
                                        Object ... arguments) {
     try{

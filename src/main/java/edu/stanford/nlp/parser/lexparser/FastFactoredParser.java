@@ -65,7 +65,7 @@ public class FastFactoredParser implements KBestViterbiParser {
   }
 
 
-  private List<ScoredObject<Tree>> nGoodTrees = new ArrayList<ScoredObject<Tree>>();
+  private List<ScoredObject<Tree>> nGoodTrees = new ArrayList<>();
 
 
 
@@ -120,7 +120,7 @@ public class FastFactoredParser implements KBestViterbiParser {
      *
      * @param t The parse tree to examine the daughters of
      * @return The parse tree that is the head.  The convention has been
-     *         that this returns <code>null</code> if no head is found.
+     *         that this returns {@code null} if no head is found.
      *         But maybe it should throw an exception?
      */
     public Tree determineHead(Tree t) {
@@ -128,11 +128,11 @@ public class FastFactoredParser implements KBestViterbiParser {
         return t.firstChild();
       } else {
         String lval = t.firstChild().label().value();
-        if (lval != null && lval.startsWith("@")) {
+        if (lval != null && !lval.isEmpty() && lval.charAt(0) == '@') {
           return t.firstChild();
         } else {
           String rval = t.lastChild().label().value();
-          if (rval.startsWith("@") || rval.equals(Lexicon.BOUNDARY_TAG)) {
+          if (!rval.isEmpty() && rval.charAt(0) == '@' || rval.equals(Lexicon.BOUNDARY_TAG)) {
             return t.lastChild();
           }
         }
@@ -159,14 +159,14 @@ public class FastFactoredParser implements KBestViterbiParser {
     int numParsesToConsider = numToFind * op.testOptions.fastFactoredCandidateMultiplier + op.testOptions.fastFactoredCandidateAddend;
     if (pparser.hasParse()) {
       List<ScoredObject<Tree>> pcfgBest = pparser.getKBestParses(numParsesToConsider);
-      Beam<ScoredObject<Tree>> goodParses = new Beam<ScoredObject<Tree>>(numToFind);
+      Beam<ScoredObject<Tree>> goodParses = new Beam<>(numToFind);
 
       for (ScoredObject<Tree> candidate : pcfgBest) {
         if (Thread.interrupted()) {
           throw new RuntimeInterruptedException();
         }
         double depScore = depScoreTree(candidate.object());
-        ScoredObject<Tree> x = new ScoredObject<Tree>(candidate.object(), candidate.score() + depScore);
+        ScoredObject<Tree> x = new ScoredObject<>(candidate.object(), candidate.score() + depScore);
         goodParses.add(x);
       }
       nGoodTrees = goodParses.asSortedList();

@@ -46,10 +46,10 @@ public class ExtractorVerbalVBNZero extends DictionaryExtractor {
     int vBDCount = dict.getCount(cword, vbdTag);
 
     // Conditions for deciding inapplicable
-    if ((allCount == 0) && (!(cword.endsWith(edSuff) || cword.endsWith(enSuff)))) {
+    if (allCount == 0 && !(cword.endsWith(edSuff) || cword.endsWith(enSuff))) {
       return zeroSt;
     }
-    if ((allCount > 0) && (vBNCount + vBDCount <= allCount / 100)) {
+    if (allCount > 0 && vBNCount + vBDCount <= allCount / 100) {
       return zeroSt;
     }
 

@@ -14,7 +14,7 @@ class ProjectionScorer implements Scorer {
   protected final Options op;
 
   protected Edge project(Edge edge) {
-    Edge tempEdge = new Edge(op.testOptions.exhaustiveTest);
+    Edge tempEdge = new Edge(TestOptions.exhaustiveTest);
     tempEdge.start = edge.start;
     tempEdge.end = edge.end;
     tempEdge.state = gp.project(edge.state);
@@ -24,7 +24,7 @@ class ProjectionScorer implements Scorer {
   }
 
   protected Hook project(Hook hook) {
-    Hook tempHook = new Hook(op.testOptions.exhaustiveTest);
+    Hook tempHook = new Hook(TestOptions.exhaustiveTest);
     tempHook.start = hook.start;
     tempHook.end = hook.end;
     tempHook.state = gp.project(hook.state);

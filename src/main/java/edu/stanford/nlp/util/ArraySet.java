@@ -24,7 +24,7 @@ public class ArraySet<E> extends AbstractSet<E> {
    * @param initialSize initial size of the backing array.
    */
   public ArraySet(int initialSize) {
-    backer = new ArrayList<E>(initialSize);
+    backer = new ArrayList<>(initialSize);
   }
 
   /**
@@ -49,14 +49,11 @@ public class ArraySet<E> extends AbstractSet<E> {
   /**
    * Adds element to set.
    * @param e the element to be added.
-   * @return <code>false</code> if the set already contained (vis. <code>.equals()</code>) the specified element; <code>true</code> otherwise.
+   * @return {@code false} if the set already contained (vis. {@code .equals()}) the specified element; {@code true} otherwise.
    */
   @Override
   public boolean add(E e) {
-    if(backer.contains(e))
-      return false;
-    else
-      return backer.add(e);
+      return backer.contains(e) ? false : backer.add(e);
   }
 
   /**

@@ -29,11 +29,11 @@ public class DijkstraShortestPath {
     Map<V, V> previous = Generics.newHashMap();
     
     BinaryHeapPriorityQueue<V> unsettledNodes = 
-      new BinaryHeapPriorityQueue<V>();
+      new BinaryHeapPriorityQueue<>();
 
     unsettledNodes.add(node1, 0);
 
-    while (unsettledNodes.size() > 0) {
+    while (!unsettledNodes.isEmpty()) {
       double distance = unsettledNodes.getPriority();
       V u = unsettledNodes.removeFirst();
       visited.add(u);
@@ -43,8 +43,8 @@ public class DijkstraShortestPath {
 
       unsettledNodes.remove(u);
 
-      Set<V> candidates = ((directionSensitive) ? 
-                           graph.getChildren(u) : graph.getNeighbors(u));
+      Set<V> candidates = directionSensitive ?
+                           graph.getChildren(u) : graph.getNeighbors(u);
       for (V candidate : candidates) {
         double alt = distance - 1;
         // nodes not already present will have a priority of -inf
@@ -57,7 +57,7 @@ public class DijkstraShortestPath {
     }
     if (!previous.containsKey(node2))
       return null;
-    ArrayList<V> path = new ArrayList<V>();
+    ArrayList<V> path = new ArrayList<>();
     path.add(node2);
     V n = node2;
     while (previous.containsKey(n)) {

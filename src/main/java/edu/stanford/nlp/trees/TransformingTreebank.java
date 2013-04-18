@@ -11,8 +11,8 @@ import java.util.Arrays;
 
 
 /** This class wraps another Treebank, and will vend trees that have been through
- *  a TreeTransformer.  You can access them via requests like <code>apply()</code> or
- *  <code>iterator()</code>.
+ *  a TreeTransformer.  You can access them via requests like {@code apply()} or
+ *  {@code iterator()}.
  *  <p>
  *  <i>Important note</i>: This class will only function properly if the TreeTransformer
  *  used is a function (which doesn't change its argument) rather than if it is a
@@ -31,7 +31,7 @@ public class TransformingTreebank extends Treebank {
 
   /**
    * Create a new TransformingTreebank.
-   * The trees are made with a <code>LabeledScoredTreeReaderFactory</code>.
+   * The trees are made with a {@code LabeledScoredTreeReaderFactory}.
    * <p/>
    * <i>Compatibility note: Until Sep 2004, this used to create a Treebank
    * with a SimpleTreeReaderFactory, but this was changed as the old
@@ -45,7 +45,7 @@ public class TransformingTreebank extends Treebank {
    * Create a new TransformingTreebank.
    *
    * @param trf the factory class to be called to create a new
-   *            <code>TreeReader</code>
+   *            {@code TreeReader}
    */
   public TransformingTreebank(TreeReaderFactory trf) {
     super(trf);
@@ -66,7 +66,7 @@ public class TransformingTreebank extends Treebank {
 
 
   /**
-   * Empty a <code>Treebank</code>.
+   * Empty a {@code Treebank}.
    */
   @Override
   public void clear() {
@@ -120,11 +120,11 @@ public class TransformingTreebank extends Treebank {
   /**
    * Loads treebank grammar from first argument and prints it.
    * Just a demonstration of functionality. <br>
-   * <code>usage: java MemoryTreebank treebankFilesPath</code>
+   * {@code usage: java MemoryTreebank treebankFilesPath}
    *
    * @param args array of command-line arguments
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Timing.startTime();
     Treebank treebank = new DiskTreebank(new TreeReaderFactory() {
       public TreeReader newTreeReader(Reader in) {

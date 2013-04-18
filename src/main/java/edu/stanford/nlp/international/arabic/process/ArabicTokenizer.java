@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -37,21 +38,22 @@ import edu.stanford.nlp.util.StringUtils;
  */
 public class ArabicTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
 
-  // The underlying JFlex lexer
+    private static final Pattern COMPILE = Pattern.compile(",");
+    // The underlying JFlex lexer
   private final ArabicLexer lexer;
 
   // Produces the normalization for parsing used in Green and Manning (2010)
   private static final Properties atbOptions = new Properties();
   static {
     String optionsStr = "normArDigits,normArPunc,normAlif,removeDiacritics,removeTatweel,removeQuranChars";
-    String[] optionToks = optionsStr.split(",");
+    String[] optionToks = COMPILE.split(optionsStr);
     for (String option : optionToks) {
-      atbOptions.put(option, "true");
+        atbOptions.setProperty(option, "true");
     }
   }
 
   public static ArabicTokenizer<CoreLabel> newArabicTokenizer(Reader r, Properties lexerProperties) {
-    return new ArabicTokenizer<CoreLabel>(r, new CoreLabelTokenFactory(), lexerProperties);
+    return new ArabicTokenizer<>(r, new CoreLabelTokenFactory(), lexerProperties);
   }
 
   public ArabicTokenizer(Reader r, LexedTokenFactory<T> tf, Properties lexerProperties) {
@@ -68,7 +70,7 @@ public class ArabicTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
       // until we see a non-zero length token.
       do {
         nextToken = (T) lexer.next();
-      } while (nextToken != null && nextToken.word().length() == 0);
+      } while (nextToken != null && nextToken.word().isEmpty());
 
       return nextToken;
 
@@ -80,13 +82,14 @@ public class ArabicTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
   public static class ArabicTokenizerFactory<T extends HasWord> implements TokenizerFactory<T>, Serializable  {
 
     private static final long serialVersionUID = 946818805507187330L;
+      private static final Pattern PATTERN = Pattern.compile(",");
 
-    protected final LexedTokenFactory<T> factory;
+      protected final LexedTokenFactory<T> factory;
 
     protected Properties lexerProperties = new Properties();
 
     public static TokenizerFactory<CoreLabel> newTokenizerFactory() {
-      return new ArabicTokenizerFactory<CoreLabel>(new CoreLabelTokenFactory());
+      return new ArabicTokenizerFactory<>(new CoreLabelTokenFactory());
     }
 
     private ArabicTokenizerFactory(LexedTokenFactory<T> factory) {
@@ -98,16 +101,16 @@ public class ArabicTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
     }
 
     public Tokenizer<T> getTokenizer(Reader r) {
-      return new ArabicTokenizer<T>(r, factory, lexerProperties);
+      return new ArabicTokenizer<>(r, factory, lexerProperties);
     }
 
     /**
      * options: A comma-separated list of options
      */
     public void setOptions(String options) {
-      String[] optionList = options.split(",");
+      String[] optionList = PATTERN.split(options);
       for (String option : optionList) {
-        lexerProperties.put(option, "true");
+          lexerProperties.setProperty(option, "true");
       }
     }
 
@@ -142,24 +145,24 @@ public class ArabicTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * <p>
    * The following normalization options are provided:
    * <ul>
-   * <li><code>useUTF8Ellipsis</code> : Replaces sequences of three or more full stops with \u2026</li>
-   * <li><code>normArDigits</code> : Convert Arabic digits to ASCII equivalents</li>
-   * <li><code>normArPunc</code> : Convert Arabic punctuation to ASCII equivalents</li>
-   * <li><code>normAlif</code> : Change all alif forms to bare alif</li>
-   * <li><code>normYa</code> : Map ya to alif maqsura</li>
-   * <li><code>removeDiacritics</code> : Strip all diacritics</li>
-   * <li><code>removeTatweel</code> : Strip tatweel elongation character</li>
-   * <li><code>removeQuranChars</code> : Remove diacritics that appear in the Quran</li>
-   * <li><code>removeProMarker</code> : Remove the ATB null pronoun marker</li>
-   * <li><code>removeSegMarker</code> : Remove the ATB clitic segmentation marker</li>
-   * <li><code>removeMorphMarker</code> : Remove the ATB morpheme boundary markers</li>
-   * <li><code>atbEscaping</code> : Replace left/right parentheses with ATB escape characters</li>
+   * <li>{@code useUTF8Ellipsis} : Replaces sequences of three or more full stops with \u2026</li>
+   * <li>{@code normArDigits} : Convert Arabic digits to ASCII equivalents</li>
+   * <li>{@code normArPunc} : Convert Arabic punctuation to ASCII equivalents</li>
+   * <li>{@code normAlif} : Change all alif forms to bare alif</li>
+   * <li>{@code normYa} : Map ya to alif maqsura</li>
+   * <li>{@code removeDiacritics} : Strip all diacritics</li>
+   * <li>{@code removeTatweel} : Strip tatweel elongation character</li>
+   * <li>{@code removeQuranChars} : Remove diacritics that appear in the Quran</li>
+   * <li>{@code removeProMarker} : Remove the ATB null pronoun marker</li>
+   * <li>{@code removeSegMarker} : Remove the ATB clitic segmentation marker</li>
+   * <li>{@code removeMorphMarker} : Remove the ATB morpheme boundary markers</li>
+   * <li>{@code atbEscaping} : Replace left/right parentheses with ATB escape characters</li>
    * </ul>
    * </p>
    *
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if (args.length > 0 && args[0].contains("help")) {
       System.err.printf("Usage: java %s [OPTIONS] < file%n", ArabicTokenizer.class.getName());
       System.err.printf("%nOptions:%n");
@@ -169,8 +172,8 @@ public class ArabicTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
     }
 
     // Process normalization options
-    final Properties tokenizerOptions = StringUtils.argsToProperties(args);
-    final TokenizerFactory<CoreLabel> tf = tokenizerOptions.containsKey("atb") ?
+    Properties tokenizerOptions = StringUtils.argsToProperties(args);
+    TokenizerFactory<CoreLabel> tf = tokenizerOptions.containsKey("atb") ?
         ArabicTokenizer.atbFactory() : ArabicTokenizer.factory();
     for (String option : tokenizerOptions.stringPropertyNames()) {
       tf.setOptions(option);
@@ -183,7 +186,7 @@ public class ArabicTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
     // Read the file
     int nLines = 0;
     int nTokens = 0;
-    final String encoding = "UTF-8";
+    String encoding = "UTF-8";
     try {
       Tokenizer<CoreLabel> tokenizer = tf.getTokenizer(new InputStreamReader(System.in, encoding));
       boolean printSpace = false;

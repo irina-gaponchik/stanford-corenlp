@@ -57,6 +57,6 @@ public interface SequenceModel {
    * @param sequence the sequence to compute a score for
    * @return the score for the sequence
    */
-  double scoreOf(int[] sequence);
+  double scoreOf(int... sequence);
 
 }

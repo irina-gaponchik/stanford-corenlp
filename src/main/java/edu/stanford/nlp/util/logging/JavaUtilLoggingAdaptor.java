@@ -80,9 +80,9 @@ public class JavaUtilLoggingAdaptor {
       String message = record.getMessage();
       Level level = record.getLevel();
       Object tag = null;
-      if (level == Level.WARNING) {
+      if (level.equals(Level.WARNING)) {
         tag = Redwood.WARN;
-      } else if (level == Level.SEVERE) {
+      } else if (level.equals(Level.SEVERE)) {
         tag = Redwood.ERR;
       } else if (level.intValue() <= Level.FINE.intValue()) {
         tag = Redwood.DBG;
@@ -100,7 +100,7 @@ public class JavaUtilLoggingAdaptor {
   /**
    * Simple test case.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if (args.length > 0 && args[0].equals("redwood")) {
       Redwood.log(Redwood.DBG, "at the top");
       Redwood.startTrack("Adaptor test controlled by redwood");

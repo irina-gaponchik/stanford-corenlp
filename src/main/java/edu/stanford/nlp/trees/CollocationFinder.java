@@ -29,7 +29,7 @@ import edu.stanford.nlp.util.StringUtils;
 
 public class CollocationFinder {
 
-  private static boolean DEBUG = false;
+  private static boolean DEBUG;
   private final Tree qTree;
   private final HeadFinder hf;
   private final List<Collocation> collocationCollector;
@@ -94,8 +94,8 @@ public class CollocationFinder {
       // this will take the longer one
       if (t.equals(c.parentNode)) {
         if (matchingColl == null ||
-            (c.span.first() <= matchingColl.span.first() &&
-                c.span.second() >= matchingColl.span.second())) {
+                c.span.first() <= matchingColl.span.first() &&
+                    c.span.second() >= matchingColl.span.second()) {
           matchingColl = c;
           if (DEBUG) {
             err.println("Found matching collocation for tree:");
@@ -121,7 +121,7 @@ public class CollocationFinder {
       for (int i : matchingColl.indicesOfConstituentChildren) {
         String strToAppend = mergeLeavesIntoCollocatedString(allChildren[i]);
         mutatedString.append(strToAppend);
-        mutatedString.append("_");
+        mutatedString.append('_');
       }
       mutatedString = mutatedString.deleteCharAt(mutatedString.length() - 1);
 
@@ -164,16 +164,16 @@ public class CollocationFinder {
   }
 
   /**
-   * Prints the collocations found in this <code>Tree</code> as strings.
+   * Prints the collocations found in this {@code Tree} as strings.
    * Each is followed by its boundary constituent indices in the original tree.
-   * <br>Example: <code> throw_up (2,3) </code>
-   *   <br>       <code> came_up_with (7,9) </code>
+   * <br>Example: {@code throw_up (2,3) }
+   *   <br>       {@code came_up_with (7,9) }
    */
   public void PrintCollocationStrings(PrintWriter pw){
     //ArrayList<String> strs = new ArrayList<String>();
     for(Collocation c: collocationCollector){
       String cs = c.collocationString;
-      pw.println(cs+" ("+(c.span.first()+1)+","+(c.span.second()+1)+")");
+      pw.println(cs+" ("+(c.span.first()+1)+ ',' +(c.span.second()+1)+ ')');
     }
   }
 
@@ -196,19 +196,19 @@ public class CollocationFinder {
     StringBuffer testString = null;
     Integer leftSistersBuffer=0;//measures the length of sisters in words when reading
     for (int i = 0; i < children.size();i++){
-      ArrayList<Integer> childConstituents = new ArrayList<Integer>();
+      ArrayList<Integer> childConstituents = new ArrayList<>();
       childConstituents.add(i);
       Tree subtree = children.get(i);
       Integer currWindowLength=0; //measures the length in words of the current collocation.
       getCollocationsList(subtree, threadSafe); //recursive call to get colls in subtrees.
       testString = new StringBuffer(160);
       testString.append(treeAsStemmedCollocation(subtree, threadSafe));
-      testString.append("_");
+      testString.append('_');
       Integer thisSubtreeLength = subtree.yield().size();
       currWindowLength+=thisSubtreeLength;
-      StringBuffer testStringNonStemmed = new StringBuffer(160);
+      StringBuilder testStringNonStemmed = new StringBuilder(160);
       testStringNonStemmed.append(treeAsNonStemmedCollocation(subtree));
-      testStringNonStemmed.append("_");
+      testStringNonStemmed.append('_');
 
       //for each subtree i, we iteratively append word yields of succeeding sister
       //subtrees j and check their wordnet entries.  if they exist we write them to
@@ -232,36 +232,36 @@ public class CollocationFinder {
                 testString);
           }
         } else if (wordNetContains(testString.toString())) {
-          Pair <Integer, Integer> c = new Pair<Integer,Integer>(leftMostLeaf+leftSistersBuffer,leftMostLeaf+leftSistersBuffer+currWindowLength-1);
+          Pair <Integer, Integer> c = new Pair<>(leftMostLeaf+leftSistersBuffer,leftMostLeaf+leftSistersBuffer+currWindowLength-1);
 
-          ArrayList<Integer> childConstituentsClone = new ArrayList<Integer>(childConstituents);
+          ArrayList<Integer> childConstituentsClone = new ArrayList<>(childConstituents);
           Collocation col = new Collocation(c,t,childConstituentsClone,testString.toString(),headLabel);
           collocationCollector.add(col);
           if (DEBUG) {
-            err.println("Found collocation in wordnet: "+ testString.toString());
+            err.println("Found collocation in wordnet: "+ testString);
             err.println("  Span of collocation is: " + c +
                 "; childConstituents is: " + c);
           }
         }
-        testString.append("_");
+        testString.append('_');
         if (StringUtils.lookingAt(testStringNonStemmed.toString(), "(?:[Tt]he|THE|[Aa][Nn]?)[ _]")) {
           if (false) {
             err.println("CollocationFinder: Not collapsing the/a word: " +
                 testStringNonStemmed);
           }
         } else if (wordNetContains(testStringNonStemmed.toString())) {
-          Pair <Integer, Integer> c = new Pair<Integer,Integer>(leftMostLeaf+leftSistersBuffer,leftMostLeaf+leftSistersBuffer+currWindowLength-1);
+          Pair <Integer, Integer> c = new Pair<>(leftMostLeaf+leftSistersBuffer,leftMostLeaf+leftSistersBuffer+currWindowLength-1);
 
-          ArrayList<Integer> childConstituentsClone = new ArrayList<Integer>(childConstituents);
+          ArrayList<Integer> childConstituentsClone = new ArrayList<>(childConstituents);
           Collocation col = new Collocation(c,t,childConstituentsClone,testStringNonStemmed.toString(),headLabel);
           collocationCollector.add(col);
           if (DEBUG) {
-            err.println("Found collocation in wordnet: "+ testStringNonStemmed.toString());
+            err.println("Found collocation in wordnet: "+ testStringNonStemmed);
             err.println("  Span of collocation is: " + c +
                 "; childConstituents is: " + c);
           }
         }
-        testStringNonStemmed.append("_");
+        testStringNonStemmed.append('_');
       }
       leftSistersBuffer+=thisSubtreeLength;
     }
@@ -270,11 +270,11 @@ public class CollocationFinder {
   private static String treeAsStemmedCollocation(Tree t, boolean threadSafe) {
     List<WordTag> list= getStemmedWordTagsFromTree(t, threadSafe);
     // err.println(list.size());
-    StringBuffer s = new StringBuffer(160);
+    StringBuilder s = new StringBuilder(160);
     WordTag firstWord = list.remove(0);
     s.append(firstWord.word());
     for(WordTag wt : list) {
-      s.append("_");
+      s.append('_');
       s.append(wt.word());
     }
     //err.println("Expressing this as:"+s.toString());
@@ -284,11 +284,11 @@ public class CollocationFinder {
   private static String treeAsNonStemmedCollocation(Tree t) {
     List<WordTag> list= getNonStemmedWordTagsFromTree(t);
 
-    StringBuffer s = new StringBuffer(160);
+    StringBuilder s = new StringBuilder(160);
     WordTag firstWord = list.remove(0);
     s.append(firstWord.word());
     for(WordTag wt : list) {
-      s.append("_");
+      s.append('_');
       s.append(wt.word());
     }
     return s.toString();
@@ -298,17 +298,17 @@ public class CollocationFinder {
     StringBuilder sb = new StringBuilder(160);
     ArrayList<TaggedWord> sent = t.taggedYield();
     for (TaggedWord aSent : sent) {
-      sb.append(aSent.word()).append("_");
+      sb.append(aSent.word()).append('_');
     }
     return sb.substring(0,sb.length() -1);
   }
 
-  private static String mergeLeavesIntoCollocatedString(Tree[] trees) {
+  private static String mergeLeavesIntoCollocatedString(Tree... trees) {
     StringBuilder sb = new StringBuilder(160);
     for (Tree t: trees) {
       ArrayList<TaggedWord> sent = t.taggedYield();
       for (TaggedWord aSent : sent) {
-        sb.append(aSent.word()).append("_");
+        sb.append(aSent.word()).append('_');
       }
     }
     return sb.substring(0,sb.length() -1);
@@ -377,7 +377,7 @@ public class CollocationFinder {
 
     @Override
     public String toString() {
-      return collocationString + indicesOfConstituentChildren + "/" +
+      return collocationString + indicesOfConstituentChildren + '/' +
              headLabel;
     }
 

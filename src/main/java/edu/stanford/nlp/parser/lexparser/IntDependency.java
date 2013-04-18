@@ -23,7 +23,7 @@ public class IntDependency implements Serializable {
 
   @Override
   public int hashCode() {
-    return head.hashCode() ^ (arg.hashCode() << 8) ^ ((leftHeaded ? 1 : 0) << 15) ^ (distance << 16);
+    return head.hashCode() ^ arg.hashCode() << 8 ^ (leftHeaded ? 1 : 0) << 15 ^ distance << 16;
   }
 
   @Override
@@ -33,7 +33,7 @@ public class IntDependency implements Serializable {
     }
     if (o instanceof IntDependency) {
       IntDependency d = (IntDependency) o;
-      return (head.equals(d.head) && arg.equals(d.arg) && distance == d.distance && leftHeaded == d.leftHeaded);
+      return head.equals(d.head) && arg.equals(d.arg) && distance == d.distance && leftHeaded == d.leftHeaded;
     } else {
       return false;
     }
@@ -43,11 +43,11 @@ public class IntDependency implements Serializable {
 
   @Override
   public String toString() {
-    return "\"" + StringUtils.escapeString(head.toString(), charsToEscape, '\\') + "\" -> \"" + StringUtils.escapeString(arg.toString(), charsToEscape, '\\') + "\" " + (leftHeaded ? LEFT : RIGHT) + " " + distance;
+    return '"' + StringUtils.escapeString(head.toString(), charsToEscape, '\\') + "\" -> \"" + StringUtils.escapeString(arg.toString(), charsToEscape, '\\') + "\" " + (leftHeaded ? LEFT : RIGHT) + ' ' + distance;
   }
 
   public String toString(Index<String> wordIndex, Index<String> tagIndex) {
-    return "\"" + StringUtils.escapeString(head.toString(wordIndex, tagIndex), charsToEscape, '\\') + "\" -> \"" + StringUtils.escapeString(arg.toString(wordIndex, tagIndex), charsToEscape, '\\') + "\" " + (leftHeaded ? LEFT : RIGHT) + " " + distance;
+    return '"' + StringUtils.escapeString(head.toString(wordIndex, tagIndex), charsToEscape, '\\') + "\" -> \"" + StringUtils.escapeString(arg.toString(wordIndex, tagIndex), charsToEscape, '\\') + "\" " + (leftHeaded ? LEFT : RIGHT) + ' ' + distance;
   }
 
   public IntDependency(IntTaggedWord head, IntTaggedWord arg, boolean leftHeaded, int distance) {

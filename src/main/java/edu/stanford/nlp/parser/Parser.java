@@ -25,9 +25,9 @@ public interface Parser {
    * implement HasTag, the tag will be believed.  The return value
    * will be false if the sentence is not parseable.  Acceptance is with
    * respect to some goal category, which may be specified by the grammar,
-   * or may be a parser default (for instance, <code>S</code>).
+   * or may be a parser default (for instance, {@code S}).
    *
-   * @param sentence A <code>List&lt;HasWord&gt;</code> to be parsed
+   * @param sentence A {@code List&lt;HasWord&gt;} to be parsed
    * @return true iff the sentence is recognized
    * @throws UnsupportedOperationException This will be thrown if for
    *           any reason the parser can't complete parsing this sentence, for

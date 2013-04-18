@@ -5,6 +5,7 @@ import edu.stanford.nlp.util.StringUtils;
 import java.io.*;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.util.Generics;
@@ -24,8 +25,11 @@ import edu.stanford.nlp.util.Generics;
 public class TaggerConfig extends Properties /* Inherits implementation of serializable! */ {
 
   private static final long serialVersionUID = -4136407850147157497L;
+    private static final Pattern COMPILE = Pattern.compile("\\s*,\\s*");
+    private static final Pattern PATTERN = Pattern.compile("\\s+");
+    private static final Pattern COMPILE1 = Pattern.compile("(^|.*,)invertible=true");
 
-  public enum Mode {
+    public enum Mode {
     TRAIN, TEST, TAG, DUMP
   }
 
@@ -116,8 +120,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
    * Used internally.
    */
   private TaggerConfig() {
-    super();
-    this.putAll(defaultValues);
+      this.putAll(defaultValues);
   }
 
   /**
@@ -191,7 +194,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
     //on command line/in props file
     //Get the path to the model (or the path where you'd like to save the model); this is necessary for training, testing, and tagging
     this.setProperty("model", props.getProperty("model", this.getProperty("model", "")).trim());
-    if ( ! (this.getMode() == Mode.DUMP) && this.getProperty("model").equals("")) {
+    if ( ! (this.getMode() == Mode.DUMP) && this.getProperty("model").isEmpty()) {
       throw new RuntimeException("'model' parameter must be specified");
     }
 
@@ -224,7 +227,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
     this.setProperty("closedClassTagThreshold", props.getProperty("closedClassTagThreshold", this.getProperty("closedClassTagThreshold")));
 
     this.setProperty("arch", props.getProperty("arch", this.getProperty("arch")));
-    if (this.getMode() == Mode.TRAIN && this.getProperty("arch").equals("")) {
+    if (this.getMode() == Mode.TRAIN && this.getProperty("arch").isEmpty()) {
       throw new IllegalArgumentException("No architecture specified; " +
                                          "set the -arch flag with " +
                                          "the features to be used");
@@ -276,7 +279,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
 
   public String getOutputFormat() { return getProperty("outputFormat"); }
 
-  public String[] getOutputOptions() { return getProperty("outputFormatOptions").split("\\s*,\\s*"); }
+  public String[] getOutputOptions() { return COMPILE.split(getProperty("outputFormatOptions")); }
 
   public boolean getOutputVerbosity() {
     return getOutputOptionsContains("verbose");
@@ -327,11 +330,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
   }
 
   private static String[] wsvStringToStringArray(String str) {
-    if (str == null || str.equals("")) {
-      return StringUtils.EMPTY_STRING_ARRAY;
-    } else {
-      return str.split("\\s+");
-    }
+      return str == null || str.isEmpty() ? StringUtils.EMPTY_STRING_ARRAY : PATTERN.split(str);
   }
 
   public boolean getLearnClosedClassTags() { return Boolean.parseBoolean(getProperty("learnClosedClassTags")); }
@@ -388,10 +387,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
 
   public boolean getTokenizerInvertible() {
     String tokenizerOptions = getTokenizerOptions();
-    if (tokenizerOptions != null &&
-        tokenizerOptions.matches("(^|.*,)invertible=true"))
-      return true;
-    return getOutputVerbosity() || getOutputLemmas();
+      return tokenizerOptions != null && COMPILE1.matcher(tokenizerOptions).matches() || getOutputVerbosity() || getOutputLemmas();
   }
 
   /**
@@ -409,11 +405,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
     String approx = getProperty("approximate");
     if ("false".equalsIgnoreCase(approx)) {
       return -1.0;
-    } else if ("true".equalsIgnoreCase(approx)) {
-      return 1.0;
-    } else {
-      return Double.parseDouble(approx);
-    }
+    } else return "true".equalsIgnoreCase(approx) ? 1.0 : Double.parseDouble(approx);
   }
 
 
@@ -725,7 +717,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
   /** Serialize the TaggerConfig.
    *
    * @param os Where to write this TaggerConfig
-   * @throws IOException If any IO problems
+   * @throws java.io.IOException If any IO problems
    */
   public void saveConfig(OutputStream os) throws IOException {
     ObjectOutputStream out = new ObjectOutputStream(os);
@@ -737,7 +729,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
    *
    * @param stream Where to read from
    * @return The TaggerConfig
-   * @throws IOException Misc IOError
+   * @throws java.io.IOException Misc IOError
    * @throws ClassNotFoundException Class error
    */
   public static TaggerConfig readConfig(DataInputStream stream)

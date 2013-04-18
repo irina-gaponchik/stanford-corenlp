@@ -58,7 +58,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
   //Use -xmlFormat below to enable reading the raw files.
   private boolean readPennFormat = true;
 
-  private boolean collinizerRetainsPunctuation = false;
+  private boolean collinizerRetainsPunctuation;
 
   //Controls the MW annotation feature
   private TwoDimensionalCounter<String, String> mwCounter;
@@ -77,12 +77,12 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
     optionsString.append("FrenchTreebankParserParams\n");
 
     annotationPatterns = Generics.newHashMap();
-    activeAnnotations = new ArrayList<Pair<TregexPattern,Function<TregexMatcher,String>>>();
+    activeAnnotations = new ArrayList<>();
 
     initializeAnnotationPatterns();
   }
 
-  private final List<String> baselineFeatures = new ArrayList<String>();
+  private final List<String> baselineFeatures = new ArrayList<>();
   {
     baselineFeatures.add("-tagPAFr");
     
@@ -103,7 +103,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
     // New features for CL submission
     baselineFeatures.add("-splitPUNC");
   }
-  private final List<String> additionalFeatures = new ArrayList<String>();
+  private final List<String> additionalFeatures = new ArrayList<>();
 
 
   private void initializeAnnotationPatterns() {
@@ -318,7 +318,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
     } catch (TregexParseException e) {
       int nth = annotationPatterns.size() + 1;
-      String nthStr = (nth == 1) ? "1st": ((nth == 2) ? "2nd": nth + "th");
+      String nthStr = nth == 1 ? "1st": nth == 2 ? "2nd": nth + "th";
       System.err.println("Parse exception on " + nthStr + " annotation pattern initialization:" + e);
     }
   }
@@ -330,16 +330,19 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
     public String apply(TregexMatcher m) {
 
-      final String punc = m.getNode(key).value();
+      String punc = m.getNode(key).value();
 
-      if (punc.equals("."))
-        return "-fs";
-      else if (punc.equals("?"))
-        return "-quest";
-      else if (punc.equals(","))
-        return "-comma";
-      else if (punc.equals(":") || punc.equals(";"))
-        return "-colon";
+        switch (punc) {
+            case ".":
+                return "-fs";
+            case "?":
+                return "-quest";
+            case ",":
+                return "-comma";
+            case ":":
+            case ";":
+                return "-colon";
+        }
 //      else if (punc.equals("-LRB-"))
 //        return "-lrb";
 //      else if (punc.equals("-RRB-"))
@@ -398,8 +401,8 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
     private String annotationMark;
     private String key;
     private String key2;
-    private boolean doBasicCat = false;
-    private boolean toLower = false;
+    private boolean doBasicCat;
+    private boolean toLower;
 
     public AddRelativeNodeFunction(String annotationMark, String key, boolean basicCategory) {
       this.annotationMark = annotationMark;
@@ -421,22 +424,19 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
     public String apply(TregexMatcher m) {
       String tag;
       if(key2 == null)
-        tag = annotationMark + ((doBasicCat) ? tlp.basicCategory(m.getNode(key).label().value()) : m.getNode(key).label().value());
+        tag = annotationMark + (doBasicCat ? tlp.basicCategory(m.getNode(key).label().value()) : m.getNode(key).label().value());
       else {
-        String annot1 = (doBasicCat) ? tlp.basicCategory(m.getNode(key).label().value()) : m.getNode(key).label().value();
-        String annot2 = (doBasicCat) ? tlp.basicCategory(m.getNode(key2).label().value()) : m.getNode(key2).label().value();
+        String annot1 = doBasicCat ? tlp.basicCategory(m.getNode(key).label().value()) : m.getNode(key).label().value();
+        String annot2 = doBasicCat ? tlp.basicCategory(m.getNode(key2).label().value()) : m.getNode(key2).label().value();
         tag = annotationMark + annot1 + annotationMark + annot2;
       }
 
-      return (toLower) ? tag.toLowerCase() : tag;
+      return toLower ? tag.toLowerCase() : tag;
     }
 
     @Override
     public String toString() {
-      if(key2 == null)
-        return "AddRelativeNodeFunction[" + annotationMark + ',' + key + ']';
-      else
-        return "AddRelativeNodeFunction[" + annotationMark + ',' + key + ',' + key2 + ']';
+        return key2 == null ? "AddRelativeNodeFunction[" + annotationMark + ',' + key + ']' : "AddRelativeNodeFunction[" + annotationMark + ',' + key + ',' + key2 + ']';
     }
 
     private static final long serialVersionUID = 1L;
@@ -466,13 +466,10 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
         if( ! kid.isPreTerminal())
           throw new RuntimeException("Not POS sequence for tree: " + t.toString());
         String tag = doBasicCat ? tlp.basicCategory(kid.value()) : kid.value();
-        sb.append(tag).append(" ");
+        sb.append(tag).append(' ');
       }
 
-      if(mwCounter.getCount(t.value(), sb.toString().trim()) > cutoff)
-        return annotationMark + sb.toString().replaceAll("\\s+", "").toLowerCase();
-      else
-        return "";
+        return mwCounter.getCount(t.value(), sb.toString().trim()) > cutoff ? annotationMark + sb.toString().replaceAll("\\s+", "").toLowerCase() : "";
     }
 
     @Override
@@ -593,7 +590,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
     }
 
     //Update the label(s)
-    String newCat = baseCat + newCategory.toString();
+    String newCat = baseCat + newCategory;
     t.setValue(newCat);
     if (t.isPreTerminal() && t.label() instanceof HasTag)
       ((HasTag) t.label()).setTag(newCat);
@@ -603,7 +600,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
 
   private void loadMWMap(String filename) {
-    mwCounter = new TwoDimensionalCounter<String,String>();
+    mwCounter = new TwoDimensionalCounter<>();
 
     try {
       BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename)), "UTF-8"));
@@ -618,10 +615,6 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
       System.err.printf("%s: Loaded %d lines from %s into MWE counter%n", this.getClass().getName(),nLines,filename);
 
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -665,7 +658,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
       if(!baselineFeatures.contains(args[i])) additionalFeatures.add(args[i]);
       Pair<TregexPattern,Function<TregexMatcher,String>> p = annotationPatterns.get(args[i]);
       activeAnnotations.add(p);
-      optionsString.append("Option " + args[i] + " added annotation pattern " + p.first() + " with annotation " + p.second() + '\n');
+      optionsString.append("Option ").append(args[i]).append(" added annotation pattern ").append(p.first()).append(" with annotation ").append(p.second()).append('\n');
       i++;
 
     } else if (args[i].equals("-collinizerRetainsPunctuation")) {
@@ -673,11 +666,11 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
       collinizerRetainsPunctuation = true;
       i++;
 
-    } else if (args[i].equalsIgnoreCase("-headFinder") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-headFinder") && i + 1 < args.length) {
       try {
         HeadFinder hf = (HeadFinder) Class.forName(args[i + 1]).newInstance();
         setHeadFinder(hf);
-        optionsString.append("HeadFinder: " + args[i + 1] + "\n");
+        optionsString.append("HeadFinder: ").append(args[i + 1]).append('\n');
 
       } catch (Exception e) {
         System.err.println(e);
@@ -715,7 +708,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
       i++;
 
-    } else if(args[i].equals("-factlex") && (i + 1 < args.length)) {
+    } else if(args[i].equals("-factlex") && i + 1 < args.length) {
       String activeFeats = setupMorphoFeatures(args[i+1]);
       optionsString.append("Factored Lexicon: active features: ").append(activeFeats);
 

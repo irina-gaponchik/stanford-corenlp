@@ -18,25 +18,23 @@ import java.io.Serializable;
  */
 public class TrainOptions implements Serializable {
 
-  public String trainTreeFile = null; // same for me -- Teg
+  public String trainTreeFile; // same for me -- Teg
 
   /* THESE OPTIONS AFFECT ONLY TRAIN TIME */
 
-  public TrainOptions() {}
-
-  public int trainLengthLimit = 100000;
+    public int trainLengthLimit = 100000;
 
   /** Add all test set trees to training data for PCFG.
    *  (Currently only supported in FactoredParser main.)
    */
-  public boolean cheatPCFG = false;
+  public boolean cheatPCFG;
 
   /** Whether to do "horizontal Markovization" (as in ACL 2003 paper).
    *  False means regular PCFG expansions.
    */
-  public boolean markovFactor = false;
+  public boolean markovFactor;
   public int markovOrder = 1;
-  public boolean hSelSplit = false; // good with true;
+  public boolean hSelSplit; // good with true;
   public int HSEL_CUT = 10;
 
   /** Whether or not to mark final states in binarized grammar.
@@ -75,32 +73,32 @@ public class TrainOptions implements Serializable {
   /**
    * This variable controls doing 2 levels of parent annotation.  Bad.
    */
-  public boolean gPA = false;
+  public boolean gPA;
 
-  public boolean postPA = false;
-  public boolean postGPA = false;
+  public boolean postPA;
+  public boolean postGPA;
 
   /**
    * Only split the "common high KL divergence" parent categories.... Good.
    */
-  public boolean selectiveSplit = false; //true;
+  public boolean selectiveSplit; //true;
 
-  public double selectiveSplitCutOff = 0.0;
+  public double selectiveSplitCutOff;
 
-  public boolean selectivePostSplit = false;
+  public boolean selectivePostSplit;
 
-  public double selectivePostSplitCutOff = 0.0;
+  public double selectivePostSplitCutOff;
 
   /** Whether, in post-splitting of categories, nodes are annotated with the
    *  (grand)parent's base category or with its complete subcategorized
    *  category.
    */
-  public boolean postSplitWithBaseCategory = false;
+  public boolean postSplitWithBaseCategory;
 
   /**
    * Selective Sister annotation.
    */
-  public boolean sisterAnnotate = false;
+  public boolean sisterAnnotate;
 
   public Set<String> sisterSplitters;
 
@@ -113,50 +111,50 @@ public class TrainOptions implements Serializable {
    * (A value of 1 is better than 2 in combos.)  A value of 1 corresponds
    * to the old boolean -unary flag.
    */
-  public int markUnary = 0;
+  public int markUnary;
 
   /** Mark POS tags which are the sole member of their phrasal constituent.
    *  This is like markUnary=2, applied to POS tags.
    */
-  public boolean markUnaryTags = false;
+  public boolean markUnaryTags;
 
 
   /**
    * Mark all pre-preterminals (also does splitBaseNP: don't need both)
    */
-  public boolean splitPrePreT = false;
+  public boolean splitPrePreT;
 
 
   /**
    * Parent annotation on tags.  Good (for PCFG?)
    */
-  public boolean tagPA = false;//true;
+  public boolean tagPA;//true;
 
   /**
    * Do parent annotation on tags selectively.  Neutral, but less splits.
    */
-  public boolean tagSelectiveSplit = false;
+  public boolean tagSelectiveSplit;
 
-  public double tagSelectiveSplitCutOff = 0.0;
+  public double tagSelectiveSplitCutOff;
 
-  public boolean tagSelectivePostSplit = false;
+  public boolean tagSelectivePostSplit;
 
-  public double tagSelectivePostSplitCutOff = 0.0;
+  public double tagSelectivePostSplitCutOff;
 
   /**
    * Right edge is right-recursive (X << X) Bad. (NP only is good)
    */
-  public boolean rightRec = false;//true;
+  public boolean rightRec;//true;
 
   /**
    * Left edge is right-recursive (X << X)  Bad.
    */
-  public boolean leftRec = false;
+  public boolean leftRec;
 
   /**
    * Promote/delete punctuation like Collins.  Bad (!)
    */
-  public boolean collinsPunc = false;
+  public boolean collinsPunc;
 
   /**
    * Set the splitter strings.  These are a set of parent and/or grandparent
@@ -172,14 +170,14 @@ public class TrainOptions implements Serializable {
    * Just for debugging: check that your tree transforms work correctly.  This
    * will print the transformations of the first printTreeTransformations trees.
    */
-  public int printTreeTransformations = 0;
+  public int printTreeTransformations;
 
   public PrintWriter printAnnotatedPW;
   public PrintWriter printBinarizedPW;
 
   // todo [cdm nov 2012]: At present this does nothing. It should print the list of all states of a grammar it trains
   // Maybe just make it an anytime option and print it at the same time that verbose printing of tags is done?
-  public boolean printStates = false;
+  public boolean printStates;
 
   /** How to compact grammars as FSMs.
    *  0 = no compaction [uses makeSyntheticLabel1],
@@ -194,7 +192,7 @@ public class TrainOptions implements Serializable {
    */
   public int compactGrammar = 3; // exact compaction on by default
 
-  public boolean leftToRight = false; // whether to binarize left to right or head out
+  public boolean leftToRight; // whether to binarize left to right or head out
 
   public int compactGrammar() {
     if (markovFactor) {
@@ -203,7 +201,7 @@ public class TrainOptions implements Serializable {
     return 0;
   }
 
-  public boolean noTagSplit = false;
+  public boolean noTagSplit;
 
   /**
    * CHANGE ANYTHING BELOW HERE AT YOUR OWN RISK
@@ -214,29 +212,29 @@ public class TrainOptions implements Serializable {
    * but before grammar compaction. The alpha term is the same
    * as that described in Petrov et al. (2006), and has range [0,1].
    */
-  public boolean ruleSmoothing = false;
-  public double ruleSmoothingAlpha = 0.0;
+  public boolean ruleSmoothing;
+  public double ruleSmoothingAlpha;
 
   /**
    * TODO wsg2011: This is the old grammar smoothing parameter that no
    * longer does anything in the parser. It should be removed.
    */
-  public boolean smoothing = false;
+  public boolean smoothing;
 
   /*  public boolean factorOut = false;
   public boolean rightBonus = false;
   public boolean brokenDep = false;*/
 
   /** Discounts the count of BinaryRule's (only, apparently) in training data. */
-  public double ruleDiscount = 0.0;
+  public double ruleDiscount;
 
   //public boolean outsideFilter = false;
 
-  public boolean printAnnotatedRuleCounts = false;
-  public boolean printAnnotatedStateCounts = false;
+  public boolean printAnnotatedRuleCounts;
+  public boolean printAnnotatedStateCounts;
 
   /** Where to use the basic or split tags in the dependency grammar */
-  public boolean basicCategoryTagsInDependencyGrammar = false;
+  public boolean basicCategoryTagsInDependencyGrammar;
 
   /**
    * A transformer to use on the training data before any other
@@ -246,20 +244,20 @@ public class TrainOptions implements Serializable {
    * strip subcategories, to run a tsurgeon pattern, or any number of
    * other useful operations.
    */
-  public TreeTransformer preTransformer = null;
+  public TreeTransformer preTransformer;
 
   /**
    * A set of files to use as extra information in the lexicon.  This
    * can provide tagged words which are not part of trees
    */
-  public String taggedFiles = null;
+  public String taggedFiles;
 
   /**
    * Use the method reported by Berkeley for splitting and recombining
    * states.  This is an experimental and still in development
    * reimplementation of that work.
    */
-  public boolean predictSplits = false;
+  public boolean predictSplits;
 
   /**
    * If we are predicting splits, we loop this many times
@@ -269,18 +267,18 @@ public class TrainOptions implements Serializable {
   /**
    * If we are predicting splits, we recombine states at this rate every loop
    */
-  public double splitRecombineRate = 0.0;
+  public double splitRecombineRate;
 
   /**
    * When binarizing trees, don't annotate the labels with anything
    */
-  public boolean simpleBinarizedLabels = false;
+  public boolean simpleBinarizedLabels;
 
   /**
    * When binarizing trees, don't binarize trees with two children.
    * Only applies when using inside markov binarization for now.
    */
-  public boolean noRebinarization = false;
+  public boolean noRebinarization;
 
   /**
    * If the training algorithm allows for parallelization, how many
@@ -294,48 +292,44 @@ public class TrainOptions implements Serializable {
 
   @Override
   public String toString() {
-    return("Train parameters:" + 
-           " smooth=" + smoothing + 
-           " PA=" + PA + 
-           " GPA=" + gPA + 
-           " selSplit=" + selectiveSplit + 
-           " (" + selectiveSplitCutOff + ((deleteSplitters != null) ? ("; deleting " + deleteSplitters): "") + ")" + 
-           " mUnary=" + markUnary + 
-           " mUnaryTags=" + markUnaryTags + 
-           " sPPT=" + splitPrePreT + 
-           " tagPA=" + tagPA + 
-           " tagSelSplit=" + tagSelectiveSplit + " (" + tagSelectiveSplitCutOff + ")" + 
-           " rightRec=" + rightRec + 
-           " leftRec=" + leftRec + 
-           " collinsPunc=" + collinsPunc + 
-           " markov=" + markovFactor + 
-           " mOrd=" + markovOrder + 
-           " hSelSplit=" + hSelSplit + " (" + HSEL_CUT + ")" + 
-           " compactGrammar=" + compactGrammar() + 
-           " postPA=" + postPA + 
-           " postGPA=" + postGPA + 
-           " selPSplit=" + selectivePostSplit + " (" + selectivePostSplitCutOff + ")" + 
-           " tagSelPSplit=" + tagSelectivePostSplit + " (" + tagSelectivePostSplitCutOff + ")" + 
-           " postSplitWithBase=" + postSplitWithBaseCategory + 
-           " fractionBeforeUnseenCounting=" + fractionBeforeUnseenCounting + 
-           " openClassTypesThreshold=" + openClassTypesThreshold + 
-           " preTransformer=" + preTransformer + 
-           " taggedFiles=" + taggedFiles + 
-           " predictSplits=" + predictSplits + 
-           " splitCount=" + splitCount + 
-           " splitRecombineRate=" + splitRecombineRate + 
-           " simpleBinarizedLabels=" + simpleBinarizedLabels + 
-           " noRebinarization=" + noRebinarization + 
-           " trainingThreads=" + trainingThreads);
+    return "Train parameters:" +
+           " smooth=" + smoothing +
+           " PA=" + PA +
+           " GPA=" + gPA +
+           " selSplit=" + selectiveSplit +
+           " (" + selectiveSplitCutOff + (deleteSplitters != null ? "; deleting " + deleteSplitters : "") + ')' +
+           " mUnary=" + markUnary +
+           " mUnaryTags=" + markUnaryTags +
+           " sPPT=" + splitPrePreT +
+           " tagPA=" + tagPA +
+           " tagSelSplit=" + tagSelectiveSplit + " (" + tagSelectiveSplitCutOff + ')' +
+           " rightRec=" + rightRec +
+           " leftRec=" + leftRec +
+           " collinsPunc=" + collinsPunc +
+           " markov=" + markovFactor +
+           " mOrd=" + markovOrder +
+           " hSelSplit=" + hSelSplit + " (" + HSEL_CUT + ')' +
+           " compactGrammar=" + compactGrammar() +
+           " postPA=" + postPA +
+           " postGPA=" + postGPA +
+           " selPSplit=" + selectivePostSplit + " (" + selectivePostSplitCutOff + ')' +
+           " tagSelPSplit=" + tagSelectivePostSplit + " (" + tagSelectivePostSplitCutOff + ')' +
+           " postSplitWithBase=" + postSplitWithBaseCategory +
+           " fractionBeforeUnseenCounting=" + fractionBeforeUnseenCounting +
+           " openClassTypesThreshold=" + openClassTypesThreshold +
+           " preTransformer=" + preTransformer +
+           " taggedFiles=" + taggedFiles +
+           " predictSplits=" + predictSplits +
+           " splitCount=" + splitCount +
+           " splitRecombineRate=" + splitRecombineRate +
+           " simpleBinarizedLabels=" + simpleBinarizedLabels +
+           " noRebinarization=" + noRebinarization +
+           " trainingThreads=" + trainingThreads;
   }
 
   public static void printTrainTree(PrintWriter pw, String message, Tree t) {
     PrintWriter myPW;
-    if (pw == null) {
-      myPW = new PrintWriter(System.out, true);
-    } else {
-      myPW = pw;
-    }
+      myPW = pw == null ? new PrintWriter(System.out, true) : pw;
     if (message != null && pw == null) {
       // hard coded to not print message if using file output!
       myPW.println(message);

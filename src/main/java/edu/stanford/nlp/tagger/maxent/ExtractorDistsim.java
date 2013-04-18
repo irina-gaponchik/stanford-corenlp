@@ -83,8 +83,7 @@ public class ExtractorDistsim extends Extractor {
     }
 
     ExtractorDistsimConjunction(String distSimPath, int left, int right) {
-      super();
-      lexicon = initLexicon(distSimPath);
+        lexicon = initLexicon(distSimPath);
       this.left = left;
       this.right = right;
       name = "ExtractorDistsimConjunction(" + left + ',' + right + ')';

@@ -11,7 +11,7 @@ import java.util.Map;
  * @author Ari Steinberg (ari.steinberg@stanford.edu)
  */
 
-public class CacheMap<K,V> extends LinkedHashMap<K,V> implements Map<K,V>, Cloneable, Serializable {
+public class CacheMap<K,V> extends LinkedHashMap<K,V> {
 
   private static final long serialVersionUID = 1L;
   public String backingFile;
@@ -82,10 +82,10 @@ public class CacheMap<K,V> extends LinkedHashMap<K,V> implements Map<K,V>, Clone
       return c;
     } catch (FileNotFoundException ex) {
       System.err.println("Cache file " + file + " has not been created yet.  Making new one.");
-      return new CacheMap<K, V>(numEntries, loadFactor, accessOrder, file);
+      return new CacheMap<>(numEntries, loadFactor, accessOrder, file);
     } catch (Exception ex) {
       System.err.println("Error reading cache file " + file + ".  Making a new cache and NOT backing to file.");
-      return new CacheMap<K, V>(numEntries, loadFactor, accessOrder);
+      return new CacheMap<>(numEntries, loadFactor, accessOrder);
     }
   }
 
@@ -95,11 +95,11 @@ public class CacheMap<K,V> extends LinkedHashMap<K,V> implements Map<K,V>, Clone
   }
 
   public static <K,V> CacheMap<K,V> create(int numEntries, String file, boolean useFileParams) {
-    return create(numEntries, .75f, false, file, useFileParams);
+    return create(numEntries, 0.75f, false, file, useFileParams);
   }
 
   public static <K,V> CacheMap<K,V> create(String file, boolean useFileParams) {
-    return create(1000, .75f, false, file, useFileParams);
+    return create(1000, 0.75f, false, file, useFileParams);
   }
 
   /**
@@ -108,7 +108,7 @@ public class CacheMap<K,V> extends LinkedHashMap<K,V> implements Map<K,V>, Clone
   public void write() {
     // Do this even if not writing so we printStats() at good times
     entriesSinceLastWritten = 0;
-    if (frequencyToWrite < CACHE_ENTRIES/4) frequencyToWrite *= 2;
+    if (frequencyToWrite < CACHE_ENTRIES/4) frequencyToWrite <<= 1;
 
     if (backingFile == null) return; 
 
@@ -118,21 +118,14 @@ public class CacheMap<K,V> extends LinkedHashMap<K,V> implements Map<K,V>, Clone
       ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(backingFile));
       oos.writeObject(this);
     } catch (Exception ex) {
-      System.err.println("Error writing cache to file: " + backingFile + "!");
+      System.err.println("Error writing cache to file: " + backingFile + '!');
       System.err.println(ex);
     }
   }
 
-  /**
-   * @see java.util.LinkedHashMap#removeEldestEntry
-   */
   @Override
   protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
-    if (size() > CACHE_ENTRIES) {
-      return true;
-    } else {
-      return false;
-    }
+      return size() > CACHE_ENTRIES;
   }
 
   /**
@@ -173,7 +166,7 @@ public class CacheMap<K,V> extends LinkedHashMap<K,V> implements Map<K,V>, Clone
   public void printStats(PrintStream out) {
     out.println("cache stats: size: " + size() + ", hits: " + hits +
                 ", misses: " + misses + ", puts: " + puts +
-                ", hit % (using misses): " + ((float)hits)/(hits + misses) +
-                ", hit % (using puts): " + ((float)hits)/(hits + puts));
+                ", hit % (using misses): " + (float)hits /(hits + misses) +
+                ", hit % (using puts): " + (float)hits /(hits + puts));
   }
 }

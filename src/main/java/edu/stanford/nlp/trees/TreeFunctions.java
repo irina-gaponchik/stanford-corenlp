@@ -46,7 +46,7 @@ public class TreeFunctions {
         return tf.newTreeNode(new StringLabel(t.label().value()), Collections.singletonList(helper(t.children()[0])));
       }
       int numKids = t.numChildren();
-      List<Tree> children = new ArrayList<Tree>(numKids);
+      List<Tree> children = new ArrayList<>(numKids);
       for (int k = 0; k < numKids; k++) {
         children.add(helper(t.children()[k]));
       }
@@ -85,7 +85,7 @@ public class TreeFunctions {
         return tf.newTreeNode(t.label().value(), Collections.singletonList(helper(t.children()[0])));
       } else {
         int numKids = t.numChildren();
-        List<Tree> children = new ArrayList<Tree>(numKids);
+        List<Tree> children = new ArrayList<>(numKids);
         for (int k = 0; k < numKids; k++) {
           children.add(helper(t.children()[k]));
         }
@@ -129,7 +129,7 @@ public class TreeFunctions {
                          Collections.singletonList(apply(t.children()[0])));
       } else {
         int numKids = t.numChildren();
-        List<Tree> children = new ArrayList<Tree>(numKids);
+        List<Tree> children = new ArrayList<>(numKids);
         for (int k = 0; k < numKids; k++) {
           children.add(apply(t.children()[k]));
         }
@@ -154,11 +154,11 @@ public class TreeFunctions {
   /**
    * This method just tests the functionality of the included transformers.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     //TreeFactory tf = new LabeledScoredTreeFactory();
     Tree stringyTree = null;
     try {
-      stringyTree = (new PennTreeReader(new StringReader("(S (VP (VBZ Try) (NP (DT this))) (. .))"), new LabeledScoredTreeFactory(new StringLabelFactory()))).readTree();
+      stringyTree = new PennTreeReader(new StringReader("(S (VP (VBZ Try) (NP (DT this))) (. .))"), new LabeledScoredTreeFactory(new StringLabelFactory())).readTree();
     } catch (IOException e) {
       // do nothing
     }

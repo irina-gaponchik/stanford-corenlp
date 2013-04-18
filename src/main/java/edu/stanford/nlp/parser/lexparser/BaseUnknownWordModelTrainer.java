@@ -30,7 +30,7 @@ public class BaseUnknownWordModelTrainer
 
   Set<String> seenEnd;
 
-  double indexToStartUnkCounting = 0;
+  double indexToStartUnkCounting;
   
   UnknownGTTrainer unknownGTTrainer;
 
@@ -44,17 +44,17 @@ public class BaseUnknownWordModelTrainer
                                  Index<String> tagIndex, double totalTrees) {
     super.initializeTraining(op, lex, wordIndex, tagIndex, totalTrees);
 
-    seenCounter = new ClassicCounter<IntTaggedWord>();;
-    unSeenCounter = new ClassicCounter<IntTaggedWord>();
+    seenCounter = new ClassicCounter<>();
+      unSeenCounter = new ClassicCounter<>();
     tagHash = Generics.newHashMap();
-    tc = new ClassicCounter<Label>();
+    tc = new ClassicCounter<>();
     c = Generics.newHashMap();
     seenEnd = Generics.newHashSet();
 
-    useEnd = (op.lexOptions.unknownSuffixSize > 0 && 
-              op.lexOptions.useUnknownWordSignatures > 0);
+    useEnd = op.lexOptions.unknownSuffixSize > 0 &&
+              op.lexOptions.useUnknownWordSignatures > 0;
     useFirstCap = op.lexOptions.useUnknownWordSignatures > 0;
-    useGT = (op.lexOptions.useUnknownWordSignatures == 0);
+    useGT = op.lexOptions.useUnknownWordSignatures == 0;
     useFirst = false;
 
     if (useFirst) {
@@ -70,9 +70,9 @@ public class BaseUnknownWordModelTrainer
       System.err.println("Using Good-Turing smoothing for unknown words.");
     }
     
-    this.indexToStartUnkCounting = (totalTrees * op.trainOptions.fractionBeforeUnseenCounting);
+    this.indexToStartUnkCounting = totalTrees * op.trainOptions.fractionBeforeUnseenCounting;
     
-    this.unknownGTTrainer = (useGT) ? new UnknownGTTrainer() : null;
+    this.unknownGTTrainer = useGT ? new UnknownGTTrainer() : null;
 
     this.model = buildUWM();
   }
@@ -86,8 +86,8 @@ public class BaseUnknownWordModelTrainer
     String word = tw.word();
     String subString = model.getSignature(word, loc);
           
-    Label tag = new Tag(tw.tag());;
-    if ( ! c.containsKey(tag)) {
+    Label tag = new Tag(tw.tag());
+      if ( ! c.containsKey(tag)) {
       c.put(tag, new ClassicCounter<String>());
     }
     c.get(tag).incrementCount(subString, weight);
@@ -115,23 +115,23 @@ public class BaseUnknownWordModelTrainer
       unknownGTTrainer.finishTraining();
     }
     
-    for (Label tag : c.keySet()) {
+    for (Map.Entry<Label, ClassicCounter<String>> labelClassicCounterEntry : c.entrySet()) {
       /* outer iteration is over tags */
-      ClassicCounter<String> wc = c.get(tag); // counts for words given a tag
+      ClassicCounter<String> wc = labelClassicCounterEntry.getValue(); // counts for words given a tag
       
-      if (!tagHash.containsKey(tag)) {
-        tagHash.put(tag, new ClassicCounter<String>());
+      if (!tagHash.containsKey(labelClassicCounterEntry.getKey())) {
+        tagHash.put(labelClassicCounterEntry.getKey(), new ClassicCounter<String>());
       }
       
       /* the UNKNOWN sequence is assumed to be seen once in each tag */
       // This is sort of broken, but you can regard it as a Dirichlet prior.
-      tc.incrementCount(tag);
+      tc.incrementCount(labelClassicCounterEntry.getKey());
       wc.setCount(unknown, 1.0);
       
       /* inner iteration is over words */
       for (String end : wc.keySet()) {
-        double prob = Math.log((wc.getCount(end)) / (tc.getCount(tag)));  // p(sig|tag)
-        tagHash.get(tag).setCount(end, prob);
+        double prob = Math.log(wc.getCount(end) / tc.getCount(labelClassicCounterEntry.getKey()));  // p(sig|tag)
+        tagHash.get(labelClassicCounterEntry.getKey()).setCount(end, prob);
         //if (Test.verbose)
         //EncodingPrintWriter.out.println(tag + " rewrites as " + end + " endchar with probability " + prob,encoding);
       }

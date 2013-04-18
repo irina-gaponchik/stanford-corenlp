@@ -6,16 +6,16 @@ import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
 /**
  * Indicates that a class supports "pretty logging". Pretty logging is a type of
  * pretty-printing that uses the Redwood logging system to structure itself.
- * 
+ *
  * When pretty logging the contents of your object, you should check to see if
- * each object (call it <code>obj</code>) is dispatchable with
- * <code>PrettyLogger.dispatchable(obj)</code> if you don't know their type. If
- * true, you should call <code>channels.prettyLog(obj)</code> to pretty log it.
- * Otherwise, use its <code>toString()</code> method.
- * 
+ * each object (call it {@code obj}) is dispatchable with
+ * {@code PrettyLogger.dispatchable(obj)} if you don't know their type. If
+ * true, you should call {@code channels.prettyLog(obj)} to pretty log it.
+ * Otherwise, use its {@code toString()} method.
+ *
  * @see PrettyLogger
  * @author David McClosky
- * 
+ *
  */
 public interface PrettyLoggable {
   /**

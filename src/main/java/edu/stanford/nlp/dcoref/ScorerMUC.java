@@ -17,7 +17,7 @@ public class ScorerMUC extends CorefScorer {
 
     Map<Integer, Mention> predictedMentions = doc.allPredictedMentions;
     for(CorefCluster g : doc.goldCorefClusters.values()){
-      if(g.corefMentions.size()==0) {
+      if(g.corefMentions.isEmpty()) {
         SieveCoreferenceSystem.logger.warning("NO MENTIONS for cluster " + g.getClusterID());
         continue;
       }
@@ -39,7 +39,7 @@ public class ScorerMUC extends CorefScorer {
       System.err.println("doc.allGoldMentions.size() is " + doc.allGoldMentions.size());
       System.err.println("doc.goldCorefClusters.values().size() is " + doc.goldCorefClusters.values().size());
     }
-    assert(rDen == (doc.allGoldMentions.size()-doc.goldCorefClusters.values().size()));
+    assert rDen == doc.allGoldMentions.size()-doc.goldCorefClusters.values().size();
 
     recallNumSum += rNum;
     recallDenSum += rDen;
@@ -52,7 +52,7 @@ public class ScorerMUC extends CorefScorer {
     Map<Integer, Mention> goldMentions = doc.allGoldMentions;
 
     for(CorefCluster c : doc.corefClusters.values()){
-      if(c.corefMentions.size()==0) continue;
+      if(c.corefMentions.isEmpty()) continue;
       pDen += c.corefMentions.size()-1;
       pNum += c.corefMentions.size();
       Set<CorefCluster> partitions = Generics.newHashSet();
@@ -65,7 +65,7 @@ public class ScorerMUC extends CorefScorer {
       }
       pNum -= partitions.size();
     }
-    assert(pDen == (doc.allPredictedMentions.size()-doc.corefClusters.values().size()));
+    assert pDen == doc.allPredictedMentions.size()-doc.corefClusters.values().size();
 
     precisionDenSum += pDen;
     precisionNumSum += pNum;

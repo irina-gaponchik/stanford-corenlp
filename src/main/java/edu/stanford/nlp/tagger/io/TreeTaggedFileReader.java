@@ -22,9 +22,9 @@ public class TreeTaggedFileReader implements TaggedFileReader {
 
   final Iterator<Tree> treeIterator;
 
-  Tree next = null;
+  Tree next;
   
-  int numSentences = 0;
+  int numSentences;
 
   public TreeTaggedFileReader(TaggedFileRecord record) {
     filename = record.file;

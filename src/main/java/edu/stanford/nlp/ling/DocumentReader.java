@@ -71,7 +71,7 @@ public class DocumentReader<L> {
     if (in != null) {
       setReader(in);
     }
-    setTokenizerFactory(tokenizerFactory);
+      this.tokenizerFactory = tokenizerFactory;
     this.keepOriginalText = keepOriginalText;
   }
 
@@ -96,7 +96,7 @@ public class DocumentReader<L> {
    * Returns the tokenizer used to chop up text into words for the documents.
    */
   public TokenizerFactory<? extends HasWord> getTokenizerFactory() {
-    return (tokenizerFactory);
+    return tokenizerFactory;
   }
 
   /**
@@ -110,7 +110,7 @@ public class DocumentReader<L> {
    * Returns whether created documents will store their source text along with tokenized words.
    */
   public boolean getKeepOriginalText() {
-    return (keepOriginalText);
+    return keepOriginalText;
   }
 
   /**
@@ -132,7 +132,7 @@ public class DocumentReader<L> {
   public BasicDocument<L> readDocument() throws IOException {
     String text = readNextDocumentText();
     if (text == null) {
-      return (null);
+      return null;
     }
     return parseDocumentText(text);
   }
@@ -157,7 +157,7 @@ public class DocumentReader<L> {
    * document subclass with additional meta-data.
    */
   protected BasicDocument<L> parseDocumentText(String text) {
-    new BasicDocument<L>();
+    /*new BasicDocument<L>()*/;
     return BasicDocument.init(text, keepOriginalText);
   }
 
@@ -175,7 +175,7 @@ public class DocumentReader<L> {
    */
   public static BufferedReader getBufferedReader(Reader in) {
     if (in == null) {
-      return (null);
+      return null;
     }
     if (!(in instanceof BufferedReader)) {
       in = new BufferedReader(in);
@@ -190,7 +190,7 @@ public class DocumentReader<L> {
   public static String readText(Reader in) throws IOException {
     // returns null if the reader is null
     if (in == null) {
-      return (null);
+      return null;
     }
 
     // ensures the reader is buffered
@@ -210,27 +210,27 @@ public class DocumentReader<L> {
    * Returns a Reader that reads in the given text.
    */
   public static Reader getReader(String text) {
-    return (new StringReader(text));
+    return new StringReader(text);
   }
 
   /**
    * Returns a Reader that reads in the given file.
    */
   public static Reader getReader(File file) throws FileNotFoundException {
-    return (new FileReader(file));
+    return new FileReader(file);
   }
 
   /**
    * Returns a Reader that reads in the given URL.
    */
   public static Reader getReader(URL url) throws IOException {
-    return (getReader(url.openStream()));
+    return getReader(url.openStream());
   }
 
   /**
    * Returns a Reader that reads in the given InputStream.
    */
   public static Reader getReader(InputStream in) {
-    return (new InputStreamReader(in));
+    return new InputStreamReader(in);
   }
 }

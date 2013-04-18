@@ -38,10 +38,10 @@ import java.util.StringTokenizer;
 public class ReadDataTagged {
 
   private final List<TaggedFileRecord> fileRecords;
-  private ArrayList<DataWordTag> v = new ArrayList<DataWordTag>();
-  private int numElements = 0;
-  private int totalSentences = 0;
-  private int totalWords = 0;
+  private ArrayList<DataWordTag> v = new ArrayList<>();
+  private int numElements;
+  private int totalSentences;
+  private int totalWords;
   private final PairsHolder pairs;
   private final MaxentTagger maxentTagger;
 
@@ -80,8 +80,8 @@ public class ReadDataTagged {
   private void loadFile(TaggedFileReader reader, Map<String, IntCounter<String>> wordTagCounts) {
     System.err.println("Loading tagged words from " + reader.filename());
 
-    ArrayList<String> words = new ArrayList<String>();
-    ArrayList<String> tags = new ArrayList<String>();
+    ArrayList<String> words = new ArrayList<>();
+    ArrayList<String> tags = new ArrayList<>();
     int numSentences = 0;
     int numWords = 0;
     int maxLen = Integer.MIN_VALUE;
@@ -90,7 +90,7 @@ public class ReadDataTagged {
     for (List<TaggedWord> sentence : reader) {
       if (maxentTagger.wordFunction != null) {
         List<TaggedWord> newSentence = 
-          new ArrayList<TaggedWord>(sentence.size());
+          new ArrayList<>(sentence.size());
         for (TaggedWord word : sentence) {
           TaggedWord newWord = 
             new TaggedWord(maxentTagger.wordFunction.apply(word.word()), 
@@ -109,8 +109,8 @@ public class ReadDataTagged {
           maxentTagger.tagTokens.get(tw.tag()).add(tw.word());
         }
       }
-      maxLen = (sentence.size() > maxLen ? sentence.size() : maxLen);
-      minLen = (sentence.size() < minLen ? sentence.size() : minLen);
+      maxLen = sentence.size() > maxLen ? sentence.size() : maxLen;
+      minLen = sentence.size() < minLen ? sentence.size() : minLen;
       words.add(TaggerConstants.EOS_WORD);
       tags.add(TaggerConstants.EOS_TAG);
       numElements = numElements + sentence.size() + 1;
@@ -129,7 +129,7 @@ public class ReadDataTagged {
 
         IntCounter<String> tagCounts = wordTagCounts.get(word);
         if (tagCounts == null) {
-          tagCounts = new IntCounter<String>();
+          tagCounts = new IntCounter<>();
           wordTagCounts.put(word, tagCounts);
         }
         tagCounts.incrementCount(tag, 1);
@@ -140,7 +140,7 @@ public class ReadDataTagged {
       numWords += sentence.size();
       words.clear();
       tags.clear();
-      if ((numSentences % 100000) == 0) System.err.println("Read " + numSentences + " sentences, min " + minLen + " words, max " + maxLen + " words ... [still reading]");
+      if (numSentences % 100000 == 0) System.err.println("Read " + numSentences + " sentences, min " + minLen + " words, max " + maxLen + " words ... [still reading]");
     }
 
     System.err.println("Read " + numWords + " words from " + reader.filename() + " [done].");

@@ -100,7 +100,6 @@ public final class DFSAState<T,S> implements Scored {
   }
 
   // equals
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -117,7 +116,7 @@ public final class DFSAState<T,S> implements Scored {
 
   public Set<DFSAState<T, S>> statesReachable() {
     Set<DFSAState<T, S>> visited = Generics.newHashSet();
-    List<DFSAState<T, S>> toVisit = new ArrayList<DFSAState<T, S>>();
+    List<DFSAState<T, S>> toVisit = new ArrayList<>();
     toVisit.add(this);
     exploreStates(toVisit, visited);
     return visited;
@@ -144,7 +143,7 @@ public final class DFSAState<T,S> implements Scored {
 
   public DFSAState(S id, DFSA<T,S> dfsa, double score) {
     this(id,dfsa);
-    setScore(score);
+      this.score = score;
   }
 
 

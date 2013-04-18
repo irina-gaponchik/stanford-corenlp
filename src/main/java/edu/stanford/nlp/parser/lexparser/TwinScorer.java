@@ -30,7 +30,7 @@ class TwinScorer implements Scorer {
   public boolean parse(List<? extends HasWord> words) {
     boolean b1 = scorer1.parse(words);
     boolean b2 = scorer2.parse(words);
-    return (b1 && b2);
+    return b1 && b2;
   }
 
   public TwinScorer(Scorer scorer1, Scorer scorer2) {

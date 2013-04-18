@@ -102,7 +102,7 @@ public class NERClassifierCombiner extends ClassifierCombiner<CoreLabel> {
   }
 
   @Override
-  public List<CoreLabel> classifyWithGlobalInformation(List<CoreLabel> tokens, final CoreMap document, final CoreMap sentence) {
+  public List<CoreLabel> classifyWithGlobalInformation(List<CoreLabel> tokens, CoreMap document, CoreMap sentence) {
     List<CoreLabel> output = super.classify(tokens);
     if (applyNumericClassifiers) {
       try {
@@ -141,7 +141,7 @@ public class NERClassifierCombiner extends ClassifierCombiner<CoreLabel> {
     return output;
   }
 
-  private void recognizeNumberSequences(List<CoreLabel> words, final CoreMap document, final CoreMap sentence) {
+  private void recognizeNumberSequences(List<CoreLabel> words, CoreMap document, CoreMap sentence) {
     // we need to copy here because NumberSequenceClassifier overwrites the AnswerAnnotation
     List<CoreLabel> newWords = NumberSequenceClassifier.copyTokens(words, sentence);
 

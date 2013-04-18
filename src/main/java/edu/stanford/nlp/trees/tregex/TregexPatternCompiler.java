@@ -55,7 +55,7 @@ public class TregexPatternCompiler {
   private final HeadFinder headFinder;
 
   private final List<Pair<String, String>> macros =
-    new ArrayList<Pair<String, String>>();
+    new ArrayList<>();
 
   public static final TregexPatternCompiler defaultCompiler =
     new TregexPatternCompiler();
@@ -95,7 +95,7 @@ public class TregexPatternCompiler {
   }
 
   public void addMacro(String original, String replacement) {
-    macros.add(new Pair<String, String>(original, replacement));
+    macros.add(new Pair<>(original, replacement));
   }
 
   /**
@@ -121,12 +121,10 @@ public class TregexPatternCompiler {
       TregexParser parser = new TregexParser(new StringReader(tregex + '\n'),
                                              basicCatFunction, headFinder);
       pattern = parser.Root();
-    } catch (TokenMgrError tme) {
+    } catch (TokenMgrError | ParseException tme) {
       throw new TregexParseException("Could not parse " + tregex, tme);
-    } catch (ParseException e) {
-      throw new TregexParseException("Could not parse " + tregex, e);
     }
-    pattern.setPatternString(tregex);
+      pattern.setPatternString(tregex);
     return pattern;
   }
 

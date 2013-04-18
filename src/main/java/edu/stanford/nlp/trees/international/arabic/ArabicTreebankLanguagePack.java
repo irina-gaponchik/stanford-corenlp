@@ -195,12 +195,12 @@ public class ArabicTreebankLanguagePack extends AbstractTreebankLanguagePack {
    *
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     TreebankLanguagePack tlp = new PennTreebankLanguagePack();
     System.out.println("Start symbol: " + tlp.startSymbol());
     String start = tlp.startSymbol();
-    System.out.println("Should be true: " + (tlp.isStartSymbol(start)));
-    String[] strs = new String[]{"-", "-LLB-", "NP-2", "NP=3", "NP-LGS", "NP-TMP=3"};
+    System.out.println("Should be true: " + tlp.isStartSymbol(start));
+    String[] strs = {"-", "-LLB-", "NP-2", "NP=3", "NP-LGS", "NP-TMP=3"};
     for (String str : strs) {
       System.out.println("String: " + str + " basic: " + tlp.basicCategory(str) + " basicAndFunc: " + tlp.categoryAndFunction(str));
     }

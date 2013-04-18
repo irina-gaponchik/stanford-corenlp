@@ -20,7 +20,7 @@ public class IntTuple implements Serializable, Comparable<IntTuple> {
   private static final long serialVersionUID = 7266305463893511982L;
 
 
-  public IntTuple(int[] arr) {
+  public IntTuple(int... arr) {
     elements = arr;
   }
 
@@ -39,7 +39,7 @@ public class IntTuple implements Serializable, Comparable<IntTuple> {
     if (o.length() == length()) {
       return 0;
     } else {
-      return (length() < o.length())? -1:1;
+      return length() < o.length() ? -1:1;
     }
   }
 
@@ -106,24 +106,20 @@ public class IntTuple implements Serializable, Comparable<IntTuple> {
     if (num == 1) {
       return new IntUni();
     }
-    if ((num == 2)) {
+    if (num == 2) {
       return new IntPair();
     }
     if (num == 3) {
       return new IntTriple();
     }
-    if (num == 4) {
-      return new IntQuadruple();
-    } else {
-      return new IntTuple(num);
-    }
+      return num == 4 ? new IntQuadruple() : new IntTuple(num);
   }
 
 
   public static IntTuple getIntTuple(List<Integer> integers) {
     IntTuple t = IntTuple.getIntTuple(integers.size());
     for (int i = 0; i < t.length(); i++) {
-      t.set(i, integers.get(i).intValue());
+      t.set(i, integers.get(i));
     }
     return t;
   }

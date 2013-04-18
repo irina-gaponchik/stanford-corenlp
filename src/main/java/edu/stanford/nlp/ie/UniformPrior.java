@@ -32,7 +32,7 @@ public class UniformPrior<IN extends CoreMap> implements SequenceModel, Sequence
     this.doc = doc;
   }
 
-  public double scoreOf(int[] sequence) {
+  public double scoreOf(int... sequence) {
     return 0;
   }
   
@@ -63,7 +63,7 @@ public class UniformPrior<IN extends CoreMap> implements SequenceModel, Sequence
     return 0.0;
   }
 
-  public void setInitialSequence(int[] sequence) {
+  public void setInitialSequence(int... sequence) {
   }
 
   public void updateSequenceElement(int[] sequence, int pos, int oldVal) {

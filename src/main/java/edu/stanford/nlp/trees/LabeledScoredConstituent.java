@@ -5,7 +5,7 @@ import edu.stanford.nlp.ling.LabelFactory;
 import edu.stanford.nlp.ling.StringLabel;
 
 /**
- * A <code>LabeledScoredConstituent</code> object defines an edge in a graph
+ * A {@code LabeledScoredConstituent} object defines an edge in a graph
  * with a label and a score.
  *
  * @author Christopher Manning
@@ -15,7 +15,7 @@ public class LabeledScoredConstituent extends LabeledConstituent {
   private double score;
 
   /**
-   * Create an empty <code>LabeledScoredConstituent</code> object.
+   * Create an empty {@code LabeledScoredConstituent} object.
    */
   public LabeledScoredConstituent() {
     // implicitly super();
@@ -23,7 +23,7 @@ public class LabeledScoredConstituent extends LabeledConstituent {
 
 
   /**
-   * Create a <code>LabeledScoredConstituent</code> object with given
+   * Create a {@code LabeledScoredConstituent} object with given
    * values.
    *
    * @param start start node of edge
@@ -35,7 +35,7 @@ public class LabeledScoredConstituent extends LabeledConstituent {
 
 
   /**
-   * Create a <code>LabeledScoredConstituent</code> object with given
+   * Create a {@code LabeledScoredConstituent} object with given
    * values.
    *
    * @param start start node of edge
@@ -63,57 +63,57 @@ public class LabeledScoredConstituent extends LabeledConstituent {
    * Sets the score associated with the current node, if there is one
    */
   @Override
-  public void setScore(final double score) {
+  public void setScore(double score) {
     this.score = score;
   }
 
 
   /**
-   * A <code>LabeledScoredConstituentLabelFactory</code> object makes a
-   * <code>LabeledScoredConstituent</code> with a <code>StringLabel</code>
+   * A {@code LabeledScoredConstituentLabelFactory} object makes a
+   * {@code LabeledScoredConstituent} with a {@code StringLabel}
    * label (or of the type of label passed in for the final constructor).
    */
   private static class LabeledScoredConstituentLabelFactory implements LabelFactory {
 
     /**
-     * Make a new <code>LabeledScoredConstituent</code>.
+     * Make a new {@code LabeledScoredConstituent}.
      *
      * @param labelStr A string
      * @return The created label
      */
-    public Label newLabel(final String labelStr) {
+    public Label newLabel(String labelStr) {
       return new LabeledScoredConstituent(0, 0, new StringLabel(labelStr), 0.0);
     }
 
 
     /**
-     * Make a new <code>LabeledScoredConstituent</code>.
+     * Make a new {@code LabeledScoredConstituent}.
      *
      * @param labelStr A string.
      * @param options  The options are ignored.
      * @return The created label
      */
-    public Label newLabel(final String labelStr, final int options) {
+    public Label newLabel(String labelStr, int options) {
       return newLabel(labelStr);
     }
 
 
     /**
-     * Make a new <code>LabeledScoredConstituent</code>.
+     * Make a new {@code LabeledScoredConstituent}.
      *
      * @param labelStr A string that
      * @return The created label
      */
-    public Label newLabelFromString(final String labelStr) {
+    public Label newLabelFromString(String labelStr) {
       return newLabel(labelStr);
     }
 
 
     /**
-     * Create a new <code>LabeledScoredConstituent</code>.
+     * Create a new {@code LabeledScoredConstituent}.
      *
-     * @param oldLabel A <code>Label</code>.
-     * @return A new <code>LabeledScoredConstituent</code>
+     * @param oldLabel A {@code Label}.
+     * @return A new {@code LabeledScoredConstituent}
      */
     public Label newLabel(Label oldLabel) {
       return new LabeledScoredConstituent(0, 0, oldLabel, 0.0);

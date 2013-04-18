@@ -22,7 +22,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
 
   private final int prior;
   private final double sigma;
-  private final double epsilon = 0.1; // You can't actually set this at present
+  private static final double epsilon = 0.1; // You can't actually set this at present
   /** label indices - for all possible label sequences - for each feature */
   private final List<Index<CRFLabel>> labelIndices;
   private final Index<String> classIndex;  // didn't have <String> before. Added since that's what is assumed everywhere.
@@ -40,7 +40,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
 
   private final String backgroundSymbol;
 
-  public static boolean VERBOSE = false;
+  public static boolean VERBOSE;
 
   public static int getPriorType(String priorTypeStr) {
     if (priorTypeStr == null) return QUADRATIC_PRIOR;  // default
@@ -104,7 +104,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
    *
    * @return a 2D weight array
    */
-  public static double[][] to2D(double[] weights, List<Index<CRFLabel>> labelIndices, int[] map) {
+  public static double[][] to2D(double[] weights, List<Index<CRFLabel>> labelIndices, int... map) {
     double[][] newWeights = new double[map.length][];
     int index = 0;
     for (int i = 0; i < map.length; i++) {
@@ -115,7 +115,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
     return newWeights;
   }
 
-  public double[][] to2D(double[] weights) {
+  public double[][] to2D(double... weights) {
     return to2D(weights, this.labelIndices, this.map);
   }
 
@@ -129,10 +129,10 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
   public static double[] to1D(double[][] weights, int domainDimension) {
     double[] newWeights = new double[domainDimension];
     int index = 0;
-    for (int i = 0; i < weights.length; i++) {
-      System.arraycopy(weights[i], 0, newWeights, index, weights[i].length);
-      index += weights[i].length;
-    }
+      for (double[] weight : weights) {
+          System.arraycopy(weight, 0, newWeights, index, weight.length);
+          index += weight.length;
+      }
     return newWeights;
   }
 
@@ -215,7 +215,8 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
     return expectedCountsAndValueForADoc(weights, E, docIndex, false);
   }
 
-  public CliquePotentialFunction getCliquePotentialFunction(double[] x) {
+  @Override
+  public CliquePotentialFunction getCliquePotentialFunction(double... x) {
     double[][] weights = to2D(x);
     return new LinearCliquePotentialFunction(weights);
   }
@@ -250,7 +251,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
       int label = docLabels[i];
       double p = cliqueTree.condLogProbGivenPrevious(i, label, given);
       if (VERBOSE) {
-        System.err.println("P(" + label + "|" + ArrayMath.toString(given) + ")=" + p);
+        System.err.println("P(" + label + '|' + ArrayMath.toString(given) + ")=" + p);
       }
       prob += p;
       System.arraycopy(given, 1, given, 0, given.length - 1);
@@ -286,7 +287,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
    * Calculates both value and partial derivatives at the point x, and save them internally.
    */
   @Override
-  public void calculate(double[] x) {
+  public void calculate(double... x) {
 
     double prob = 0.0; // the log prob of the sequence given the model, which is the negation of value at this point
     double[][] weights = to2D(x);
@@ -314,9 +315,9 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
     int index = 0;
     for (int i = 0; i < E.length; i++) {
       for (int j = 0; j < E[i].length; j++) {
-        derivative[index++] = (E[i][j] - Ehat[i][j]);
+        derivative[index++] = E[i][j] - Ehat[i][j];
         if (VERBOSE) {
-          System.err.println("deriv(" + i + "," + j + ") = " + E[i][j] + " - " + Ehat[i][j] + " = " + derivative[index - 1]);
+          System.err.println("deriv(" + i + ',' + j + ") = " + E[i][j] + " - " + Ehat[i][j] + " = " + derivative[index - 1]);
         }
       }
     }
@@ -344,7 +345,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
           derivative[i] += batchScale*w / epsilon / sigmaSq;
         } else {
           value += batchScale*(wabs - epsilon / 2) / sigmaSq;
-          derivative[i] += batchScale*((w < 0.0) ? -1.0 : 1.0) / sigmaSq;
+          derivative[i] += batchScale*(w < 0.0 ? -1.0 : 1.0) / sigmaSq;
         }
       }
     } else if (prior == QUARTIC_PRIOR) {
@@ -359,7 +360,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
   }
 
   @Override
-  public void calculateStochastic(double[] x, double [] v, int[] batch){
+  public void calculateStochastic(double[] x, double [] v, int... batch){
     calculateStochasticGradientOnly(x,batch);
   }
 
@@ -370,12 +371,12 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
 
 
   //TODO(mengqiu) SGD based methods are not yet compatible with featureVals
-  public void calculateStochasticGradientOnly(double[] x, int[] batch) {
+  public void calculateStochasticGradientOnly(double[] x, int... batch) {
 
     double prob = 0.0; // the log prob of the sequence given the model, which is the negation of value at this point
     double[][] weights = to2D(x);
 
-    double batchScale = ((double) batch.length)/((double) this.dataDimension());
+    double batchScale = (double) batch.length / (double) this.dataDimension();
 
     // the expectations over counts
     // first index is feature index, second index is of possible labeling
@@ -395,9 +396,9 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
     int index = 0;
     for (int i = 0; i < E.length; i++) {
       for (int j = 0; j < E[i].length; j++) {
-        derivative[index++] = (E[i][j] - batchScale*Ehat[i][j]);
+        derivative[index++] = E[i][j] - batchScale*Ehat[i][j];
         if (VERBOSE) {
-          System.err.println("deriv(" + i + "," + j + ") = " + E[i][j] + " - " + Ehat[i][j] + " = " + derivative[index - 1]);
+          System.err.println("deriv(" + i + ',' + j + ") = " + E[i][j] + " - " + Ehat[i][j] + " = " + derivative[index - 1]);
         }
       }
     }
@@ -498,7 +499,7 @@ public class CRFLogConditionalObjectiveFunction extends AbstractStochasticCachin
    * @return value of function at specified x (scaled by xscale) for samples
    */
   @Override
-  public double valueAt(double[] x, double xscale, int[] batch) {
+  public double valueAt(double[] x, double xscale, int... batch) {
     double prob = 0; // the log prob of the sequence given the model, which is the negation of value at this point
     // int[][] wis = getWeightIndices();
     double[][] weights = to2D(x, xscale);

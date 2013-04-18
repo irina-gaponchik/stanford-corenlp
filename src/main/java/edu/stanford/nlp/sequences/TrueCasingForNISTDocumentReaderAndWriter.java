@@ -36,7 +36,7 @@ public class TrueCasingForNISTDocumentReaderAndWriter implements DocumentReaderA
   /**
    * for test only
    **/
-  public static void main(String[] args) throws IOException{
+  public static void main(String... args) throws IOException{
     Reader reader = new BufferedReader(new FileReader(args[0]));
     TrueCasingForNISTDocumentReaderAndWriter raw = new TrueCasingForNISTDocumentReaderAndWriter();
     raw.init(null);
@@ -55,7 +55,7 @@ public class TrueCasingForNISTDocumentReaderAndWriter implements DocumentReaderA
     factory = LineIterator.getFactory(new LineToTrueCasesParser()); // todo
   }
 
-  public static Set knownWords = null;
+  public static Set knownWords;
 
   public static boolean known(String s) {
     return knownWords.contains(s.toLowerCase());
@@ -66,7 +66,7 @@ public class TrueCasingForNISTDocumentReaderAndWriter implements DocumentReaderA
   }
 
   public void printAnswers(List<CoreLabel> doc, PrintWriter out) {
-    List<String> sentence = new ArrayList<String>();
+    List<String> sentence = new ArrayList<>();
     int wrong = 0;
     
     for (CoreLabel wi : doc) {
@@ -104,18 +104,19 @@ public class TrueCasingForNISTDocumentReaderAndWriter implements DocumentReaderA
   }
 
   public static class LineToTrueCasesParser implements Function<String,List<CoreLabel>> {
-    private static Pattern allLower = Pattern.compile("[^A-Z]*?[a-z]+[^A-Z]*?");
+      private static final Pattern COMPILE = Pattern.compile(" ");
+      private static Pattern allLower = Pattern.compile("[^A-Z]*?[a-z]+[^A-Z]*?");
     private static Pattern allUpper = Pattern.compile("[^a-z]*?[A-Z]+[^a-z]*?");
     private static Pattern startUpper = Pattern.compile("[A-Z].*");
     
     public List<CoreLabel> apply(String line) {
-      List<CoreLabel> doc = new ArrayList<CoreLabel>();
+      List<CoreLabel> doc = new ArrayList<>();
       int pos = 0;
       
       //line = line.replaceAll(" +"," ");
       //System.err.println("pichuan: processing line = "+line);
       
-      String[] toks = line.split(" ");
+      String[] toks = COMPILE.split(line);
       for (String word : toks) {
         CoreLabel wi = new CoreLabel();
         Matcher lowerMatcher = allLower.matcher(word);
@@ -151,7 +152,7 @@ public class TrueCasingForNISTDocumentReaderAndWriter implements DocumentReaderA
         }
         
         wi.setWord(word.toLowerCase());
-        wi.set(CoreAnnotations.PositionAnnotation.class, pos + "");
+        wi.set(CoreAnnotations.PositionAnnotation.class, String.valueOf(pos));
         doc.add(wi);
         pos++;
       }

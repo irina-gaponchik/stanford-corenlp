@@ -12,8 +12,8 @@ import java.util.Iterator;
  * Time: 7:27:39 PM
  */
 public class ConcatenationIterator<T> implements Iterator<T> {
-  Iterator<T> first = null;
-  Iterator<T> second = null;
+  Iterator<T> first;
+  Iterator<T> second;
 
   Iterator<T> current() {
     if (first.hasNext()) {
@@ -39,12 +39,12 @@ public class ConcatenationIterator<T> implements Iterator<T> {
     this.second = second;
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Collection<String> c1 = Collections.singleton("a");
     Collection<String> c2 = Collections.singleton("b");
-    Iterator<String> i = new ConcatenationIterator<String>(c1.iterator(), c2.iterator());
+    Iterator<String> i = new ConcatenationIterator<>(c1.iterator(), c2.iterator());
     while (i.hasNext()) {
-      System.out.println(i.next() + " ");
+      System.out.println(i.next() + ' ');
     }
   }
 }

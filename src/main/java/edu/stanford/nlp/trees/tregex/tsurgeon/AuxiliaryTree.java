@@ -13,7 +13,8 @@ import java.util.regex.Matcher;
  */
 class AuxiliaryTree {
 
-  private final String originalTreeString;
+    private static final Pattern COMPILE = Pattern.compile("\\\\(.)");
+    private final String originalTreeString;
   final Tree tree;
   final Tree foot;
   private final IdentityHashMap<Tree,String> nodesToNames; // no one else should be able to get this one.
@@ -28,7 +29,7 @@ class AuxiliaryTree {
       throw new RuntimeException("Error -- no foot node found for " + originalTreeString);
     }
     namesToNodes = Generics.newHashMap();
-    nodesToNames = new IdentityHashMap<Tree,String>();
+    nodesToNames = new IdentityHashMap<>();
     initializeNamesNodesMaps(tree);
   }
 
@@ -66,14 +67,14 @@ class AuxiliaryTree {
     Tree clone;
     Tree newFoot = null;
     if (node.isLeaf()) {
-      if (node == foot) { // found the foot node; pass it up.
+      if (node.equals(foot)) { // found the foot node; pass it up.
         clone = node.treeFactory().newTreeNode(node.label(),new ArrayList<Tree>(0));
         newFoot = clone;
       } else {
         clone = node.treeFactory().newLeaf(node.label().labelFactory().newLabel(node.label()));
       }
     } else {
-      List<Tree> newChildren = new ArrayList<Tree>(node.children().length);
+      List<Tree> newChildren = new ArrayList<>(node.children().length);
       for (Tree child : node.children()) {
         Pair<Tree,Tree> newChild = copyHelper(child,newNamesToNodes);
         newChildren.add(newChild.first());
@@ -89,7 +90,7 @@ class AuxiliaryTree {
         newNamesToNodes.put(nodesToNames.get(node),clone);
       }
     }
-    return new Pair<Tree,Tree>(clone,newFoot);
+    return new Pair<>(clone,newFoot);
   }
 
 
@@ -181,7 +182,7 @@ class AuxiliaryTree {
   }
 
   static String unescape(String input) {
-    return input.replaceAll("\\\\(.)", "$1");
+    return COMPILE.matcher(input).replaceAll("$1");
   }
 
 }

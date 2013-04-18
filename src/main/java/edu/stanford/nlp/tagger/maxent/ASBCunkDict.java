@@ -4,13 +4,15 @@ import java.io.*;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.util.Generics;
 
 public class ASBCunkDict {
 
   private static final String defaultFilename = "/u/nlp/data/pos-tagger/asbc_amb.fixed.gb18030";
-  private static ASBCunkDict ASBCunkDictSingleton = null;
+    private static final Pattern COMPILE = Pattern.compile(" ");
+    private static ASBCunkDict ASBCunkDictSingleton;
 
   private static synchronized ASBCunkDict getInstance()  {
 
@@ -37,7 +39,7 @@ public class ASBCunkDict {
       ASBCunk_dict = Generics.newHashMap();
 
       while ((ASBCunkDetectorLine = ASBCunkDetectorReader.readLine()) != null) {
-        String[] fields = ASBCunkDetectorLine.split(" ");
+        String[] fields = COMPILE.split(ASBCunkDetectorLine);
         String tag=fields[1];
         Set<String> words=ASBCunk_dict.get(tag);
 
@@ -59,10 +61,10 @@ public class ASBCunkDict {
 
  protected static String getTag(String a1, String a2) {
    ASBCunkDict dict = ASBCunkDict.getInstance();
-    if (dict.get(a1)== null) {
+    if (get(a1)== null) {
       return "0";
     }
-    if (dict.get(a1).contains(a2)) {
+    if (get(a1).contains(a2)) {
       return "1";
     }
     return "0";

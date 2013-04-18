@@ -26,11 +26,8 @@ public class ChineseGrammaticalStructureFactory implements GrammaticalStructureF
   public ChineseGrammaticalStructure newGrammaticalStructure(Tree t) {
     if (puncFilter == null && hf == null) {
       return new ChineseGrammaticalStructure(t);
-    } else if (hf == null) {
-      return new ChineseGrammaticalStructure(t, puncFilter);
-    } else {
-      return new ChineseGrammaticalStructure(t, puncFilter, hf);
-    }
+    } else
+        return hf == null ? new ChineseGrammaticalStructure(t, puncFilter) : new ChineseGrammaticalStructure(t, puncFilter, hf);
   }
   
 }

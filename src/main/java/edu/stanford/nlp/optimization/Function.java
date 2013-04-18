@@ -11,10 +11,10 @@ public interface Function {
   /**
    * Returns the value of the function at a single point.
    *
-   * @param x a <code>double[]</code> input
+   * @param x a {@code double[]} input
    * @return the function value at the input
    */
-  double valueAt(double[] x);
+  double valueAt(double... x);
 
   /**
    * Returns the number of dimensions in the function's domain

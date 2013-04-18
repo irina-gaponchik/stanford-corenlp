@@ -31,11 +31,7 @@ public class CoordinationTransformer implements TreeTransformer {
   private final TreeTransformer dates = new DateTreeTransformer();    //to flatten date patterns
 
 
-  // default constructor
-  public CoordinationTransformer() {
-  }
-
-  /**
+    /**
    * Transforms t if it contains a coordination in a flat structure (CCtransform)
    * and transforms UCP (UCPtransform).
    *
@@ -145,11 +141,7 @@ public class CoordinationTransformer implements TreeTransformer {
   private static String getHeadTag(Tree t) {
     if (t.value().startsWith("NN")) {
       return "NP";
-    } else if (t.value().startsWith("JJ")) {
-      return "ADJP";
-    } else {
-      return "NP";
-    }
+    } else return t.value().startsWith("JJ") ? "ADJP" : "NP";
   }
 
 
@@ -173,16 +165,16 @@ public class CoordinationTransformer implements TreeTransformer {
     Tree[] ccSiblings = t.children();
 
     //check if other CC
-    List<Integer> ccPositions = new ArrayList<Integer>();
+    List<Integer> ccPositions = new ArrayList<>();
     for (int i = ccIndex + 1; i < ccSiblings.length; i++) {
       if (ccSiblings[i].value().startsWith("CC") && i < ccSiblings.length - 1) { // second conjunct to ensure that a CC we add isn't the last child
-        ccPositions.add(Integer.valueOf(i));
+        ccPositions.add(i);
       }
     }
 
     // a CC b c ... -> (a CC b) c ...  with b not a DT
     String beforeSibling = ccSiblings[ccIndex - 1].value();
-    if (ccIndex == 1 && (beforeSibling.equals("DT") || beforeSibling.equals("JJ") || beforeSibling.equals("RB") || ! (ccSiblings[ccIndex + 1].value().equals("DT"))) && ! (beforeSibling.startsWith("NP")
+    if (ccIndex == 1 && (beforeSibling.equals("DT") || beforeSibling.equals("JJ") || beforeSibling.equals("RB") || !ccSiblings[ccIndex + 1].value().equals("DT")) && ! (beforeSibling.startsWith("NP")
             || beforeSibling.equals("ADJP")
             || beforeSibling.equals("NNS"))) { // && (ccSiblings.length == ccIndex + 3 || !ccPositions.isEmpty())) {  // something like "soya or maize oil"
       String leftHead = getHeadTag(ccSiblings[ccIndex - 1]);
@@ -257,7 +249,7 @@ public class CoordinationTransformer implements TreeTransformer {
       }
     }
     // DT a CC b c -> DT (a CC b) c
-    else if (ccIndex == 2 && ccSiblings[0].value().startsWith("DT") && !ccSiblings[ccIndex - 1].value().equals("NNS") && (ccSiblings.length == 5 || (!ccPositions.isEmpty() && ccPositions.get(0) == 5))) {
+    else if (ccIndex == 2 && ccSiblings[0].value().startsWith("DT") && !ccSiblings[ccIndex - 1].value().equals("NNS") && (ccSiblings.length == 5 || !ccPositions.isEmpty() && ccPositions.get(0) == 5)) {
       String head = getHeadTag(ccSiblings[ccIndex - 1]);
       //create a new tree to be inserted as second child of t (after the determiner
       Tree child = tf.newTreeNode(lf.newLabel(head), null);
@@ -345,11 +337,7 @@ public class CoordinationTransformer implements TreeTransformer {
 
       // create the right tree
       int nextCC;
-      if (ccPositions.isEmpty()) {
-        nextCC = ccSiblings.length;
-      } else {
-        nextCC = ccPositions.get(0);
-      }
+        nextCC = ccPositions.isEmpty() ? ccSiblings.length : ccPositions.get(0);
       String rightHead = getHeadTag(ccSiblings[nextCC - 1]);
       Tree right = tf.newTreeNode(lf.newLabel(rightHead), null);
       for (int i = ccIndex + 1; i < nextCC - 1; i++) {
@@ -462,7 +450,7 @@ public class CoordinationTransformer implements TreeTransformer {
   }
 
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
     CoordinationTransformer transformer = new CoordinationTransformer();
     Treebank tb = new MemoryTreebank();

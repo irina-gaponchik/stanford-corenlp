@@ -8,7 +8,7 @@ import edu.stanford.nlp.util.Generics;
 public class LatticeEdge implements Serializable {
 
 	public final String word;
-	public String label = null;
+	public String label;
 	public double weight;
 	public final int start;
 	public final int end;
@@ -35,10 +35,10 @@ public class LatticeEdge implements Serializable {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("[ " + word);
+		sb.append("[ ").append(word);
 		sb.append(String.format(" start(%d) end(%d) wt(%f) ]", start,end,weight));
 		if(label != null)
-			sb.append(" / " + label);
+			sb.append(" / ").append(label);
 		return sb.toString();
 	}
 

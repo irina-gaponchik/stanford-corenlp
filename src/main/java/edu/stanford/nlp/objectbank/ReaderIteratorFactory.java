@@ -72,7 +72,7 @@ public class ReaderIteratorFactory implements Iterable<Reader> {
 
 
   public ReaderIteratorFactory() {
-    c = new ArrayList<Object>();
+    c = new ArrayList<>();
   }
 
   /**
@@ -85,7 +85,7 @@ public class ReaderIteratorFactory implements Iterable<Reader> {
 
   /**
    * The encoding for file input.  This is defaulted to "utf-8"
-   * only applies when c is of type <code> File </code>.
+   * only applies when c is of type {@code File }.
    */
   protected String enc = "UTF-8";
 
@@ -178,7 +178,7 @@ public class ReaderIteratorFactory implements Iterable<Reader> {
         if (o instanceof File) {
           File file = (File) o;
           if (file.isDirectory()) {
-            ArrayList<Object> l = new ArrayList<Object>();
+            ArrayList<Object> l = new ArrayList<>();
             l.addAll(Arrays.asList(file.listFiles()));
             while (iter.hasNext()) {
               l.add(iter.next());
@@ -186,11 +186,7 @@ public class ReaderIteratorFactory implements Iterable<Reader> {
             iter = l.iterator();
             file = (File) iter.next();
           }
-          if (file.getName().endsWith(".gz")) {
-            nextObject = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file)), enc));
-          } else {
-            nextObject = new BufferedReader(new EncodingFileReader(file, enc));
-          }
+            nextObject = file.getName().endsWith(".gz") ? new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file)), enc)) : new BufferedReader(new EncodingFileReader(file, enc));
           //nextObject = new BufferedReader(new FileReader(file));
         } else if (o instanceof String) {
 //           File file = new File((String)o);

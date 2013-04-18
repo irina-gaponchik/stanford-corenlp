@@ -42,7 +42,7 @@ public class LambdaSolveTagger extends LambdaSolve {
     zlambda = new double[p1.data.xSize];
     ftildeArr = new double[p.fSize];
     initCondsZlambdaEtc();
-    super.setBinary();
+    setBinary();
   }
 
 
@@ -66,12 +66,12 @@ public class LambdaSolveTagger extends LambdaSolve {
 
   LambdaSolveTagger(String filename) {
     this.readL(filename);
-    super.setBinary();
+    setBinary();
   }
 
   LambdaSolveTagger(DataInputStream dataStream) {
     lambda = read_lambdas(dataStream);
-    super.setBinary();
+    setBinary();
   }
 
   void initCondsZlambdaEtc() {
@@ -103,7 +103,7 @@ public class LambdaSolveTagger extends LambdaSolve {
    *
    * @return true if this lambda hasn't converged.
    */
-  @SuppressWarnings({"UnusedDeclaration"})
+  @SuppressWarnings("UnusedDeclaration")
   boolean iterate(int index, double err, MutableDouble ret) {
     double deltaL = 0.0;
     deltaL = newton(deltaL, index, err);
@@ -112,7 +112,7 @@ public class LambdaSolveTagger extends LambdaSolve {
       System.err.println(" NaN " + index + ' ' + deltaL);
     }
     ret.set(deltaL);
-    return (Math.abs(deltaL) >= eps);
+    return Math.abs(deltaL) >= eps;
   }
 
 
@@ -161,14 +161,14 @@ public class LambdaSolveTagger extends LambdaSolve {
   void updateConds(int index, double deltaL) {
     //  for each x that (x,y)=true / exists y
     //  recalculate pcond(y,x) for all y
-    int yTag = ((TaggerFeature) (p.functions.get(index))).getYTag();
+    int yTag = ((TaggerFeature) p.functions.get(index)).getYTag();
     for (int i = 0; i < p.functions.get(index).len(); i++) {
       // update for this x
       double s = 0;
-      int x = (p.functions.get(index)).getX(i);
+      int x = p.functions.get(index).getX(i);
       double zlambdaX = zlambda[x] + pcond(yTag, x) * zlambda[x] * (Math.exp(deltaL) - 1);
       for (int y = 0; y < p.data.ySize; y++) {
-        probConds[x][y] = (probConds[x][y] * zlambda[x]) / zlambdaX;
+        probConds[x][y] = probConds[x][y] * zlambda[x] / zlambdaX;
         s = s + probConds[x][y];
       }
       s = s - probConds[x][yTag];
@@ -211,7 +211,7 @@ public class LambdaSolveTagger extends LambdaSolve {
     double s = 0.0;
     for (int i = 0; i < p.functions.get(index).len(); i++) {
       int y = ((TaggerFeature) p.functions.get(index)).getYTag();
-      int x = (p.functions.get(index)).getX(i);
+      int x = p.functions.get(index).getX(i);
       s = s + p.data.ptildeX(x) * pcond(y, x) * 1 * Math.exp(lambdaP * fnum(x, y));
     }
     s = s - ftildeArr[index];
@@ -222,8 +222,8 @@ public class LambdaSolveTagger extends LambdaSolve {
   double gprime(double lambdaP, int index) {
     double s = 0.0;
     for (int i = 0; i < p.functions.get(index).len(); i++) {
-      int y = ((TaggerFeature) (p.functions.get(index))).getYTag();
-      int x = (p.functions.get(index)).getX(i);
+      int y = ((TaggerFeature) p.functions.get(index)).getYTag();
+      int x = p.functions.get(index).getX(i);
       s = s + p.data.ptildeX(x) * pcond(y, x) * 1 * Math.exp(lambdaP * fnum(x, y)) * fnum(x, y);
     }
     return s;

@@ -9,6 +9,7 @@ import edu.stanford.nlp.util.ReflectionLoading;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Flags for sequence classifiers. Documentation for general flags and
@@ -134,112 +135,113 @@ public class SeqClassifierFlags implements Serializable {
   private static final long serialVersionUID = -7076671761070232567L;
 
   public static final String DEFAULT_BACKGROUND_SYMBOL = "O";
+    private static final Pattern COMPILE = Pattern.compile("[, ]+");
 
-  private String stringRep = "";
+    private String stringRep = "";
 
-  public boolean useNGrams = false;
-  public boolean conjoinShapeNGrams = false;
-  public boolean lowercaseNGrams = false;
-  public boolean dehyphenateNGrams = false;
-  public boolean usePrev = false;
-  public boolean useNext = false;
-  public boolean useTags = false;
-  public boolean useWordPairs = false;
-  public boolean useGazettes = false;
+  public boolean useNGrams;
+  public boolean conjoinShapeNGrams;
+  public boolean lowercaseNGrams;
+  public boolean dehyphenateNGrams;
+  public boolean usePrev;
+  public boolean useNext;
+  public boolean useTags;
+  public boolean useWordPairs;
+  public boolean useGazettes;
   public boolean useSequences = true;
-  public boolean usePrevSequences = false;
-  public boolean useNextSequences = false;
-  public boolean useLongSequences = false;
-  public boolean useBoundarySequences = false;
-  public boolean useTaggySequences = false;
-  public boolean useExtraTaggySequences = false;
-  public boolean dontExtendTaggy = false;
-  public boolean useTaggySequencesShapeInteraction = false;
-  public boolean strictlyZeroethOrder = false;
-  public boolean strictlyFirstOrder = false;
-  public boolean strictlySecondOrder = false;
-  public boolean strictlyThirdOrder = false;
+  public boolean usePrevSequences;
+  public boolean useNextSequences;
+  public boolean useLongSequences;
+  public boolean useBoundarySequences;
+  public boolean useTaggySequences;
+  public boolean useExtraTaggySequences;
+  public boolean dontExtendTaggy;
+  public boolean useTaggySequencesShapeInteraction;
+  public boolean strictlyZeroethOrder;
+  public boolean strictlyFirstOrder;
+  public boolean strictlySecondOrder;
+  public boolean strictlyThirdOrder;
   public String entitySubclassification = "IO";
-  public boolean retainEntitySubclassification = false;
-  public boolean useGazettePhrases = false;
-  public boolean makeConsistent = false;
-  public boolean useWordLabelCounts = false;
+  public boolean retainEntitySubclassification;
+  public boolean useGazettePhrases;
+  public boolean makeConsistent;
+  public boolean useWordLabelCounts;
   // boolean usePrevInstanceLabel = false;
   // boolean useNextInstanceLabel = false;
   public boolean useViterbi = true;
 
-  public int[] binnedLengths = null;
+  public int[] binnedLengths;
 
-  public boolean verboseMode = false;
+  public boolean verboseMode;
 
-  public boolean useSum = false;
-  public double tolerance = 1e-4;
+  public boolean useSum;
+  public double tolerance = 1.0e-4;
   // Turned on if non-null. Becomes part of the filename features are printed to
-  public String printFeatures = null;
+  public String printFeatures;
 
-  public boolean useSymTags = false;
+  public boolean useSymTags;
   /**
    * useSymWordPairs Has a small negative effect.
    */
-  public boolean useSymWordPairs = false;
+  public boolean useSymWordPairs;
 
   public String printClassifier = "WeightHistogram";
   public int printClassifierParam = 100;
 
-  public boolean intern = false;
-  public boolean intern2 = false;
-  public boolean selfTest = false;
+  public boolean intern;
+  public boolean intern2;
+  public boolean selfTest;
 
-  public boolean sloppyGazette = false;
-  public boolean cleanGazette = false;
+  public boolean sloppyGazette;
+  public boolean cleanGazette;
 
-  public boolean noMidNGrams = false;
+  public boolean noMidNGrams;
   public int maxNGramLeng = -1;
-  public boolean useReverse = false;
+  public boolean useReverse;
 
-  public boolean greekifyNGrams = false;
+  public boolean greekifyNGrams;
 
-  public boolean useParenMatching = false;
+  public boolean useParenMatching;
 
-  public boolean useLemmas = false;
-  public boolean usePrevNextLemmas = false;
-  public boolean normalizeTerms = false;
-  public boolean normalizeTimex = false;
+  public boolean useLemmas;
+  public boolean usePrevNextLemmas;
+  public boolean normalizeTerms;
+  public boolean normalizeTimex;
 
-  public boolean useNB = false;
+  public boolean useNB;
   public boolean useQN = true;
-  public boolean useFloat = false;
+  public boolean useFloat;
 
   public int QNsize = 25;
   public int QNsize2 = 25;
   public int maxIterations = -1;
 
   public int wordShape = WordShapeClassifier.NOWORDSHAPE;
-  public boolean useShapeStrings = false;
-  public boolean useTypeSeqs = false;
-  public boolean useTypeSeqs2 = false;
-  public boolean useTypeSeqs3 = false;
-  public boolean useDisjunctive = false;
+  public boolean useShapeStrings;
+  public boolean useTypeSeqs;
+  public boolean useTypeSeqs2;
+  public boolean useTypeSeqs3;
+  public boolean useDisjunctive;
   public int disjunctionWidth = 4;
-  public boolean useDisjunctiveShapeInteraction = false;
-  public boolean useDisjShape = false;
+  public boolean useDisjunctiveShapeInteraction;
+  public boolean useDisjShape;
 
   public boolean useWord = true; // ON by default
-  public boolean useClassFeature = false;
-  public boolean useShapeConjunctions = false;
-  public boolean useWordTag = false;
-  public boolean useNPHead = false;
-  public boolean useNPGovernor = false;
-  public boolean useHeadGov = false;
+  public boolean useClassFeature;
+  public boolean useShapeConjunctions;
+  public boolean useWordTag;
+  public boolean useNPHead;
+  public boolean useNPGovernor;
+  public boolean useHeadGov;
 
-  public boolean useLastRealWord = false;
-  public boolean useNextRealWord = false;
-  public boolean useOccurrencePatterns = false;
-  public boolean useTypeySequences = false;
+  public boolean useLastRealWord;
+  public boolean useNextRealWord;
+  public boolean useOccurrencePatterns;
+  public boolean useTypeySequences;
 
-  public boolean justify = false;
+  public boolean justify;
 
-  public boolean normalize = false;
+  public boolean normalize;
 
   public String priorType = "QUADRATIC";
   public double sigma = 1.0;
@@ -248,48 +250,48 @@ public class SeqClassifierFlags implements Serializable {
   public int beamSize = 30;
 
   public int maxLeft = 2;
-  public int maxRight = 0;
+  public int maxRight;
 
-  public boolean usePosition = false;
-  public boolean useBeginSent = false;
-  public boolean useGazFeatures = false;
-  public boolean useMoreGazFeatures = false;
-  public boolean useAbbr = false;
-  public boolean useMinimalAbbr = false;
-  public boolean useAbbr1 = false;
-  public boolean useMinimalAbbr1 = false;
-  public boolean useMoreAbbr = false;
+  public boolean usePosition;
+  public boolean useBeginSent;
+  public boolean useGazFeatures;
+  public boolean useMoreGazFeatures;
+  public boolean useAbbr;
+  public boolean useMinimalAbbr;
+  public boolean useAbbr1;
+  public boolean useMinimalAbbr1;
+  public boolean useMoreAbbr;
 
-  public boolean deleteBlankLines = false;
+  public boolean deleteBlankLines;
 
-  public boolean useGENIA = false;
-  public boolean useTOK = false;
-  public boolean useABSTR = false;
-  public boolean useABSTRFreqDict = false;
-  public boolean useABSTRFreq = false;
-  public boolean useFREQ = false;
-  public boolean useABGENE = false;
-  public boolean useWEB = false;
-  public boolean useWEBFreqDict = false;
-  public boolean useIsURL = false;
-  public boolean useURLSequences = false;
-  public boolean useIsDateRange = false;
-  public boolean useEntityTypes = false;
-  public boolean useEntityTypeSequences = false;
-  public boolean useEntityRule = false;
-  public boolean useOrdinal = false;
-  public boolean useACR = false;
-  public boolean useANTE = false;
+  public boolean useGENIA;
+  public boolean useTOK;
+  public boolean useABSTR;
+  public boolean useABSTRFreqDict;
+  public boolean useABSTRFreq;
+  public boolean useFREQ;
+  public boolean useABGENE;
+  public boolean useWEB;
+  public boolean useWEBFreqDict;
+  public boolean useIsURL;
+  public boolean useURLSequences;
+  public boolean useIsDateRange;
+  public boolean useEntityTypes;
+  public boolean useEntityTypeSequences;
+  public boolean useEntityRule;
+  public boolean useOrdinal;
+  public boolean useACR;
+  public boolean useANTE;
 
-  public boolean useMoreTags = false;
+  public boolean useMoreTags;
 
-  public boolean useChunks = false;
-  public boolean useChunkySequences = false;
+  public boolean useChunks;
+  public boolean useChunkySequences;
 
-  public boolean usePrevVB = false;
-  public boolean useNextVB = false;
-  public boolean useVB = false;
-  public boolean subCWGaz = false;
+  public boolean usePrevVB;
+  public boolean useNextVB;
+  public boolean useVB;
+  public boolean subCWGaz;
 
   public String documentReader = "ColumnDocumentReader"; // TODO OBSOLETE:
   // delete when breaking
@@ -300,93 +302,93 @@ public class SeqClassifierFlags implements Serializable {
   // public String testMap = "word=0,tag=1,answer=2";
   public String map = "word=0,tag=1,answer=2";
 
-  public boolean useWideDisjunctive = false;
+  public boolean useWideDisjunctive;
   public int wideDisjunctionWidth = 10;
 
   // chinese word-segmenter features
-  public boolean useRadical = false;
-  public boolean useBigramInTwoClique = false;
-  public String morphFeatureFile = null;
-  public boolean useReverseAffix = false;
+  public boolean useRadical;
+  public boolean useBigramInTwoClique;
+  public String morphFeatureFile;
+  public boolean useReverseAffix;
   public int charHalfWindow = 3;
-  public boolean useWord1 = false;
-  public boolean useWord2 = false;
-  public boolean useWord3 = false;
-  public boolean useWord4 = false;
-  public boolean useRad1 = false;
-  public boolean useRad2 = false;
-  public boolean useWordn = false;
-  public boolean useCTBPre1 = false;
-  public boolean useCTBSuf1 = false;
-  public boolean useASBCPre1 = false;
-  public boolean useASBCSuf1 = false;
-  public boolean usePKPre1 = false;
-  public boolean usePKSuf1 = false;
-  public boolean useHKPre1 = false;
-  public boolean useHKSuf1 = false;
-  public boolean useCTBChar2 = false;
-  public boolean useASBCChar2 = false;
-  public boolean useHKChar2 = false;
-  public boolean usePKChar2 = false;
-  public boolean useRule2 = false;
-  public boolean useDict2 = false;
-  public boolean useOutDict2 = false;
+  public boolean useWord1;
+  public boolean useWord2;
+  public boolean useWord3;
+  public boolean useWord4;
+  public boolean useRad1;
+  public boolean useRad2;
+  public boolean useWordn;
+  public boolean useCTBPre1;
+  public boolean useCTBSuf1;
+  public boolean useASBCPre1;
+  public boolean useASBCSuf1;
+  public boolean usePKPre1;
+  public boolean usePKSuf1;
+  public boolean useHKPre1;
+  public boolean useHKSuf1;
+  public boolean useCTBChar2;
+  public boolean useASBCChar2;
+  public boolean useHKChar2;
+  public boolean usePKChar2;
+  public boolean useRule2;
+  public boolean useDict2;
+  public boolean useOutDict2;
   public String outDict2 = "/u/htseng/scr/chunking/segmentation/out.lexicon";
-  public boolean useDictleng = false;
-  public boolean useDictCTB2 = false;
-  public boolean useDictASBC2 = false;
-  public boolean useDictPK2 = false;
-  public boolean useDictHK2 = false;
-  public boolean useBig5 = false;
-  public boolean useNegDict2 = false;
-  public boolean useNegDict3 = false;
-  public boolean useNegDict4 = false;
-  public boolean useNegCTBDict2 = false;
-  public boolean useNegCTBDict3 = false;
-  public boolean useNegCTBDict4 = false;
-  public boolean useNegASBCDict2 = false;
-  public boolean useNegASBCDict3 = false;
-  public boolean useNegASBCDict4 = false;
-  public boolean useNegHKDict2 = false;
-  public boolean useNegHKDict3 = false;
-  public boolean useNegHKDict4 = false;
-  public boolean useNegPKDict2 = false;
-  public boolean useNegPKDict3 = false;
-  public boolean useNegPKDict4 = false;
-  public boolean usePre = false;
-  public boolean useSuf = false;
-  public boolean useRule = false;
-  public boolean useHk = false;
-  public boolean useMsr = false;
-  public boolean useMSRChar2 = false;
-  public boolean usePk = false;
-  public boolean useAs = false;
-  public boolean useFilter = false; // TODO this flag is used for nothing;
+  public boolean useDictleng;
+  public boolean useDictCTB2;
+  public boolean useDictASBC2;
+  public boolean useDictPK2;
+  public boolean useDictHK2;
+  public boolean useBig5;
+  public boolean useNegDict2;
+  public boolean useNegDict3;
+  public boolean useNegDict4;
+  public boolean useNegCTBDict2;
+  public boolean useNegCTBDict3;
+  public boolean useNegCTBDict4;
+  public boolean useNegASBCDict2;
+  public boolean useNegASBCDict3;
+  public boolean useNegASBCDict4;
+  public boolean useNegHKDict2;
+  public boolean useNegHKDict3;
+  public boolean useNegHKDict4;
+  public boolean useNegPKDict2;
+  public boolean useNegPKDict3;
+  public boolean useNegPKDict4;
+  public boolean usePre;
+  public boolean useSuf;
+  public boolean useRule;
+  public boolean useHk;
+  public boolean useMsr;
+  public boolean useMSRChar2;
+  public boolean usePk;
+  public boolean useAs;
+  public boolean useFilter; // TODO this flag is used for nothing;
   // delete when breaking serialization
-  public boolean largeChSegFile = false; // TODO this flag is used for nothing;
+  public boolean largeChSegFile; // TODO this flag is used for nothing;
   // delete when breaking serialization
-  public boolean useRad2b = false;
+  public boolean useRad2b;
 
   /**
    * Keep the whitespace between English words in testFile when printing out
    * answers. Doesn't really change the content of the CoreLabels. (For Chinese
    * segmentation.)
    */
-  public boolean keepEnglishWhitespaces = false;
+  public boolean keepEnglishWhitespaces;
 
   /**
    * Keep all the whitespace words in testFile when printing out answers.
    * Doesn't really change the content of the CoreLabels. (For Chinese
    * segmentation.)
    */
-  public boolean keepAllWhitespaces = false;
+  public boolean keepAllWhitespaces;
 
-  public boolean sighanPostProcessing = false;
+  public boolean sighanPostProcessing;
 
   /**
    * use POS information (an "open" feature for Chinese segmentation)
    */
-  public boolean useChPos = false;
+  public boolean useChPos;
 
   // CTBSegDocumentReader normalization table
   // A value of null means that a default algorithmic normalization
@@ -406,60 +408,60 @@ public class SeqClassifierFlags implements Serializable {
 
   // end Sighan 20005 chinese word-segmenter features/properties
 
-  public boolean useWordShapeGaz = false;
-  public String wordShapeGaz = null;
+  public boolean useWordShapeGaz;
+  public String wordShapeGaz;
 
   // TODO: This should be removed in favor of suppressing splitting when
   // maxDocSize <= 0, when next breaking serialization
   // this now controls nothing
   public boolean splitDocuments = true;
 
-  public boolean printXML = false;
+  public boolean printXML;
 
-  public boolean useSeenFeaturesOnly = false;
+  public boolean useSeenFeaturesOnly;
 
   public String lastNameList = "/u/nlp/data/dist.all.last";
   public String maleNameList = "/u/nlp/data/dist.male.first";
   public String femaleNameList = "/u/nlp/data/dist.female.first";
 
   // don't want these serialized
-  public transient String trainFile = null;
+  public transient String trainFile;
   /** NER adaptation (Gaussian prior) parameters. */
-  public transient String adaptFile = null;
-  public transient String devFile = null;
-  public transient String testFile = null;
-  public transient String textFile = null;
-  public transient String textFiles = null;
-  public transient boolean readStdin = false;
-  public transient String outputFile = null;
-  public transient String loadClassifier = null;
-  public transient String loadTextClassifier = null;
-  public transient String loadJarClassifier = null;
-  public transient String loadAuxClassifier = null;
-  public transient String serializeTo = null;
-  public transient String serializeToText = null;
-  public transient int interimOutputFreq = 0;
-  public transient String initialWeights = null;
-  public transient List<String> gazettes = new ArrayList<String>();
-  public transient String selfTrainFile = null;
+  public transient String adaptFile;
+  public transient String devFile;
+  public transient String testFile;
+  public transient String textFile;
+  public transient String textFiles;
+  public transient boolean readStdin;
+  public transient String outputFile;
+  public transient String loadClassifier;
+  public transient String loadTextClassifier;
+  public transient String loadJarClassifier;
+  public transient String loadAuxClassifier;
+  public transient String serializeTo;
+  public transient String serializeToText;
+  public transient int interimOutputFreq;
+  public transient String initialWeights;
+  public transient List<String> gazettes = new ArrayList<>();
+  public transient String selfTrainFile;
 
   public String inputEncoding = "UTF-8"; // used for CTBSegDocumentReader as
   // well
 
-  public boolean bioSubmitOutput = false;
+  public boolean bioSubmitOutput;
   public int numRuns = 1;
-  public String answerFile = null;
-  public String altAnswerFile = null;
+  public String answerFile;
+  public String altAnswerFile;
   public String dropGaz;
-  public String printGazFeatures = null;
+  public String printGazFeatures;
   public int numStartLayers = 1;
-  public boolean dump = false;
+  public boolean dump;
   public boolean mergeTags; // whether to merge B- and I- tags
   public boolean splitOnHead;
 
   // threshold
-  public int featureCountThreshold = 0;
-  public double featureWeightThreshold = 0.0;
+  public int featureCountThreshold;
+  public double featureWeightThreshold;
 
   // feature factory
   public String featureFactory = "edu.stanford.nlp.ie.NERFeatureFactory";
@@ -467,170 +469,170 @@ public class SeqClassifierFlags implements Serializable {
 
   public String backgroundSymbol = DEFAULT_BACKGROUND_SYMBOL;
   // use
-  public boolean useObservedSequencesOnly = false;
+  public boolean useObservedSequencesOnly;
 
-  public int maxDocSize = 0;
-  public boolean printProbs = false;
-  public boolean printFirstOrderProbs = false;
+  public int maxDocSize;
+  public boolean printProbs;
+  public boolean printFirstOrderProbs;
 
-  public boolean saveFeatureIndexToDisk = false;
-  public boolean removeBackgroundSingletonFeatures = false;
-  public boolean doGibbs = false;
+  public boolean saveFeatureIndexToDisk;
+  public boolean removeBackgroundSingletonFeatures;
+  public boolean doGibbs;
   public int numSamples = 100;
-  public boolean useNERPrior = false;
-  public boolean useAcqPrior = false;
+  public boolean useNERPrior;
+  public boolean useAcqPrior;
   /**
    * If true and doGibbs also true, will do generic Gibbs inference without any
    * priors
    */
-  public boolean useUniformPrior = false;
-  public boolean useMUCFeatures = false;
-  public double annealingRate = 0.0;
-  public String annealingType = null;
-  public String loadProcessedData = null;
+  public boolean useUniformPrior;
+  public boolean useMUCFeatures;
+  public double annealingRate;
+  public String annealingType;
+  public String loadProcessedData;
 
   public boolean initViterbi = true;
 
-  public boolean useUnknown = false;
+  public boolean useUnknown;
 
-  public boolean checkNameList = false;
+  public boolean checkNameList;
 
-  public boolean useSemPrior = false;
-  public boolean useFirstWord = false;
+  public boolean useSemPrior;
+  public boolean useFirstWord;
 
-  public boolean useNumberFeature = false;
+  public boolean useNumberFeature;
 
-  public int ocrFold = 0;
-  public transient boolean ocrTrain = false;
+  public int ocrFold;
+  public transient boolean ocrTrain;
 
   public String classifierType = "MaxEnt";
-  public String svmModelFile = null;
+  public String svmModelFile;
 
   public String inferenceType = "Viterbi";
 
-  public boolean useLemmaAsWord = false;
+  public boolean useLemmaAsWord;
 
   public String type = "cmm";
 
   public String readerAndWriter = "edu.stanford.nlp.sequences.ColumnDocumentReaderAndWriter";
 
-  public List<String> comboProps = new ArrayList<String>();
+  public List<String> comboProps = new ArrayList<>();
 
-  public boolean usePrediction = false;
+  public boolean usePrediction;
 
-  public boolean useAltGazFeatures = false;
+  public boolean useAltGazFeatures;
 
-  public String gazFilesFile = null;
+  public String gazFilesFile;
 
-  public boolean usePrediction2 = false;
+  public boolean usePrediction2;
   public String baseTrainDir = ".";
   public String baseTestDir = ".";
-  public String trainFiles = null;
-  public String trainFileList = null;
-  public String testFiles = null;
-  public String trainDirs = null; // cdm 2009: this is currently unsupported,
+  public String trainFiles;
+  public String trainFileList;
+  public String testFiles;
+  public String trainDirs; // cdm 2009: this is currently unsupported,
   // but one user wanted something like this....
-  public String testDirs = null;
+  public String testDirs;
 
-  public boolean useOnlySeenWeights = false;
+  public boolean useOnlySeenWeights;
 
-  public String predProp = null;
+  public String predProp;
 
   public CoreLabel pad = new CoreLabel();
 
-  public boolean useObservedFeaturesOnly = false;
+  public boolean useObservedFeaturesOnly;
 
-  public String distSimLexicon = null;
-  public boolean useDistSim = false;
+  public String distSimLexicon;
+  public boolean useDistSim;
 
-  public int removeTopN = 0;
+  public int removeTopN;
   public int numTimesRemoveTopN = 1;
   public double randomizedRatio = 1.0;
 
-  public double removeTopNPercent = 0.0;
+  public double removeTopNPercent;
   public int purgeFeatures = -1;
 
-  public boolean booleanFeatures = false;
+  public boolean booleanFeatures;
 
-  public boolean iobWrapper = false;
-  public boolean iobTags = false;
-  public boolean useSegmentation = false; /*
+  public boolean iobWrapper;
+  public boolean iobTags;
+  public boolean useSegmentation; /*
                                            * binary segmentation feature for
                                            * character-based Chinese NER
                                            */
 
-  public boolean memoryThrift = false;
-  public boolean timitDatum = false;
+  public boolean memoryThrift;
+  public boolean timitDatum;
 
-  public String serializeDatasetsDir = null;
-  public String loadDatasetsDir = null;
-  public String pushDir = null;
-  public boolean purgeDatasets = false;
+  public String serializeDatasetsDir;
+  public String loadDatasetsDir;
+  public String pushDir;
+  public boolean purgeDatasets;
   public boolean keepOBInMemory = true;
-  public boolean fakeDataset = false;
-  public boolean restrictTransitionsTimit = false;
+  public boolean fakeDataset;
+  public boolean restrictTransitionsTimit;
   public int numDatasetsPerFile = 1;
-  public boolean useTitle = false;
+  public boolean useTitle;
 
   // these are for the old stuff
-  public boolean lowerNewgeneThreshold = false;
-  public boolean useEitherSideWord = false;
-  public boolean useEitherSideDisjunctive = false;
-  public boolean twoStage = false;
+  public boolean lowerNewgeneThreshold;
+  public boolean useEitherSideWord;
+  public boolean useEitherSideDisjunctive;
+  public boolean twoStage;
   public String crfType = "MaxEnt";
   public int featureThreshold = 1;
-  public String featThreshFile = null;
-  public double featureDiffThresh = 0.0;
-  public int numTimesPruneFeatures = 0;
-  public double newgeneThreshold = 0.0;
-  public boolean doAdaptation = false;
+  public String featThreshFile;
+  public double featureDiffThresh;
+  public int numTimesPruneFeatures;
+  public double newgeneThreshold;
+  public boolean doAdaptation;
   public boolean useInternal = true;
   public boolean useExternal = true;
   public double selfTrainConfidenceThreshold = 0.9;
   public int selfTrainIterations = 1;
   public int selfTrainWindowSize = 1; // Unigram
-  public boolean useHuber = false;
-  public boolean useQuartic = false;
+  public boolean useHuber;
+  public boolean useQuartic;
   public double adaptSigma = 1.0;
   public int numFolds = 1;
   public int startFold = 1;
   public int endFold = 1;
 
-  public boolean cacheNGrams = false;
+  public boolean cacheNGrams;
 
   public String outputFormat;
 
-  public boolean useSMD = false;
-  public boolean useSGDtoQN = false;
-  public boolean useStochasticQN = false;
-  public boolean useScaledSGD = false;
-  public int scaledSGDMethod = 0;
+  public boolean useSMD;
+  public boolean useSGDtoQN;
+  public boolean useStochasticQN;
+  public boolean useScaledSGD;
+  public int scaledSGDMethod;
   public int SGDPasses = -1;
   public int QNPasses = -1;
-  public boolean tuneSGD = false;
+  public boolean tuneSGD;
   public StochasticCalculateMethods stochasticMethod = StochasticCalculateMethods.NoneSpecified;
   public double initialGain = 0.1;
   public int stochasticBatchSize = 15;
-  public boolean useSGD = false;
+  public boolean useSGD;
   public double gainSGD = 0.1;
-  public boolean useHybrid = false;
-  public int hybridCutoffIteration = 0;
-  public boolean outputIterationsToFile = false;
-  public boolean testObjFunction = false;
-  public boolean testVariance = false;
+  public boolean useHybrid;
+  public int hybridCutoffIteration;
+  public boolean outputIterationsToFile;
+  public boolean testObjFunction;
+  public boolean testVariance;
   public int SGD2QNhessSamples = 50;
-  public boolean testHessSamples = false;
+  public boolean testHessSamples;
   public int CRForder = 1;  // TODO remove this when breaking serialization; this is unused; really maxLeft/maxRight control order
   public int CRFwindow = 2;  // TODO remove this when breaking serialization; this is unused; really maxLeft/maxRight control clique size
-  public boolean estimateInitial = false;
+  public boolean estimateInitial;
 
-  public transient String biasedTrainFile = null;
-  public transient String confusionMatrix = null;
+  public transient String biasedTrainFile;
+  public transient String confusionMatrix;
 
-  public String outputEncoding = null;
+  public String outputEncoding;
 
-  public boolean useKBest = false;
-  public String searchGraphPrefix = null;
+  public boolean useKBest;
+  public String searchGraphPrefix;
   public double searchGraphPrune = Double.POSITIVE_INFINITY;
   public int kBest = 1;
 
@@ -667,114 +669,114 @@ public class SeqClassifierFlags implements Serializable {
 
   public boolean printNR; // a flag for WordAndTagDocumentReaderAndWriter
 
-  public String classBias = null;
+  public String classBias;
 
   public boolean printLabelValue; // Old printErrorStuff
 
-  public boolean useRobustQN = false;
-  public boolean combo = false;
+  public boolean useRobustQN;
+  public boolean combo;
 
-  public boolean useGenericFeatures = false;
+  public boolean useGenericFeatures;
 
-  public boolean verboseForTrueCasing = false;
+  public boolean verboseForTrueCasing;
 
-  public String trainHierarchical = null;
-  public String domain = null;
-  public boolean baseline = false;
-  public String transferSigmas = null;
-  public boolean doFE = false;
+  public String trainHierarchical;
+  public String domain;
+  public boolean baseline;
+  public String transferSigmas;
+  public boolean doFE;
   public boolean restrictLabels = true;
 
-  public boolean announceObjectBankEntries = false; // whether to print a line
+  public boolean announceObjectBankEntries; // whether to print a line
   // giving each ObjectBank
   // entry (usually a
   // filename)
 
   // Arabic Subject Detector flags
-  public boolean usePos = false;
-  public boolean useAgreement = false;
-  public boolean useAccCase = false;
-  public boolean useInna = false;
-  public boolean useConcord = false;
-  public boolean useFirstNgram = false;
-  public boolean useLastNgram = false;
-  public boolean collapseNN = false;
-  public boolean useConjBreak = false;
-  public boolean useAuxPairs = false;
-  public boolean usePPVBPairs = false;
-  public boolean useAnnexing = false;
-  public boolean useTemporalNN = false;
-  public boolean usePath = false;
-  public boolean innaPPAttach = false;
-  public boolean markProperNN = false;
-  public boolean markMasdar = false;
-  public boolean useSVO = false;
+  public boolean usePos;
+  public boolean useAgreement;
+  public boolean useAccCase;
+  public boolean useInna;
+  public boolean useConcord;
+  public boolean useFirstNgram;
+  public boolean useLastNgram;
+  public boolean collapseNN;
+  public boolean useConjBreak;
+  public boolean useAuxPairs;
+  public boolean usePPVBPairs;
+  public boolean useAnnexing;
+  public boolean useTemporalNN;
+  public boolean usePath;
+  public boolean innaPPAttach;
+  public boolean markProperNN;
+  public boolean markMasdar;
+  public boolean useSVO;
 
   public int numTags = 3;
-  public boolean useTagsCpC = false;
-  public boolean useTagsCpCp2C = false;
-  public boolean useTagsCpCp2Cp3C = false;
-  public boolean useTagsCpCp2Cp3Cp4C = false;
+  public boolean useTagsCpC;
+  public boolean useTagsCpCp2C;
+  public boolean useTagsCpCp2Cp3C;
+  public boolean useTagsCpCp2Cp3Cp4C;
 
-  public double l1reg = 0.0;
+  public double l1reg;
 
   // truecaser flags:
   public String mixedCaseMapFile = "";
   public String auxTrueCaseModels = "";
 
   // more flags inspired by Zhang and Johnson 2003
-  public boolean use2W = false;
-  public boolean useLC = false;
-  public boolean useYetMoreCpCShapes = false;
+  public boolean use2W;
+  public boolean useLC;
+  public boolean useYetMoreCpCShapes;
 
   // added for the NFL domain
-  public boolean useIfInteger = false;
+  public boolean useIfInteger;
 
-  public String exportFeatures = null;
-  public boolean useInPlaceSGD = false;
-  public boolean useTopics = false;
+  public String exportFeatures;
+  public boolean useInPlaceSGD;
+  public boolean useTopics;
 
   // Number of iterations before evaluating weights (0 = don't evaluate)
-  public int evaluateIters = 0;
+  public int evaluateIters;
   // Command to use for evaluation
   public String evalCmd = "";
   // Evaluate on training set or not
-  public boolean evaluateTrain = false;
+  public boolean evaluateTrain;
   public int tuneSampleSize = -1;
 
-  public boolean usePhraseFeatures = false;
-  public boolean usePhraseWords = false;
-  public boolean usePhraseWordTags = false;
-  public boolean usePhraseWordSpecialTags = false;
-  public boolean useCommonWordsFeature = false;
-  public boolean useProtoFeatures = false;
-  public boolean useWordnetFeatures = false;
+  public boolean usePhraseFeatures;
+  public boolean usePhraseWords;
+  public boolean usePhraseWordTags;
+  public boolean usePhraseWordSpecialTags;
+  public boolean useCommonWordsFeature;
+  public boolean useProtoFeatures;
+  public boolean useWordnetFeatures;
   public String tokenFactory = "edu.stanford.nlp.process.CoreLabelTokenFactory";
   public Object[] tokenFactoryArgs = new Object[0];
   public String tokensAnnotationClassName = "edu.stanford.nlp.ling.CoreAnnotations$TokensAnnotation";
 
-  public transient String tokenizerOptions = null;
-  public transient String tokenizerFactory = null;
+  public transient String tokenizerOptions;
+  public transient String tokenizerFactory;
 
-  public boolean useCorefFeatures = false;
-  public String wikiFeatureDbFile = null;
+  public boolean useCorefFeatures;
+  public String wikiFeatureDbFile;
   // for combining 2 CRFs - one trained from noisy data and another trained from
   // non-noisy
-  public boolean useNoisyNonNoisyFeature = false;
+  public boolean useNoisyNonNoisyFeature;
   // year annotation of the document
-  public boolean useYear = false;
+  public boolean useYear;
 
-  public boolean useSentenceNumber = false;
+  public boolean useSentenceNumber;
   // to know source of the label. Currently, used to know which pattern is used
   // to label the token
-  public boolean useLabelSource = false;
+  public boolean useLabelSource;
 
   /**
    * Whether to (not) lowercase tokens before looking them up in distsim
    * lexicon. By default lowercasing was done, but now it doesn't have to be
    * true :-).
    */
-  public boolean casedDistSim = false;
+  public boolean casedDistSim;
 
   /**
    * The format of the distsim file. Known values are: alexClark = TSV file.
@@ -798,7 +800,7 @@ public class SeqClassifierFlags implements Serializable {
    * lexicon and for lookup. This is a simple word shaping that can shrink
    * distsim lexicons and improve their performance.
    */
-  public boolean numberEquivalenceDistSim = false;
+  public boolean numberEquivalenceDistSim;
 
   /**
    * What class to assign to words not found in the dist sim lexicon. You might
@@ -809,14 +811,14 @@ public class SeqClassifierFlags implements Serializable {
   /**
    * Use prefixes and suffixes from the previous and next word.
    */
-  public boolean useNeighborNGrams = false;
+  public boolean useNeighborNGrams;
 
   /**
    * This function maps words in the training or test data to new
    * words.  They are used at the feature extractor level, ie in the
    * FeatureFactory.  For now, only the NERFeatureFactory uses this.
    */
-  public Function<String, String> wordFunction = null;
+  public Function<String, String> wordFunction;
 
   public static final String DEFAULT_PLAIN_TEXT_READER = "edu.stanford.nlp.sequences.PlainTextDocumentReaderAndWriter";
   public String plainTextDocumentReaderAndWriter = DEFAULT_PLAIN_TEXT_READER;
@@ -825,116 +827,116 @@ public class SeqClassifierFlags implements Serializable {
    * Use a bag of all words as a feature.  Perhaps this will find some
    * words that indicate certain types of entities are present.
    */
-  public boolean useBagOfWords = false;
+  public boolean useBagOfWords;
 
   /**
    * When scoring, count the background symbol stats too.  Useful for
    * things where the background symbol is particularly meaningful,
    * such as truecase.
    */
-  public boolean evaluateBackground = false;
+  public boolean evaluateBackground;
 
   /**
    * Number of experts to be used in Logarithmic Opinion Pool (product of experts) training
    * default value is 1
    */
   public int numLopExpert = 1;
-  public transient String initialLopScales = null;
-  public transient String initialLopWeights = null;
-  public boolean includeFullCRFInLOP = false;
-  public boolean backpropLopTraining = false;
-  public boolean randomLopWeights = false;
-  public boolean randomLopFeatureSplit = false;
-  public boolean nonLinearCRF = false;
-  public boolean secondOrderNonLinear = false;
+  public transient String initialLopScales;
+  public transient String initialLopWeights;
+  public boolean includeFullCRFInLOP;
+  public boolean backpropLopTraining;
+  public boolean randomLopWeights;
+  public boolean randomLopFeatureSplit;
+  public boolean nonLinearCRF;
+  public boolean secondOrderNonLinear;
   public int numHiddenUnits = -1;
   public boolean useOutputLayer = true;
   public boolean useHiddenLayer = true;
-  public boolean gradientDebug = false;
-  public boolean checkGradient = false;
-  public boolean useSigmoid = false;
-  public boolean skipOutputRegularization = false;
-  public boolean sparseOutputLayer = false;
-  public boolean tieOutputLayer = false;
-  public boolean blockInitialize = false;
-  public boolean softmaxOutputLayer = false;
+  public boolean gradientDebug;
+  public boolean checkGradient;
+  public boolean useSigmoid;
+  public boolean skipOutputRegularization;
+  public boolean sparseOutputLayer;
+  public boolean tieOutputLayer;
+  public boolean blockInitialize;
+  public boolean softmaxOutputLayer;
 
 
   /**
    * Bisequence CRF parameters
    */
-  public String loadBisequenceClassifierEn = null;
-  public String loadBisequenceClassifierCh = null;
-  public String bisequenceClassifierPropEn = null;
-  public String bisequenceClassifierPropCh = null;
-  public String bisequenceTestFileEn = null;
-  public String bisequenceTestFileCh = null;
-  public String bisequenceTestOutputEn = null;
-  public String bisequenceTestOutputCh = null;
-  public String bisequenceTestAlignmentFile = null;
+  public String loadBisequenceClassifierEn;
+  public String loadBisequenceClassifierCh;
+  public String bisequenceClassifierPropEn;
+  public String bisequenceClassifierPropCh;
+  public String bisequenceTestFileEn;
+  public String bisequenceTestFileCh;
+  public String bisequenceTestOutputEn;
+  public String bisequenceTestOutputCh;
+  public String bisequenceTestAlignmentFile;
   public int bisequencePriorType = 1;
-  public String bisequenceAlignmentPriorPenaltyCh = null;
-  public String bisequenceAlignmentPriorPenaltyEn = null;
-  public double alignmentPruneThreshold = 0.0;
-  public boolean factorInAlignmentProb = false;
-  public boolean useChromaticSampling = false;
-  public boolean useSequentialScanSampling = false;
+  public String bisequenceAlignmentPriorPenaltyCh;
+  public String bisequenceAlignmentPriorPenaltyEn;
+  public double alignmentPruneThreshold;
+  public boolean factorInAlignmentProb;
+  public boolean useChromaticSampling;
+  public boolean useSequentialScanSampling;
   public int maxAllowedChromaticSize = 8;
 
   /** Whether to drop out some fraction of features in the input during
    *  training (and then to scale the weights at test time).
    */
-  public double inputDropOut = 0.0;
+  public double inputDropOut;
 
   /**
    * Whether or not to keep blank sentences when processing.  Useful
    * for systems such as the segmenter if you want to line up each
    * line exactly, including blank lines.
    */
-  public boolean keepEmptySentences = false;
-  public boolean useBilingualNERPrior = false;
+  public boolean keepEmptySentences;
+  public boolean useBilingualNERPrior;
 
   public int samplingSpeedUpThreshold = -1;
-  public String entityMatrixCh = null;
-  public String entityMatrixEn = null;
+  public String entityMatrixCh;
+  public String entityMatrixEn;
 
-  public int multiThreadGibbs = 0;
-  public boolean matchNERIncentive = false;
+  public int multiThreadGibbs;
+  public boolean matchNERIncentive;
 
-  public boolean useEmbedding = false;
-  public boolean prependEmbedding = false;
-  public String embeddingWords = null;
-  public String embeddingVectors = null;
-  public boolean transitionEdgeOnly = false;
-  public double priorL1Lambda = 0;
-  public boolean addCapitalFeatures = false;
+  public boolean useEmbedding;
+  public boolean prependEmbedding;
+  public String embeddingWords;
+  public String embeddingVectors;
+  public boolean transitionEdgeOnly;
+  public double priorL1Lambda;
+  public boolean addCapitalFeatures;
   public int arbitraryInputLayerSize = -1;
-  public boolean noEdgeFeature = false;
-  public boolean terminateOnEvalImprovement = false;
+  public boolean noEdgeFeature;
+  public boolean terminateOnEvalImprovement;
   public int terminateOnEvalImprovementNumOfEpoch = 1;
   public boolean useMemoryEvaluator = true;
-  public boolean suppressTestDebug = false;
-  public boolean useOWLQN = false;
-  public boolean printWeights = false;
+  public boolean suppressTestDebug;
+  public boolean useOWLQN;
+  public boolean printWeights;
   public int totalDataSlice = 10;
-  public int numOfSlices = 0;
-  public boolean regularizeSoftmaxTieParam = false;
-  public double softmaxTieLambda = 0;
+  public int numOfSlices;
+  public boolean regularizeSoftmaxTieParam;
+  public double softmaxTieLambda;
   public int totalFeatureSlice = 10;
-  public int numOfFeatureSlices = 0;
-  public boolean addBiasToEmbedding = false;
-  public boolean hardcodeSoftmaxOutputWeights = false;
+  public int numOfFeatureSlices;
+  public boolean addBiasToEmbedding;
+  public boolean hardcodeSoftmaxOutputWeights;
 
-  public boolean useNERPriorBIO = false;
-  public String entityMatrix = null;
-  public int multiThreadClassifier = 0;
+  public boolean useNERPriorBIO;
+  public String entityMatrix;
+  public int multiThreadClassifier;
   
-  public String splitWordRegex = null;
+  public String splitWordRegex;
   
   // "ADD VARIABLES ABOVE HERE"
 
-  public transient List<String> phraseGazettes = null;
-  public transient Properties props = null;
+  public transient List<String> phraseGazettes;
+  public transient Properties props;
 
   public SeqClassifierFlags() {
   }
@@ -974,7 +976,7 @@ public class SeqClassifierFlags implements Serializable {
     for (Enumeration e = props.propertyNames(); e.hasMoreElements();) {
       String key = (String) e.nextElement();
       String val = props.getProperty(key);
-      if (!(key.length() == 0 && val.length() == 0)) {
+      if (!(key.isEmpty() && val.isEmpty())) {
         if (printProps) {
           System.err.println(key + '=' + val);
         }
@@ -1136,7 +1138,7 @@ public class SeqClassifierFlags implements Serializable {
         }
       } else if (key.equalsIgnoreCase("binnedLengths")) {
         if (val != null) {
-          String[] binnedLengthStrs = val.split("[, ]+");
+          String[] binnedLengthStrs = COMPILE.split(val);
           binnedLengths = new int[binnedLengthStrs.length];
           for (int i = 0; i < binnedLengths.length; i++) {
             binnedLengths[i] = Integer.parseInt(binnedLengthStrs[i]);
@@ -1229,7 +1231,7 @@ public class SeqClassifierFlags implements Serializable {
       } else if (key.equalsIgnoreCase("phraseGazettes")) {
         StringTokenizer st = new StringTokenizer(val, " ,;\t");
         if (phraseGazettes == null) {
-          phraseGazettes = new ArrayList<String>();
+          phraseGazettes = new ArrayList<>();
         }
         while (st.hasMoreTokens()) {
           phraseGazettes.add(st.nextToken());
@@ -1446,7 +1448,7 @@ public class SeqClassifierFlags implements Serializable {
         useGazettes = true;
         StringTokenizer st = new StringTokenizer(val, " ,;\t");
         if (gazettes == null) {
-          gazettes = new ArrayList<String>();
+          gazettes = new ArrayList<>();
         } // for after deserialization, as gazettes is transient
         while (st.hasMoreTokens()) {
           gazettes.add(st.nextToken());
@@ -1462,10 +1464,7 @@ public class SeqClassifierFlags implements Serializable {
         l1reg = Double.parseDouble(val);
       } else if (key.equalsIgnoreCase("useFloat")) {
         useFloat = Boolean.parseBoolean(val);
-      } else if (key.equalsIgnoreCase("trainMap")) {
-        System.err.println("trainMap and testMap are no longer valid options - please use map instead.");
-        throw new RuntimeException();
-      } else if (key.equalsIgnoreCase("testMap")) {
+      } else if (key.equalsIgnoreCase("trainMap") || key.equalsIgnoreCase("testMap")) {
         System.err.println("trainMap and testMap are no longer valid options - please use map instead.");
         throw new RuntimeException();
       } else if (key.equalsIgnoreCase("map")) {
@@ -1812,29 +1811,17 @@ public class SeqClassifierFlags implements Serializable {
         // don't set if empty string or spaces or true: revert it to null
         // special case so can empty out dictionary list on command line!
         val = val.trim();
-        if (val.length() > 0 && !"true".equals(val) && !"null".equals(val) && !"false".equals("val")) {
-          dictionary = val;
-        } else {
-          dictionary = null;
-        }
+          dictionary = !val.isEmpty() && !"true".equals(val) && !"null".equals(val) && !"false".equals("val") ? val : null;
       } else if (key.equalsIgnoreCase("serDictionary")) {
         // don't set if empty string or spaces or true: revert it to null
         // special case so can empty out dictionary list on command line!
         val = val.trim();
-        if (val.length() > 0 && !"true".equals(val) && !"null".equals(val) && !"false".equals("val")) {
-          serializedDictionary = val;
-        } else {
-          serializedDictionary = null;
-        }
+          serializedDictionary = !val.isEmpty() && !"true".equals(val) && !"null".equals(val) && !"false".equals("val") ? val : null;
       } else if (key.equalsIgnoreCase("dictionary2")) {
         // don't set if empty string or spaces or true: revert it to null
         // special case so can empty out dictionary list on command line!
         val = val.trim();
-        if (val.length() > 0 && !"true".equals(val) && !"null".equals(val) && !"false".equals("val")) {
-          dictionary2 = val;
-        } else {
-          dictionary2 = null;
-        }
+          dictionary2 = !val.isEmpty() && !"true".equals(val) && !"null".equals(val) && !"false".equals("val") ? val : null;
       } else if (key.equalsIgnoreCase("normTableEncoding")) {
         normTableEncoding = val;
       } else if (key.equalsIgnoreCase("useLemmaAsWord")) {
@@ -2263,7 +2250,7 @@ public class SeqClassifierFlags implements Serializable {
       } else if (key.equalsIgnoreCase("splitWordRegex")){
         splitWordRegex = val;
         // ADD VALUE ABOVE HERE
-      } else if (key.length() > 0 && !key.equals("prop")) {
+      } else if (!key.isEmpty() && !key.equals("prop")) {
         System.err.println("Unknown property: |" + key + '|');
       }
     }
@@ -2313,45 +2300,45 @@ public class SeqClassifierFlags implements Serializable {
         if (type.equals(Boolean.class) || type.equals(boolean.class)) {
           boolean val = ff.getBoolean(this);
           if (val) {
-            rep += joiner + name + "=" + val;
+            rep += joiner + name + '=' + val;
           }
         } else if (type.equals(String.class)) {
           String val = (String) ff.get(this);
           if (val != null)
-            rep += joiner + name + "=" + val;
+            rep += joiner + name + '=' + val;
         } else if (type.equals(Double.class)) {
           Double val = (Double) ff.get(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(double.class)) {
           double val = ff.getDouble(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(Integer.class)) {
           Integer val = (Integer) ff.get(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(int.class)) {
           int val = ff.getInt(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(Float.class)) {
           Float val = (Float) ff.get(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(float.class)) {
           float val = ff.getFloat(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(Byte.class)) {
           Byte val = (Byte) ff.get(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(byte.class)) {
           byte val = ff.getByte(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(char.class)) {
           char val = ff.getChar(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(Long.class)) {
           Long val = (Long) ff.get(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         } else if (type.equals(long.class)) {
           long val = ff.getLong(this);
-          rep += joiner + name + "=" + val;
+          rep += joiner + name + '=' + val;
         }
       }
       return rep;

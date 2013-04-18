@@ -68,7 +68,7 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
 
   @Override
   public String toString() {
-    return "(" + first + "," + second + ")";
+    return "(" + first + ',' + second + ')';
   }
 
   @Override
@@ -84,8 +84,8 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
 
   @Override
   public int hashCode() {
-    int firstHash  = (first == null ? 0 : first.hashCode());
-    int secondHash = (second == null ? 0 : second.hashCode());
+    int firstHash  = first == null ? 0 : first.hashCode();
+    int secondHash = second == null ? 0 : second.hashCode();
 
     return firstHash*31 + secondHash;
   }
@@ -97,10 +97,10 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
   /**
    * Read a string representation of a Pair from a DataStream.
    * This might not work correctly unless the pair of objects are of type
-   * <code>String</code>.
+   * {@code String}.
    */
   public static Pair<String, String> readStringPair(DataInputStream in) {
-    Pair<String, String> p = new Pair<String, String>();
+    Pair<String, String> p = new Pair<>();
     try {
       p.first = in.readUTF();
       p.second = in.readUTF();
@@ -116,15 +116,15 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
    * don't have to write out potentially long class names.
    */
   public static <X, Y> Pair<X, Y> makePair(X x, Y y) {
-    return new Pair<X, Y>(x, y);
+    return new Pair<>(x, y);
   }
 
   /**
    * Write a string representation of a Pair to a DataStream.
-   * The <code>toString()</code> method is called on each of the pair
-   * of objects and a <code>String</code> representation is written.
+   * The {@code toString()} method is called on each of the pair
+   * of objects and a {@code String} representation is written.
    * This might not allow one to recover the pair of objects unless they
-   * are of type <code>String</code>.
+   * are of type {@code String}.
    */
   public void save(DataOutputStream out) {
     try {
@@ -136,34 +136,30 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
   }
 
   /**
-   * Compares this <code>Pair</code> to another object.
-   * If the object is a <code>Pair</code>, this function will work providing
-   * the elements of the <code>Pair</code> are themselves comparable.
+   * Compares this {@code Pair} to another object.
+   * If the object is a {@code Pair}, this function will work providing
+   * the elements of the {@code Pair} are themselves comparable.
    * It will then return a value based on the pair of objects, where
-   * <code>p &gt; q iff p.first() &gt; q.first() ||
-   * (p.first().equals(q.first()) && p.second() &gt; q.second())</code>.
-   * If the other object is not a <code>Pair</code>, it throws a
-   * <code>ClassCastException</code>.
+   * {@code p &gt; q iff p.first() &gt; q.first() ||
+   * (p.first().equals(q.first()) && p.second() &gt; q.second())}.
+   * If the other object is not a {@code Pair}, it throws a
+   * {@code ClassCastException}.
    *
-   * @param another the <code>Object</code> to be compared.
-   * @return the value <code>0</code> if the argument is a
-   *         <code>Pair</code> equal to this <code>Pair</code>; a value less than
-   *         <code>0</code> if the argument is a <code>Pair</code>
-   *         greater than this <code>Pair</code>; and a value
-   *         greater than <code>0</code> if the argument is a
-   *         <code>Pair</code> less than this <code>Pair</code>.
+   * @param another the {@code Object} to be compared.
+   * @return the value {@code 0} if the argument is a
+   *         {@code Pair} equal to this {@code Pair}; a value less than
+   *         {@code 0} if the argument is a {@code Pair}
+   *         greater than this {@code Pair}; and a value
+   *         greater than {@code 0} if the argument is a
+   *         {@code Pair} less than this {@code Pair}.
    * @throws ClassCastException if the argument is not a
-   *                            <code>Pair</code>.
-   * @see java.lang.Comparable
+   *                            {@code Pair}.
+   * @see Comparable
    */
   @SuppressWarnings("unchecked")
   public int compareTo(Pair<T1,T2> another) {
     int comp = ((Comparable<T1>) first()).compareTo(another.first());
-    if (comp != 0) {
-      return comp;
-    } else {
-      return ((Comparable<T2>) second()).compareTo(another.second());
-    }
+      return comp != 0 ? comp : ((Comparable<T2>) second()).compareTo(another.second());
   }
 
   /**
@@ -187,7 +183,7 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
    * and then deserialized, first and second are interned upon
    * deserialization.
    * <p><i>Note:</i> I put this in thinking that its use might be
-   * faster than calling <code>x = new Pair(a, b).stringIntern()</code>
+   * faster than calling {@code x = new Pair(a, b).stringIntern()}
    * but it's not really clear whether this is true.
    *
    * @param first  The first object
@@ -244,10 +240,10 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
   }
   
   /**
-   * Compares a <code>Pair</code> to another <code>Pair</code> according to the first object of the pair only
+   * Compares a {@code Pair} to another {@code Pair} according to the first object of the pair only
    * This function will work providing
-   * the first element of the <code>Pair</code> is comparable, otherwise will throw a 
-   * <code>ClassCastException</code>
+   * the first element of the {@code Pair} is comparable, otherwise will throw a
+   * {@code ClassCastException}
    * @author jonathanberant
    *
    * @param <T1>
@@ -263,10 +259,10 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
   }
   
   /**
-   * Compares a <code>Pair</code> to another <code>Pair</code> according to the first object of the pair only in decreasing order
+   * Compares a {@code Pair} to another {@code Pair} according to the first object of the pair only in decreasing order
    * This function will work providing
-   * the first element of the <code>Pair</code> is comparable, otherwise will throw a 
-   * <code>ClassCastException</code>
+   * the first element of the {@code Pair} is comparable, otherwise will throw a
+   * {@code ClassCastException}
    * @author jonathanberant
    *
    * @param <T1>
@@ -282,10 +278,10 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
   }
   
   /**
-   * Compares a <code>Pair</code> to another <code>Pair</code> according to the second object of the pair only
+   * Compares a {@code Pair} to another {@code Pair} according to the second object of the pair only
    * This function will work providing
-   * the first element of the <code>Pair</code> is comparable, otherwise will throw a 
-   * <code>ClassCastException</code>
+   * the first element of the {@code Pair} is comparable, otherwise will throw a
+   * {@code ClassCastException}
    * @author jonathanberant
    *
    * @param <T1>
@@ -301,10 +297,10 @@ public class Pair <T1,T2> implements Comparable<Pair<T1,T2>>, Serializable, Pret
   }
   
   /**
-   * Compares a <code>Pair</code> to another <code>Pair</code> according to the second object of the pair only in decreasing order
+   * Compares a {@code Pair} to another {@code Pair} according to the second object of the pair only in decreasing order
    * This function will work providing
-   * the first element of the <code>Pair</code> is comparable, otherwise will throw a 
-   * <code>ClassCastException</code>
+   * the first element of the {@code Pair} is comparable, otherwise will throw a
+   * {@code ClassCastException}
    * @author jonathanberant
    *
    * @param <T1>

@@ -37,7 +37,7 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
 
   String backgroundSymbol;
 
-  public static boolean VERBOSE = false;
+  public static boolean VERBOSE;
 
   CRFLogConditionalObjectiveFloatFunction(int[][][][] data, int[][] labels, Index featureIndex, int window, Index classIndex, List<Index<CRFLabel>> labelIndices, int[] map, String backgroundSymbol) {
     this(data, labels, featureIndex, window, classIndex, labelIndices, map, QUADRATIC_PRIOR, backgroundSymbol);
@@ -70,18 +70,19 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
   public int domainDimension() {
     if (domainDimension < 0) {
       domainDimension = 0;
-      for (int i = 0; i < map.length; i++) {
-        domainDimension += labelIndices.get(map[i]).size();
-      }
+        for (int aMap : map) {
+            domainDimension += labelIndices.get(aMap).size();
+        }
     }
     return domainDimension;
   }
 
-  public CliquePotentialFunction getCliquePotentialFunction(double[] x) {
+  @Override
+  public CliquePotentialFunction getCliquePotentialFunction(double... x) {
     throw new UnsupportedOperationException("CRFLogConditionalObjectiveFloatFunction is not clique potential compatible yet"); 
   }
 
-  public float[][] to2D(float[] weights) {
+  public float[][] to2D(float... weights) {
     float[][] newWeights = new float[map.length][];
     int index = 0;
     for (int i = 0; i < map.length; i++) {
@@ -95,10 +96,10 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
   public float[] to1D(float[][] weights) {
     float[] newWeights = new float[domainDimension()];
     int index = 0;
-    for (int i = 0; i < weights.length; i++) {
-      System.arraycopy(weights[i], 0, newWeights, index, weights[i].length);
-      index += weights[i].length;
-    }
+      for (float[] weight : weights) {
+          System.arraycopy(weight, 0, newWeights, index, weight.length);
+          index += weight.length;
+      }
     return newWeights;
   }
 
@@ -231,7 +232,7 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
   }
 
   @Override
-  public void calculate(float[] x) {
+  public void calculate(float... x) {
 
     // if (crfType.equalsIgnoreCase("weird")) {
     //   calculateWeird(x);
@@ -260,7 +261,7 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
       for (int i = 0; i < data[m].length; i++) {
         float p = factorTables[i].conditionalLogProb(given, labels[m][i]);
         if (VERBOSE) {
-          System.err.println("P(" + labels[m][i] + "|" + Arrays.toString(given) + ")=" + p);
+          System.err.println("P(" + labels[m][i] + '|' + Arrays.toString(given) + ")=" + p);
         }
         prob += p;
         System.arraycopy(given, 1, given, 0, given.length - 1);
@@ -295,9 +296,9 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
     int index = 0;
     for (int i = 0; i < E.length; i++) {
       for (int j = 0; j < E[i].length; j++) {
-        derivative[index++] = (E[i][j] - Ehat[i][j]);
+        derivative[index++] = E[i][j] - Ehat[i][j];
         if (VERBOSE) {
-          System.err.println("deriv(" + i + "," + j + ") = " + E[i][j] + " - " + Ehat[i][j] + " = " + derivative[index - 1]);
+          System.err.println("deriv(" + i + ',' + j + ") = " + E[i][j] + " - " + Ehat[i][j] + " = " + derivative[index - 1]);
         }
       }
     }
@@ -322,7 +323,7 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
           derivative[i] += w / epsilon / sigmaSq;
         } else {
           value += (wabs - epsilon / 2) / sigmaSq;
-          derivative[i] += ((w < 0.0) ? -1.0 : 1.0) / sigmaSq;
+          derivative[i] += (w < 0.0 ? -1.0 : 1.0) / sigmaSq;
         }
       }
     } else if (prior == QUARTIC_PRIOR) {
@@ -338,7 +339,7 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
 
   }
 
-  public void calculateWeird1(float[] x) {
+  public void calculateWeird1(float... x) {
 
     float[][] weights = to2D(x);
     float[][] E = empty2D();
@@ -368,9 +369,9 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
           Arrays.fill(sums[cl], 0.0f);
           int numClasses = labelIndices.get(cl).size();
           for (int c = 0; c < numClasses; c++) {
-            for (int f = 0; f < features.length; f++) {
-              sums[cl][c] += weights[features[f]][c];
-            }
+              for (int feature : features) {
+                  sums[cl][c] += weights[feature][c];
+              }
           }
         }
 
@@ -440,7 +441,7 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
     int index = 0;
     for (int i = 0; i < E.length; i++) {
       for (int j = 0; j < E[i].length; j++) {
-        derivative[index++] = (E[i][j] - Ehat[i][j]);
+        derivative[index++] = E[i][j] - Ehat[i][j];
       }
     }
 
@@ -471,7 +472,7 @@ public class CRFLogConditionalObjectiveFloatFunction extends AbstractCachingDiff
           derivative[i] += w / epsilon / sigmaSq;
         } else {
           value += (wabs - epsilon / 2) / sigmaSq;
-          derivative[i] += ((w < 0.0) ? -1.0 : 1.0) / sigmaSq;
+          derivative[i] += (w < 0.0 ? -1.0 : 1.0) / sigmaSq;
         }
       }
     } else if (prior == QUARTIC_PRIOR) {

@@ -59,7 +59,7 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
 
     @Override
     public int hashCode() {
-      return ((key == null) ? 0 : key.hashCode()) ^ ((value == null) ? 0 : value.hashCode());
+      return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
     }
 
     @Override
@@ -68,7 +68,7 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
     }
 
     private static boolean eq(Object o1, Object o2) {
-      return (o1 == null ? o2 == null : o1.equals(o2));
+      return o1 == null ? o2 == null : o1.equals(o2);
     }
   }
 
@@ -89,10 +89,7 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
     if (value == null) {
       return originalMap.containsKey(key);
     }
-    if (value == removedValue) {
-      return false;
-    }
-    return true;
+      return !value.equals(removedValue);
   }
 
   /**
@@ -112,10 +109,10 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
     if (deltaResult == null) {
       return originalMap.get(key);
     }
-    if (deltaResult == nullValue) {
+    if (deltaResult.equals(nullValue)) {
       return null;
     }
-    if (deltaResult == removedValue) {
+    if (deltaResult.equals(removedValue)) {
       return null;
     }
     return deltaResult;
@@ -123,40 +120,43 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
 
   // Modification Operations
 
-  /**
-   * This may cost twice what it would in the original Map because we have to find
-   * the original value for this key.
-   *
-   * @param key   key with which the specified value is to be associated.
-   * @param value value to be associated with the specified key.
-   * @return previous value associated with specified key, or <tt>null</tt>
-   *         if there was no mapping for key.  A <tt>null</tt> return can
-   *         also indicate that the map previously associated <tt>null</tt>
-   *         with the specified key, if the implementation supports
-   *         <tt>null</tt> values.
-   */
-  @Override
-  @SuppressWarnings("unchecked")
-  public V put(K key, V value) {
-    if (value == null) {
-      return put(key, (V)nullValue);
+    /**
+     * This may cost twice what it would in the original Map because we have to find
+     * the original value for this key.
+     *
+     * @param key   key with which the specified value is to be associated.
+     * @param value value to be associated with the specified key.
+     * @return previous value associated with specified key, or <tt>null</tt>
+     *         if there was no mapping for key.  A <tt>null</tt> return can
+     *         also indicate that the map previously associated <tt>null</tt>
+     *         with the specified key, if the implementation supports
+     *         <tt>null</tt> values.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public V put(K key, V value) {
+        while (true) {
+            if (value == null) {
+                value = (V) nullValue;
+                continue;
+            }
+            // key could be not in original or in deltaMap
+            // key could be not in original but in deltaMap
+            // key could be in original but removed from deltaMap
+            // key could be in original but mapped to something else in deltaMap
+            V result = deltaMap.put(key, value);
+            if (result == null) {
+                return originalMap.get(key);
+            }
+            if (result.equals(nullValue)) {
+                return null;
+            }
+            if (result.equals(removedValue)) {
+                return null;
+            }
+            return result;
+        }
     }
-    // key could be not in original or in deltaMap
-    // key could be not in original but in deltaMap
-    // key could be in original but removed from deltaMap
-    // key could be in original but mapped to something else in deltaMap
-    V result = deltaMap.put(key, value);
-    if (result == null) {
-      return originalMap.get(key);
-    }
-    if (result == nullValue) {
-      return null;
-    }
-    if (result == removedValue) {
-      return null;
-    }
-    return result;
-  }
 
   /**
    *
@@ -207,17 +207,14 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
           }
         };
 
-        Iterator<Map.Entry<K, V>> iter1 = new FilteredIterator<Map.Entry<K, V>>(originalMap.entrySet().iterator(), filter1);
+        Iterator<Map.Entry<K, V>> iter1 = new FilteredIterator<>(originalMap.entrySet().iterator(), filter1);
 
         Filter<Map.Entry<K,V>> filter2 = new Filter<Map.Entry<K,V>>() {
           private static final long serialVersionUID = 1L;
           // only accepts stuff not overwritten by deltaMap
           public boolean accept(Map.Entry<K,V> e) {
             Object value = e.getValue();
-            if (value == removedValue) {
-              return false;
-            }
-            return true;
+              return !value.equals(removedValue);
           }
         };
 
@@ -235,8 +232,8 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
           public Map.Entry<K, V> next() {
             Map.Entry<K,V> e = i.next();
             Object o = e.getValue();
-            if (o == nullValue) {
-              return new SimpleEntry<K,V>(e.getKey(), null);
+            if (o.equals(nullValue)) {
+              return new SimpleEntry<>(e.getKey(), null);
             }
             return e;
           }
@@ -246,9 +243,9 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
           }
         }
 
-        Iterator<Entry<K, V>> iter2 = new FilteredIterator<Entry<K,V>>(new NullingIterator<K, V>(deltaMap.entrySet().iterator()), filter2);
+        Iterator<Entry<K, V>> iter2 = new FilteredIterator<>(new NullingIterator<>(deltaMap.entrySet().iterator()), filter2);
 
-        return new ConcatenationIterator<Entry<K,V>>(iter1, iter2);
+        return new ConcatenationIterator<>(iter1, iter2);
       }
 
       @Override
@@ -284,31 +281,31 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
    *
    * @param args from command line
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Map<Integer,Integer> originalMap = Generics.newHashMap();
     Random r = new Random();
     for (int i = 0; i < 1000; i++) {
-      originalMap.put(Integer.valueOf(i), Integer.valueOf(r.nextInt(1000)));
+      originalMap.put(i, r.nextInt(1000));
     }
     Map<Integer,Integer> originalCopyMap = Generics.newHashMap(originalMap);
     Map<Integer,Integer> deltaCopyMap = Generics.newHashMap(originalMap);
-    Map<Integer,Integer> deltaMap = new DeltaMap<Integer,Integer>(originalMap);
+    Map<Integer,Integer> deltaMap = new DeltaMap<>(originalMap);
     // now make a lot of changes to deltaMap;
     // add and change some stuff
     for (int i = 900; i < 1100; i++) {
-      Integer rInt = Integer.valueOf(r.nextInt(1000));
-      deltaMap.put(Integer.valueOf(i), rInt);
-      deltaCopyMap.put(Integer.valueOf(i), rInt);
+      Integer rInt = r.nextInt(1000);
+      deltaMap.put(i, rInt);
+      deltaCopyMap.put(i, rInt);
     }
     // remove some stuff
     for (int i = 0; i < 100; i++) {
-      Integer rInt = Integer.valueOf(r.nextInt(1100));
+      Integer rInt = r.nextInt(1100);
       deltaMap.remove(rInt);
       deltaCopyMap.remove(rInt);
     }
     // set some stuff to null
     for (int i = 0; i < 100; i++) {
-      Integer rInt = Integer.valueOf(r.nextInt(1100));
+      Integer rInt = r.nextInt(1100);
       deltaMap.put(rInt, null);
       deltaCopyMap.put(rInt, null);
     }

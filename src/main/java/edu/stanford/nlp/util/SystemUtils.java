@@ -56,9 +56,7 @@ public class SystemUtils {
         String msg = "process %s exited with value %d";
         throw new ProcessException(String.format(msg, builder.command(), result));
       }
-    } catch (InterruptedException e) {
-      throw new ProcessException(e);
-    } catch (IOException e) {
+    } catch (InterruptedException | IOException e) {
       throw new ProcessException(e);
     }
   }
@@ -130,7 +128,7 @@ public class SystemUtils {
     private Thread outWriterThread;
     private Thread errWriterThread;
 
-    public ProcessOutputStream(String[] cmd) throws IOException {
+    public ProcessOutputStream(String... cmd) throws IOException {
       this(new ProcessBuilder(cmd), new PrintWriter(System.out), new PrintWriter(System.err));
     }
 
@@ -176,8 +174,8 @@ public class SystemUtils {
 
   /**
    * Runs the shell command which is specified, along with its arguments, in the
-   * given <code>String</code> array.  If there is any regular output or error
-   * output, it is appended to the given <code>StringBuilder</code>s.
+   * given {@code String} array.  If there is any regular output or error
+   * output, it is appended to the given {@code StringBuilder}s.
    */
   public static void runShellCommand(String[] cmd,
                                      StringBuilder outputLines,
@@ -205,8 +203,8 @@ public class SystemUtils {
 
   /**
    * Runs the shell command which is specified, along with its arguments, in the
-   * given <code>String</code>.  If there is any regular output or error output,
-   * it is appended to the given <code>StringBuilder</code>s.
+   * given {@code String}.  If there is any regular output or error output,
+   * it is appended to the given {@code StringBuilder}s.
    */
   public static void runShellCommand(String cmd,
                                      StringBuilder outputLines,
@@ -218,8 +216,8 @@ public class SystemUtils {
 
   /**
    * Runs the shell command which is specified, along with its arguments, in the
-   * given <code>String</code> array.  If there is any regular output, it is
-   * appended to the given <code>StringBuilder</code>.  If there is any error
+   * given {@code String} array.  If there is any regular output, it is
+   * appended to the given {@code StringBuilder}.  If there is any error
    * output, it is swallowed (!).
    */
   public static void runShellCommand(String[] cmd,
@@ -231,8 +229,8 @@ public class SystemUtils {
 
   /**
    * Runs the shell command which is specified, along with its arguments, in the
-   * given <code>String</code>.  If there is any regular output, it is appended
-   * to the given <code>StringBuilder</code>.  If there is any error output, it
+   * given {@code String}.  If there is any regular output, it is appended
+   * to the given {@code StringBuilder}.  If there is any error output, it
    * is swallowed (!).
    */
   public static void runShellCommand(String cmd,
@@ -244,10 +242,10 @@ public class SystemUtils {
 
   /**
    * Runs the shell command which is specified, along with its arguments, in the
-   * given <code>String</code> array.  If there is any output, it is swallowed
+   * given {@code String} array.  If there is any output, it is swallowed
    * (!).
    */
-  public static void runShellCommand(String[] cmd)
+  public static void runShellCommand(String... cmd)
     throws IOException {
     runShellCommand(cmd, null, null);
   }
@@ -255,7 +253,7 @@ public class SystemUtils {
 
   /**
    * Runs the shell command which is specified, along with its arguments, in the
-   * given <code>String</code>.  If there is any output, it is swallowed (!).
+   * given {@code String}.  If there is any output, it is swallowed (!).
    */
   public static void runShellCommand(String cmd)
     throws IOException {
@@ -268,8 +266,8 @@ public class SystemUtils {
    */
   public static int getPID() throws IOException {
     // note that we ask Perl for "ppid" -- process ID of parent -- that's us
-    String[] cmd = 
-      new String[] {"perl", "-e", "print getppid() . \"\\n\";"};
+    String[] cmd =
+            {"perl", "-e", "print getppid() . \"\\n\";"};
     StringBuilder out = new StringBuilder();
     runShellCommand(cmd, out);
     return Integer.parseInt(out.toString());
@@ -293,21 +291,21 @@ public class SystemUtils {
    */
   public static int getMemoryInUse() {
     Runtime runtime = Runtime.getRuntime();
-    long mb = 1024 * 1024;
+    long mb = 1024 << 10;
     long total = runtime.totalMemory();
     long free = runtime.freeMemory();
     return (int) ((total - free) / mb);
   }
 
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     StringBuilder out = new StringBuilder();
     runShellCommand("date", out);
     System.out.println("The date is " + out);
     int pid = getPID();
     System.out.println("The PID is " + pid);
     System.out.println("The memory in use is " + getMemoryInUse() + "MB");
-    List<String> foo = new ArrayList<String>();
+    List<String> foo = new ArrayList<>();
     for (int i = 0; i < 5000000; i++) {
       foo.add("0123456789");
     }

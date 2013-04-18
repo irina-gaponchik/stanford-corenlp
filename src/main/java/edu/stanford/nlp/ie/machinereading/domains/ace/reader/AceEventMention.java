@@ -31,7 +31,7 @@ public class AceEventMention extends AceMention {
   public String toString() {
     return "AceEventMention [mAnchor=" + mAnchor + ", mParent=" + mParent
         + ", mRolesToArguments=" + mRolesToArguments + ", mExtent=" + mExtent
-        + ", mId=" + mId + "]";
+        + ", mId=" + mId + ']';
   }
 
   public Collection<AceEventMentionArgument> getArgs() {
@@ -81,10 +81,7 @@ public class AceEventMention extends AceMention {
     int earliestTokenStart = -1;
     for (AceEventMentionArgument arg : args) {
       int tokenStart = arg.getContent().getHead().getTokenStart();
-      if (earliestTokenStart == -1)
-        earliestTokenStart = tokenStart;
-      else
-        earliestTokenStart = Math.min(earliestTokenStart, tokenStart);
+        earliestTokenStart = earliestTokenStart == -1 ? tokenStart : Math.min(earliestTokenStart, tokenStart);
     }
 
     // this will happen when we have no arguments
@@ -103,10 +100,7 @@ public class AceEventMention extends AceMention {
     int latestTokenStart = -1;
     for (AceEventMentionArgument arg : args) {
       int tokenStart = arg.getContent().getHead().getTokenStart();
-      if (latestTokenStart == -1)
-        latestTokenStart = tokenStart;
-      else
-        latestTokenStart = Math.max(latestTokenStart, tokenStart);
+        latestTokenStart = latestTokenStart == -1 ? tokenStart : Math.max(latestTokenStart, tokenStart);
     }
 
     // this will happen when we have no arguments

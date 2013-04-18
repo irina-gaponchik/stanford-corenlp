@@ -56,7 +56,7 @@ public class Interner<T> {
    */
   @SuppressWarnings("unchecked")
   public static <T> T globalIntern(T o) {
-    return (T) getGlobal().intern(o);
+    return (T) interner.intern(o);
   }
 
 
@@ -82,7 +82,7 @@ public class Interner<T> {
   }
 
   /**
-   * Returns a <code>Set</code> such that each element in the returned set
+   * Returns a {@code Set} such that each element in the returned set
    * is a unique object e' that .equals the corresponding element e in the
    * original set.
    */
@@ -101,10 +101,9 @@ public class Interner<T> {
   /**
    * Test method: interns its arguments and says whether they == themselves.
    */
-  public static void main(String[] args) {
-    for (int i = 0; i < args.length; i++) {
-      String str = args[i];
-      System.out.println(Interner.globalIntern(str) == str);
-    }
+  public static void main(String... args) {
+      for (String str : args) {
+          System.out.println(Interner.globalIntern(str).equals(str));
+      }
   }
 }

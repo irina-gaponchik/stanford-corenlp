@@ -11,7 +11,6 @@ public class StanfordRedwoodConfiguration extends RedwoodConfiguration {
    * Private constructor to prevent use of "new StanfordRedwoodConfiguration()"
    */
   private StanfordRedwoodConfiguration() {
-    super();
   }
 
   /**

@@ -21,7 +21,7 @@ import java.util.*;
 public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
 
   /**
-   * A <code>HeapEntry</code> stores an object in the heap along with
+   * A {@code HeapEntry} stores an object in the heap along with
    * its current location (array position) in the heap.
    *
    * @author <a href="mailto:klein@cs.stanford.edu">Dan Klein</a>
@@ -33,41 +33,41 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
   }
 
   /**
-   * <code>indexToEntry</code> maps linear array locations (not
+   * {@code indexToEntry} maps linear array locations (not
    * priorities) to heap entries.
    */
   private ArrayList<HeapEntry<E>> indexToEntry;
   /**
-   * <code>objectToEntry</code> maps heap objects to their heap
+   * {@code objectToEntry} maps heap objects to their heap
    * entries.
    */
   private Map<E,HeapEntry<E>> objectToEntry;
   /**
-   * <code>cmp</code> is the comparator passed on construction.
+   * {@code cmp} is the comparator passed on construction.
    */
   private Comparator<? super E> cmp;
 
   // Primitive Heap Operations
 
-  private static int parent(final int index) {
+  private static int parent(int index) {
     return (index - 1) / 2;
   }
 
   private HeapEntry<E> parent(HeapEntry<E> entry) {
     int index = entry.index;
-    return (index > 0 ? indexToEntry.get((index - 1) / 2) : null);
+    return index > 0 ? indexToEntry.get((index - 1) / 2) : null;
   }
 
   private HeapEntry<E> leftChild(HeapEntry<E> entry) {
     int index = entry.index;
-    int leftIndex = index * 2 + 1;
-    return (leftIndex < size() ? indexToEntry.get(leftIndex) : null);
+    int leftIndex = (index << 1) + 1;
+    return leftIndex < size() ? indexToEntry.get(leftIndex) : null;
   }
 
   private HeapEntry<E> rightChild(HeapEntry<E> entry) {
     int index = entry.index;
-    int rightIndex = index * 2 + 2;
-    return (rightIndex < size() ? indexToEntry.get(rightIndex) : null);
+    int rightIndex = (index << 1) + 2;
+    return rightIndex < size() ? indexToEntry.get(rightIndex) : null;
   }
 
   private int compare(HeapEntry<E> entryA, HeapEntry<E> entryB) {
@@ -98,7 +98,7 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
   private HeapEntry<E> getEntry(E o) {
     HeapEntry<E> entry = objectToEntry.get(o);
     if (entry == null) {
-      entry = new HeapEntry<E>();
+      entry = new HeapEntry<>();
       entry.index = size();
       entry.object = o;
       indexToEntry.add(entry);
@@ -155,13 +155,13 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
         }
       }
 
-      if (minEntry != entry) {
+      if (!minEntry.equals(entry)) {
         // Swap min and current
         swap(minEntry, entry);
         // at start of next loop, we set currentIndex to largestIndex
         // this indexation now holds current, so it is unchanged
       }
-    } while (minEntry != entry);
+    } while (!minEntry.equals(entry));
     // System.err.println("Done with heapify down");
     // verify();
   }
@@ -209,7 +209,7 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
    * already present, with better score, it will NOT cause an
    * "increase key".
    *
-   * @param o an <code>Object</code> value
+   * @param o an {@code Object} value
    */
   @Override
   public boolean add(E o) {
@@ -222,13 +222,13 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
    * change in the ordering of o.  If o's key has actually increased,
    * it will do nothing, particularly not an "increase key".
    *
-   * @param o An <code>Object</code> value
+   * @param o An {@code Object} value
    * @return The number of swaps done on decrease.
    */
   @Override
   public int decreaseKey(E o) {
     HeapEntry<E> entry = getEntry(o);
-    if (o != entry.object) {
+    if (!o.equals(entry.object)) {
       if (cmp.compare(o, entry.object) < 0) {
         entry.object = o;
       }
@@ -239,7 +239,7 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
   /**
    * Checks if the heap is empty.
    *
-   * @return a <code>boolean</code> value
+   * @return a {@code boolean} value
    */
   @Override
   public boolean isEmpty() {
@@ -249,7 +249,7 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
   /**
    * Get the number of elements in the heap.
    *
-   * @return an <code>int</code> value
+   * @return an {@code int} value
    */
   @Override
   public int size() {
@@ -258,8 +258,8 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
 
   @Override
   public Iterator<E> iterator() {
-    Heap<E> tempHeap = new ArrayHeap<E>(cmp, size());
-    List<E> tempList = new ArrayList<E>(size());
+    Heap<E> tempHeap = new ArrayHeap<>(cmp, size());
+    List<E> tempList = new ArrayList<>(size());
     for (E obj : objectToEntry.keySet()) {
       tempHeap.add(obj);
     }
@@ -281,7 +281,7 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
 
   public void dump() {
     for (int j = 0; j < indexToEntry.size(); j++) {
-      System.err.println(" " + j + " " + ((Scored) indexToEntry.get(j).object).score());
+      System.err.println(" " + j + ' ' + ((Scored) indexToEntry.get(j).object).score());
     }
   }
 
@@ -290,7 +290,7 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
       if (i != 0) {
         // check ordering
         if (compare(indexToEntry.get(i), indexToEntry.get(parent(i))) < 0) {
-          System.err.println("Error in the ordering of the heap! (" + i + ")");
+          System.err.println("Error in the ordering of the heap! (" + i + ')');
           dump();
           System.exit(0);
         }
@@ -304,22 +304,22 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
 
   /** Create an ArrayHeap.
    *
-   *  @param cmp The objects added will be ordered using the <code>Comparator</code>.
+   *  @param cmp The objects added will be ordered using the {@code Comparator}.
    */
   public ArrayHeap(Comparator<? super E> cmp) {
     this.cmp = cmp;
-    indexToEntry = new ArrayList<HeapEntry<E>>();
+    indexToEntry = new ArrayList<>();
     objectToEntry = Generics.newHashMap();
   }
 
   public ArrayHeap(Comparator<? super E> cmp, int initCapacity) {
     this.cmp = cmp;
-    indexToEntry = new ArrayList<HeapEntry<E>>(initCapacity);
+    indexToEntry = new ArrayList<>(initCapacity);
     objectToEntry = Generics.newHashMap(initCapacity);
   }
 
   public List<E> asList() {
-    return new LinkedList<E>(this);
+    return new LinkedList<>(this);
   }
 
   /**
@@ -328,7 +328,7 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
    */
   @Override
   public String toString() {
-    ArrayList<E> result = new ArrayList<E>();
+    ArrayList<E> result = new ArrayList<>();
     for(E key : objectToEntry.keySet())
       result.add(key);
     Collections.sort(result,cmp);

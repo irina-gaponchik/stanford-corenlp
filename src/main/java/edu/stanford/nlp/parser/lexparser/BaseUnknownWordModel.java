@@ -89,10 +89,10 @@ public class BaseUnknownWordModel implements UnknownWordModel {
                               Set<String> seenEnd) {
     endLength = op.lexOptions.unknownSuffixSize;
     // TODO: refactor these terms into BaseUnknownWordModelTrainer
-    useEnd = (op.lexOptions.unknownSuffixSize > 0 && 
-              op.lexOptions.useUnknownWordSignatures > 0);
+    useEnd = op.lexOptions.unknownSuffixSize > 0 &&
+              op.lexOptions.useUnknownWordSignatures > 0;
     useFirstCap = op.lexOptions.useUnknownWordSignatures > 0;
-    useGT = (op.lexOptions.useUnknownWordSignatures == 0);
+    useGT = op.lexOptions.useUnknownWordSignatures == 0;
     useFirst = false;
     this.lex = lex;
     this.trainOptions = op.trainOptions;
@@ -160,11 +160,8 @@ public class BaseUnknownWordModel implements UnknownWordModel {
         if (wordProbs == null) {
           System.err.println("Warning: proposed tag is unseen in training data:\t"+tagStr);
           logProb = Float.NEGATIVE_INFINITY;
-        } else if (wordProbs.keySet().contains(end)) {
-          logProb = (float) wordProbs.getCount(end);
-        } else {
-          logProb = (float) wordProbs.getCount(unknown);
-        }
+        } else
+            logProb = wordProbs.keySet().contains(end) ? (float) wordProbs.getCount(end) : (float) wordProbs.getCount(unknown);
       }
     } else if (useGT) {
       logProb = scoreGT(tagStr);
@@ -188,11 +185,7 @@ public class BaseUnknownWordModel implements UnknownWordModel {
   // todo [cdm 2012]: But see if this bug is only if you use Lexicon's main method, or also when training a parser in the usual way. 
   protected float scoreGT(String tag) {
     if (VERBOSE) System.err.println("using GT for unknown word and tag " + tag);
-    if (unknownGT.containsKey(tag)) {
-      return unknownGT.get(tag).floatValue();
-    } else {
-      return Float.NEGATIVE_INFINITY;
-    }
+      return unknownGT.containsKey(tag) ? unknownGT.get(tag) : Float.NEGATIVE_INFINITY;
   }
 
   /**

@@ -66,22 +66,27 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
 
   // SEQUENCE MODEL METHODS
 
+  @Override
   public int length() {
     return factorTables.length;
   }
 
+  @Override
   public int leftWindow() {
     return windowSize;
   }
 
+  @Override
   public int rightWindow() {
     return 0;
   }
 
+  @Override
   public int[] getPossibleValues(int position) {
     return possibleValues;
   }
 
+  @Override
   public double scoreOf(int[] sequence, int pos) {
     return scoresOf(sequence, pos)[sequence[pos]];
   }
@@ -98,6 +103,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    * @return an array of type double, representing a probability distribution;
    *         sums to 1.0
    */
+  @Override
   public double[] scoresOf(int[] sequence, int position) {
     if (position >= factorTables.length) throw new RuntimeException("Index out of bounds: " + position);
     // DecimalFormat nf = new DecimalFormat("#0.000");
@@ -173,7 +179,8 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    *          the sequence to compute a score for
    * @return the score for the sequence
    */
-  public double scoreOf(int[] sequence) {
+  @Override
+  public double scoreOf(int... sequence) {
 
     int[] given = new int[window() - 1];
     Arrays.fill(given, classIndex.indexOf(backgroundSymbol));
@@ -231,7 +238,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
   }
 
   public Counter<E> probs(int position) {
-    Counter<E> c = new ClassicCounter<E>();
+    Counter<E> c = new ClassicCounter<>();
     for (int i = 0; i < classIndex.size(); i++) {
       E label = classIndex.get(i);
       c.incrementCount(label, prob(position, i));
@@ -240,7 +247,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
   }
 
   public Counter<E> logProbs(int position) {
-    Counter<E> c = new ClassicCounter<E>();
+    Counter<E> c = new ClassicCounter<>();
     for (int i = 0; i < classIndex.size(); i++) {
       E label = classIndex.get(i);
       c.incrementCount(label, logProb(position, i));
@@ -259,7 +266,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    * marginal log prob that the label at position 3 is 1, the label at position
    * 4 is 2 and the label at position 5 is 3.
    */
-  public double logProb(int position, int[] labels) {
+  public double logProb(int position, int... labels) {
     if (labels.length < windowSize) {
       return factorTables[position].unnormalizedLogProbEnd(labels) - z;
     } else if (labels.length == windowSize) {
@@ -288,7 +295,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    * prob that the label at position 3 is 1, the label at position 4 is 2 and
    * the label at position 5 is 3.
    */
-  public double prob(int position, int[] labels) {
+  public double prob(int position, int... labels) {
     return Math.exp(logProb(position, labels));
   }
 
@@ -299,7 +306,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    * that the label at position 3 is "O", the label at position 4 is "PER" and
    * the label at position 5 is "ORG".
    */
-  public double logProb(int position, E[] labels) {
+  public double logProb(int position, E... labels) {
     return logProb(position, objectArrayToIntArray(labels));
   }
 
@@ -310,12 +317,12 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    * that the label at position 3 is "O", the label at position 4 is "PER" and
    * the label at position 5 is "ORG".
    */
-  public double prob(int position, E[] labels) {
+  public double prob(int position, E... labels) {
     return Math.exp(logProb(position, labels));
   }
 
   public GeneralizedCounter logProbs(int position, int window) {
-    GeneralizedCounter<E> gc = new GeneralizedCounter<E>(window);
+    GeneralizedCounter<E> gc = new GeneralizedCounter<>(window);
     int[] labels = new int[window];
     // cdm july 2005: below array initialization isn't necessary: JLS (3rd ed.)
     // 4.12.5
@@ -339,7 +346,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
   }
 
   public GeneralizedCounter probs(int position, int window) {
-    GeneralizedCounter<E> gc = new GeneralizedCounter<E>(window);
+    GeneralizedCounter<E> gc = new GeneralizedCounter<>(window);
     int[] labels = new int[window];
     // cdm july 2005: below array initialization isn't necessary: JLS (3rd ed.)
     // 4.12.5
@@ -366,7 +373,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
   // HELPER METHODS
   //
 
-  private int[] objectArrayToIntArray(E[] os) {
+  private int[] objectArrayToIntArray(E... os) {
     int[] is = new int[os.length];
     for (int i = 0; i < os.length; i++) {
       is[i] = classIndex.indexOf(os[i]);
@@ -374,11 +381,11 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
     return is;
   }
 
-  private List<E> intArrayToListE(int[] is) {
-    List<E> os = new ArrayList<E>(is.length);
-    for (int i = 0; i < is.length; i++) {
-      os.add(classIndex.get(is[i]));
-    }
+  private List<E> intArrayToListE(int... is) {
+    List<E> os = new ArrayList<>(is.length);
+      for (int i1 : is) {
+          os.add(classIndex.get(i1));
+      }
     return os;
   }
 
@@ -393,7 +400,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    * @param prevLabels
    * @return conditional log probability
    */
-  public double condLogProbGivenPrevious(int position, int label, int[] prevLabels) {
+  public double condLogProbGivenPrevious(int position, int label, int... prevLabels) {
     if (prevLabels.length + 1 == windowSize) {
       return factorTables[position].conditionalLogProbGivenPrevious(prevLabels, label);
     } else if (prevLabels.length + 1 < windowSize) {
@@ -409,20 +416,20 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
     }
   }
 
-  public double condLogProbGivenPrevious(int position, E label, E[] prevLabels) {
+  public double condLogProbGivenPrevious(int position, E label, E... prevLabels) {
     return condLogProbGivenPrevious(position, classIndex.indexOf(label), objectArrayToIntArray(prevLabels));
   }
 
-  public double condProbGivenPrevious(int position, int label, int[] prevLabels) {
+  public double condProbGivenPrevious(int position, int label, int... prevLabels) {
     return Math.exp(condLogProbGivenPrevious(position, label, prevLabels));
   }
 
-  public double condProbGivenPrevious(int position, E label, E[] prevLabels) {
+  public double condProbGivenPrevious(int position, E label, E... prevLabels) {
     return Math.exp(condLogProbGivenPrevious(position, label, prevLabels));
   }
 
-  public Counter<E> condLogProbsGivenPrevious(int position, int[] prevlabels) {
-    Counter<E> c = new ClassicCounter<E>();
+  public Counter<E> condLogProbsGivenPrevious(int position, int... prevlabels) {
+    Counter<E> c = new ClassicCounter<>();
     for (int i = 0; i < classIndex.size(); i++) {
       E label = classIndex.get(i);
       c.incrementCount(label, condLogProbGivenPrevious(position, i, prevlabels));
@@ -430,8 +437,8 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
     return c;
   }
 
-  public Counter<E> condLogProbsGivenPrevious(int position, E[] prevlabels) {
-    Counter<E> c = new ClassicCounter<E>();
+  public Counter<E> condLogProbsGivenPrevious(int position, E... prevlabels) {
+    Counter<E> c = new ClassicCounter<>();
     for (int i = 0; i < classIndex.size(); i++) {
       E label = classIndex.get(i);
       c.incrementCount(label, condLogProbGivenPrevious(position, label, prevlabels));
@@ -443,7 +450,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
   // PROB OF TAG AT SINGLE POSITION CONDITIONED ON FOLLOWING SEQUENCE OF LABELS
   //
 
-  public double condLogProbGivenNext(int position, int label, int[] nextLabels) {
+  public double condLogProbGivenNext(int position, int label, int... nextLabels) {
     position = position + nextLabels.length;
     if (nextLabels.length + 1 == windowSize) {
       return factorTables[position].conditionalLogProbGivenNext(nextLabels, label);
@@ -460,20 +467,20 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
     }
   }
 
-  public double condLogProbGivenNext(int position, E label, E[] nextLabels) {
+  public double condLogProbGivenNext(int position, E label, E... nextLabels) {
     return condLogProbGivenNext(position, classIndex.indexOf(label), objectArrayToIntArray(nextLabels));
   }
 
-  public double condProbGivenNext(int position, int label, int[] nextLabels) {
+  public double condProbGivenNext(int position, int label, int... nextLabels) {
     return Math.exp(condLogProbGivenNext(position, label, nextLabels));
   }
 
-  public double condProbGivenNext(int position, E label, E[] nextLabels) {
+  public double condProbGivenNext(int position, E label, E... nextLabels) {
     return Math.exp(condLogProbGivenNext(position, label, nextLabels));
   }
 
-  public Counter<E> condLogProbsGivenNext(int position, int[] nextlabels) {
-    Counter<E> c = new ClassicCounter<E>();
+  public Counter<E> condLogProbsGivenNext(int position, int... nextlabels) {
+    Counter<E> c = new ClassicCounter<>();
     for (int i = 0; i < classIndex.size(); i++) {
       E label = classIndex.get(i);
       c.incrementCount(label, condLogProbGivenNext(position, i, nextlabels));
@@ -481,8 +488,8 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
     return c;
   }
 
-  public Counter<E> condLogProbsGivenNext(int position, E[] nextlabels) {
-    Counter<E> c = new ClassicCounter<E>();
+  public Counter<E> condLogProbsGivenNext(int position, E... nextlabels) {
+    Counter<E> c = new ClassicCounter<>();
     for (int i = 0; i < classIndex.size(); i++) {
       E label = classIndex.get(i);
       c.incrementCount(label, condLogProbGivenNext(position, label, nextlabels));
@@ -532,7 +539,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
       factorTables[i].multiplyInEnd(summedOut);
     }
 
-    return new CRFCliqueTree<E>(factorTables, classIndex, backgroundSymbol);
+    return new CRFCliqueTree<>(factorTables, classIndex, backgroundSymbol);
   }
 
   /**
@@ -561,7 +568,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
       factorTables[i].multiplyInEnd(summedOut);
     }
 
-    return new CRFCliqueTree<E>(factorTables, classIndex, backgroundSymbol);
+    return new CRFCliqueTree<>(factorTables, classIndex, backgroundSymbol);
   }
 
   private static FactorTable getFactorTable(double[] weights, double wscale, int[][] weightIndices, int[][] data,
@@ -683,6 +690,7 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    * if desired.
    *
    */
+  @Override
   public void updateSequenceElement(int[] sequence, int pos, int oldVal) {
     // do nothing; we don't change this model
   }
@@ -692,7 +700,8 @@ public class CRFCliqueTree<E> implements SequenceModel, SequenceListener {
    * initialized to sequence
    *
    */
-  public void setInitialSequence(int[] sequence) {
+  @Override
+  public void setInitialSequence(int... sequence) {
     // do nothing
   }
 

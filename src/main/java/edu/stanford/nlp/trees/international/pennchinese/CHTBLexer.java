@@ -2,9 +2,7 @@
 
 package edu.stanford.nlp.trees.international.pennchinese;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 
 /** 
  * A lexer for the Penn Chinese Treebank.  Supports Chinese characters.
@@ -39,7 +37,7 @@ class CHTBLexer {
    *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
-  private static final int ZZ_LEXSTATE[] = { 
+  private static final int[] ZZ_LEXSTATE = {
      0,  0,  1,  1,  2,  2,  3,  3,  4,  4,  5,  5,  6,  6,  7,  7, 
      8, 8
   };
@@ -81,7 +79,7 @@ class CHTBLexer {
     return result;
   }
 
-  private static int zzUnpackAction(String packed, int offset, int [] result) {
+  private static int zzUnpackAction(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -129,13 +127,13 @@ class CHTBLexer {
     return result;
   }
 
-  private static int zzUnpackRowMap(String packed, int offset, int [] result) {
+  private static int zzUnpackRowMap(String packed, int offset, int... result) {
     int i = 0;  /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
     while (i < l) {
-      int high = packed.charAt(i++) << 16;
-      result[j++] = high | packed.charAt(i++);
+      int high = (int) packed.charAt(i++) << 16;
+      result[j++] = high | (int) packed.charAt(i++);
     }
     return j;
   }
@@ -218,7 +216,7 @@ class CHTBLexer {
     return result;
   }
 
-  private static int zzUnpackTrans(String packed, int offset, int [] result) {
+  private static int zzUnpackTrans(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -238,14 +236,14 @@ class CHTBLexer {
   private static final int ZZ_PUSHBACK_2BIG = 2;
 
   /* error messages for the codes above */
-  private static final String ZZ_ERROR_MSG[] = {
+  private static final String[] ZZ_ERROR_MSG = {
     "Unkown internal scanner error",
     "Error: could not match input",
     "Error: pushback value was too large"
   };
 
   /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
    */
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
@@ -265,7 +263,7 @@ class CHTBLexer {
     return result;
   }
 
-  private static int zzUnpackAttribute(String packed, int offset, int [] result) {
+  private static int zzUnpackAttribute(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -284,11 +282,11 @@ class CHTBLexer {
   private int zzState;
 
   /** the current lexical state */
-  private int zzLexicalState = YYINITIAL;
+  private int zzLexicalState;
 
   /** this buffer contains the current text to be matched and is
       the source of the yytext() string */
-  private char zzBuffer[] = new char[ZZ_BUFFERSIZE];
+  private char[] zzBuffer = new char[ZZ_BUFFERSIZE];
 
   /** the textposition at the last accepting state */
   private int zzMarkedPos;
@@ -343,7 +341,7 @@ class CHTBLexer {
     try {
       PrintWriter p = new PrintWriter(new OutputStreamWriter(System.err,
                                                 "GB18030"), true);
-      p.println("chtbl.flex tokenization error: \"" + yytext + "\"");
+      p.println("chtbl.flex tokenization error: \"" + yytext + '"');
       if (yytext.length() >= 1) {
 	p.println("First character is: " + yytext.charAt(0));
 	if (yytext.length() >= 2) {
@@ -399,9 +397,9 @@ class CHTBLexer {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
-   * 
-   * @exception   java.io.IOException  if any I/O-Error occurs
+   * @return      {@code false}, iff there was new input.
+   *
+   * @exception java.io.IOException  if any I/O-Error occurs
    */
   private boolean zzRefill() throws java.io.IOException {
 
@@ -421,7 +419,7 @@ class CHTBLexer {
     /* is the buffer big enough? */
     if (zzCurrentPos >= zzBuffer.length) {
       /* if not: blow it up */
-      char newBuffer[] = new char[zzCurrentPos*2];
+      char[] newBuffer = new char[(zzCurrentPos << 1)];
       System.arraycopy(zzBuffer, 0, newBuffer, 0, zzBuffer.length);
       zzBuffer = newBuffer;
     }
@@ -548,7 +546,7 @@ class CHTBLexer {
    *
    * @param   errorCode  the code of the errormessage to display
    */
-  private void zzScanError(int errorCode) {
+  private static void zzScanError(int errorCode) {
     String message;
     try {
       message = ZZ_ERROR_MSG[errorCode];
@@ -636,7 +634,7 @@ class CHTBLexer {
               zzInput = zzBufferL[zzCurrentPosL++];
             }
           }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+          int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 
@@ -654,88 +652,84 @@ class CHTBLexer {
       zzMarkedPos = zzMarkedPosL;
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
-        case 4: 
-          { System.out.print(yytext());
-          }
-        case 19: break;
-        case 8: 
-          { //System.err.println("Transitioning to SRCID");
-                          yybegin(SRCID); return IGNORE;
-          }
-        case 20: break;
-        case 10: 
-          { yybegin(HEADER); return IGNORE;
-          }
-        case 21: break;
-        case 14: 
-          { //System.err.println("Transitioning to DOCTYPE");
-                          yybegin(DOCTYPE); return IGNORE;
-          }
-        case 22: break;
-        case 9: 
-          { //System.err.println("Transitioning to YYINITIAL");
-                   yybegin(YYINITIAL); return IGNORE;
-          }
-        case 23: break;
-        case 17: 
-          { //System.err.println("Transitioning to YYINITIAL");
-                  yybegin(YYINITIAL); return IGNORE;
-          }
-        case 24: break;
-        case 5: 
-          { //System.err.println("Transitioning to DATETIME");
-                          yybegin(DATETIME); return IGNORE;
-          }
-        case 25: break;
-        case 6: 
-          { yybegin(DATEINHEADER); return IGNORE;
-          }
-        case 26: break;
-        case 12: 
-          { // System.err.println("Transitioning to YYINITIAL");
-                yybegin(YYINITIAL); return IGNORE;
-          }
-        case 27: break;
-        case 18: 
-          { yybegin(YYINITIAL); return IGNORE;
-          }
-        case 28: break;
-        case 7: 
-          { // System.err.println("Transitioning to DOCNO");
-                          yybegin(DOCNO); return IGNORE;
-          }
-        case 29: break;
-        case 2: 
-          { return IGNORE;
-          }
-        case 30: break;
-        case 13: 
-          { //System.err.println("In SRCID; Transitioning to YYINITIAL");
-                yybegin(YYINITIAL); return IGNORE;
-          }
-        case 31: break;
-        case 15: 
-          { //System.err.println("Transitioning to YYINITIAL");
-                yybegin(YYINITIAL); return IGNORE;
-          }
-        case 32: break;
-        case 16: 
-          { yybegin(PREAMBLE); return IGNORE;
-          }
-        case 33: break;
-        case 1: 
-          { return ACCEPT;
-          }
-        case 34: break;
-        case 3: 
-          { reportError(yytext());
-          }
-        case 35: break;
-        case 11: 
-          { //System.err.println("Transitioning to HEADER");
-                          yybegin(HEADER); return IGNORE;
-          }
-        case 36: break;
+        case 4:
+            System.out.print(yytext());
+          case 19: break;
+        case 8:
+            //System.err.println("Transitioning to SRCID");
+            yybegin(SRCID);
+            return IGNORE;
+          case 20: break;
+        case 10:
+            yybegin(HEADER);
+            return IGNORE;
+          case 21: break;
+        case 14:
+            //System.err.println("Transitioning to DOCTYPE");
+            yybegin(DOCTYPE);
+            return IGNORE;
+          case 22: break;
+        case 9:
+            //System.err.println("Transitioning to YYINITIAL");
+            yybegin(YYINITIAL);
+            return IGNORE;
+          case 23: break;
+        case 17:
+            //System.err.println("Transitioning to YYINITIAL");
+            yybegin(YYINITIAL);
+            return IGNORE;
+          case 24: break;
+        case 5:
+            //System.err.println("Transitioning to DATETIME");
+            yybegin(DATETIME);
+            return IGNORE;
+          case 25: break;
+        case 6:
+            yybegin(DATEINHEADER);
+            return IGNORE;
+          case 26: break;
+        case 12:
+            // System.err.println("Transitioning to YYINITIAL");
+            yybegin(YYINITIAL);
+            return IGNORE;
+          case 27: break;
+        case 18:
+            yybegin(YYINITIAL);
+            return IGNORE;
+          case 28: break;
+        case 7:
+            // System.err.println("Transitioning to DOCNO");
+            yybegin(DOCNO);
+            return IGNORE;
+          case 29: break;
+        case 2:
+            return IGNORE;
+          case 30: break;
+        case 13:
+            //System.err.println("In SRCID; Transitioning to YYINITIAL");
+            yybegin(YYINITIAL);
+            return IGNORE;
+          case 31: break;
+        case 15:
+            //System.err.println("Transitioning to YYINITIAL");
+            yybegin(YYINITIAL);
+            return IGNORE;
+          case 32: break;
+        case 16:
+            yybegin(PREAMBLE);
+            return IGNORE;
+          case 33: break;
+        case 1:
+            return ACCEPT;
+          case 34: break;
+        case 3:
+            reportError(yytext());
+          case 35: break;
+        case 11:
+            //System.err.println("Transitioning to HEADER");
+            yybegin(HEADER);
+            return IGNORE;
+          case 36: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;
@@ -757,29 +751,26 @@ class CHTBLexer {
    * @param argv   the command line, contains the filenames to run
    *               the scanner on.
    */
-  public static void main(String argv[]) {
+  public static void main(String... argv) {
     if (argv.length == 0) {
       System.out.println("Usage : java CHTBLexer <inputfile>");
     }
     else {
-      for (int i = 0; i < argv.length; i++) {
-        CHTBLexer scanner = null;
-        try {
-          scanner = new CHTBLexer( new java.io.FileReader(argv[i]) );
-          while ( !scanner.zzAtEOF ) scanner.yylex();
+        for (String anArgv : argv) {
+            CHTBLexer scanner = null;
+            try {
+                scanner = new CHTBLexer(new FileReader(anArgv));
+                while (!scanner.zzAtEOF) scanner.yylex();
+            } catch (FileNotFoundException e) {
+                System.out.println("File not found : \"" + anArgv + '"');
+            } catch (IOException e) {
+                System.out.println("IO error scanning file \"" + anArgv + '"');
+                System.out.println(e);
+            } catch (Exception e) {
+                System.out.println("Unexpected exception:");
+                e.printStackTrace();
+            }
         }
-        catch (java.io.FileNotFoundException e) {
-          System.out.println("File not found : \""+argv[i]+"\"");
-        }
-        catch (java.io.IOException e) {
-          System.out.println("IO error scanning file \""+argv[i]+"\"");
-          System.out.println(e);
-        }
-        catch (Exception e) {
-          System.out.println("Unexpected exception:");
-          e.printStackTrace();
-        }
-      }
     }
   }
 

@@ -17,22 +17,16 @@ public abstract class MapFactory<K,V> implements Serializable {
 
   private static final long serialVersionUID = 4529666940763477360L;
 
-  @SuppressWarnings("unchecked")
   public static final MapFactory HASH_MAP_FACTORY = new HashMapFactory();
 
-  @SuppressWarnings("unchecked")
   public static final MapFactory IDENTITY_HASH_MAP_FACTORY = new IdentityHashMapFactory();
 
-  @SuppressWarnings("unchecked")
   private static final MapFactory WEAK_HASH_MAP_FACTORY = new WeakHashMapFactory();
 
-  @SuppressWarnings("unchecked")
   private static final MapFactory TREE_MAP_FACTORY = new TreeMapFactory();
 
-  @SuppressWarnings("unchecked")
   private static final MapFactory LINKED_HASH_MAP_FACTORY = new LinkedHashMapFactory();
 
-  @SuppressWarnings("unchecked")
   private static final MapFactory ARRAY_MAP_FACTORY = new ArrayMapFactory();
 
 
@@ -151,23 +145,23 @@ public abstract class MapFactory<K,V> implements Serializable {
 
     @Override
     public Map<K,V> newMap() {
-      return new IdentityHashMap<K,V>();
+      return new IdentityHashMap<>();
     }
 
     @Override
     public Map<K,V> newMap(int initCapacity) {
-      return new IdentityHashMap<K,V>(initCapacity);
+      return new IdentityHashMap<>(initCapacity);
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map) {
-      map = new IdentityHashMap<K1,V1>();
+      map = new IdentityHashMap<>();
       return map;
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map, int initCapacity) {
-      map = new IdentityHashMap<K1,V1>(initCapacity);
+      map = new IdentityHashMap<>(initCapacity);
       return map;
     }
 
@@ -180,24 +174,24 @@ public abstract class MapFactory<K,V> implements Serializable {
 
     @Override
     public Map<K,V> newMap() {
-      return new WeakHashMap<K,V>();
+      return new WeakHashMap<>();
     }
 
     @Override
     public Map<K,V> newMap(int initCapacity) {
-      return new WeakHashMap<K,V>(initCapacity);
+      return new WeakHashMap<>(initCapacity);
     }
 
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map) {
-      map = new WeakHashMap<K1,V1>();
+      map = new WeakHashMap<>();
       return map;
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map, int initCapacity) {
-      map = new WeakHashMap<K1,V1>(initCapacity);
+      map = new WeakHashMap<>(initCapacity);
       return map;
     }
 
@@ -210,7 +204,7 @@ public abstract class MapFactory<K,V> implements Serializable {
 
     @Override
     public Map<K,V> newMap() {
-      return new TreeMap<K,V>();
+      return new TreeMap<>();
     }
 
     @Override
@@ -221,13 +215,13 @@ public abstract class MapFactory<K,V> implements Serializable {
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map) {
-      map = new TreeMap<K1,V1>();
+      map = new TreeMap<>();
       return map;
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map, int initCapacity) {
-      map = new TreeMap<K1,V1>();
+      map = new TreeMap<>();
       return map;
     }
 
@@ -240,7 +234,7 @@ public abstract class MapFactory<K,V> implements Serializable {
 
     @Override
     public Map<K,V> newMap() {
-      return new LinkedHashMap<K,V>();
+      return new LinkedHashMap<>();
     }
 
     @Override
@@ -251,13 +245,13 @@ public abstract class MapFactory<K,V> implements Serializable {
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map) {
-      map = new LinkedHashMap<K1,V1>();
+      map = new LinkedHashMap<>();
       return map;
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map, int initCapacity) {
-      map = new LinkedHashMap<K1,V1>();
+      map = new LinkedHashMap<>();
       return map;
     }
 
@@ -270,22 +264,22 @@ public abstract class MapFactory<K,V> implements Serializable {
 
     @Override
     public Map<K,V> newMap() {
-      return new ArrayMap<K,V>();
+      return new ArrayMap<>();
     }
 
     @Override
     public Map<K,V> newMap(int initCapacity) {
-      return new ArrayMap<K,V>(initCapacity);
+      return new ArrayMap<>(initCapacity);
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1, V1> map) {
-      return new ArrayMap<K1,V1>();
+      return new ArrayMap<>();
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map, int initCapacity) {
-      map = new ArrayMap<K1,V1>(initCapacity);
+      map = new ArrayMap<>(initCapacity);
       return map;
     }
 

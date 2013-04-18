@@ -21,14 +21,14 @@ public class BasicDatum<LabelType, FeatureType> implements Datum<LabelType, Feat
   /**
    * features for this Datum
    */
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
   private final Collection<FeatureType> features;
 
   /**
    * labels for this Datum. Invariant: always non-null
    */
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
-  private final List<LabelType> labels = new ArrayList<LabelType>();
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
+  private final List<LabelType> labels = new ArrayList<>();
 
   /**
    * Constructs a new BasicDatum with the given features and labels.
@@ -64,14 +64,14 @@ public class BasicDatum<LabelType, FeatureType> implements Datum<LabelType, Feat
    * Returns the collection that this BasicDatum was constructed with.
    */
   public Collection<FeatureType> asFeatures() {
-    return (features);
+    return features;
   }
 
   /**
    * Returns the first label for this Datum, or null if none have been set.
    */
   public LabelType label() {
-    return ((labels.size() > 0) ?  labels.get(0) : null);
+    return !labels.isEmpty() ?  labels.get(0) : null;
   }
 
   /**
@@ -117,7 +117,7 @@ public class BasicDatum<LabelType, FeatureType> implements Datum<LabelType, Feat
    */
   @Override
   public String toString() {
-    return ("BasicDatum[features=" + asFeatures() + ",labels=" + labels() + "]");
+    return "BasicDatum[features=" + asFeatures() + ",labels=" + labels() + ']';
   }
 
 
@@ -129,7 +129,7 @@ public class BasicDatum<LabelType, FeatureType> implements Datum<LabelType, Feat
   @Override
   public boolean equals(Object o) {
     if (!(o instanceof Datum)) {
-      return (false);
+      return false;
     }
 
     Datum<LabelType, FeatureType> d = (Datum<LabelType, FeatureType>) o;

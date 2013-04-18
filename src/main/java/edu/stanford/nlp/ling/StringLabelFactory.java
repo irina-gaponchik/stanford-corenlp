@@ -2,15 +2,15 @@ package edu.stanford.nlp.ling;
 
 
 /**
- * A <code>StringLabelFactory</code> object makes a simple
- * <code>StringLabel</code> out of a <code>String</code>.
+ * A {@code StringLabelFactory} object makes a simple
+ * {@code StringLabel} out of a {@code String}.
  *
  * @author Christopher Manning
  */
 public class StringLabelFactory implements LabelFactory {
 
   /**
-   * Make a new label with this <code>String</code> as the "name".
+   * Make a new label with this {@code String} as the "name".
    *
    * @param labelStr A string that determines the content of the label.
    *                 For a StringLabel, it is exactly the given string
@@ -22,7 +22,7 @@ public class StringLabelFactory implements LabelFactory {
 
 
   /**
-   * Make a new label with this <code>String</code> as the "name".
+   * Make a new label with this {@code String} as the "name".
    *
    * @param labelStr A string that determines the content of the label.
    *                 For a StringLabel, it is exactly the given string
@@ -35,7 +35,7 @@ public class StringLabelFactory implements LabelFactory {
 
 
   /**
-   * Make a new label with this <code>String</code> as the "name".
+   * Make a new label with this {@code String} as the "name".
    * This version does no decoding -- StringLabels just have a value.
    *
    * @param labelStr A string that determines the content of the label.
@@ -48,10 +48,10 @@ public class StringLabelFactory implements LabelFactory {
 
 
   /**
-   * Create a new <code>StringLabel</code>, where the label is
+   * Create a new {@code StringLabel}, where the label is
    * formed from
-   * the <code>Label</code> object passed in.  Depending on what fields
-   * each label has, other things will be <code>null</code>.
+   * the {@code Label} object passed in.  Depending on what fields
+   * each label has, other things will be {@code null}.
    *
    * @param oldLabel The Label that the new label is being created from
    * @return a new label of a particular type

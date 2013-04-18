@@ -45,14 +45,14 @@ import edu.stanford.nlp.util.Timing;
 
 
 /**
- * A TregexPattern is a <code>tgrep</code>-type pattern for matching tree
- * node configurations.  Unlike <code>tgrep</code> or <code>tgrep2</code>but like Unix
- * <code>grep</code>, there is no pre-indexing of the data to be searched.
+ * A TregexPattern is a {@code tgrep}-type pattern for matching tree
+ * node configurations.  Unlike {@code tgrep} or {@code tgrep2}but like Unix
+ * {@code grep}, there is no pre-indexing of the data to be searched.
  * Rather there is a linear scan through the trees where matches are sought.
  * As a result, matching is slower, but a TregexPattern can be applied
  * to an arbitrary set of trees at runtime in a processing pipeline.
  *
- * <p> TregexPattern instances can be matched against instances of the {@link Tree} class.
+ * <p> TregexPattern instances can be matched against instances of the {@link edu.stanford.nlp.trees.Tree} class.
  * The {@link #main} method can be used to find matching nodes of a treebank from the command line.
  *
  * <p>
@@ -125,68 +125,68 @@ import edu.stanford.nlp.util.Timing;
  * </emph> The basicCategory is defined according to a Function
  * mapping Strings to Strings, as provided by
  * {@link edu.stanford.nlp.trees.AbstractTreebankLanguagePack#getBasicCategoryFunction()}.
- * Label description regular expressions are matched as <code>find()</code>,
+ * Label description regular expressions are matched as {@code find()},
  * as in Perl/tgrep;
- * you need to use <code>^</code> or <code>$</code> to constrain matches to
+ * you need to use {@code ^} or {@code $} to constrain matches to
  * the ends of strings.
  * <p/>
  * In a chain of relations, all relations are relative to the first node in
- * the chain. For example, <code> (S &lt; VP &lt; NP) </code> means
+ * the chain. For example, {@code (S &lt; VP &lt; NP) } means
  * "an S over a VP and also over an NP".
  * If instead what you want is an S above a VP above an NP, you should write
- * "<code>S &lt; (VP &lt; NP)</code>".
+ * "{@code S &lt; (VP &lt; NP)}".
  * <p> Nodes can be grouped using parentheses '(' and ')'
- * as in <code> S &lt; (NP $++ VP) </code> to match an S
+ * as in {@code S &lt; (NP $++ VP) } to match an S
  * over an NP, where the NP has a VP as a right sister.
  *
  * <h3>Notes on relations</h3>
  *
  * <p>
- * Node <code>B</code> "follows" node <code>A</code> if <code>B</code>
- * or one of its ancestors is a right sibling of <code>A</code> or one
- * of its ancestors.  Node <code>B</code> "immediately follows" node
- * <code>A</code> if <code>B</code> follows <code>A</code> and there
- * is no node <code>C</code> such that <code>B</code> follows
- * <code>C</code> and <code>C</code> follows <code>A</code>.
+ * Node {@code B} "follows" node {@code A} if {@code B}
+ * or one of its ancestors is a right sibling of {@code A} or one
+ * of its ancestors.  Node {@code B} "immediately follows" node
+ * {@code A} if {@code B} follows {@code A} and there
+ * is no node {@code C} such that {@code B} follows
+ * {@code C} and {@code C} follows {@code A}.
  *
  * <p>
- * Node <code>A</code> dominates <code>B</code> through an unbroken
- * chain of unary local trees only if <code>A</code> is also
- * unary. <code>(A (B))</code> is a valid example that matches <code>A
- * &lt;&lt;: B</code>
+ * Node {@code A} dominates {@code B} through an unbroken
+ * chain of unary local trees only if {@code A} is also
+ * unary. {@code (A (B))} is a valid example that matches {@code A
+ * &lt;&lt;: B}
  *
  * <p>
  * When specifying that nodes are dominated via an unbroken chain of
- * nodes matching a description <code>C</code>, the description
- * <code>C</code> cannot be a full Tregex expression, but only an
+ * nodes matching a description {@code C}, the description
+ * {@code C} cannot be a full Tregex expression, but only an
  * expression specifying the name of the node.  Negation of this
  * description is allowed.
  *
  * <p>
  * == has the same precedence as the other relations, so the expression
- * <code>A &lt;&lt; B == A &lt;&lt; C</code> associates as
- * <code>(((A &lt;&lt; B) == A) &lt;&lt; C)</code>, not as
- * <code>((A &lt;&lt; B) == (A &lt;&lt; C))</code>.  (Both expressions are
+ * {@code A &lt;&lt; B == A &lt;&lt; C} associates as
+ * {@code (((A &lt;&lt; B) == A) &lt;&lt; C)}, not as
+ * {@code ((A &lt;&lt; B) == (A &lt;&lt; C))}.  (Both expressions are
  * equivalent, of course, but this is just an example.)
  *
  * <h3>Boolean relational operators</h3>
  *
  * <p> Relations can be combined using the '&' and '|' operators,
  * negated with the '!' operator, and made optional with the '?' operator.
- * Thus <code> (NP < NN | < NNS) </code> will match an NP node dominating either
- * an NN or an NNS.  <code> (NP > S & $++ VP) </code> matches an NP that
+ * Thus {@code (NP < NN | < NNS) } will match an NP node dominating either
+ * an NN or an NNS.  {@code (NP > S & $++ VP) } matches an NP that
  * is both under an S and has a VP as a right sister.
  * <p>
  * Expressions stop evaluating as soon as the result is known.  For
- * example, if the pattern is <code>NP=a | NNP=b</code> and the NP
- * matches, then variable <code>b</code> will not be assigned even if
+ * example, if the pattern is {@code NP=a | NNP=b} and the NP
+ * matches, then variable {@code b} will not be assigned even if
  * there is an NNP in the tree.
  *
  * <p> Relations can be grouped using brackets '[' and ']'.  So the
  * expression
  *
  * <blockquote>
- * <code> NP [< NN | < NNS] & > S </code>
+ * {@code NP [< NN | < NNS] & > S }
  * </blockquote>
  *
  *  matches an NP that (1) dominates either an NN or an NNS, and (2) is under an S.  Without
@@ -195,17 +195,17 @@ import edu.stanford.nlp.util.Timing;
  * operator is omitted in a chain of relations, so that the two patterns are equivalent:
  *
  * <blockquote>
- * <code> (S < VP < NP) </code><br>
- * <code> (S < VP & < NP) </code>
+ * {@code (S < VP < NP) }<br>
+ * {@code (S < VP & < NP) }
  * </blockquote>
  *
- * As another example, <code> (VP < VV | < NP % NP)
- * </code> can be written explicitly as <code> (VP [< VV | [< NP & % NP] ] )
- * </code>
+ * As another example, {@code (VP < VV | < NP % NP)
+ * } can be written explicitly as {@code (VP [< VV | [< NP & % NP] ])
+ * }
  *
  * <p> Relations can be negated with the '!' operator, in which case the
  * expression will match only if there is no node satisfying the relation.
- * For example <code> (NP !< NNP) </code> matches only NPs not dominating
+ * For example {@code (NP !< NNP) } matches only NPs not dominating
  * an NNP.  Label descriptions can also be negated with '!': (NP < !NNP|NNS) matches
  * NPs dominating some node that is not an NNP or an NNS.
 
@@ -218,7 +218,7 @@ import edu.stanford.nlp.util.Timing;
  * <p> In order to consider only the "basic category" of a tree label,
  * i.e. to ignore functional tags or other annotations on the label,
  * prefix that node's description with the &#64; symbol.  For example
- * <code> (@NP < @/NN.?/) </code>  This can only be used for individual nodes;
+ * {@code (@NP < @/NN.?/) }  This can only be used for individual nodes;
  * if you want all nodes to use the basic category, it would be more efficient
  * to use a {@link edu.stanford.nlp.trees.TreeNormalizer} to remove functional
  * tags before passing the tree to the TregexPattern.
@@ -239,13 +239,13 @@ import edu.stanford.nlp.util.Timing;
  * <p> Nodes can be given names (a.k.a. handles) using '='.  A named node will be stored in a
  * map that maps names to nodes so that if a match is found, the node
  * corresponding to the named node can be extracted from the map.  For
- * example <code> (NP < NNP=name) </code> will match an NP dominating an NNP
+ * example {@code (NP < NNP=name) } will match an NP dominating an NNP
  * and after a match is found, the map can be queried with the
- * name to retreived the matched node using {@link TregexMatcher#getNode(String o)}
+ * name to retreived the matched node using {@link edu.stanford.nlp.trees.tregex.TregexMatcher#getNode(String o)}
  * with (String) argument "name" (<it>not</it> "=name").
  * Note that you are not allowed to name a node that is under the scope of a negation operator (the semantics would
  * be unclear, since you can't store a node that never gets matched to).
- * Trying to do so will cause a {@link TregexParseException} to be thrown. Named nodes <it>can be put within the scope of an optionality operator</it>.
+ * Trying to do so will cause a {@link edu.stanford.nlp.trees.tregex.TregexParseException} to be thrown. Named nodes <it>can be put within the scope of an optionality operator</it>.
  *
  * <p> Named nodes that refer back to previous named nodes need not have a node
  * description -- this is known as "backreferencing".  In this case, the expression
@@ -253,11 +253,11 @@ import edu.stanford.nlp.util.Timing;
  * For example: the pattern
  *
  * <blockquote>
- * <code> (@NP <, (@NP $+ (/,/ $+ (@NP $+ /,/=comma))) <- =comma) </code>
+ * {@code (@NP <, (@NP $+ (/,/ $+ (@NP $+ /,/=comma))) <- =comma) }
  * </blockquote>
  *
  * matches only an NP dominating exactly the four node sequence
- * <code>NP , NP ,</code> -- the mother NP cannot have any other
+ * {@code NP , NP ,} -- the mother NP cannot have any other
  * daughters. Multiple backreferences are allowed.  If the node w/ no
  * node description does not refer to a previously named node, there
  * will be no error, the expression simply will not match anything.
@@ -270,9 +270,9 @@ import edu.stanford.nlp.util.Timing;
  *
  * <p><h3>Customizing headship and basic categories</h3>
  *
- * <p> The HeadFinder used to determine heads for the head relations <code>&lt;#</code>, <code>&gt;#</code>, <code>&lt;&lt;#</code>, and <code>&gt;&gt;#</code>, and also
+ * <p> The HeadFinder used to determine heads for the head relations {@code &lt;#}, {@code &gt;#}, {@code &lt;&lt;#}, and {@code &gt;&gt;#}, and also
  * the Function mapping from labels to Basic Category tags can be
- * chosen by using a {@link TregexPatternCompiler}.
+ * chosen by using a {@link edu.stanford.nlp.trees.tregex.TregexPatternCompiler}.
  *
  * <p><h3>Variable Groups</h3>
  *
@@ -281,16 +281,16 @@ import edu.stanford.nlp.util.Timing;
  * capture the same string.  This is useful for enforcing coindexation constraints.  The syntax is
  *
  * <blockquote>
- * <code> / &lt;regex-stuff&gt; /#&lt;group-number&gt;%&lt;variable-name&gt;</code>
+ * {@code  / &lt;regex-stuff&gt; /#&lt;group-number&gt;%&lt;variable-name&gt;}
  * </blockquote>
  *
  * For example, the pattern (designed for Penn Treebank trees)
  *
  * <blockquote>
- * <code> @SBAR < /^WH.*-([0-9]+)$/#1%index << (__=empty < (/^-NONE-/ < /^\*T\*-([0-9]+)$/#1%index)) </code>
+ * {@code  @SBAR < /^WH.*-([0-9]+)$/#1%index << (__=empty < (/^-NONE-/ < /^\*T\*-([0-9]+)$/#1%index)) }
  * </blockquote>
  *
- * will match only such that the WH- node under the SBAR is coindexed with the trace node that gets the name <code>empty</code>.
+ * will match only such that the WH- node under the SBAR is coindexed with the trace node that gets the name {@code empty}.
  *
  * <p><h3>Getting Started</h3>
  *
@@ -300,12 +300,12 @@ import edu.stanford.nlp.util.Timing;
  * <br>
  * The first thing to do is figure out what pattern to use.  Since we
  * want to match anything starting with MW, we use the pattern
- * <code>/^MW/</code>.
+ * {@code /^MW/}.
  * <br>
  * We then create a pattern, find matches in a given tree, and process
  * those matches as follows:
  * <blockquote>
- * <code>
+ * {@code
  *   // Create a reusable pattern object <br>
  *   TregexPattern patternMW = TregexPattern.compile("/^MW/"); <br>
  *   // Run the pattern on one particular tree <br>
@@ -315,7 +315,7 @@ import edu.stanford.nlp.util.Timing;
  *   &nbsp;&nbsp;Tree match = matcher.getMatch(); <br>
  *   &nbsp;&nbsp;// do what we want to with the subtree <br>
  *   }
- * </code>
+ * }
  * </blockquote>
  *
  * <p><h3>Current known bugs/shortcomings:</h3>
@@ -323,14 +323,14 @@ import edu.stanford.nlp.util.Timing;
  * <ul>
  *
  * <li> Tregex does not support disjunctions at the root level.  For
- * example, the pattern <code>A | B</code> will not work.
+ * example, the pattern {@code A | B} will not work.
  *
  * <li> Using multiple variable strings in one regex may not
  * necessarily work.  For example, suppose the first two regex
- * patterns are <code>/(.*)/#1%foo</code> and
- * <code>/(.*)/#1%bar</code>.  You might then want to write a pattern
+ * patterns are {@code /(.*)/#1%foo} and
+ * {@code /(.*)/#1%bar}.  You might then want to write a pattern
  * that matches the concatenation of these patterns,
- * <code>/(.*)(.*)/#1%foo#2%bar</code>, but that will not work.
+ * {@code /(.*)(.*)/#1%foo#2%bar}, but that will not work.
  *
  * </ul>
  *
@@ -340,8 +340,9 @@ import edu.stanford.nlp.util.Timing;
  * @author John Bauer (extensively tested and bugfixed)
  */
 public abstract class TregexPattern implements Serializable {
-  private boolean neg = false;
-  private boolean opt = false;
+    private static final Pattern COMPILE = Pattern.compile("\n|\r|\n\r");
+    private boolean neg;
+  private boolean opt;
   private String patternString;
 
   void negate() {
@@ -398,7 +399,7 @@ public abstract class TregexPattern implements Serializable {
                                  VariableStrings variableStrings);
 
   /**
-   * Get a {@link TregexMatcher} for this pattern on this tree.
+   * Get a {@link edu.stanford.nlp.trees.tregex.TregexMatcher} for this pattern on this tree.
    *
    * @param t a tree to match on
    * @return a TregexMatcher
@@ -410,11 +411,11 @@ public abstract class TregexPattern implements Serializable {
   /**
    * Creates a pattern from the given string using the default HeadFinder and
    * BasicCategoryFunction.  If you want to use a different HeadFinder or
-   * BasicCategoryFunction, use a {@link TregexPatternCompiler} object.
+   * BasicCategoryFunction, use a {@link edu.stanford.nlp.trees.tregex.TregexPatternCompiler} object.
    *
    * @param tregex the pattern string
    * @return a TregexPattern for the string.
-   * @throws TregexParseException if the string does not parse
+   * @throws edu.stanford.nlp.trees.tregex.TregexParseException if the string does not parse
    */
   public static TregexPattern compile(String tregex) {
     return TregexPatternCompiler.defaultCompiler.compile(tregex);
@@ -423,7 +424,7 @@ public abstract class TregexPattern implements Serializable {
   /**
    * Creates a pattern from the given string using the default HeadFinder and
    * BasicCategoryFunction.  If you want to use a different HeadFinder or
-   * BasicCategoryFunction, use a {@link TregexPatternCompiler} object.
+   * BasicCategoryFunction, use a {@link edu.stanford.nlp.trees.tregex.TregexPatternCompiler} object.
    * Rather than throwing an exception when the string does not parse,
    * simply returns null.
    *
@@ -437,7 +438,7 @@ public abstract class TregexPattern implements Serializable {
       result = TregexPatternCompiler.defaultCompiler.compile(tregex);
     } catch (TregexParseException ex) {
       if (verbose) {
-        System.err.println("Could not parse " + tregex + ":");
+        System.err.println("Could not parse " + tregex + ':');
         ex.printStackTrace();
       }
     }
@@ -486,11 +487,11 @@ public abstract class TregexPattern implements Serializable {
   private static final Pattern codePattern = Pattern.compile("([0-9]+):([0-9]+)");
 
   private static void extractSubtrees(List<String> codeStrings, String treeFile) {
-    List<Pair<Integer,Integer>> codes = new ArrayList<Pair<Integer,Integer>>();
+    List<Pair<Integer,Integer>> codes = new ArrayList<>();
     for(String s : codeStrings) {
       Matcher m = codePattern.matcher(s);
       if(m.matches())
-        codes.add(new Pair<Integer,Integer>(Integer.parseInt(m.group(1)),Integer.parseInt(m.group(2))));
+        codes.add(new Pair<>(Integer.parseInt(m.group(1)),Integer.parseInt(m.group(2))));
       else
         throw new RuntimeException("Error: illegal node code " + s);
     }
@@ -505,54 +506,54 @@ public abstract class TregexPattern implements Serializable {
 
   /**
    * Prints out all matches of a tree pattern on each tree in the path.
-   * Usage: <br><br><code>
+   * Usage: <br><br>{@code
    * java edu.stanford.nlp.trees.tregex.TregexPattern [[-TCwfosnu] [-filter] [-h &lt;node-name&gt;]]* pattern
-   *  filepath   </code>
+   *  filepath   }
    *
    * <p>
    * Arguments:<br>
-   * <ul><li><code>pattern</code>: the tree
-   * pattern which optionally names some set of nodes (i.e., gives it the "handle") <code>=name</code> (for some arbitrary
+   * <ul><li>{@code pattern}: the tree
+   * pattern which optionally names some set of nodes (i.e., gives it the "handle") {@code =name} (for some arbitrary
    * string "name")
-   * <li> <code>filepath</code>: the path to files with trees. If this is a directory, there will be recursive descent and the pattern will be run on all files beneath the specified directory.
+   * <li> {@code filepath}: the path to files with trees. If this is a directory, there will be recursive descent and the pattern will be run on all files beneath the specified directory.
    * </ul><p>
    * Options:<br>
-   * <li> <code>-C</code> suppresses printing of matches, so only the
+   * <li> {@code -C} suppresses printing of matches, so only the
    * number of matches is printed.
-   * <li> <code>-w</code> causes the whole of a tree that matches to be printed.
-   * <li> <code>-f</code> causes the filename to be printed.
-   * <li> <code>-i &lt;filename&gt;</code> causes the pattern to be matched to be read from <code>&lt;filename&gt;</code> rather than the command line.  Don't specify a pattern when this option is used.
-   * <li> <code>-o</code> Specifies that each tree node can be reported only once as the root of a match (by default a node will
+   * <li> {@code -w} causes the whole of a tree that matches to be printed.
+   * <li> {@code -f} causes the filename to be printed.
+   * <li> {@code -i &lt;filename&gt;} causes the pattern to be matched to be read from {@code &lt;filename&gt;} rather than the command line.  Don't specify a pattern when this option is used.
+   * <li> {@code -o} Specifies that each tree node can be reported only once as the root of a match (by default a node will
    * be printed once for every <em>way</em> the pattern matches).
-   * <li> <code>-s</code> causes trees to be printed all on one line (by default they are pretty printed).
-   * <li> <code>-n</code> causes the number of the tree in which the match was found to be
+   * <li> {@code -s} causes trees to be printed all on one line (by default they are pretty printed).
+   * <li> {@code -n} causes the number of the tree in which the match was found to be
    * printed before every match.
-   * <li> <code>-u</code> causes only the label of each matching node to be printed, not complete subtrees.
-   * <li> <code>-t</code> causes only the yield (terminal words) of the selected node to be printed (or the yield of the whole tree, if the <code>-w</code> option is used).
-   * <li> <code>-encoding &lt;charset_encoding&gt;</code> option allows specification of character encoding of trees..
-   * <li> <code>-h &lt;node-handle&gt;</code> If a <code>-h</code> option is given, the root tree node will not be printed.  Instead,
-   * for each <code>node-handle</code> specified, the node matched and given that handle will be printed.  Multiple nodes can be printed by using the
-   * <code>-h</code> option multiple times on a single command line.
-   * <li> <code>-hf &lt;headfinder-class-name&gt;</code> use the specified {@link HeadFinder} class to determine headship relations.
-   * <li> <code>-hfArg &lt;string&gt;</code> pass a string argument in to the {@link HeadFinder} class's constructor.  <code>-hfArg</code> can be used multiple times to pass in multiple arguments.
-   * <li> <code>-trf &lt;TreeReaderFactory-class-name&gt;</code> use the specified {@link TreeReaderFactory} class to read trees from files.
-   * <li> <code>-v</code> print every tree that contains no matches of the specified pattern, but print no matches to the pattern.
+   * <li> {@code -u} causes only the label of each matching node to be printed, not complete subtrees.
+   * <li> {@code -t} causes only the yield (terminal words) of the selected node to be printed (or the yield of the whole tree, if the {@code -w} option is used).
+   * <li> {@code -encoding &lt;charset_encoding&gt;} option allows specification of character encoding of trees..
+   * <li> {@code -h &lt;node-handle&gt;} If a {@code -h} option is given, the root tree node will not be printed.  Instead,
+   * for each {@code node-handle} specified, the node matched and given that handle will be printed.  Multiple nodes can be printed by using the
+   * {@code -h} option multiple times on a single command line.
+   * <li> {@code -hf &lt;headfinder-class-name&gt;} use the specified {@link edu.stanford.nlp.trees.HeadFinder} class to determine headship relations.
+   * <li> {@code -hfArg &lt;string&gt;} pass a string argument in to the {@link edu.stanford.nlp.trees.HeadFinder} class's constructor.  {@code -hfArg} can be used multiple times to pass in multiple arguments.
+   * <li> {@code -trf &lt;TreeReaderFactory-class-name&gt;} use the specified {@link edu.stanford.nlp.trees.TreeReaderFactory} class to read trees from files.
+   * <li> {@code -v} print every tree that contains no matches of the specified pattern, but print no matches to the pattern.
    *
-   * <li> <code>-x</code> Instead of the matched subtree, print the matched subtree's identifying number as defined in <tt>tgrep2</tt>:a
+   * <li> {@code -x} Instead of the matched subtree, print the matched subtree's identifying number as defined in <tt>tgrep2</tt>:a
    * unique identifier for the subtree and is in the form s:n, where s is an integer specifying
    * the sentence number in the corpus (starting with 1), and n is an integer giving the order
    * in which the node is encountered in a depth-first search starting with 1 at top node in the
    * sentence tree.
    *
-   * <li> <code>-extract &lt;code&gt; &lt;tree-file&gt;</code> extracts the subtree s:n specified by <tt>code</tt> from the specified <tt>tree-file</tt>.  Overrides all other behavior of tregex.  Can't specify multiple encodings etc. yet.
-   * <li> <code>-extractFile &lt;code-file&gt; &lt;tree-file&gt;</code> extracts every subtree specified by the subtree codes in <tt>code-file</tt>, which must appear exactly one per line, from the specified <tt>tree-file</tt>.  Overrides all other behavior of tregex. Can't specify multiple encodings etc. yet.
-   * <li> <code>-filter</code> causes this to act as a filter, reading tree input from stdin
-   * <li> <code>-T</code> causes all trees to be printed as processed (for debugging purposes).  Otherwise only matching nodes are printed.
-   * <li> <code>-macros &lt;filename&gt;</code> filename with macro substitutions to use.  file with tab separated lines original-tab-replacement
+   * <li> {@code -extract &lt;code&gt; &lt;tree-file&gt;} extracts the subtree s:n specified by <tt>code</tt> from the specified <tt>tree-file</tt>.  Overrides all other behavior of tregex.  Can't specify multiple encodings etc. yet.
+   * <li> {@code -extractFile &lt;code-file&gt; &lt;tree-file&gt;} extracts every subtree specified by the subtree codes in <tt>code-file</tt>, which must appear exactly one per line, from the specified <tt>tree-file</tt>.  Overrides all other behavior of tregex. Can't specify multiple encodings etc. yet.
+   * <li> {@code -filter} causes this to act as a filter, reading tree input from stdin
+   * <li> {@code -T} causes all trees to be printed as processed (for debugging purposes).  Otherwise only matching nodes are printed.
+   * <li> {@code -macros &lt;filename&gt;} filename with macro substitutions to use.  file with tab separated lines original-tab-replacement
    *
    * </ul>
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     Timing.startTime();
 
     StringBuilder treePrintFormats = new StringBuilder();
@@ -601,7 +602,7 @@ public abstract class TregexPattern implements Serializable {
       return;
     }
     if (argsMap.containsKey(extractSubtreesFileOption)) {
-      List<String> subTreeStrings = Arrays.asList(IOUtils.slurpFile(argsMap.get(extractSubtreesFileOption)[0]).split("\n|\r|\n\r"));
+      List<String> subTreeStrings = Arrays.asList(COMPILE.split(IOUtils.slurpFile(argsMap.get(extractSubtreesFileOption)[0])));
       extractSubtrees(subTreeStrings,argsMap.get(extractSubtreesFileOption)[0]);
       return;
     }
@@ -745,20 +746,20 @@ public abstract class TregexPattern implements Serializable {
   // not thread-safe, but only used by TregexPattern's main method
   private static class TRegexTreeVisitor implements TreeVisitor {
 
-    private static boolean printNumMatchesToStdOut = false;
-    static boolean printNonMatchingTrees = false;
-    static boolean printSubtreeCode = false;
-    static boolean printTree = false;
-    static boolean printWholeTree = false;
+    private static boolean printNumMatchesToStdOut;
+    static boolean printNonMatchingTrees;
+    static boolean printSubtreeCode;
+    static boolean printTree;
+    static boolean printWholeTree;
     static boolean printMatches = true;
-    static boolean printFilename = false;
-    static boolean oneMatchPerRootNode = false;
-    static boolean reportTreeNumbers = false;
+    static boolean printFilename;
+    static boolean oneMatchPerRootNode;
+    static boolean reportTreeNumbers;
 
     static TreePrint tp;
     private PrintWriter pw;
 
-    int treeNumber = 0;
+    int treeNumber;
 
     private final TregexPattern p;
     String[] handles;
@@ -795,7 +796,7 @@ public abstract class TregexPattern implements Serializable {
       Tree lastMatchingRootNode = null;
       while (match.find()) {
         if(oneMatchPerRootNode) {
-          if(lastMatchingRootNode == match.getMatch())
+          if(lastMatchingRootNode.equals(match.getMatch()))
             continue;
           else
             lastMatchingRootNode = match.getMatch();
@@ -863,11 +864,7 @@ public abstract class TregexPattern implements Serializable {
 
         @Override
         public String normalizeNonterminal(String str) {
-          if (str == null) {
-            return "";
-          } else {
-            return str;
-          }
+            return str == null ? "" : str;
         }
       });
     }

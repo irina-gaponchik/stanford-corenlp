@@ -20,13 +20,13 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
   Object[] matchedResults;         // Additional information about matches (per element)
   Function<List<? extends T>, String> nodesToStringConverter;
   SequencePattern.VarGroupBindings varGroupBindings;
-  double score = 0.0;
+  double score;
   int order;
 
   public List<? extends T> elements() { return elements; }
 
   public static <T> BasicSequenceMatchResult<T> toBasicSequenceMatchResult(List<? extends T> elements) {
-    BasicSequenceMatchResult<T> matchResult = new BasicSequenceMatchResult<T>();
+    BasicSequenceMatchResult<T> matchResult = new BasicSequenceMatchResult<>();
     matchResult.elements = elements;
     matchResult.matchedGroups = new MatchedGroup[0];
     return matchResult;
@@ -36,7 +36,7 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
     return copy();
   }
 
-  public BasicSequenceMatchResult<T> copy() {
+  public BasicSequenceMatchResult copy() {
     BasicSequenceMatchResult res = new BasicSequenceMatchResult<T>();
     res.elements = elements;
     res.matchedGroups = new MatchedGroup[matchedGroups.length];
@@ -82,20 +82,12 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
     } else if (group == GROUP_AFTER_MATCH) {
       return matchedGroups[0].matchEnd;
     }
-    if (matchedGroups[group] != null) {
-      return matchedGroups[group].matchBegin;
-    } else {
-      return -1;
-    }
+      return matchedGroups[group] != null ? matchedGroups[group].matchBegin : -1;
   }
 
   public int start(String var) {
     int g = getFirstVarGroup(var);
-    if (g >= 0) {
-      return start(g);
-    } else {
-      return -1;
-    }
+      return g >= 0 ? start(g) : -1;
   }
 
   public int end() {
@@ -108,20 +100,12 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
     } else if (group == GROUP_AFTER_MATCH) {
       return elements.size();
     }
-    if (matchedGroups[group] != null) {
-      return matchedGroups[0].matchEnd;
-    } else {
-      return -1;
-    }
+      return matchedGroups[group] != null ? matchedGroups[0].matchEnd : -1;
   }
 
   public int end(String var) {
     int g = getFirstVarGroup(var);
-    if (g >= 0) {
-      return end(g);
-    } else {
-      return -1;
-    }
+      return g >= 0 ? end(g) : -1;
   }
 
   public String group() {
@@ -131,7 +115,7 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
   public String group(int group) {
     List<? extends T> groupTokens = groupNodes(group);
     if (nodesToStringConverter == null) {
-      return (groupTokens != null)? StringUtils.join(groupTokens, " "): null;
+      return groupTokens != null ? StringUtils.join(groupTokens, " "): null;
     } else {
       return nodesToStringConverter.apply(groupTokens);
     }
@@ -139,11 +123,7 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
 
   public String group(String var) {
     int g = getFirstVarGroup(var);
-    if (g >= 0) {
-      return group(g);
-    } else {
-      return null;
-    }
+      return g >= 0 ? group(g) : null;
   }
 
   public List<? extends T> groupNodes() {
@@ -153,23 +133,14 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
   public List<? extends T> groupNodes(int group) {
     if (group == GROUP_BEFORE_MATCH || group == GROUP_AFTER_MATCH) {
       // return a new list so the resulting object is serializable
-      return new ArrayList<T>(elements.subList(start(group), end(group)));
+      return new ArrayList<>(elements.subList(start(group), end(group)));
     }
-    if (matchedGroups[group] != null) {
-      // return a new list so the resulting object is serializable
-      return new ArrayList<T>(elements.subList(matchedGroups[group].matchBegin, matchedGroups[group].matchEnd));
-    } else {
-      return null;
-    }
+      return matchedGroups[group] != null ? new ArrayList<>(elements.subList(matchedGroups[group].matchBegin, matchedGroups[group].matchEnd)) : null;
   }
 
   public List<? extends T> groupNodes(String var) {
     int g = getFirstVarGroup(var);
-    if (g >= 0) {
-      return groupNodes(g);
-    } else {
-      return null;
-    }
+      return g >= 0 ? groupNodes(g) : null;
   }
 
   public Object groupValue() {
@@ -179,22 +150,14 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
   public Object groupValue(int group) {
     if (group == GROUP_BEFORE_MATCH || group == GROUP_AFTER_MATCH) {
       // return a new list so the resulting object is serializable
-      return new ArrayList<T>(elements.subList(start(group), end(group)));
+      return new ArrayList<>(elements.subList(start(group), end(group)));
     }
-    if (matchedGroups[group] != null) {
-      return matchedGroups[group].value;
-    } else {
-      return null;
-    }
+      return matchedGroups[group] != null ? matchedGroups[group].value : null;
   }
 
   public Object groupValue(String var) {
     int g = getFirstVarGroup(var);
-    if (g >= 0) {
-      return groupValue(g);
-    } else {
-      return null;
-    }
+      return g >= 0 ? groupValue(g) : null;
   }
 
   public MatchedGroupInfo<T> groupInfo() {
@@ -207,7 +170,7 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
       Object value = groupValue(group);
       String text = group(group);
       List<Object> matchedResults = groupMatchResults(group);
-      return new MatchedGroupInfo<T>(text, nodes, matchedResults, value);
+      return new MatchedGroupInfo<>(text, nodes, matchedResults, value);
     } else {
       return null;
     }
@@ -215,11 +178,7 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
 
   public MatchedGroupInfo<T> groupInfo(String var) {
     int g = getFirstVarGroup(var);
-    if (g >= 0) {
-      return groupInfo(g);
-    } else {
-      return null;
-    }
+      return g >= 0 ? groupInfo(g) : null;
   }
 
   public int groupCount() {
@@ -235,28 +194,16 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
     if (group == GROUP_BEFORE_MATCH || group == GROUP_AFTER_MATCH) {
       return Arrays.asList(Arrays.copyOfRange(matchedResults, start(group), end(group)));
     }
-    if (matchedGroups[group] != null) {
-      return Arrays.asList(Arrays.copyOfRange(matchedResults, matchedGroups[group].matchBegin, matchedGroups[group].matchEnd));
-    } else {
-      return null;
-    }
+      return matchedGroups[group] != null ? Arrays.asList(Arrays.copyOfRange(matchedResults, matchedGroups[group].matchBegin, matchedGroups[group].matchEnd)) : null;
   }
 
   public List<Object> groupMatchResults(String var) {
     int g = getFirstVarGroup(var);
-    if (g >= 0) {
-      return groupMatchResults(g);
-    } else {
-      return null;
-    }
+      return g >= 0 ? groupMatchResults(g) : null;
   }
 
   public Object nodeMatchResult(int index) {
-    if (matchedResults != null) {
-      return matchedResults[index];
-    } else {
-      return null;
-    }
+      return matchedResults != null ? matchedResults[index] : null;
   }
 
   public Object groupMatchResult(int group, int index) {
@@ -275,11 +222,7 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
 
   public Object groupMatchResult(String var, int index) {
     int g = getFirstVarGroup(var);
-    if (g >= 0) {
-      return groupMatchResult(g, index);
-    } else {
-      return null;
-    }
+      return g >= 0 ? groupMatchResult(g, index) : null;
   }
 
   private int getFirstVarGroup(String v)
@@ -299,7 +242,7 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
   {
     int matchBegin = -1;
     int matchEnd = -1;
-    Object value = null;
+    Object value;
 
     protected MatchedGroup(MatchedGroup mg) {
       this.matchBegin = mg.matchBegin;
@@ -315,7 +258,7 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
 
     public String toString()
     {
-      return "(" + matchBegin + "," + matchEnd + ")";
+      return "(" + matchBegin + ',' + matchEnd + ')';
     }
   }
 

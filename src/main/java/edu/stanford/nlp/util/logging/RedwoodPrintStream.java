@@ -15,7 +15,7 @@ public class RedwoodPrintStream extends PrintStream {
   private final Redwood.Flag tag;
 	private final PrintStream realStream;
   private StringBuilder buffer = new StringBuilder();
-  private boolean checkForThrowable = false;
+  private boolean checkForThrowable;
 
   public RedwoodPrintStream(Redwood.Flag tag, PrintStream realStream) {
     super(realStream);
@@ -32,7 +32,7 @@ public class RedwoodPrintStream extends PrintStream {
     }
   }
 
-  private synchronized void logf(String format, Object[] args){
+  private synchronized void logf(String format, Object... args){
     if(tag != null){
       Redwood.channels(tag).logf(format, args);
     } else {
@@ -48,7 +48,7 @@ public class RedwoodPrintStream extends PrintStream {
         if(tag != null){ Redwood.log(tag, msg); } else { Redwood.log(msg); }
         buffer = new StringBuilder();
       } else {
-        buffer.append(""+c);
+        buffer.append("").append(c);
       }
     }
 

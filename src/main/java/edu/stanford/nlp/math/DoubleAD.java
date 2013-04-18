@@ -1,9 +1,9 @@
 package edu.stanford.nlp.math;
 
 /**
- * The class <code>DoubleAD</code> was created to extend the
+ * The class {@code DoubleAD} was created to extend the
  * current calculations of gradient to automatically include a calculation of the
- * hessian vector product with another vector <code>v</code>.  This is used with the
+ * hessian vector product with another vector {@code v}.  This is used with the
  * Stochastic Meta Descent Optimization, but could be extended for use in any application
  * that requires an additional order of differentiation without explicitly creating the code.
  *
@@ -19,8 +19,8 @@ public class DoubleAD extends Number {
 
 
   public DoubleAD(){
-    setval(0);
-    setdot(1);
+      val = 0;
+      dot = 1;
   }
 
   public DoubleAD(double initVal, double initDot){
@@ -29,21 +29,15 @@ public class DoubleAD extends Number {
   }
 
   public boolean equals(DoubleAD b){
-    if(b.getval() == val && b.getdot() == dot){
-      return true;
-    } else return false;
+      return b.getval() == val && b.getdot() == dot;
   }
 
   public boolean equals(double valToCompare,double dotToCompare){
-    if(valToCompare == val && dotToCompare == dot){
-      return true;
-    }else return false;
+      return valToCompare == val && dotToCompare == dot;
   }
 
   public boolean equals(double valToCompare,double dotToCompare,double TOL){
-    if( Math.abs(valToCompare - val) < TOL && Math.abs(dotToCompare - dot) < TOL){
-      return true;
-    }else return false;
+      return Math.abs(valToCompare - val) < TOL && Math.abs(dotToCompare - dot) < TOL;
   }
 
   public double getval(){
@@ -68,23 +62,23 @@ public class DoubleAD extends Number {
   }
 
   public void plusEqualsConst(double a){
-    setval(val + a);
+      val = val + a;
   }
 
 
 
   public void plusEquals(DoubleAD a){
-    setval(val + a.getval() );
-    setdot(dot + a.getdot() );
+      val = val + a.getval();
+      dot = dot + a.getdot();
   }
 
   public void minusEquals(DoubleAD a){
-    setval(val - a.getval() );
-    setdot(dot - a.getdot() );
+      val = val - a.getval();
+      dot = dot - a.getdot();
   }
 
   public void minusEqualsConst(double a){
-    setval(val - a);
+      val = val - a;
   }
 
 

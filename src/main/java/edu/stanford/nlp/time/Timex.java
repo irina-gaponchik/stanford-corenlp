@@ -14,17 +14,17 @@ import org.w3c.dom.Element;
  *
  * <p>
  * Example text with TIMEX3 annotation:<br>
- * <code>In Washington &lt;TIMEX3 tid="t1" TYPE="DATE" VAL="PRESENT_REF"
+ * {@code In Washington &lt;TIMEX3 tid="t1" TYPE="DATE" VAL="PRESENT_REF"
  * temporalFunction="true" valueFromFunction="tf1"
  * anchorTimeID="t0"&gt;today&lt;/TIMEX3&gt;, the Federal Aviation Administration
  * released air traffic control tapes from the night the TWA Flight eight
  * hundred went down.
- * </code>
+ * }
  * <p>
  * <br>
  * TIMEX3 specification:
  * <br>
- * <pre><code>
+ * <pre>{@code
  * attributes ::= tid type [functionInDocument] [beginPoint] [endPoint]
  *                [quant] [freq] [temporalFunction] (value | valueFromFunction)
  *                [mod] [anchorTimeID] [comment]
@@ -53,7 +53,7 @@ import org.w3c.dom.Element;
  * anchorTimeID ::= IDREF
  *   {anchorTimeID ::= TimeID}
  * comment ::= CDATA
- * </code></pre>
+ * }</pre>
  *
  * <p>
  * References
@@ -162,7 +162,7 @@ public class Timex implements Serializable {
     this.type = type;
     this.beginPoint = -1;
     this.endPoint = -1;
-    this.xml = (val == null ? "<TIMEX3/>" : String.format("<TIMEX3 VAL=\"%s\" TYPE=\"%s\"/>", this.val, this.type));
+    this.xml = val == null ? "<TIMEX3/>" : String.format("<TIMEX3 VAL=\"%s\" TYPE=\"%s\"/>", this.val, this.type);
   }
 
   private void init(Element element) {
@@ -192,9 +192,9 @@ public class Timex implements Serializable {
 
     // Optional attributes
     String beginPoint = XMLUtils.getAttribute(element, "beginPoint");
-    this.beginPoint = (beginPoint == null || beginPoint.length() == 0)? -1 : Integer.parseInt(beginPoint.substring(1));
+    this.beginPoint = beginPoint == null || beginPoint.isEmpty() ? -1 : Integer.parseInt(beginPoint.substring(1));
     String endPoint = XMLUtils.getAttribute(element, "endPoint");
-    this.endPoint = (endPoint == null || endPoint.length() == 0)? -1 : Integer.parseInt(endPoint.substring(1));
+    this.endPoint = endPoint == null || endPoint.isEmpty() ? -1 : Integer.parseInt(endPoint.substring(1));
   }
 
   public String toString() {
@@ -221,11 +221,8 @@ public class Timex implements Serializable {
     if (type != null ? !type.equals(timex.type) : timex.type != null) {
       return false;
     }
-    if (val != null ? !val.equals(timex.val) : timex.val != null) {
-      return false;
-    }
+      return !(val != null ? !val.equals(timex.val) : timex.val != null);
 
-    return true;
   }
 
   @Override
@@ -252,10 +249,10 @@ public class Timex implements Serializable {
       element.setAttribute("type", type);
     }
     if (beginPoint != -1) {
-      element.setAttribute("beginPoint", "t" + String.valueOf(beginPoint));
+      element.setAttribute("beginPoint", 't' + String.valueOf(beginPoint));
     }
     if (endPoint != -1) {
-      element.setAttribute("endPoint", "t" + String.valueOf(endPoint));
+      element.setAttribute("endPoint", 't' + String.valueOf(endPoint));
     }
     if (text != null) {
       element.setTextContent(text);
@@ -346,14 +343,14 @@ public class Timex implements Serializable {
       int year = Integer.parseInt(this.val.substring(0, 4));
       int month = Integer.parseInt(this.val.substring(4, 6));
       int day = Integer.parseInt(this.val.substring(6, 8));
-      return new Pair<Calendar, Calendar>(makeCalendar(year, month, day), makeCalendar(year, month, day));
+      return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
     }
     // YYYY-MM-DD or YYYY-MM-DDT...
     else if (val.length() >= 10 && Pattern.matches("\\d\\d\\d\\d-\\d\\d-\\d\\d", this.val.substring(0, 10))) {
       int year = Integer.parseInt(this.val.substring(0, 4));
       int month = Integer.parseInt(this.val.substring(5, 7));
       int day = Integer.parseInt(this.val.substring(8, 10));
-      return new Pair<Calendar, Calendar>(makeCalendar(year, month, day), makeCalendar(year, month, day));
+      return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
     }
 
     // YYYYMMDDL+
@@ -361,7 +358,7 @@ public class Timex implements Serializable {
       int year = Integer.parseInt(this.val.substring(0, 4));
       int month = Integer.parseInt(this.val.substring(4, 6));
       int day = Integer.parseInt(this.val.substring(6, 8));
-      return new Pair<Calendar, Calendar>(makeCalendar(year, month, day), makeCalendar(year, month, day));
+      return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
     }
 
     // YYYYMM or YYYYMMT...
@@ -371,7 +368,7 @@ public class Timex implements Serializable {
       Calendar begin = makeCalendar(year, month, 1);
       int lastDay = begin.getActualMaximum(Calendar.DATE);
       Calendar end = makeCalendar(year, month, lastDay);
-      return new Pair<Calendar, Calendar>(begin, end);
+      return new Pair<>(begin, end);
     }
 
     // YYYY-MM or YYYY-MMT...
@@ -381,13 +378,13 @@ public class Timex implements Serializable {
       Calendar begin = makeCalendar(year, month, 1);
       int lastDay = begin.getActualMaximum(Calendar.DATE);
       Calendar end = makeCalendar(year, month, lastDay);
-      return new Pair<Calendar, Calendar>(begin, end);
+      return new Pair<>(begin, end);
     }
 
     // YYYY or YYYYT...
     else if (val.length() >= 4 && Pattern.matches("\\d\\d\\d\\d", this.val.substring(0, 4))) {
       int year = Integer.parseInt(this.val.substring(0, 4));
-      return new Pair<Calendar, Calendar>(makeCalendar(year, 1, 1), makeCalendar(year, 12, 31));
+      return new Pair<>(makeCalendar(year, 1, 1), makeCalendar(year, 12, 31));
     }
 
     // PDDY
@@ -401,7 +398,7 @@ public class Timex implements Serializable {
         Calendar start = copyCalendar(rc);
         Calendar end = copyCalendar(rc);
         end.add(Calendar.YEAR, yearRange);
-        return new Pair<Calendar, Calendar>(start, end);
+        return new Pair<>(start, end);
       }
 
       // in the past
@@ -409,7 +406,7 @@ public class Timex implements Serializable {
         Calendar start = copyCalendar(rc);
         Calendar end = copyCalendar(rc);
         start.add(Calendar.YEAR, 0 - yearRange);
-        return new Pair<Calendar, Calendar>(start, end);
+        return new Pair<>(start, end);
       }
 
       throw new RuntimeException("begin and end are equal " + this);
@@ -424,7 +421,7 @@ public class Timex implements Serializable {
         Calendar start = copyCalendar(rc);
         Calendar end = copyCalendar(rc);
         end.add(Calendar.MONTH, monthRange);
-        return new Pair<Calendar, Calendar>(start, end);
+        return new Pair<>(start, end);
       }
 
       // in the past
@@ -432,7 +429,7 @@ public class Timex implements Serializable {
         Calendar start = copyCalendar(rc);
         Calendar end = copyCalendar(rc);
         start.add(Calendar.MONTH, 0 - monthRange);
-        return new Pair<Calendar, Calendar>(start, end);
+        return new Pair<>(start, end);
       }
 
       throw new RuntimeException("begin and end are equal " + this);
@@ -447,7 +444,7 @@ public class Timex implements Serializable {
         Calendar start = copyCalendar(rc);
         Calendar end = copyCalendar(rc);
         end.add(Calendar.DAY_OF_MONTH, dayRange);
-        return new Pair<Calendar, Calendar>(start, end);
+        return new Pair<>(start, end);
       }
 
       // in the past
@@ -455,7 +452,7 @@ public class Timex implements Serializable {
         Calendar start = copyCalendar(rc);
         Calendar end = copyCalendar(rc);
         start.add(Calendar.DAY_OF_MONTH, 0 - dayRange);
-        return new Pair<Calendar, Calendar>(start, end);
+        return new Pair<>(start, end);
       }
 
       throw new RuntimeException("begin and end are equal " + this);
@@ -466,28 +463,28 @@ public class Timex implements Serializable {
       int year = Integer.parseInt(this.val.substring(0, 4));
       Calendar start = makeCalendar(year, 2, 1);
       Calendar end = makeCalendar(year, 4, 31);
-      return new Pair<Calendar, Calendar>(start, end);
+      return new Pair<>(start, end);
     }
     // YYYYSU
     if (Pattern.matches("\\d+SU", this.val)) {
       int year = Integer.parseInt(this.val.substring(0, 4));
       Calendar start = makeCalendar(year, 5, 1);
       Calendar end = makeCalendar(year, 7, 31);
-      return new Pair<Calendar, Calendar>(start, end);
+      return new Pair<>(start, end);
     }
     // YYYYFA
     if (Pattern.matches("\\d+FA", this.val)) {
       int year = Integer.parseInt(this.val.substring(0, 4));
       Calendar start = makeCalendar(year, 8, 1);
       Calendar end = makeCalendar(year, 10, 31);
-      return new Pair<Calendar, Calendar>(start, end);
+      return new Pair<>(start, end);
     }
     // YYYYWI
     if (Pattern.matches("\\d+WI", this.val)) {
       int year = Integer.parseInt(this.val.substring(0, 4));
       Calendar start = makeCalendar(year, 11, 1);
       Calendar end = makeCalendar(year + 1, 1, 29);
-      return new Pair<Calendar, Calendar>(start, end);
+      return new Pair<>(start, end);
     }
 
     // YYYYWDD
@@ -498,7 +495,7 @@ public class Timex implements Serializable {
       int endDay = startDay + 6;
       Calendar start = makeCalendar(year, startDay);
       Calendar end = makeCalendar(year, endDay);
-      return new Pair<Calendar, Calendar>(start, end);
+      return new Pair<>(start, end);
     }
 
     // PRESENT_REF
@@ -506,7 +503,7 @@ public class Timex implements Serializable {
       Calendar rc = documentTime.getDate();  // todo: This case doesn't check for documentTime being null and will NPE
       Calendar start = copyCalendar(rc);
       Calendar end = copyCalendar(rc);
-      return new Pair<Calendar, Calendar>(start, end);
+      return new Pair<>(start, end);
     }
 
     throw new RuntimeException(String.format("unknown value \"%s\" in %s", this.val, this));

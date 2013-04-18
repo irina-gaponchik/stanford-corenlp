@@ -67,7 +67,7 @@ public class ParserAnnotator implements Annotator {
   public ParserAnnotator(String parserLoc,
                          boolean verbose,
                          int maxSent,
-                         String[] flags) {
+                         String... flags) {
     this(loadModel(parserLoc, verbose, flags), verbose, maxSent);
   }
 
@@ -107,11 +107,7 @@ public class ParserAnnotator implements Annotator {
     this.maxSentenceLength = PropertiesUtils.getInt(props, annotatorName + ".maxlen", -1);
 
     String treeMapClass = props.getProperty(annotatorName + ".treemap");
-    if (treeMapClass == null) {
-      this.treeMap = null;
-    } else {
-      this.treeMap = ReflectionLoading.loadByReflection(treeMapClass, props);
-    }
+      this.treeMap = treeMapClass == null ? null : (Function<Tree, Tree>) ReflectionLoading.loadByReflection(treeMapClass, props);
 
     this.maxParseTime = PropertiesUtils.getLong(props, annotatorName + ".maxtime", 0);
 
@@ -137,39 +133,27 @@ public class ParserAnnotator implements Annotator {
 
   public static String signature(String annotatorName, Properties props) {
     StringBuilder os = new StringBuilder();
-    os.append(annotatorName + ".model:" +
-            props.getProperty(annotatorName + ".model",
-                    LexicalizedParser.DEFAULT_PARSER_LOC));
-    os.append(annotatorName + ".debug:" +
-            props.getProperty(annotatorName + ".debug", "false"));
-    os.append(annotatorName + ".flags:" +
-            props.getProperty(annotatorName + ".flags", ""));
-    os.append(annotatorName + ".maxlen:" +
-            props.getProperty(annotatorName + ".maxlen", "-1"));
-    os.append(annotatorName + ".treemap:" +
-            props.getProperty(annotatorName + ".treemap", ""));
-    os.append(annotatorName + ".maxtime:" +
-            props.getProperty(annotatorName + ".maxtime", "0"));
-    os.append(annotatorName + ".buildgraphs:" +
-            props.getProperty(annotatorName + ".buildgraphs", "true"));
-    os.append(annotatorName + ".nthreads:" + 
-              props.getProperty(annotatorName + ".nthreads", props.getProperty("nthreads", "")));
+    os.append(annotatorName).append(".model:").append(props.getProperty(annotatorName + ".model",
+            LexicalizedParser.DEFAULT_PARSER_LOC));
+    os.append(annotatorName).append(".debug:").append(props.getProperty(annotatorName + ".debug", "false"));
+    os.append(annotatorName).append(".flags:").append(props.getProperty(annotatorName + ".flags", ""));
+    os.append(annotatorName).append(".maxlen:").append(props.getProperty(annotatorName + ".maxlen", "-1"));
+    os.append(annotatorName).append(".treemap:").append(props.getProperty(annotatorName + ".treemap", ""));
+    os.append(annotatorName).append(".maxtime:").append(props.getProperty(annotatorName + ".maxtime", "0"));
+    os.append(annotatorName).append(".buildgraphs:").append(props.getProperty(annotatorName + ".buildgraphs", "true"));
+    os.append(annotatorName).append(".nthreads:").append(props.getProperty(annotatorName + ".nthreads", props.getProperty("nthreads", "")));
     return os.toString();
   }
 
   public static String[] convertFlagsToArray(String parserFlags) {
     if (parserFlags == null) {
       return DEFAULT_FLAGS;
-    } else if (parserFlags.trim().equals("")) {
-      return StringUtils.EMPTY_STRING_ARRAY;
-    } else {
-      return parserFlags.trim().split("\\s+");
-    }
+    } else return parserFlags.trim().isEmpty() ? StringUtils.EMPTY_STRING_ARRAY : parserFlags.trim().split("\\s+");
   }
 
   private static LexicalizedParser loadModel(String parserLoc,
                                                     boolean verbose,
-                                                    String[] flags) {
+                                                    String... flags) {
     if (verbose) {
       System.err.println("Loading Parser Model [" + parserLoc + "] ...");
     }
@@ -197,7 +181,7 @@ public class ParserAnnotator implements Annotator {
   public void annotate(Annotation annotation) {
     if (annotation.containsKey(CoreAnnotations.SentencesAnnotation.class)) {
       if (nThreads != 1 || maxParseTime > 0) {
-        MulticoreWrapper<CoreMap, CoreMap> wrapper = new MulticoreWrapper<CoreMap, CoreMap>(nThreads, new ParserAnnotatorProcessor());
+        MulticoreWrapper<CoreMap, CoreMap> wrapper = new MulticoreWrapper<>(nThreads, new ParserAnnotatorProcessor());
         if (maxParseTime > 0) {
           wrapper.setMaxBlockTime(maxParseTime);
         }
@@ -223,7 +207,7 @@ public class ParserAnnotator implements Annotator {
   }
 
   private void doOneSentence(CoreMap sentence) {
-    final List<CoreLabel> words = sentence.get(CoreAnnotations.TokensAnnotation.class);
+    List<CoreLabel> words = sentence.get(CoreAnnotations.TokensAnnotation.class);
     if (VERBOSE) {
       System.err.println("Parsing: " + words);
     }
@@ -231,7 +215,7 @@ public class ParserAnnotator implements Annotator {
     // generate the constituent tree
     if (maxSentenceLength <= 0 || words.size() < maxSentenceLength) {
       try {
-        final List<ParserConstraint> constraints = sentence.get(ParserAnnotations.ConstraintAnnotation.class);
+        List<ParserConstraint> constraints = sentence.get(ParserAnnotations.ConstraintAnnotation.class);
         tree = doOneSentence(constraints, words);
       } catch (RuntimeInterruptedException e) {
         if (VERBOSE) {
@@ -271,10 +255,9 @@ public class ParserAnnotator implements Annotator {
     return tree;
   }
 
-  @SuppressWarnings("unused")
   private Tree doOneSentence(List<? extends CoreLabel> words) {
     // TODO: might not need to create new tokens
-    List<CoreLabel> newWords = new ArrayList<CoreLabel>();
+    List<CoreLabel> newWords = new ArrayList<>();
     for (CoreLabel fl : words) {
       CoreLabel ml = new CoreLabel();
       ml.setWord(fl.word());
@@ -282,11 +265,7 @@ public class ParserAnnotator implements Annotator {
       newWords.add(ml);
     }
 
-    if(maxSentenceLength <= 0 || newWords.size() < maxSentenceLength) {
-      return parser.apply(newWords);
-    } else {
-      return ParserAnnotatorUtils.xTree(newWords);
-    }
+      return maxSentenceLength <= 0 || newWords.size() < maxSentenceLength ? parser.apply(newWords) : ParserAnnotatorUtils.xTree(newWords);
   }
 
 

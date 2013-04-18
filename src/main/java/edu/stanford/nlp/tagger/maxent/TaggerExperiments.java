@@ -94,7 +94,7 @@ public class TaggerExperiments extends Experiments {
       vArray[i][0] = indX;
       vArray[i][1] = indY;
 
-      if (i > 0 && (i % 10000) == 0) {
+      if (i > 0 && i % 10000 == 0) {
         System.err.printf("%d ",i);
         if (i % 100000 == 0) { System.err.println(); }
       }
@@ -130,7 +130,7 @@ public class TaggerExperiments extends Experiments {
    * @return Whether the key was already known (false) or added (true)
    */
   protected boolean add(FeatureKey s) {
-    if ((sTemplates.contains(s))) {
+    if (sTemplates.contains(s)) {
       return false;
     }
     sTemplates.add(s);
@@ -150,11 +150,11 @@ public class TaggerExperiments extends Experiments {
       System.err.println("getFeaturesNew adding features ...");
       int current = 0;
       int numFeats = 0;
-      final boolean VERBOSE = false;
+      boolean VERBOSE = false;
       for (FeatureKey fK : sTemplates) {
         int numF = fK.num;
         int[] xValues;
-        Pair<Integer, String> wT = new Pair<Integer, String>(numF, fK.val);
+        Pair<Integer, String> wT = new Pair<>(numF, fK.val);
         xValues = tFeature.getXValues(wT);
         if (xValues == null) {
           System.err.println("  xValues is null: " + fK.toString()); //  + " " + i
@@ -315,7 +315,7 @@ public class TaggerExperiments extends Experiments {
         System.err.printf("%d ",x);
         if (x % 100000 == 0) { System.err.println(); }
       }
-      int fSize = (maxentTagger.isRare(ExtractorFrames.cWord.extract(h)) ? fAll : fGeneral);
+      int fSize = maxentTagger.isRare(ExtractorFrames.cWord.extract(h)) ? fAll : fGeneral;
       for (int i = 0; i < fSize; i++) {
         tFeature.addPrev(i, h);
       }
@@ -330,7 +330,7 @@ public class TaggerExperiments extends Experiments {
         System.err.print(x + " ");
         if (x % 100000 == 0) { System.err.println(); }
       }
-      int fSize = (maxentTagger.isRare(ExtractorFrames.cWord.extract(h)) ? fAll : fGeneral);
+      int fSize = maxentTagger.isRare(ExtractorFrames.cWord.extract(h)) ? fAll : fGeneral;
       for (int i = 0; i < fSize; i++) {
         tFeature.add(i, h, x); // write this to check whether to add
       }
@@ -347,12 +347,9 @@ public class TaggerExperiments extends Experiments {
   protected static boolean isPopulated(int fNo, int size, MaxentTagger maxentTagger) {
     // Feature number 0 is hard-coded as the current word feature, which has a special threshold
     if (fNo == 0) {
-      return (size > maxentTagger.curWordMinFeatureThresh);
-    } else if (fNo < maxentTagger.extractors.getSize()) {
-      return (size > maxentTagger.minFeatureThresh);
-    } else {
-      return (size > maxentTagger.rareWordMinFeatureThresh);
-    }
+      return size > maxentTagger.curWordMinFeatureThresh;
+    } else
+        return fNo < maxentTagger.extractors.getSize() ? size > maxentTagger.minFeatureThresh : size > maxentTagger.rareWordMinFeatureThresh;
   }
 
   private void initTemplatesNew() {
@@ -370,7 +367,7 @@ public class TaggerExperiments extends Experiments {
         continue;
       } //do not add the feature
       //iterate over tags in dictionary
-      if (maxentTagger.alltags) {
+      if (MaxentTagger.alltags) {
         int numTags = maxentTagger.tags.getSize();
         for (int j = 0; j < numTags; j++) {
 
@@ -401,7 +398,7 @@ public class TaggerExperiments extends Experiments {
   private void addRareTemplatesNew(History h, String tag) {
     // Feature templates rare
 
-    if (!(maxentTagger.isRare(ExtractorFrames.cWord.extract(h)))) {
+    if (!maxentTagger.isRare(ExtractorFrames.cWord.extract(h))) {
       return;
     }
     int start = numFeatsGeneral;
@@ -411,7 +408,7 @@ public class TaggerExperiments extends Experiments {
       if (s.equals(zeroSt)) {
         continue;
       } //do not add the feature
-      if (maxentTagger.alltags) {
+      if (MaxentTagger.alltags) {
         int numTags = maxentTagger.tags.getSize();
         for (int j = 0; j < numTags; j++) {
 

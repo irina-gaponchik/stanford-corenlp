@@ -28,7 +28,7 @@ public class DefaultLexicalMapper implements Mapper, Serializable {
   private final Pattern utf8ArabicChart = Pattern.compile("[\u0600-\u06FF]");
 
   //Buckwalter patterns
-  private final String bwAlefChar = "A"; //U+0627
+  private static final String bwAlefChar = "A"; //U+0627
   private final Pattern bwDiacritics = Pattern.compile("F|N|K|a|u|i|\\~|o");
   private final Pattern bwTatweel = Pattern.compile("_");
   private final Pattern bwAlef = Pattern.compile("\\{|\\||>|<");
@@ -56,20 +56,20 @@ public class DefaultLexicalMapper implements Mapper, Serializable {
   private final Pattern hasDigit = Pattern.compile("\\d+");
 
   // Process the vocalized section for parsing
-  private boolean useATBVocalizedSectionMapping = false;
+  private boolean useATBVocalizedSectionMapping;
 
   // Strip morpheme boundary markers in the vocalized section
-  private boolean stripMorphemeMarkersInUTF8 = false;
+  private boolean stripMorphemeMarkersInUTF8;
 
   // Strip all morpheme and segmentation markers in UTF-8 Arabic
-  private boolean stripSegmentationMarkersInUTF8 = false;
+  private boolean stripSegmentationMarkersInUTF8;
 
   //wsg: "LATIN" does not appear in the Bies tagset, so be sure to pass
   //in the extended POS tags during normalization
-  private final String parentTagString = "PUNC LATIN -NONE-";
+  private static final String parentTagString = "PUNC LATIN -NONE-";
   private final Set<String> parentTagsToEscape;
 
-  private final String utf8CliticString = "ل ف و ما ه ها هم هن نا كم تن تم ى ي هما ك ب م";
+  private static final String utf8CliticString = "ل ف و ما ه ها هم هن نا كم تن تم ى ي هما ك ب م";
 //  private final Set<String> utf8Clitics;
   private final Set<String> bwClitics;
 
@@ -114,12 +114,12 @@ public class DefaultLexicalMapper implements Mapper, Serializable {
     if (stripMorphemeMarkersInUTF8) {
       Matcher rmMorphemeBoundary = morphemeBoundary.matcher(element);
       String strippedElem = rmMorphemeBoundary.replaceAll("");
-      if(strippedElem.length() > 0)
+      if(!strippedElem.isEmpty())
         element = strippedElem;
     }
     if (stripSegmentationMarkersInUTF8) {
       String strippedElem = segmentationMarker.matcher(element).replaceAll("");
-      if(strippedElem.length() > 0)
+      if(!strippedElem.isEmpty())
         element = strippedElem;
     }
 
@@ -163,7 +163,7 @@ public class DefaultLexicalMapper implements Mapper, Serializable {
       Matcher cliticMarker = segmentationMarker.matcher(element);
       if(cliticMarker.find() && !hasDigit.matcher(element).find()) {
         String strippedElem = cliticMarker.replaceAll("");
-        if(strippedElem.length() > 0)
+        if(!strippedElem.isEmpty())
           element = bwClitics.contains(strippedElem) ? element : strippedElem;
       }
 
@@ -182,22 +182,25 @@ public class DefaultLexicalMapper implements Mapper, Serializable {
       return elem;
 
     Matcher utf8Encoding = utf8ArabicChart.matcher(elem);
-    return (utf8Encoding.find()) ? mapUtf8(elem) : mapBuckwalter(elem);
+    return utf8Encoding.find() ? mapUtf8(elem) : mapBuckwalter(elem);
   }
 
   public void setup(File path, String... options) {
     if(options == null) return;
 
-    for(int i = 0; i < options.length; i++) {
-      final String opt = options[i];
-      if (opt.equals("ATBVocalizedSection")) {
-        useATBVocalizedSectionMapping = true;
-      } else if (opt.equals("StripSegMarkersInUTF8")) {
-        stripSegmentationMarkersInUTF8 = true;
-      } else if (opt.equals("StripMorphMarkersInUTF8")) {
-        stripMorphemeMarkersInUTF8 = true;
+      for (String opt : options) {
+          switch (opt) {
+              case "ATBVocalizedSection":
+                  useATBVocalizedSectionMapping = true;
+                  break;
+              case "StripSegMarkersInUTF8":
+                  stripSegmentationMarkersInUTF8 = true;
+                  break;
+              case "StripMorphMarkersInUTF8":
+                  stripMorphemeMarkersInUTF8 = true;
+                  break;
+          }
       }
-    }
   }
 
   //Whether or not the encoding of this word can be converted to another encoding
@@ -210,14 +213,14 @@ public class DefaultLexicalMapper implements Mapper, Serializable {
     //This is NUMERIC_COMMA in the raw trees. We allow conversion of this
     //token to UTF-8 since it would appear in this encoding in arbitrary
     //UTF-8 text input
-    if(parent.contains("NUMERIC_COMMA") || (parent.contains("PUNC") && element.equals("r"))) //Numeric comma
+    if(parent.contains("NUMERIC_COMMA") || parent.contains("PUNC") && element.equals("r")) //Numeric comma
       return true;
 
     Matcher numMatcher = hasDigit.matcher(element);
     return !(numMatcher.find() || parentTagsToEscape.contains(parent));
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Mapper m = new DefaultLexicalMapper();
 
     System.out.printf("< :-> %s\n",m.map(null, "FNKqq"));

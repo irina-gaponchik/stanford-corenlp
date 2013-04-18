@@ -31,8 +31,8 @@ public class InfoTemplate{
     int tally=31;
     int n=7;
     tally = whomepage.hashCode()+n*wacronym.hashCode()+n*n*wname.hashCode();
-    tally += (chomepage.hashCode() + 
-              n*cacronym.hashCode()+ n*n*cname.hashCode());
+    tally += chomepage.hashCode() +
+              n*cacronym.hashCode()+ n*n*cname.hashCode();
     return tally;
   }
   
@@ -42,17 +42,17 @@ public class InfoTemplate{
     if(!( obj instanceof InfoTemplate)) return false;
     InfoTemplate i = (InfoTemplate)obj;
     
-    return(whomepage.equals(i.whomepage)&&
+    return whomepage.equals(i.whomepage)&&
            wacronym.equals(i.wacronym) &&
            wname.equals(i.wname) &&
            chomepage.equals(i.chomepage)&&
            cacronym.equals(i.cacronym) &&
-           cname.equals(i.cname));              
+           cname.equals(i.cname);
   }
   
   @Override
   public String toString(){
-    return ("W_URL: "+whomepage+" W_ACRO: "+wacronym+" W_NAME: "+wname+ 
-            "\nC_URL: "+chomepage+" C_ACRO: "+cacronym+" C_NAME: "+cname);
+    return "W_URL: "+whomepage+" W_ACRO: "+wacronym+" W_NAME: "+wname+
+            "\nC_URL: "+chomepage+" C_ACRO: "+cacronym+" C_NAME: "+cname;
   }
 }

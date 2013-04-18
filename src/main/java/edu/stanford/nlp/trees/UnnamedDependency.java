@@ -75,9 +75,9 @@ public class UnnamedDependency implements Dependency<Label, Label, Object> {
     return null;
   }
   
-  protected String getText(Label label) {
-    return ((label instanceof HasWord) ? 
-            ((HasWord) label).word() : label.value());
+  protected static String getText(Label label) {
+    return label instanceof HasWord ?
+            ((HasWord) label).word() : label.value();
   }
 
   @Override
@@ -91,7 +91,7 @@ public class UnnamedDependency implements Dependency<Label, Label, Object> {
   }
   
   public boolean equalsIgnoreName(Object o) {
-     if (this == o) {
+     if (this.equals(o)) {
         return true;
       } else if( !(o instanceof UnnamedDependency)) {
         return false;
@@ -117,13 +117,14 @@ public class UnnamedDependency implements Dependency<Label, Label, Object> {
    * Otherwise the default toString() is used.
    */
   public String toString(String format) {
-    if ("xml".equals(format)) {
-      return "  <dep>\n    <governor>" + XMLUtils.escapeXML(governor().value()) + "</governor>\n    <dependent>" + XMLUtils.escapeXML(dependent().value()) + "</dependent>\n  </dep>";
-    } else if ("predicate".equals(format)) {
-      return "dep(" + governor() + "," + dependent() + ")";
-    } else {
-      return toString();
-    }
+      switch (format) {
+          case "xml":
+              return "  <dep>\n    <governor>" + XMLUtils.escapeXML(governor().value()) + "</governor>\n    <dependent>" + XMLUtils.escapeXML(dependent().value()) + "</dependent>\n  </dep>";
+          case "predicate":
+              return "dep(" + governor() + ',' + dependent() + ')';
+          default:
+              return toString();
+      }
   }
   
   public DependencyFactory dependencyFactory() {
@@ -140,19 +141,19 @@ public class UnnamedDependency implements Dependency<Label, Label, Object> {
   }
 
   /**
-   * A <code>DependencyFactory</code> acts as a factory for creating objects
-   * of class <code>Dependency</code>
+   * A {@code DependencyFactory} acts as a factory for creating objects
+   * of class {@code Dependency}
    */
   private static class UnnamedDependencyFactory implements DependencyFactory {
     /**
-     * Create a new <code>Dependency</code>.
+     * Create a new {@code Dependency}.
      */
     public Dependency<Label, Label, Object> newDependency(Label regent, Label dependent) {
       return newDependency(regent, dependent, null);
     }
 
     /**
-     * Create a new <code>Dependency</code>.
+     * Create a new {@code Dependency}.
      */
     public Dependency<Label, Label, Object> newDependency(Label regent, Label dependent, Object name) {
       return new UnnamedDependency(regent, dependent);

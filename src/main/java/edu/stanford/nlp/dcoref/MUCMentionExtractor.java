@@ -84,11 +84,11 @@ public class MUCMentionExtractor extends MentionExtractor {
 
   @Override
   public Document nextDoc() throws Exception {
-    List<List<CoreLabel>> allWords = new ArrayList<List<CoreLabel>>();
-    List<Tree> allTrees = new ArrayList<Tree>();
-    List<List<Mention>> allGoldMentions = new ArrayList<List<Mention>>();
+    List<List<CoreLabel>> allWords = new ArrayList<>();
+    List<Tree> allTrees = new ArrayList<>();
+    List<List<Mention>> allGoldMentions = new ArrayList<>();
     List<List<Mention>> allPredictedMentions;
-    List<CoreMap> allSentences = new ArrayList<CoreMap>();
+    List<CoreMap> allSentences = new ArrayList<>();
     Annotation docAnno = new Annotation("");
 
     Pattern docPattern = Pattern.compile("<DOC>(.*?)</DOC>", Pattern.DOTALL+Pattern.CASE_INSENSITIVE);
@@ -104,8 +104,7 @@ public class MUCMentionExtractor extends MentionExtractor {
     //Maintain current document ID.
     Pattern docIDPattern = Pattern.compile("<DOCNO>(.*?)</DOCNO>", Pattern.DOTALL+Pattern.CASE_INSENSITIVE);
     Matcher docIDMatcher = docIDPattern.matcher(doc);
-    if(docIDMatcher.find()) currentDocumentID = docIDMatcher.group(1);
-    else currentDocumentID = "documentAfter " + currentDocumentID;
+      currentDocumentID = docIDMatcher.find() ? docIDMatcher.group(1) : "documentAfter " + currentDocumentID;
 
     while (sentenceMatcher.find()) {
       String sentenceString = sentenceMatcher.group(2);
@@ -117,7 +116,7 @@ public class MUCMentionExtractor extends MentionExtractor {
         if (i > 0 && w.word().equals("$")) {
           if(!words.get(i-1).word().endsWith("PRP") && !words.get(i-1).word().endsWith("WP"))
             continue;
-          words.get(i-1).set(CoreAnnotations.TextAnnotation.class, words.get(i-1).word()+"$");
+          words.get(i-1).set(CoreAnnotations.TextAnnotation.class, words.get(i-1).word()+ '$');
           words.remove(i);
           i--;
         } else if (w.word().equals("\\/")) {
@@ -130,10 +129,10 @@ public class MUCMentionExtractor extends MentionExtractor {
       }
       // END FIXING TOKENIZATION PROBLEMS
 
-      List<CoreLabel> sentence = new ArrayList<CoreLabel>();
+      List<CoreLabel> sentence = new ArrayList<>();
       // MUC accepts embedded coref mentions, so we need to keep a stack for the mentions currently open
-      Stack<Mention> stack = new Stack<Mention>();
-      List<Mention> mentions = new ArrayList<Mention>();
+      Stack<Mention> stack = new Stack<>();
+      List<Mention> mentions = new ArrayList<>();
 
       allWords.add(sentence);
       allGoldMentions.add(mentions);
@@ -141,7 +140,7 @@ public class MUCMentionExtractor extends MentionExtractor {
       for (CoreLabel word : words) {
         String w = word.get(CoreAnnotations.TextAnnotation.class);
         // found regular token: WORD/POS
-        if (!w.startsWith("<") && w.contains("\\/") && w.lastIndexOf("\\/") != w.length()-2) {
+        if (!(!w.isEmpty() && w.charAt(0) == '<') && w.contains("\\/") && w.lastIndexOf("\\/") != w.length()-2) {
           int i = w.lastIndexOf("\\/");
           String w1 = w.substring(0, i);
           // we do NOT set POS info here. We take the POS tags from the parser!
@@ -157,7 +156,7 @@ public class MUCMentionExtractor extends MentionExtractor {
           sentence.add(word);
         }
         // found the start SGML tag for a NE, e.g., "<ORGANIZATION>"
-        else if (w.startsWith("<") && !w.startsWith("<COREF") && !w.startsWith("</")) {
+        else if (!w.isEmpty() && w.charAt(0) == '<' && !w.startsWith("<COREF") && !w.startsWith("</")) {
           Pattern nerPattern = Pattern.compile("<(.*?)>");
           Matcher m = nerPattern.matcher(w);
           m.find();
@@ -219,7 +218,7 @@ public class MUCMentionExtractor extends MentionExtractor {
         CoreLabel w = sentence.get(i);
         w.set(CoreAnnotations.IndexAnnotation.class, i+1);
         w.set(CoreAnnotations.UtteranceAnnotation.class, 0);
-        if(i>0) textContent.append(" ");
+        if(i>0) textContent.append(' ');
         textContent.append(w.getString(CoreAnnotations.TextAnnotation.class));
       }
       CoreMap sentCoreMap = new Annotation(textContent.toString());
@@ -285,8 +284,7 @@ public class MUCMentionExtractor extends MentionExtractor {
     }
 
     // extract predicted mentions
-    if(Constants.USE_GOLD_MENTIONS) allPredictedMentions = allGoldMentions;
-    else allPredictedMentions = mentionFinder.extractPredictedMentions(docAnno, maxID, dictionaries);
+      allPredictedMentions = Constants.USE_GOLD_MENTIONS ? allGoldMentions : mentionFinder.extractPredictedMentions(docAnno, maxID, dictionaries);
 
     // add the relevant fields to mentions and order them for coref
     return arrange(docAnno, allWords, allTrees, allPredictedMentions, allGoldMentions, true);

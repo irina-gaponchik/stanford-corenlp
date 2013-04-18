@@ -37,22 +37,22 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    * ChineseTreebankLanguagePack.
    */
   private ChineseTreebankLanguagePack ctlp;
-  public boolean charTags = false;
-  public boolean useCharacterBasedLexicon = false;
-  public boolean useMaxentLexicon = false;
-  public boolean useMaxentDepGrammar = false;
-  public boolean segment = false;
-  public boolean segmentMarkov = false;
-  public boolean sunJurafskyHeadFinder = false;
-  public boolean bikelHeadFinder = false;
-  public boolean discardFrags = false;
-  public boolean useSimilarWordMap = false;
+  public boolean charTags;
+  public boolean useCharacterBasedLexicon;
+  public boolean useMaxentLexicon;
+  public boolean useMaxentDepGrammar;
+  public boolean segment;
+  public boolean segmentMarkov;
+  public boolean sunJurafskyHeadFinder;
+  public boolean bikelHeadFinder;
+  public boolean discardFrags;
+  public boolean useSimilarWordMap;
 
-  public String segmenterClass = null;
+  public String segmenterClass;
 
   private Lexicon lex;
   private WordSegmenter segmenter;
-  private HeadFinder headFinder = null;
+  private HeadFinder headFinder;
 
   private static void printlnErr(String s) {
     EncodingPrintWriter.err.println(s, ChineseTreebankLanguagePack.ENCODING);
@@ -71,11 +71,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
     if(headFinder == null) {
       if (sunJurafskyHeadFinder) {
         return new SunJurafskyChineseHeadFinder();
-      } else if (bikelHeadFinder) {
-        return new BikelChineseHeadFinder();
-      } else {
-        return new ChineseHeadFinder();
-      }
+      } else return bikelHeadFinder ? new BikelChineseHeadFinder() : new ChineseHeadFinder();
     } else
       return headFinder;
   }
@@ -108,11 +104,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
       }
     }
 
-    if (segmenter != null) {
-      lex = new ChineseLexiconAndWordSegmenter(clex, segmenter);
-    } else {
-      lex = clex;
-    }
+      lex = segmenter != null ? new ChineseLexiconAndWordSegmenter(clex, segmenter) : clex;
 
     return lex;
   }
@@ -124,7 +116,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
 
   @Override
   public TreeReaderFactory treeReaderFactory() {
-    final TreeNormalizer tn = new CTBErrorCorrectingTreeNormalizer(splitNPTMP, splitPPTMP, splitXPTMP, charTags);
+    TreeNormalizer tn = new CTBErrorCorrectingTreeNormalizer(splitNPTMP, splitPPTMP, splitXPTMP, charTags);
     return new CTBTreeReaderFactory(tn, discardFrags);
   }
 
@@ -291,11 +283,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
           // System.out.println("Punct: Split colon"); // debugging
         } else if (ChineseTreebankLanguagePack.chineseQuoteMarkAcceptFilter().accept(word)) {
           if (chineseSplitPunctLR) {
-            if (ChineseTreebankLanguagePack.chineseLeftQuoteMarkAcceptFilter().accept(word)) {
-              tag += "-LQUOTE";
-            } else {
-              tag += "-RQUOTE";
-            }
+              tag += ChineseTreebankLanguagePack.chineseLeftQuoteMarkAcceptFilter().accept(word) ? "-LQUOTE" : "-RQUOTE";
           } else {
             tag = tag + "-QUOTE";
           }
@@ -305,11 +293,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
           // System.out.println("Punct: Split end sent"); // debugging
         } else if (ChineseTreebankLanguagePack.chineseParenthesisAcceptFilter().accept(word)) {
           if (chineseSplitPunctLR) {
-            if (ChineseTreebankLanguagePack.chineseLeftParenthesisAcceptFilter().accept(word)) {
-              tag += "-LPAREN";
-            } else {
-              tag += "-RPAREN";
-            }
+              tag += ChineseTreebankLanguagePack.chineseLeftParenthesisAcceptFilter().accept(word) ? "-LPAREN" : "-RPAREN";
           } else {
             tag += "-PAREN";
             //printlnErr("Just used -PAREN annotation");
@@ -323,7 +307,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
         } else if (ChineseTreebankLanguagePack.chineseOtherAcceptFilter().accept(word)) {
           tag = tag + "-OTHER";
         } else {
-          printlnErr("Unknown punct (you should add it to CTLP): " + tag + " |" + word + "|");
+          printlnErr("Unknown punct (you should add it to CTLP): " + tag + " |" + word + '|');
         }
       } else if (chineseSplitDouHao) {   // only split DouHao
         if (ChineseTreebankLanguagePack.chineseDouHaoAcceptFilter().accept(word) && baseTag.equals("PU")) {
@@ -343,15 +327,15 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
       }
 
       if ((chineseSelectiveTagPA || chineseVerySelectiveTagPA) && (baseTag.equals("CC") || baseTag.equals("P"))) {
-        tag += "-" + baseParentStr;
+        tag += '-' + baseParentStr;
       }
-      if (chineseSelectiveTagPA && (baseTag.equals("VV"))) {
-        tag += "-" + baseParentStr;
+      if (chineseSelectiveTagPA && baseTag.equals("VV")) {
+        tag += '-' + baseParentStr;
       }
 
-      if (markMultiNtag && tag.startsWith("N")) {
+      if (markMultiNtag && !tag.isEmpty() && tag.charAt(0) == 'N') {
         for (int i = 0; i < parent.numChildren(); i++) {
-          if (parent.children()[i].label().value().startsWith("N") && parent.children()[i] != t) {
+          if (!parent.children()[i].label().value().isEmpty() && parent.children()[i].label().value().charAt(0) == 'N' && parent.children()[i] != t) {
             tag += "=N";
             //System.out.println("Found multi=N rewrite");
           }
@@ -389,7 +373,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
       }
 
       if (gpaAD && baseTag.equals("AD")) {
-        tag += "~" + baseGrandParentStr;
+        tag += '~' + baseGrandParentStr;
         //System.out.println("Found AD with grandparent " + grandParentStr); // testing
       }
 
@@ -456,16 +440,10 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
               hasLexV = true;
             }
           }
-          if (hasCC || (hasPU && ! hasLexV)) {
+          if (hasCC || hasPU && ! hasLexV) {
             category += "-CRD";
             //System.out.println("Found coordinate VP"); // testing
-          } else if (hasLexV) {
-            category += "-COMP";
-            //System.out.println("Found complementing VP"); // testing
-          } else {
-            category += "-ADJT";
-            //System.out.println("Found adjoining VP"); // testing
-          }
+          } else category += hasLexV ? "-COMP" : "-ADJT";
         } else if (chineseSplitVP >= 1) {
           boolean hasBA = false;
           for (Tree kid : kids) {
@@ -601,7 +579,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    * Chinese: Split the dou hao (a punctuation mark separating
    * members of a list) from other punctuation.  Good but included below.
    */
-  public boolean chineseSplitDouHao = false;
+  public boolean chineseSplitDouHao;
   /**
    * Chinese: split Chinese punctuation several ways, along the lines
    * of English punctuation plus another category for the dou hao.  Good.
@@ -611,7 +589,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    * Chinese: split left right/paren quote (if chineseSplitPunct is also
    * true.  Only very marginal gains, but seems positive.
    */
-  public boolean chineseSplitPunctLR = false;
+  public boolean chineseSplitPunctLR;
 
   /**
    * Chinese: mark VVs that are sister of IP (communication &
@@ -634,7 +612,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
   /**
    * Chinese: mark ADs that are grandchild of IP.
    */
-  public boolean markADgrandchildOfIP = false;
+  public boolean markADgrandchildOfIP;
   /**
    * Grandparent annotate all AD.  Seems slightly negative.
    */
@@ -642,8 +620,8 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
 
   // using tagPA on Chinese 100k is negative.
 
-  public boolean chineseVerySelectiveTagPA = false;
-  public boolean chineseSelectiveTagPA = false;
+  public boolean chineseVerySelectiveTagPA;
+  public boolean chineseSelectiveTagPA;
 
   /**
    * Chinese: mark IPs that are sister of BA.  These always have
@@ -680,7 +658,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    * Chinese: mark nominal tags that are part of multi-nominal
    * rewrites.  Doesn't seem any good.
    */
-  public boolean markMultiNtag = false;
+  public boolean markMultiNtag;
 
   /**
    * Chinese: mark IPs that are part of prenominal modifiers. Negative.
@@ -691,8 +669,8 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    * Chinese: mark IPs that are conjuncts.  Or those that have
    * (adjuncts or subjects)
    */
-  public boolean markIPconj = false;
-  public boolean markIPadjsubj = false;
+  public boolean markIPconj;
+  public boolean markIPadjsubj;
 
   /**
    * Chinese VP splitting.  0 = none;
@@ -724,21 +702,21 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
   /**
    * Chinese: merge NN and VV.  A lark.
    */
-  public boolean mergeNNVV = false;
+  public boolean mergeNNVV;
 
   // XXXX upto in testing
 
   /**
    * Chinese: unary category marking
    */
-  public boolean unaryIP = false;
-  public boolean unaryCP = false;
+  public boolean unaryIP;
+  public boolean unaryCP;
 
   /**
    * Chinese: parent annotate daughter of root.  Meant only for
    * selectivesplit=false.
    */
-  public boolean paRootDtr = false; // true
+  public boolean paRootDtr; // true
 
   /**
    * Chinese: mark P with a left aunt VV, and PP with a left sister
@@ -746,8 +724,8 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    * context-marking.  Used to identify post-verbal P's, which are
    * rare.
    */
-  public boolean markPostverbalP = false;
-  public boolean markPostverbalPP = false;
+  public boolean markPostverbalP;
+  public boolean markPostverbalPP;
 
 
   // Not used now
@@ -757,18 +735,18 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
   /**
    * Mark base NPs.  Good.
    */
-  public boolean splitBaseNP = false;
+  public boolean splitBaseNP;
 
   /**
    * Annotate tags for number of characters contained.
    */
-  public boolean tagWordSize = false;
+  public boolean tagWordSize;
 
   /**
    * Mark phrases which are conjunctions.
    * Appears negative, even with 200K words training data.
    */
-  public boolean markCC = false;
+  public boolean markCC;
 
   /**
    * Whether to retain the -TMP functional tag on various phrasal
@@ -776,15 +754,15 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    * words, best option gives 0.6%.  Doing
    * splitNPTMP and splitPPTMP (but not splitXPTMP) is best.
    */
-  public boolean splitNPTMP = false;
-  public boolean splitPPTMP = false;
-  public boolean splitXPTMP = false;
+  public boolean splitNPTMP;
+  public boolean splitPPTMP;
+  public boolean splitXPTMP;
 
   /**
    * Verbal distance -- mark whether symbol dominates a verb (V*).
    * Seems bad for Chinese.
    */
-  public boolean dominatesV = false;
+  public boolean dominatesV;
 
 
   /**
@@ -792,7 +770,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    */
   public static final boolean DEFAULT_USE_GOOD_TURNING_UNKNOWN_WORD_MODEL = false;
   public boolean useGoodTuringUnknownWordModel = DEFAULT_USE_GOOD_TURNING_UNKNOWN_WORD_MODEL;
-  public boolean useCharBasedUnknownWordModel = false;
+  public boolean useCharBasedUnknownWordModel;
 
 
   /**
@@ -809,19 +787,19 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
    * 2: penalty for continuation chars only
    * TODO: make this an enum
    */
-  public int penaltyType = 0;
+  public int penaltyType;
 
   @Override
   public void display() {
     String chineseParams = "Using ChineseTreebankParserParams" + " chineseSplitDouHao=" + chineseSplitDouHao + " chineseSplitPunct=" + chineseSplitPunct + " chineseSplitPunctLR=" + chineseSplitPunctLR + " markVVsisterIP=" + markVVsisterIP + " markVPadjunct=" + markVPadjunct + " chineseSplitVP=" + chineseSplitVP + " mergeNNVV=" + mergeNNVV + " unaryIP=" + unaryIP + " unaryCP=" + unaryCP + " paRootDtr=" + paRootDtr + " markPsisterIP=" + markPsisterIP + " markIPsisterVVorP=" + markIPsisterVVorP + " markADgrandchildOfIP=" + markADgrandchildOfIP + " gpaAD=" + gpaAD + " markIPsisterBA=" + markIPsisterBA + " markNPmodNP=" + markNPmodNP + " markNPconj=" + markNPconj + " markMultiNtag=" + markMultiNtag + " markIPsisDEC=" + markIPsisDEC + " markIPconj=" + markIPconj + " markIPadjsubj=" + markIPadjsubj + " markPostverbalP=" + markPostverbalP + " markPostverbalPP=" + markPostverbalPP
             //      + " selSplitLevel=" + selectiveSplitLevel
-            + " baseNP=" + splitBaseNP + " headFinder=" + (sunJurafskyHeadFinder ? "sunJurafsky" : (bikelHeadFinder ? "bikel" : "levy")) + " discardFrags=" + discardFrags  + " dominatesV=" + dominatesV;
+            + " baseNP=" + splitBaseNP + " headFinder=" + (sunJurafskyHeadFinder ? "sunJurafsky" : bikelHeadFinder ? "bikel" : "levy") + " discardFrags=" + discardFrags  + " dominatesV=" + dominatesV;
     printlnErr(chineseParams);
   }
 
 
   private List<String> listBasicCategories(List<String> l) {
-    List<String> l1 = new ArrayList<String>();
+    List<String> l1 = new ArrayList<>();
     for (String s : l) {
       l1.add(ctlp.basicCategory(s));
     }
@@ -830,12 +808,12 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
 
   // TODO: Rewrite this as general matching predicate
   private static boolean hasV(List tags) {
-    for (int i = 0, tsize = tags.size(); i < tsize; i++) {
-      String str = tags.get(i).toString();
-      if (str.startsWith("V")) {
-        return true;
+      for (Object tag : tags) {
+          String str = tag.toString();
+          if (!str.isEmpty() && str.charAt(0) == 'V') {
+              return true;
+          }
       }
-    }
     return false;
   }
 
@@ -1061,10 +1039,10 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
     } else if (args[i].equalsIgnoreCase("-rad")) {
       useUnknownCharacterModel = true;
       i++;
-    } else if (args[i].equalsIgnoreCase("-lengthPenalty") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-lengthPenalty") && i + 1 < args.length) {
       lengthPenalty = Double.parseDouble(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-penaltyType") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-penaltyType") && i + 1 < args.length) {
       penaltyType = Integer.parseInt(args[i + 1]);
       i += 2;
     } else if (args[i].equalsIgnoreCase("-gtUnknown")) {
@@ -1076,7 +1054,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
     } else if (args[i].equalsIgnoreCase("-tuneSigma")) {
       // ChineseMaxentLexicon.tuneSigma = true;
       i++;
-    } else if (args[i].equalsIgnoreCase("-trainCountThresh") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-trainCountThresh") && i + 1 < args.length) {
       // ChineseMaxentLexicon.trainCountThreshold = Integer.parseInt(args[i + 1]);
       i += 2;
     } else if (args[i].equalsIgnoreCase("-markCC")) {
@@ -1110,10 +1088,10 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
       // useMaxentLexicon = true;
       // ChineseMaxentLexicon.seenTagsOnly = true;
       i++;
-    } else if (args[i].equalsIgnoreCase("-maxentLexFeatLevel") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-maxentLexFeatLevel") && i + 1 < args.length) {
       // ChineseMaxentLexicon.featureLevel = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-maxentDepGrammarFeatLevel") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-maxentDepGrammarFeatLevel") && i + 1 < args.length) {
       depGramFeatureLevel = Integer.parseInt(args[i + 1]);
       i += 2;
     } else if (args[i].equalsIgnoreCase("-maxentDepGrammar")) {
@@ -1133,7 +1111,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
       segmentMarkov = false;
       segmenterClass = args[i + 1];
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-headFinder") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-headFinder") && i + 1 < args.length) {
       try {
         headFinder = (HeadFinder) Class.forName(args[i + 1]).newInstance();
       } catch (Exception e) {
@@ -1147,7 +1125,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
     return i;
   }
 
-  private int depGramFeatureLevel = 0;
+  private int depGramFeatureLevel;
 
   @Override
   public Extractor<DependencyGrammar> dependencyGrammarExtractor(final Options op, Index<String> wordIndex, Index<String> tagIndex) {
@@ -1170,27 +1148,23 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
         }
       };
     } else ------- */
-    if (useSimilarWordMap) {
-      return new MLEDependencyGrammarExtractor(op, wordIndex, tagIndex) {
-        @Override
-        public MLEDependencyGrammar formResult() {
-          wordIndex.indexOf(Lexicon.UNKNOWN_WORD, true);
-          ChineseSimWordAvgDepGrammar dg = new ChineseSimWordAvgDepGrammar(tlpParams, directional, useDistance, useCoarseDistance, op.trainOptions.basicCategoryTagsInDependencyGrammar, op, wordIndex, tagIndex);
-          if (lex == null) {
-            throw new RuntimeException("Attempt to create ChineseSimWordAvgDepGrammar before Lexicon!!!");
-          } else {
-            dg.setLex(lex);
+      return useSimilarWordMap ? new MLEDependencyGrammarExtractor(op, wordIndex, tagIndex) {
+          @Override
+          public MLEDependencyGrammar formResult() {
+              wordIndex.indexOf(Lexicon.UNKNOWN_WORD, true);
+              ChineseSimWordAvgDepGrammar dg = new ChineseSimWordAvgDepGrammar(tlpParams, directional, useDistance, useCoarseDistance, op.trainOptions.basicCategoryTagsInDependencyGrammar, op, wordIndex, tagIndex);
+              if (lex == null) {
+                  throw new RuntimeException("Attempt to create ChineseSimWordAvgDepGrammar before Lexicon!!!");
+              } else {
+                  dg.setLex(lex);
+              }
+              for (IntDependency dependency : dependencyCounter.keySet()) {
+                  dg.addRule(dependency, dependencyCounter.getCount(dependency));
+              }
+              return dg;
           }
-          for (IntDependency dependency : dependencyCounter.keySet()) {
-            dg.addRule(dependency, dependencyCounter.getCount(dependency));
-          }
-          return dg;
-        }
 
-     };
-    } else {
-      return new MLEDependencyGrammarExtractor(op, wordIndex, tagIndex);
-    }
+      } : new MLEDependencyGrammarExtractor(op, wordIndex, tagIndex);
   }
 
   /**
@@ -1232,7 +1206,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
   /**
    * For testing: loads a treebank and prints the trees.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     TreebankLangParserParams tlpp = new ChineseTreebankParserParams();
     System.out.println("Default encoding is: " +
                        tlpp.diskTreebank().encoding());

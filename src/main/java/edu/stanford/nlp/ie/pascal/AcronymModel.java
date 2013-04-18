@@ -2,6 +2,7 @@ package edu.stanford.nlp.ie.pascal;
 
 import java.util.*;
 import java.io.*;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.util.Generics;
 
@@ -17,7 +18,8 @@ public class AcronymModel implements RelationalModel {
   
   private static final double HIGH_PROB = 1.0;
   private static final double LOW_PROB = 0.0;
-  private static boolean DEBUG= false;
+     private static final Pattern COMPILE = Pattern.compile("\\s+");
+     private static boolean DEBUG;
 
   private static final String acronymStatistics =
     "workshopname workshopacronym workshophomepage conferencename conferenceacronym conferencehomepage\n" +
@@ -90,7 +92,7 @@ public class AcronymModel implements RelationalModel {
 
   /**
    * Scores the partial template containing only the fields relevant to the score.
-   * @param temp the {@link InfoTemplate} to be scored.
+   * @param temp the {@link edu.stanford.nlp.ie.pascal.InfoTemplate} to be scored.
    * @return the model's score
    */
   public double computeProb(InfoTemplate temp){
@@ -98,12 +100,13 @@ public class AcronymModel implements RelationalModel {
       temp.whomepage, temp.chomepage);
   }
 /**
- * Scores the {@link PascalTemplate} using the fields it contains which are relevant to the score.
+ * Scores the {@link edu.stanford.nlp.ie.pascal.PascalTemplate} using the fields it contains which are relevant to the score.
  * (Ignores location and date fields.)
- * @param temp the full {@link PascalTemplate} to be scored
+ * @param temp the full {@link edu.stanford.nlp.ie.pascal.PascalTemplate} to be scored
  * @return the model's score
  */
 
+  @Override
   public double computeProb(PascalTemplate temp) {
     double prob = 1.0;
 
@@ -117,11 +120,11 @@ public class AcronymModel implements RelationalModel {
   }
 
    /**
-    * @throws IOException if the acronym statistics/weights can't be read from file.
+    * @throws java.io.IOException if the acronym statistics/weights can't be read from file.
     */
    public AcronymModel() throws IOException {
      priors = new Prior(new BufferedReader(new StringReader(acronymStatistics)));
-     features = new Feature[]{new AcronymModel.LettersAligned(), new AcronymModel.BegWord(), new AcronymModel.EndWord(), new AcronymModel.AfterAligned(), new AcronymModel.AlignedPerWord(), new AcronymModel.WordsSkipped(), new AcronymModel.SyllableBoundary()};
+     features = new Feature[]{new LettersAligned(), new BegWord(), new EndWord(), new AfterAligned(), new AlignedPerWord(), new WordsSkipped(), new SyllableBoundary()};
      weights = new double[]{// here's weights from a bunch of training examples
        //-4.1004, 18.4127, 0.1789, 16.3189, 0.8818, -0.0725, -0.6550
        //-12.4082, 18.3893, 2.1826, 18.8487, 0.5042, -0.1231, 1.8876
@@ -137,19 +140,19 @@ public class AcronymModel implements RelationalModel {
                             String confacronym, String wsurl, String confurl){
 
     Set<String> presentFields = Generics.newHashSet();
-    if( wsname != null && !wsname.equals("null") && !wsname.equals("") )
+    if( wsname != null && !wsname.equals("null") && !wsname.isEmpty())
       presentFields.add("workshopname");
-    if( wsacronym != null && !wsacronym.equals("null") && !wsacronym.equals(""))
+    if( wsacronym != null && !wsacronym.equals("null") && !wsacronym.isEmpty())
       presentFields.add("workshopacronym");
     if( confname != null && !confname.equals("null")
-        && !confname.equals(""))
+        && !confname.isEmpty())
       presentFields.add("conferencename");
     if( confacronym != null && !confacronym.equals("null")
-        && !confacronym.equals(""))
+        && !confacronym.isEmpty())
       presentFields.add("conferenceacronym");
-    if( wsurl != null && !wsurl.equals("null") && !wsurl.equals(""))
+    if( wsurl != null && !wsurl.equals("null") && !wsurl.isEmpty())
       presentFields.add("workshophomepage");
-    if( confurl != null && !confurl.equals("null") && !confurl.equals(""))
+    if( confurl != null && !confurl.equals("null") && !confurl.isEmpty())
       presentFields.add("conferencehomepage");
 
     //if the workshop and conference have the same acronym we return 0.
@@ -178,32 +181,24 @@ public class AcronymModel implements RelationalModel {
     }
 
     if( confacronym != null && confurl != null ) {
-      if( acronymMatchesURL(confacronym, confurl) ) {
-        prob *= probMatchFromAcronymAndURLMatch;
-      } else {
-        prob *= probMatchFromAcronymAndURLNoMatch;
-      }
+        prob *= acronymMatchesURL(confacronym, confurl) ? probMatchFromAcronymAndURLMatch : probMatchFromAcronymAndURLNoMatch;
     }
 
     if( wsacronym != null && wsurl != null ) {
-      if( acronymMatchesURL(wsacronym, wsurl) ) {
-        prob *= probMatchFromAcronymAndURLMatch;
-      } else {
-        prob *= probMatchFromAcronymAndURLNoMatch;
-      }
+        prob *= acronymMatchesURL(wsacronym, wsurl) ? probMatchFromAcronymAndURLMatch : probMatchFromAcronymAndURLNoMatch;
     }
     return prob;
   }
 
   private static boolean acronymMatchesURL(String ac, String url) {
     String lowerURL = url.toLowerCase();
-    String strippedAc = (new String(AcronymModel.stripAcronym(ac))).toLowerCase();
+    String strippedAc = new String(AcronymModel.stripAcronym(ac)).toLowerCase();
 
-    return lowerURL.indexOf(strippedAc) != -1;
+    return lowerURL.contains(strippedAc);
   }
 
-   private static final double probMatchFromAcronymAndURLMatch = .23934426;
-   private static final double probMatchFromAcronymAndURLNoMatch = .052516411378;
+   private static final double probMatchFromAcronymAndURLMatch = 0.23934426;
+   private static final double probMatchFromAcronymAndURLNoMatch = 0.052516411378;
 
    /**
     * Finds longest subsequent string of digits. Returns empty string
@@ -229,7 +224,7 @@ public class AcronymModel implements RelationalModel {
       *
       * @return the "naive similarity" score
       */
-   public double naiveSimilarity(String name, String acronym) {
+   public static double naiveSimilarity(String name, String acronym) {
      double similarity = LOW_PROB;
      String[] nameWords = splitOnWhitespace(name);
      String[] acronymWords = splitOnWhitespace(acronym);
@@ -255,7 +250,7 @@ public class AcronymModel implements RelationalModel {
     *
     * @return the Hearst similarity score
     */
-   public double HearstSimilarity(String name, String acronym) {
+   public static double HearstSimilarity(String name, String acronym) {
      char[] namechars = name.toLowerCase().toCharArray();
      char[] acrochars = acronym.toLowerCase().toCharArray();
 
@@ -264,7 +259,7 @@ public class AcronymModel implements RelationalModel {
        if (!Character.isLetter(acrochars[aindex])) {
          continue;
        }
-       while ((nindex >= 0 && namechars[nindex] != acrochars[aindex]) || (aindex == 0 && nindex > 0 && Character.isLetterOrDigit(namechars[nindex - 1]))) {
+       while (nindex >= 0 && namechars[nindex] != acrochars[aindex] || aindex == 0 && nindex > 0 && Character.isLetterOrDigit(namechars[nindex - 1])) {
          nindex--;
        }
        if (nindex < 0) {
@@ -289,8 +284,10 @@ public class AcronymModel implements RelationalModel {
    public static class LettersAligned implements Feature {
      public String toString() {
        return "LettersAligned";
-     };
-     public double value(Alignment alignment) {
+     }
+
+       @Override
+       public double value(Alignment alignment) {
        int numAligned = 0;
        for (int i = 0; i < alignment.pointers.length; ++i) {
          if (alignment.pointers[i] != -1) {
@@ -305,7 +302,9 @@ public class AcronymModel implements RelationalModel {
    }
 
     public static class BegWord implements Feature {
-        public String toString() { return "BegWord"; };
+        public String toString() { return "BegWord"; }
+
+        @Override
         public double value(Alignment alignment) {
             int begAligned = 0;
             for( int s = 0; s < alignment.pointers.length; ++s) {
@@ -327,7 +326,9 @@ public class AcronymModel implements RelationalModel {
     }
 
     public static class EndWord implements Feature {
-        public String toString() { return "EndWord"; };
+        public String toString() { return "EndWord"; }
+
+        @Override
         public double value(Alignment alignment) {
             int endAligned = 0;
             for( int s = 0; s < alignment.pointers.length; ++s) {
@@ -354,6 +355,7 @@ public class AcronymModel implements RelationalModel {
     public static class AfterAligned implements Feature {
       public String toString() { return "AfterAligned"; }
 
+      @Override
       public double value(Alignment alignment) {
         int numAfter = 0;
         for( int i = 1; i < alignment.pointers.length; ++i) {
@@ -369,13 +371,13 @@ public class AcronymModel implements RelationalModel {
       double average;
       int numSamples;
 
-      public RunningAverage() {
+      private RunningAverage() {
         average = 0.0;
         numSamples = 0;
       }
 
       public void addSample(double sample) {
-        average = (numSamples * average) + sample;
+        average = numSamples * average + sample;
         numSamples++;
         average /= numSamples;
       }
@@ -395,6 +397,7 @@ public class AcronymModel implements RelationalModel {
     public static class AlignedPerWord implements Feature {
       public String toString() { return "AlignedPerWord"; }
 
+      @Override
       public double value(Alignment alignment) {
 /*
         RunningAverage alignedPerWord = new RunningAverage();
@@ -449,16 +452,14 @@ public class AcronymModel implements RelationalModel {
             ++alignCount;
           }
         }
-        if( wordCount == 0 ) {
-          return 0;
-        } else {
-          return (double)alignCount / (double)wordCount;
-        }
+          return wordCount == 0 ? 0 : (double) alignCount / (double) wordCount;
       }
     }
 
     public static class WordsSkipped implements Feature {
-        public String toString() { return "WordsSkipped"; };
+        public String toString() { return "WordsSkipped"; }
+
+        @Override
         public double value(Alignment alignment) {
             int wordsSkipped = 0;
             int wordsAligned = 0;
@@ -497,21 +498,23 @@ public class AcronymModel implements RelationalModel {
                     wordsSkipped++;
                 }
             }
-            if(DEBUG)System.out.println("Words skipped: " + wordsSkipped + "/" +
+            if(DEBUG)System.out.println("Words skipped: " + wordsSkipped + '/' +
                 (wordsSkipped + wordsAligned) );
             return wordsSkipped;
         }
     }
 
     public static class SyllableBoundary implements Feature {
-        public String toString() { return "SyllableBoundary"; };
+        public String toString() { return "SyllableBoundary"; }
+
         TeXHyphenator teXHyphenator = new TeXHyphenator();
         public SyllableBoundary() throws IOException {
           teXHyphenator.loadDefault();
         }
+        @Override
         public double value(Alignment alignment) {
           char [] lcLongForm =
-            (new String(alignment.longForm)).toLowerCase().toCharArray();
+            new String(alignment.longForm).toLowerCase().toCharArray();
           boolean [] breakPoints = teXHyphenator.findBreakPoints(lcLongForm);
           int numSylAligned = 0;
           for( int i = 0; i < alignment.pointers.length; ++i ) {
@@ -534,20 +537,20 @@ public class AcronymModel implements RelationalModel {
         char [] raw = acronym.toCharArray();
         char [] firstTry = new char[raw.length];
         int outIdx = 0;
-        for( int inIdx = 0; inIdx < raw.length; ++inIdx) {
-            if( Character.isLetter(raw[inIdx]) ) {
-                firstTry[outIdx++] = raw[inIdx];
+        for (char aRaw : raw) {
+            if (Character.isLetter(aRaw)) {
+                firstTry[outIdx++] = aRaw;
             }
         }
         if( outIdx == firstTry.length ) {
           if(DEBUG)  System.out.println("Converted \"" + acronym + "\" to \"" +
-                (new String(firstTry)) + "\"\n");
+                  new String(firstTry) + "\"\n");
             return firstTry;
         } else {
             char [] polished = new char[outIdx];
             System.arraycopy(firstTry, 0, polished, 0, outIdx);
           if(DEBUG)  System.out.println("Converted \"" + acronym + "\" to \"" +
-                (new String(polished)) + "\"\n");
+                  new String(polished) + "\"\n");
             return polished;
         }
     }
@@ -583,7 +586,7 @@ public class AcronymModel implements RelationalModel {
         return maxprob;
     }
 
-    private static double dotproduct(double[] one, double[]two) {
+    private static double dotproduct(double[] one, double... two) {
         double sum = 0.0;
         for( int i = 0; i < one.length; ++i) {
             double product = one[i] * two[i];
@@ -597,18 +600,18 @@ public class AcronymModel implements RelationalModel {
     private static final String[] stringArrayType = new String[0];
 
     private static String[] splitOnWhitespace(String words) {
-        String[] firstCut = words.split("\\s+");
+        String[] firstCut = COMPILE.split(words);
 
-        ArrayList<String> wordList = new ArrayList<String>(firstCut.length);
-        for( int i = 0; i < firstCut.length; ++i ) {
-            if( firstCut[i].length() > 0 ) {
-                wordList.add(firstCut[i]);
+        ArrayList<String> wordList = new ArrayList<>(firstCut.length);
+        for (String aFirstCut : firstCut) {
+            if (!aFirstCut.isEmpty()) {
+                wordList.add(aFirstCut);
             }
         }
-        return wordList.toArray(stringArrayType);
+        return wordList.toArray(new String[wordList.size()]);
     }
 
-    private static boolean firstLetterInOrderMatch(char[] nameFirstLetters, char[] acLetters) {
+    private static boolean firstLetterInOrderMatch(char[] nameFirstLetters, char... acLetters) {
         int nameIdx = 0;
         int acIdx = 0;
 
@@ -623,13 +626,12 @@ public class AcronymModel implements RelationalModel {
         return true;
     }
 
-    private static char[] allLetters(String[] acronym) {
+    private static char[] allLetters(String... acronym) {
         StringBuffer sb = new StringBuffer();
-        for( int s = 0; s < acronym.length; ++s ) {
-            String acr = acronym[s];
-            for(int c = 0; c < acr.length(); ++c ) {
+        for (String acr : acronym) {
+            for (int c = 0; c < acr.length(); ++c) {
                 char ch = acr.charAt(c);
-                if( Character.isLetter( ch ) ) {
+                if (Character.isLetter(ch)) {
                     sb.append(ch);
                 }
             }
@@ -637,11 +639,11 @@ public class AcronymModel implements RelationalModel {
         return sbToChars(sb);
     }
 
-    private static char[] firstLetters(String[] name) {
+    private static char[] firstLetters(String... name) {
         StringBuffer sb = new StringBuffer(name.length);
-        for( int s = 0; s < name.length; ++s) {
-            char c = name[s].charAt(0);
-            if( Character.isLetter(c) ) {
+        for (String aName : name) {
+            char c = aName.charAt(0);
+            if (Character.isLetter(c)) {
                 sb.append(c);
             }
         }
@@ -654,13 +656,13 @@ public class AcronymModel implements RelationalModel {
         return letters;
     }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
 
     AcronymModel am = new AcronymModel();
     String s1 = args[0];
     String s2 = args[1];
-    System.out.println("Hearst:  "+am.HearstSimilarity(s1, s2));
-    System.out.println("naive:   "+am.naiveSimilarity(s1, s2));
+    System.out.println("Hearst:  "+ HearstSimilarity(s1, s2));
+    System.out.println("naive:   "+ naiveSimilarity(s1, s2));
     System.out.println("Rich:    "+am.RichSimilarity(s1, s2));
     System.out.println("default: "+am.similarity(s1, s2));
 

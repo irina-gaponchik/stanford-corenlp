@@ -23,32 +23,32 @@ public abstract class AbstractEval {
   protected final String str;
   protected final boolean runningAverages;
 
-  private double precision = 0.0;
-  private double recall = 0.0;
-  private double f1 = 0.0;
-  protected double num = 0.0;
-  private double exact = 0.0;
+  private double precision;
+  private double recall;
+  private double f1;
+  protected double num;
+  private double exact;
 
-  private double precision2 = 0.0;
-  private double recall2 = 0.0;
-  private double pnum2 = 0.0;
-  private double rnum2 = 0.0;
+  private double precision2;
+  private double recall2;
+  private double pnum2;
+  private double rnum2;
 
-  protected double curF1 = 0.0;
+  protected double curF1;
 
-  public AbstractEval() {
+  protected AbstractEval() {
     this(true);
   }
 
-  public AbstractEval(boolean runningAverages) {
+  protected AbstractEval(boolean runningAverages) {
     this("", runningAverages);
   }
 
-  public AbstractEval(String str) {
+  protected AbstractEval(String str) {
     this(str, true);
   }
 
-  public AbstractEval(String str, boolean runningAverages) {
+  protected AbstractEval(String str, boolean runningAverages) {
     this.str = str;
     this.runningAverages = runningAverages;
   }
@@ -107,7 +107,7 @@ public abstract class AbstractEval {
       n += 1.0;
     }
     if (DEBUG) System.err.println("Matched " + p + " of " + n);
-    return (n > 0.0 ? p / n : 0.0);
+    return n > 0.0 ? p / n : 0.0;
   }
 
   protected abstract Set<?> makeObjects(Tree tree);
@@ -133,9 +133,9 @@ public abstract class AbstractEval {
     }
     Set<?> dep1 = makeObjects(guess);
     Set<?> dep2 = makeObjects(gold);
-    final double curPrecision = precision(dep1, dep2);
-    final double curRecall = precision(dep2, dep1);
-    curF1 = (curPrecision > 0.0 && curRecall > 0.0 ? 2.0 / (1.0 / curPrecision + 1.0 / curRecall) : 0.0);
+    double curPrecision = precision(dep1, dep2);
+    double curRecall = precision(dep2, dep1);
+    curF1 = curPrecision > 0.0 && curRecall > 0.0 ? 2.0 / (1.0 / curPrecision + 1.0 / curRecall) : 0.0;
     precision += curPrecision * weight;
     recall += curRecall * weight;
     f1 += curF1 * weight;
@@ -151,19 +151,19 @@ public abstract class AbstractEval {
       exact += 1.0;
     }
     if (pw != null) {
-      pw.print(" P: " + ((int) (curPrecision * 10000)) / 100.0);
+      pw.print(" P: " + (int) (curPrecision * 10000) / 100.0);
       if (runningAverages) {
-        pw.println(" (sent ave " + ((int) (precision * 10000 / num)) / 100.0 + ") (evalb " + ((int) (precision2 * 10000 / pnum2)) / 100.0 + ")");
+        pw.println(" (sent ave " + (int) (precision * 10000 / num) / 100.0 + ") (evalb " + (int) (precision2 * 10000 / pnum2) / 100.0 + ')');
       }
-      pw.print(" R: " + ((int) (curRecall * 10000)) / 100.0);
+      pw.print(" R: " + (int) (curRecall * 10000) / 100.0);
       if (runningAverages) {
-        pw.print(" (sent ave " + ((int) (recall * 10000 / num)) / 100.0 + ") (evalb " + ((int) (recall2 * 10000 / rnum2)) / 100.0 + ")");
+        pw.print(" (sent ave " + (int) (recall * 10000 / num) / 100.0 + ") (evalb " + (int) (recall2 * 10000 / rnum2) / 100.0 + ')');
       }
       pw.println();
       double cF1 = 2.0 / (rnum2 / recall2 + pnum2 / precision2);
-      pw.print(str + " F1: " + ((int) (curF1 * 10000)) / 100.0);
+      pw.print(str + " F1: " + (int) (curF1 * 10000) / 100.0);
       if (runningAverages) {
-        pw.print(" (sent ave " + ((int) (10000 * f1 / num)) / 100.0 + ", evalb " + ((int) (10000 * cF1)) / 100.0 + ")   Exact: " + ((int) (10000 * exact / num)) / 100.0);
+        pw.print(" (sent ave " + (int) (10000 * f1 / num) / 100.0 + ", evalb " + (int) (10000 * cF1) / 100.0 + ")   Exact: " + (int) (10000 * exact / num) / 100.0);
       }
 //      pw.println(" N: " + getNum());
       pw.println(" N: " + num);
@@ -212,7 +212,7 @@ public abstract class AbstractEval {
     //System.out.println(" Precision: "+((int)(10000.0*prec))/100.0);
     //System.out.println(" Recall:    "+((int)(10000.0*rec))/100.0);
     //System.out.println(" F1:        "+((int)(10000.0*f))/100.0);
-    pw.println(str + " summary evalb: LP: " + ((int) (10000.0 * prec)) / 100.0 + " LR: " + ((int) (10000.0 * rec)) / 100.0 + " F1: " + ((int) (10000.0 * f)) / 100.0 + " Exact: " + ((int) (10000.0 * exact / num)) / 100.0 + " N: " + getNum());
+    pw.println(str + " summary evalb: LP: " + (int) (10000.0 * prec) / 100.0 + " LR: " + (int) (10000.0 * rec) / 100.0 + " F1: " + (int) (10000.0 * f) / 100.0 + " Exact: " + (int) (10000.0 * exact / num) / 100.0 + " N: " + getNum());
     /*
     double prec = (num > 0.0 ? precision/num : 0.0);
     double rec = (num > 0.0 ? recall/num : 0.0);
@@ -228,8 +228,8 @@ public abstract class AbstractEval {
 
     //private boolean verbose = false;
 
-    private ClassicCounter<String> over = new ClassicCounter<String>();
-    private ClassicCounter<String> under = new ClassicCounter<String>();
+    private ClassicCounter<String> over = new ClassicCounter<>();
+    private ClassicCounter<String> under = new ClassicCounter<>();
 
     protected static String localize(Tree tree) {
       if (tree.isLeaf()) {
@@ -271,7 +271,7 @@ public abstract class AbstractEval {
     }
 
     private static <T> void display(ClassicCounter<T> c, int num, PrintWriter pw) {
-      List<T> rules = new ArrayList<T>(c.keySet());
+      List<T> rules = new ArrayList<>(c.keySet());
       Collections.sort(rules, Counters.toComparatorDescending(c));
       int rSize = rules.size();
       if (num > rSize) {
@@ -286,9 +286,9 @@ public abstract class AbstractEval {
     public void display(boolean verbose, PrintWriter pw) {
       //this.verbose = verbose;
       pw.println("Most frequently underproposed rules:");
-      display(under, (verbose ? 100 : 10), pw);
+      display(under, verbose ? 100 : 10, pw);
       pw.println("Most frequently overproposed rules:");
-      display(over, (verbose ? 100 : 10), pw);
+      display(over, verbose ? 100 : 10, pw);
     }
 
     public RuleErrorEval(String str) {
@@ -302,8 +302,8 @@ public abstract class AbstractEval {
    */
   public static class CatErrorEval extends AbstractEval {
 
-    private ClassicCounter<String> over = new ClassicCounter<String>();
-    private ClassicCounter<String> under = new ClassicCounter<String>();
+    private ClassicCounter<String> over = new ClassicCounter<>();
+    private ClassicCounter<String> under = new ClassicCounter<>();
 
     /** Unused. Fake satisfying the abstract class. */
     @Override
@@ -312,7 +312,7 @@ public abstract class AbstractEval {
     }
 
     private static List<String> myMakeObjects(Tree tree) {
-      List<String> cats = new LinkedList<String>();
+      List<String> cats = new LinkedList<>();
       for (Tree st : tree.subTreeList()) {
         cats.add(st.value());
       }
@@ -323,7 +323,7 @@ public abstract class AbstractEval {
     public void evaluate(Tree t1, Tree t2, PrintWriter pw) {
       List<String> s1 = myMakeObjects(t1);
       List<String> s2 = myMakeObjects(t2);
-      List<String> del2 = new LinkedList<String>(s2);
+      List<String> del2 = new LinkedList<>(s2);
       // we delete out as we find them so we can score correctly a cat with
       // a certain cardinality in a tree.
       for (String o1 : s1) {
@@ -339,7 +339,7 @@ public abstract class AbstractEval {
     }
 
     private static <T> void display(ClassicCounter<T> c, PrintWriter pw) {
-      List<T> cats = new ArrayList<T>(c.keySet());
+      List<T> cats = new ArrayList<>(c.keySet());
       Collections.sort(cats, Counters.toComparatorDescending(c));
       for (T ob : cats) {
         pw.println(ob + " " + c.getCount(ob));
@@ -364,8 +364,8 @@ public abstract class AbstractEval {
   /** This isn't really a kind of AbstractEval: we're sort of cheating here. */
   public static class ScoreEval extends AbstractEval {
 
-    double totScore = 0.0;
-    double n = 0.0;
+    double totScore;
+    double n;
     NumberFormat nf = new DecimalFormat("0.000");
 
     @Override
@@ -390,7 +390,7 @@ public abstract class AbstractEval {
     public void display(boolean verbose, PrintWriter pw) {
       if (pw != null) {
         pw.println(str + " total score: " + nf.format(totScore) +
-                " average score: " + ((n == 0.0) ? "N/A": nf.format(totScore / n)));
+                " average score: " + (n == 0.0 ? "N/A": nf.format(totScore / n)));
       }
     }
 

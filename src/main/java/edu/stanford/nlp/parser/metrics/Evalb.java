@@ -87,9 +87,9 @@ public class Evalb extends AbstractEval {
 
   public static class CBEval extends Evalb {
 
-    private double cb = 0.0;
-    private double num = 0.0;
-    private double zeroCB = 0.0;
+    private double cb;
+    private double num;
+    private double zeroCB;
 
     protected void checkCrossing(Set<Constituent> s1, Set<Constituent> s2) {
       double c = 0.0;
@@ -111,15 +111,15 @@ public class Evalb extends AbstractEval {
       Set<Constituent> b2 = makeObjects(t2);
       checkCrossing(b1, b2);
       if (pw != null && runningAverages) {
-        pw.println("AvgCB: " + ((int) (10000.0 * cb / num)) / 100.0 +
-            " ZeroCB: " + ((int) (10000.0 * zeroCB / num)) / 100.0 + " N: " + getNum());
+        pw.println("AvgCB: " + (int) (10000.0 * cb / num) / 100.0 +
+            " ZeroCB: " + (int) (10000.0 * zeroCB / num) / 100.0 + " N: " + getNum());
       }
     }
 
     @Override
     public void display(boolean verbose, PrintWriter pw) {
-      pw.println(str + " AvgCB: " + ((int) (10000.0 * cb / num)) / 100.0 +
-          " ZeroCB: " + ((int) (10000.0 * zeroCB / num)) / 100.0);
+      pw.println(str + " AvgCB: " + (int) (10000.0 * cb / num) / 100.0 +
+          " ZeroCB: " + (int) (10000.0 * zeroCB / num) / 100.0);
     }
 
     public CBEval(String str, boolean runningAverages) {
@@ -160,19 +160,19 @@ public class Evalb extends AbstractEval {
    *
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if (args.length < minArgs) {
       System.err.println(usage());
       System.exit(-1);
     }
     Properties options = StringUtils.argsToProperties(args, optionArgDefs());
     Language language = PropertiesUtils.get(options, "l", Language.English, Language.class);
-    final TreebankLangParserParams tlpp = Languages.getLanguageParams(language);
-    final int maxGoldYield = PropertiesUtils.getInt(options, "y", Integer.MAX_VALUE);
-    final boolean VERBOSE = PropertiesUtils.getBool(options, "v", false);
-    final boolean sortByF1 = PropertiesUtils.hasProperty(options, "s");
+    TreebankLangParserParams tlpp = Languages.getLanguageParams(language);
+    int maxGoldYield = PropertiesUtils.getInt(options, "y", Integer.MAX_VALUE);
+    boolean VERBOSE = PropertiesUtils.getBool(options, "v", false);
+    boolean sortByF1 = PropertiesUtils.hasProperty(options, "s");
     int worstKTreesToEmit = PropertiesUtils.getInt(options, "s", 0);
-    PriorityQueue<Triple<Double,Tree,Tree>> queue = sortByF1 ? new PriorityQueue<Triple<Double,Tree,Tree>>(2000, new F1Comparator()) : null;
+    PriorityQueue<Triple<Double,Tree,Tree>> queue = sortByF1 ? new PriorityQueue<>(2000, new F1Comparator()) : null;
     boolean doCatLevel = PropertiesUtils.getBool(options, "c", false);
     String labelRegex = options.getProperty("f", null);
     String encoding = options.getProperty("e", "UTF-8");
@@ -187,21 +187,21 @@ public class Evalb extends AbstractEval {
   
     // Command-line has been parsed. Configure the metric for evaluation.
     tlpp.setInputEncoding(encoding);
-    final PrintWriter pwOut = tlpp.pw();
+    PrintWriter pwOut = tlpp.pw();
 
-    final Treebank guessTreebank = tlpp.diskTreebank();
+    Treebank guessTreebank = tlpp.diskTreebank();
     guessTreebank.loadPath(guessFile);
     pwOut.println("GUESS TREEBANK:");
     pwOut.println(guessTreebank.textualSummary());
 
-    final Treebank goldTreebank = tlpp.diskTreebank();
+    Treebank goldTreebank = tlpp.diskTreebank();
     goldTreebank.loadPath(goldFile);
     pwOut.println("GOLD TREEBANK:");
     pwOut.println(goldTreebank.textualSummary());
 
-    final Evalb metric = new Evalb("Evalb LP/LR", true);
-    final EvalbByCat evalbCat = (doCatLevel) ? new EvalbByCat("EvalbByCat LP/LR", true, labelRegex) : null;
-    final TreeTransformer tc = tlpp.collinizer();
+    Evalb metric = new Evalb("Evalb LP/LR", true);
+    EvalbByCat evalbCat = doCatLevel ? new EvalbByCat("EvalbByCat LP/LR", true, labelRegex) : null;
+    TreeTransformer tc = tlpp.collinizer();
 
     //The evalb ref implementation assigns status for each tree pair as follows:
     //
@@ -210,8 +210,8 @@ public class Evalb extends AbstractEval {
     //   2 - null parse e.g. (()).
     //
     //In the cases of 1,2, evalb does not include the tree pair in the LP/LR computation.
-    final Iterator<Tree> goldItr = goldTreebank.iterator();
-    final Iterator<Tree> guessItr = guessTreebank.iterator();
+    Iterator<Tree> goldItr = goldTreebank.iterator();
+    Iterator<Tree> guessItr = guessTreebank.iterator();
     int goldLineId = 0;
     int guessLineId = 0;
     int skippedGuessTrees = 0;
@@ -237,12 +237,12 @@ public class Evalb extends AbstractEval {
         continue;
       }
       
-      final Tree evalGuess = tc.transformTree(guessTree);
-      final Tree evalGold = tc.transformTree(goldTree);
+      Tree evalGuess = tc.transformTree(guessTree);
+      Tree evalGold = tc.transformTree(goldTree);
 
-      metric.evaluate(evalGuess, evalGold, ((VERBOSE) ? pwOut : null));
+      metric.evaluate(evalGuess, evalGold, VERBOSE ? pwOut : null);
 
-      if(doCatLevel) evalbCat.evaluate(evalGuess, evalGold, ((VERBOSE) ? pwOut : null));
+      if(doCatLevel) evalbCat.evaluate(evalGuess, evalGold, VERBOSE ? pwOut : null);
       if(sortByF1) storeTrees(queue,guessTree,goldTree,metric.getLastF1());
     }
     
@@ -269,17 +269,17 @@ public class Evalb extends AbstractEval {
     if(queue == null) System.err.println("Queue was not initialized properly");
 
     try {
-      final PrintWriter guessPw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePrefix + ".kworst.guess"),"UTF-8")));
-      final PrintWriter goldPw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePrefix + ".kworst.gold"),"UTF-8")));
+      PrintWriter guessPw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePrefix + ".kworst.guess"),"UTF-8")));
+      PrintWriter goldPw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePrefix + ".kworst.gold"),"UTF-8")));
 
-      final ConstituentFactory cFact = new LabeledScoredConstituentFactory();
-      final PrintWriter guessDepPw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePrefix + ".kworst.guess.deps"),"UTF-8")));
-      final PrintWriter goldDepPw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePrefix + ".kworst.gold.deps"),"UTF-8")));
+      ConstituentFactory cFact = new LabeledScoredConstituentFactory();
+      PrintWriter guessDepPw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePrefix + ".kworst.guess.deps"),"UTF-8")));
+      PrintWriter goldDepPw = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filePrefix + ".kworst.gold.deps"),"UTF-8")));
 
       System.out.printf("F1s of %d worst trees:\n",worstKTreesToEmit);
 
       for(int i = 0; queue.peek() != null && i < worstKTreesToEmit; i++) {
-        final Triple<Double, Tree, Tree> trees = queue.poll();
+        Triple<Double, Tree, Tree> trees = queue.poll();
 
         System.out.println(trees.first());
 
@@ -308,25 +308,23 @@ public class Evalb extends AbstractEval {
       goldDepPw.close();
       guessDepPw.close();
 
-    } catch (UnsupportedEncodingException e) {
+    } catch (UnsupportedEncodingException | FileNotFoundException e) {
       e.printStackTrace();
 
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
     }
   }
 
   private static void storeTrees(PriorityQueue<Triple<Double, Tree, Tree>> queue, Tree guess, Tree gold, double curF1) {
     if(queue == null) return;
 
-    queue.add(new Triple<Double,Tree,Tree>(curF1,gold,guess));
+    queue.add(new Triple<>(curF1,gold,guess));
   }
 
   private static class F1Comparator implements Comparator<Triple<Double, Tree, Tree>> {
 
     public int compare(Triple<Double, Tree, Tree> o1, Triple<Double, Tree, Tree> o2) {
-      final double firstF1 = o1.first();
-      final double secondF1 = o2.first();
+      double firstF1 = o1.first();
+      double secondF1 = o2.first();
 
       if(firstF1 < secondF1)
         return -1;

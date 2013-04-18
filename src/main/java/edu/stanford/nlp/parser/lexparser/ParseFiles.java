@@ -43,14 +43,14 @@ public class ParseFiles {
   final PrintWriter pwOut;
   final PrintWriter pwErr;
 
-  int numWords = 0;
-  int numSents = 0;
-  int numUnparsable = 0;
-  int numNoMemory = 0;
-  int numFallback = 0;
-  int numSkipped = 0;
+  int numWords;
+  int numSents;
+  int numUnparsable;
+  int numNoMemory;
+  int numFallback;
+  int numSkipped;
 
-  boolean saidMemMessage = false;
+  boolean saidMemMessage;
 
   final boolean runningAverages;
   final boolean summary;
@@ -90,40 +90,28 @@ public class ParseFiles {
     // evaluation setup
     this.runningAverages = Boolean.parseBoolean(op.testOptions.evals.getProperty("runningAverages"));
     this.summary = Boolean.parseBoolean(op.testOptions.evals.getProperty("summary"));
-    if (Boolean.parseBoolean(op.testOptions.evals.getProperty("pcfgLL"))) {
-      this.pcfgLL = new AbstractEval.ScoreEval("pcfgLL", runningAverages);
-    } else {
-      this.pcfgLL = null;
-    }
-    if (Boolean.parseBoolean(op.testOptions.evals.getProperty("depLL"))) {
-      this.depLL = new AbstractEval.ScoreEval("depLL", runningAverages);
-    } else {
-      this.depLL = null;
-    }
-    if (Boolean.parseBoolean(op.testOptions.evals.getProperty("factLL"))) {
-      this.factLL = new AbstractEval.ScoreEval("factLL", runningAverages);
-    } else {
-      this.factLL = null;
-    }
+      this.pcfgLL = Boolean.parseBoolean(op.testOptions.evals.getProperty("pcfgLL")) ? new AbstractEval.ScoreEval("pcfgLL", runningAverages) : null;
+      this.depLL = Boolean.parseBoolean(op.testOptions.evals.getProperty("depLL")) ? new AbstractEval.ScoreEval("depLL", runningAverages) : null;
+      this.factLL = Boolean.parseBoolean(op.testOptions.evals.getProperty("factLL")) ? new AbstractEval.ScoreEval("factLL", runningAverages) : null;
 
   }
 
   public void parseFiles(String[] args, int argIndex, boolean tokenized, TokenizerFactory<? extends HasWord> tokenizerFactory, String elementDelimiter, String sentenceDelimiter, Function<List<HasWord>, List<HasWord>> escaper, String tagDelimiter) {
-    final DocType docType = (elementDelimiter == null) ? DocType.Plain : DocType.XML;
+    DocType docType = elementDelimiter == null ? DocType.Plain : DocType.XML;
 
     if (op.testOptions.verbose) {
       if(tokenizerFactory != null)
         pwErr.println("parseFiles: Tokenizer factory is: " + tokenizerFactory);
     }
 
-    final Timing timer = new Timing();
+    Timing timer = new Timing();
     timer.start();
 
     //Loop over the files
     for (int i = argIndex; i < args.length; i++) {
-      final String filename = args[i];
+      String filename = args[i];
 
-      final DocumentPreprocessor documentPreprocessor;
+      DocumentPreprocessor documentPreprocessor;
       if (filename.equals("-")) {
         try {
           documentPreprocessor = new DocumentPreprocessor(new BufferedReader(new InputStreamReader(System.in, op.tlpParams.getInputEncoding())),docType);
@@ -142,7 +130,7 @@ public class ParseFiles {
       documentPreprocessor.setTagDelimiter(tagDelimiter);
       documentPreprocessor.setElementDelimiter(elementDelimiter);
       if(tokenizerFactory == null)
-        documentPreprocessor.setTokenizerFactory((tokenized) ? null : tlp.getTokenizerFactory());
+        documentPreprocessor.setTokenizerFactory(tokenized ? null : tlp.getTokenizerFactory());
       else
         documentPreprocessor.setTokenizerFactory(tokenizerFactory);
 
@@ -157,11 +145,11 @@ public class ParseFiles {
           //It isn't a URL, so silently ignore
         }
 
-        String ext = (op.testOptions.outputFilesExtension == null) ? "stp" : op.testOptions.outputFilesExtension;
+        String ext = op.testOptions.outputFilesExtension == null ? "stp" : op.testOptions.outputFilesExtension;
         String fname = normalizedName + '.' + ext;
-        if (op.testOptions.outputFilesDirectory != null && !op.testOptions.outputFilesDirectory.equals("")) {
+        if (op.testOptions.outputFilesDirectory != null && !op.testOptions.outputFilesDirectory.isEmpty()) {
           String fseparator = System.getProperty("file.separator");
-          if (fseparator == null || "".equals(fseparator)) {
+          if (fseparator == null || fseparator != null && fseparator.isEmpty()) {
             fseparator = "/";
           }
           File fnameFile = new File(fname);
@@ -181,7 +169,7 @@ public class ParseFiles {
       int num = 0;
       int numProcessed = 0;
       if (op.testOptions.testingThreads != 1) {
-        MulticoreWrapper<List<? extends HasWord>, ParserQuery> wrapper = new MulticoreWrapper<List<? extends HasWord>, ParserQuery>(op.testOptions.testingThreads, new ParsingThreadsafeProcessor(pqFactory, pwErr));
+        MulticoreWrapper<List<? extends HasWord>, ParserQuery> wrapper = new MulticoreWrapper<>(op.testOptions.testingThreads, new ParsingThreadsafeProcessor(pqFactory, pwErr));
 
         for (List<HasWord> sentence : documentPreprocessor) {
           num++;
@@ -232,8 +220,8 @@ public class ParseFiles {
     if (saidMemMessage) {
       ParserUtils.printOutOfMemory(pwErr);
     }
-    double wordspersec = numWords / (((double) millis) / 1000);
-    double sentspersec = numSents / (((double) millis) / 1000);
+    double wordspersec = numWords / ((double) millis / 1000);
+    double sentspersec = numSents / ((double) millis / 1000);
     NumberFormat nf = new DecimalFormat("0.00"); // easier way!
     pwErr.println("Parsed " + numWords + " words in " + numSents +
         " sentences (" + nf.format(wordspersec) + " wds/sec; " +

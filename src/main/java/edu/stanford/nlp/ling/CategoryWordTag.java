@@ -2,9 +2,9 @@ package edu.stanford.nlp.ling;
 
 
 /**
- * A <code>CategoryWordTag</code> object acts as a complex Label
+ * A {@code CategoryWordTag} object acts as a complex Label
  * which contains a category, a head word, and a tag.
- * The category label is the primary <code>value</code>
+ * The category label is the primary {@code value}
  *
  * @author Christopher Manning
  */
@@ -30,7 +30,6 @@ public class CategoryWordTag extends StringLabel implements HasCategory, HasWord
 
 
   public CategoryWordTag() {
-    super();
   }
 
   /**
@@ -93,40 +92,32 @@ public class CategoryWordTag extends StringLabel implements HasCategory, HasWord
 
   public void setCategoryWordTag(String category, String word, String tag) {
     setCategory(category);
-    setWord(word);
-    setTag(tag);
+      this.word = word;
+      this.tag = tag;
   }
 
 
   /**
-   * Returns a <code>String</code> representation of the label.
+   * Returns a {@code String} representation of the label.
    * This attempts to be somewhat clever in choosing to print or
    * suppress null components and the details of words or categories
-   * depending on the setting of <code>printWordTag</code> and
-   * <code>suppressTerminalDetails</code>.
+   * depending on the setting of {@code printWordTag} and
+   * {@code suppressTerminalDetails}.
    *
    * @return The label as a string
    */
   @Override
   public String toString() {
     if (category() != null) {
-      if ((word() == null || tag() == null) || !printWordTag || (suppressTerminalDetails && (word().equals(category()) || tag().equals(category())))) {
-        return category();
-      } else {
-        return category() + "[" + word() + "/" + tag() + "]";
-      }
+        return word() == null || tag() == null || !printWordTag || suppressTerminalDetails && (word().equals(category()) || tag().equals(category())) ? category() : category() + '[' + word() + '/' + tag() + ']';
     } else {
-      if (tag() == null) {
-        return word();
-      } else {
-        return word() + "/" + tag();
-      }
+        return tag() == null ? word() : word() + '/' + tag();
     }
   }
 
 
   /**
-   * Returns a <code>String</code> representation of the label.
+   * Returns a {@code String} representation of the label.
    * If the argument String is "full" then all components of the label
    * are returned, and otherwise the normal toString() is returned.
    *
@@ -134,7 +125,7 @@ public class CategoryWordTag extends StringLabel implements HasCategory, HasWord
    */
   public String toString(String mode) {
     if ("full".equals(mode)) {
-        return category() + "[" + word() + "/" + tag() + "]";
+        return category() + '[' + word() + '/' + tag() + ']';
     }
     return toString();
   }
@@ -152,13 +143,12 @@ public class CategoryWordTag extends StringLabel implements HasCategory, HasWord
 
   // extra class guarantees correct lazy loading (Bloch p.194)
   private static class LabelFactoryHolder {
-    private LabelFactoryHolder() {}
-    private static final LabelFactory lf = new CategoryWordTagFactory();
+      private static final LabelFactory lf = new CategoryWordTagFactory();
   }
 
   /**
    * Return a factory for this kind of label
-   * (i.e., <code>CategoryWordTag</code>).
+   * (i.e., {@code CategoryWordTag}).
    * The factory returned is always the same one (a singleton).
    *
    * @return The label factory

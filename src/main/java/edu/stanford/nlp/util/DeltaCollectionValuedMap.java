@@ -51,7 +51,6 @@ public class DeltaCollectionValuedMap<K, V> extends CollectionValuedMap<K, V> {
       return oldValue;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public boolean equals(Object o) {
       if (!(o instanceof Map.Entry)) {
@@ -63,7 +62,7 @@ public class DeltaCollectionValuedMap<K, V> extends CollectionValuedMap<K, V> {
 
     @Override
     public int hashCode() {
-      return ((key == null) ? 0 : key.hashCode()) ^ ((value == null) ? 0 : value.hashCode());
+      return (key == null ? 0 : key.hashCode()) ^ (value == null ? 0 : value.hashCode());
     }
 
     @Override
@@ -72,7 +71,7 @@ public class DeltaCollectionValuedMap<K, V> extends CollectionValuedMap<K, V> {
     }
 
     private static boolean eq(Object o1, Object o2) {
-      return (o1 == null ? o2 == null : o1.equals(o2));
+      return o1 == null ? o2 == null : o1.equals(o2);
     }
   }
 
@@ -86,7 +85,7 @@ public class DeltaCollectionValuedMap<K, V> extends CollectionValuedMap<K, V> {
     if (deltaResult == null) {
       return originalMap.get(key);
     }
-    if (deltaResult == removedValue) {
+    if (deltaResult.equals(removedValue)) {
       return cf.newEmptyCollection();
     }
     return deltaResult;
@@ -163,10 +162,7 @@ public class DeltaCollectionValuedMap<K, V> extends CollectionValuedMap<K, V> {
     if (value == null) {
       return originalMap.containsKey(key);
     }
-    if (value == removedValue) {
-      return false;
-    }
-    return true;
+      return !value.equals(removedValue);
   }
 
   @Override
@@ -220,31 +216,25 @@ public class DeltaCollectionValuedMap<K, V> extends CollectionValuedMap<K, V> {
           // only accepts stuff not overwritten by deltaMap
           public boolean accept(Map.Entry<K, Collection<V>> e) {
             K key = e.getKey();
-            if (deltaMap.containsKey(key)) {
-              return false;
-            }
-            return true;
+              return !deltaMap.containsKey(key);
           }
         };
 
-        Iterator<Map.Entry<K, Collection<V>>> iter1 = new FilteredIterator<Map.Entry<K, Collection<V>>>(originalMap.entrySet().iterator(), filter1);
+        Iterator<Map.Entry<K, Collection<V>>> iter1 = new FilteredIterator<>(originalMap.entrySet().iterator(), filter1);
 
         Filter<Map.Entry<K, Collection<V>>> filter2 = new Filter<Map.Entry<K, Collection<V>>>() {
           private static final long serialVersionUID = 1L;
 
           // only accepts stuff not overwritten by deltaMap
           public boolean accept(Map.Entry<K, Collection<V>> e) {
-            if (e.getValue() == removedValue) {
-              return false;
-            }
-            return true;
+              return !e.getValue().equals(removedValue);
           }
         };
 
 
-        Iterator<Map.Entry<K, Collection<V>>> iter2 = new FilteredIterator<Map.Entry<K, Collection<V>>>(deltaMap.entrySet().iterator(), filter2);
+        Iterator<Map.Entry<K, Collection<V>>> iter2 = new FilteredIterator<>(deltaMap.entrySet().iterator(), filter2);
 
-        return new ConcatenationIterator<Map.Entry<K, Collection<V>>>(iter1, iter2);
+        return new ConcatenationIterator<>(iter1, iter2);
       }
 
       @Override

@@ -62,25 +62,25 @@ public class LexicalizedParserQuery implements ParserQuery {
   /** The factored parser that combines the dependency and PCFG parsers. */
   private final KBestViterbiParser bparser;
 
-  private final boolean fallbackToPCFG = true;
+  private static final boolean fallbackToPCFG = true;
 
   private final TreeTransformer subcategoryStripper;
 
   // Whether or not the most complicated model available successfully
   // parsed the input sentence.
-  private boolean parseSucceeded = false;
+  private boolean parseSucceeded;
   // parseSkipped means that not only did we not succeed at parsing,
   // but for some reason we didn't even try.  Most likely this happens
   // when the sentence is too long or is of length 0.
-  private boolean parseSkipped = false;
+  private boolean parseSkipped;
   // In some sense we succeeded, but only because we used a fallback grammar
-  private boolean parseFallback = false;
+  private boolean parseFallback;
   // Not enough memory to parse
-  private boolean parseNoMemory = false;
+  private boolean parseNoMemory;
   // Horrible error
-  private boolean parseUnparsable = false;
+  private boolean parseUnparsable;
   // If something ran out of memory, where the error occurred
-  private String whatFailed = null;
+  private String whatFailed;
 
   public boolean parseSucceeded() { return parseSucceeded; }
   public boolean parseSkipped() { return parseSkipped; }
@@ -93,7 +93,7 @@ public class LexicalizedParserQuery implements ParserQuery {
   @Override
   public List<? extends HasWord> originalSentence() { return originalSentence; }
 
-  private boolean saidMemMessage = false;
+  private boolean saidMemMessage;
 
   public boolean saidMemMessage() {
     return saidMemMessage;
@@ -109,29 +109,21 @@ public class LexicalizedParserQuery implements ParserQuery {
     DependencyGrammar dg = parser.dg;
 
     Index<String> stateIndex = parser.stateIndex;
-    Index<String> wordIndex = new DeltaIndex<String>(parser.wordIndex);
+    Index<String> wordIndex = new DeltaIndex<>(parser.wordIndex);
     Index<String> tagIndex = parser.tagIndex;
 
     this.debinarizer = new Debinarizer(op.forceCNF);
     this.boundaryRemover = new BoundaryRemover();
 
     if (op.doPCFG) {
-      if (op.testOptions.iterativeCKY) {
-        pparser = new IterativeCKYPCFGParser(bg, ug, lex, op, stateIndex, wordIndex, tagIndex);
-      } else {
-        pparser = new ExhaustivePCFGParser(bg, ug, lex, op, stateIndex, wordIndex, tagIndex);
-      }
+        pparser = op.testOptions.iterativeCKY ? new IterativeCKYPCFGParser(bg, ug, lex, op, stateIndex, wordIndex, tagIndex) : new ExhaustivePCFGParser(bg, ug, lex, op, stateIndex, wordIndex, tagIndex);
     } else {
       pparser = null;
     }
 
     if (op.doDep) {
       dg.setLexicon(lex);
-      if (!op.testOptions.useFastFactored) {
-        dparser = new ExhaustiveDependencyParser(dg, lex, op, wordIndex, tagIndex);
-      } else {
-        dparser = null;
-      }
+        dparser = !op.testOptions.useFastFactored ? new ExhaustiveDependencyParser(dg, lex, op, wordIndex, tagIndex) : null;
     } else {
       dparser = null;
     }
@@ -147,11 +139,7 @@ public class LexicalizedParserQuery implements ParserQuery {
       } else {
         Scorer scorer = new TwinScorer(pparser, dparser);
         //Scorer scorer = parser;
-        if (op.testOptions.useN5) {
-          bparser = new BiLexPCFGParser.N5BiLexPCFGParser(scorer, pparser, dparser, bg, ug, dg, lex, op, stateIndex, wordIndex, tagIndex);
-        } else {
-          bparser = new BiLexPCFGParser(scorer, pparser, dparser, bg, ug, dg, lex, op, stateIndex, wordIndex, tagIndex);
-        }
+          bparser = op.testOptions.useN5 ? new BiLexPCFGParser.N5BiLexPCFGParser(scorer, pparser, dparser, bg, ug, dg, lex, op, stateIndex, wordIndex, tagIndex) : new BiLexPCFGParser(scorer, pparser, dparser, bg, ug, dg, lex, op, stateIndex, wordIndex, tagIndex);
       }
     } else {
       bparser = null;
@@ -207,7 +195,7 @@ public class LexicalizedParserQuery implements ParserQuery {
       }
     }
 
-    List<HasWord> sentenceB = new ArrayList<HasWord>(sentence);
+    List<HasWord> sentenceB = new ArrayList<>(sentence);
     if (op.testOptions.addMissingFinalPunctuation) {
       addSentenceFinalPunctIfNeeded(sentenceB, length);
     }
@@ -371,7 +359,7 @@ public class LexicalizedParserQuery implements ParserQuery {
       restoreOriginalWords(tree);
       return tree;
 
-    } else if (pparser != null && pparser.hasParse() && fallbackToPCFG) {
+    } else if (pparser != null && pparser.hasParse()) {
       return getBestPCFGParse();
     } else if (dparser != null && dparser.hasParse()) { // && fallbackToDG
       // Should we strip subcategories like this?  Traditionally haven't...
@@ -387,10 +375,7 @@ public class LexicalizedParserQuery implements ParserQuery {
   }
 
   public boolean hasFactoredParse() {
-    if (bparser == null) {
-      return false;
-    }
-    return !parseSkipped && parseSucceeded && bparser.hasParse();
+      return bparser != null && !parseSkipped && parseSucceeded && bparser.hasParse();
   }
 
   public Tree getBestFactoredParse() {
@@ -405,12 +390,12 @@ public class LexicalizedParserQuery implements ParserQuery {
     if (binaryTrees == null) {
       return null;
     }
-    List<ScoredObject<Tree>> trees = new ArrayList<ScoredObject<Tree>>(k);
+    List<ScoredObject<Tree>> trees = new ArrayList<>(k);
     for (ScoredObject<Tree> tp : binaryTrees) {
       Tree t = debinarizer.transformTree(tp.object());
       t = subcategoryStripper.transformTree(t);
       restoreOriginalWords(t);
-      trees.add(new ScoredObject<Tree>(t, tp.score()));
+      trees.add(new ScoredObject<>(t, tp.score()));
     }
     return trees;
   }
@@ -432,12 +417,12 @@ public class LexicalizedParserQuery implements ParserQuery {
     if (binaryTrees == null) {
       return null;
     }
-    List<ScoredObject<Tree>> trees = new ArrayList<ScoredObject<Tree>>(k);
+    List<ScoredObject<Tree>> trees = new ArrayList<>(k);
     for (ScoredObject<Tree> p : binaryTrees) {
       Tree t = debinarizer.transformTree(p.object());
       t = subcategoryStripper.transformTree(t);
       restoreOriginalWords(t);
-      trees.add(new ScoredObject<Tree>(t, p.score()));
+      trees.add(new ScoredObject<>(t, p.score()));
     }
     return trees;
   }
@@ -528,7 +513,7 @@ public class LexicalizedParserQuery implements ParserQuery {
   public boolean parse(List<? extends HasWord> sentence) {
     try {
       if (!parseInternal(sentence)) {
-        if (pparser != null && pparser.hasParse() && fallbackToPCFG) {
+        if (pparser != null && pparser.hasParse()) {
           parseFallback = true;
           return true;
         } else {
@@ -546,7 +531,7 @@ public class LexicalizedParserQuery implements ParserQuery {
         System.err.println(op.testOptions.maxLength);
         throw e;
       }
-      if (pparser.hasParse() && fallbackToPCFG) {
+      if (pparser.hasParse()) {
         try {
           whatFailed = "dependency";
           if (dparser.hasParse()) {
@@ -598,7 +583,7 @@ public class LexicalizedParserQuery implements ParserQuery {
         ParserUtils.printOutOfMemory(pwErr);
         saidMemMessage = true;
       }
-      if (pparser.hasParse() && fallbackToPCFG) {
+      if (pparser.hasParse()) {
         pwErr.println("No memory to gather PCFG parse. Skipping...");
       } else {
         pwErr.println("Sentence has no parse using PCFG grammar (or no PCFG fallback).  Skipping...");
@@ -653,7 +638,7 @@ public class LexicalizedParserQuery implements ParserQuery {
       if (item instanceof HasTag) {
         tag = ((HasTag) item).tag();
       }
-      if (tag != null && ! "".equals(tag)) {
+      if (tag != null && tag != null && !tag.isEmpty()) {
         if (tlp.isSentenceFinalPunctuationTag(tag)) {
           return;
         }

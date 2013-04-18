@@ -120,8 +120,8 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
    * Determine which daughter of the current parse tree is the head.
    *
    * @param t The parse tree to examine the daughters of.
-   *          If this is a leaf, <code>null</code> is returned
-   * @return The daughter parse tree that is the head of <code>t</code>
+   *          If this is a leaf, {@code null} is returned
+   * @return The daughter parse tree that is the head of {@code t}
    * @see Tree#percolateHeads(HeadFinder)
    *      for a routine to call this and spread heads throughout a tree
    */
@@ -134,9 +134,9 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
    * Determine which daughter of the current parse tree is the head.
    *
    * @param t The parse tree to examine the daughters of.
-   *          If this is a leaf, <code>null</code> is returned
+   *          If this is a leaf, {@code null} is returned
    * @param parent The parent of t
-   * @return The daughter parse tree that is the head of <code>t</code>.
+   * @return The daughter parse tree that is the head of {@code t}.
    *   Returns null for leaf nodes.
    * @see Tree#percolateHeads(HeadFinder)
    *      for a routine to call this and spread heads throughout a tree
@@ -223,7 +223,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
       }
     }
     for (int i = 0; i < how.length; i++) {
-      boolean lastResort = (i == how.length - 1);
+      boolean lastResort = i == how.length - 1;
       theHead = traverseLocate(kids, how[i], lastResort);
       if (theHead != null) {
         break;
@@ -240,25 +240,32 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
    * Go through daughterTrees looking for things from or not in a set given by
    * the contents of the array how, and if
    * you do not find one, take leftmost or rightmost perhaps matching thing iff
-   * lastResort is true, otherwise return <code>null</code>.
+   * lastResort is true, otherwise return {@code null}.
    */
   protected Tree traverseLocate(Tree[] daughterTrees, String[] how, boolean lastResort) {
     int headIdx;
-    if (how[0].equals("left")) {
-      headIdx = findLeftHead(daughterTrees, how);
-    } else if (how[0].equals("leftdis")) {
-      headIdx = findLeftDisHead(daughterTrees, how);
-    } else if (how[0].equals("leftexcept")) {
-      headIdx = findLeftExceptHead(daughterTrees, how);
-    } else if (how[0].equals("right")) {
-      headIdx = findRightHead(daughterTrees, how);
-    } else if (how[0].equals("rightdis")) {
-      headIdx = findRightDisHead(daughterTrees, how);
-    } else if (how[0].equals("rightexcept")) {
-      headIdx = findRightExceptHead(daughterTrees, how);
-    } else {
-      throw new IllegalStateException("ERROR: invalid direction type " + how[0] + " to nonTerminalInfo map in AbstractCollinsHeadFinder.");
-    }
+      switch (how[0]) {
+          case "left":
+              headIdx = findLeftHead(daughterTrees, how);
+              break;
+          case "leftdis":
+              headIdx = findLeftDisHead(daughterTrees, how);
+              break;
+          case "leftexcept":
+              headIdx = findLeftExceptHead(daughterTrees, how);
+              break;
+          case "right":
+              headIdx = findRightHead(daughterTrees, how);
+              break;
+          case "rightdis":
+              headIdx = findRightDisHead(daughterTrees, how);
+              break;
+          case "rightexcept":
+              headIdx = findRightExceptHead(daughterTrees, how);
+              break;
+          default:
+              throw new IllegalStateException("ERROR: invalid direction type " + how[0] + " to nonTerminalInfo map in AbstractCollinsHeadFinder.");
+      }
 
     // what happens if our rule didn't match anything
     if (headIdx < 0) {
@@ -276,11 +283,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
           rule = defaultRightRule;
         }
         Tree child = traverseLocate(daughterTrees, rule, false);
-        if (child != null) {
-          return child;
-        } else {
-          return daughterTrees[headIdx];
-        }
+          return child != null ? child : daughterTrees[headIdx];
       } else {
         // if we're not the last resort, we can return null to let the next rule try to match
         return null;
@@ -292,7 +295,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
     return daughterTrees[headIdx];
   }
 
-  private int findLeftHead(Tree[] daughterTrees, String[] how) {
+  private int findLeftHead(Tree[] daughterTrees, String... how) {
     for (int i = 1; i < how.length; i++) {
       for (int headIdx = 0; headIdx < daughterTrees.length; headIdx++) {
         String childCat = tlp.basicCategory(daughterTrees[headIdx].label().value());
@@ -304,7 +307,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
     return -1;
   }
 
-  private int findLeftDisHead(Tree[] daughterTrees, String[] how) {
+  private int findLeftDisHead(Tree[] daughterTrees, String... how) {
     for (int headIdx = 0; headIdx < daughterTrees.length; headIdx++) {
       String childCat = tlp.basicCategory(daughterTrees[headIdx].label().value());
       for (int i = 1; i < how.length; i++) {
@@ -316,7 +319,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
     return -1;
   }
 
-  private int findLeftExceptHead(Tree[] daughterTrees, String[] how) {
+  private int findLeftExceptHead(Tree[] daughterTrees, String... how) {
     for (int headIdx = 0; headIdx < daughterTrees.length; headIdx++) {
       String childCat = tlp.basicCategory(daughterTrees[headIdx].label().value());
       boolean found = true;
@@ -332,7 +335,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
     return -1;
   }
 
-  private int findRightHead(Tree[] daughterTrees, String[] how) {
+  private int findRightHead(Tree[] daughterTrees, String... how) {
     for (int i = 1; i < how.length; i++) {
       for (int headIdx = daughterTrees.length - 1; headIdx >= 0; headIdx--) {
         String childCat = tlp.basicCategory(daughterTrees[headIdx].label().value());
@@ -345,7 +348,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
   }
 
   // from right, but search for any of the categories, not by category in turn
-  private int findRightDisHead(Tree[] daughterTrees, String[] how) {
+  private int findRightDisHead(Tree[] daughterTrees, String... how) {
     for (int headIdx = daughterTrees.length - 1; headIdx >= 0; headIdx--) {
       String childCat = tlp.basicCategory(daughterTrees[headIdx].label().value());
       for (int i = 1; i < how.length; i++) {
@@ -357,7 +360,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
     return -1;
   }
 
-  private int findRightExceptHead(Tree[] daughterTrees, String[] how) {
+  private int findRightExceptHead(Tree[] daughterTrees, String... how) {
     for (int headIdx = daughterTrees.length - 1; headIdx >= 0; headIdx--) {
       String childCat = tlp.basicCategory(daughterTrees[headIdx].label().value());
       boolean found = true;
@@ -381,7 +384,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
    * @param daughterTrees The array of daughter trees
    * @return The new headIndex
    */
-  protected int postOperationFix(int headIdx, Tree[] daughterTrees) {
+  protected int postOperationFix(int headIdx, Tree... daughterTrees) {
     return headIdx;
   }
 

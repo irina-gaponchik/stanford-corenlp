@@ -28,7 +28,7 @@ public class Prior {
     indexFields = line.split("\\s+");
     fieldIndices = new HashMap();
     for (int i = 0; i < indexFields.length; ++i) {
-      fieldIndices.put(indexFields[i], Integer.valueOf(i));
+      fieldIndices.put(indexFields[i], i);
     }
     if (indexFields.length < 1 || indexFields.length > 31) {
       throw new IOException("Invalid number of fields, should be >=1 and <= 31");
@@ -49,17 +49,16 @@ public class Prior {
    */
   public double get(Set presentFields) {
     int index = 0;
-    for (int f = 0; f < indexFields.length; ++f) {
-      String field = indexFields[f];
-      index *= 2;
-      if (presentFields.contains(field)) {
-        ++index;
+      for (String field : indexFields) {
+          index <<= 1;
+          if (presentFields.contains(field)) {
+              ++index;
+          }
       }
-    }
     return matrix[index];
   }
 
-  public static void main(String args[]) throws Exception {
+  public static void main(String... args) throws Exception {
 
     BufferedReader br = new BufferedReader(new FileReader("/tmp/acstats"));
 

@@ -49,9 +49,9 @@ public class FactorTable {
       sb.append(Arrays.toString(toArray(i)));
       sb.append(": ");
       sb.append(prob(toArray(i)));
-      sb.append("\n");
+      sb.append('\n');
     }
-    sb.append("}");
+    sb.append('}');
     return sb.toString();
   }
 
@@ -61,9 +61,9 @@ public class FactorTable {
       sb.append(Arrays.toString(toArray(i)));
       sb.append(": ");
       sb.append(Math.exp(getValue(i)));
-      sb.append("\n");
+      sb.append('\n');
     }
-    sb.append("}");
+    sb.append('}');
     return sb.toString();
   }
 
@@ -73,9 +73,9 @@ public class FactorTable {
       sb.append(toString(toArray(i), classIndex));
       sb.append(": ");
       sb.append(getValue(i));
-      sb.append("\n");
+      sb.append('\n');
     }
-    sb.append("}");
+    sb.append('}');
     return sb.toString();
   }
 
@@ -86,17 +86,17 @@ public class FactorTable {
       sb.append(Arrays.toString(toArray(i)));
       sb.append(": ");
       sb.append(getValue(i));
-      sb.append("\n");
+      sb.append('\n');
     }
-    sb.append("}");
+    sb.append('}');
     return sb.toString();
   }
 
   private static <L> String toString(int[] array, Index<L> classIndex) {
-    List<L> l = new ArrayList<L>(array.length);
-    for (int i = 0; i < array.length; i++) {
-      l.add(classIndex.get(array[i]));
-    }
+    List<L> l = new ArrayList<>(array.length);
+      for (int anArray : array) {
+          l.add(classIndex.get(anArray));
+      }
     return l.toString();
   }
 
@@ -109,44 +109,44 @@ public class FactorTable {
     return indices;
   }
 
-  private int indexOf(int[] entry) {
+  private int indexOf(int... entry) {
     int index = 0;
-    for (int i = 0; i < entry.length; i++) {
-      index *= numClasses;
-      index += entry[i];
-    }
+      for (int anEntry : entry) {
+          index *= numClasses;
+          index += anEntry;
+      }
     // if (index < 0) throw new RuntimeException("index=" + index + " entry=" + Arrays.toString(entry)); // only if overflow
     return index;
   }
 
   private int indexOf(int[] front, int end) {
     int index = 0;
-    for (int i = 0; i < front.length; i++) {
-      index *= numClasses;
-      index += front[i];
-    }
+      for (int aFront : front) {
+          index *= numClasses;
+          index += aFront;
+      }
     index *= numClasses;
     index += end;
     return index;
   }
 
-  private int indexOf(int front, int[] end) {
+  private int indexOf(int front, int... end) {
     int index = front;
-    for (int i = 0; i < end.length; i++) {
-      index *= numClasses;
-      index += end[i];
-    }
+      for (int anEnd : end) {
+          index *= numClasses;
+          index += anEnd;
+      }
     return index;
   }
 
-  private int[] indicesEnd(int[] entries) {
+  private int[] indicesEnd(int... entries) {
     int index = 0;
-    for (int i = 0; i < entries.length; i++) {
-      index *= numClasses;
-      index += entries[i];
-    }
+      for (int entry : entries) {
+          index *= numClasses;
+          index += entry;
+      }
     int[] indices = new int[SloppyMath.intPow(numClasses, windowSize - entries.length)];
-    final int offset = SloppyMath.intPow(numClasses, entries.length);
+    int offset = SloppyMath.intPow(numClasses, entries.length);
     for (int i = 0; i < indices.length; i++) {
       indices[i] = index;
       index += offset;
@@ -163,7 +163,7 @@ public class FactorTable {
    *  @param entries The class indices of size windowsSize
    *  @return First index of requested entries
    */
-  private int indicesFront(int[] entries) {
+  private int indicesFront(int... entries) {
     int start = 0;
     for (int entry : entries) {
       start *= numClasses;
@@ -190,15 +190,15 @@ public class FactorTable {
   }
 
   /** Returns a single clique potential. */
-  public double unnormalizedLogProb(int[] label) {
+  public double unnormalizedLogProb(int... label) {
     return getValue(label);
   }
 
-  public double logProb(int[] label) {
+  public double logProb(int... label) {
     return unnormalizedLogProb(label) - totalMass();
   }
 
-  public double prob(int[] label) {
+  public double prob(int... label) {
     return Math.exp(unnormalizedLogProb(label) - totalMass());
   }
 
@@ -258,7 +258,7 @@ public class FactorTable {
    *
    * @return the probabilities of the tag at the end of the table
    */
-  public double[] conditionalLogProbsGivenPrevious(int[] given) {
+  public double[] conditionalLogProbsGivenPrevious(int... given) {
     if (given.length != windowSize - 1) {
       throw new IllegalArgumentException("conditionalLogProbsGivenPrevious requires given one less than clique size (" +
           windowSize + ") but was " + Arrays.toString(given));
@@ -279,7 +279,7 @@ public class FactorTable {
    *
    * @return the probability of the sequence of being at the end of the table
    */
-  public double conditionalLogProbGivenFirst(int given, int[] of) {
+  public double conditionalLogProbGivenFirst(int given, int... of) {
     if (of.length != windowSize - 1) {
       throw new IllegalArgumentException("conditionalLogProbGivenFirst requires of one less than clique size (" +
           windowSize + ") but was " + Arrays.toString(of));
@@ -306,7 +306,7 @@ public class FactorTable {
    *
    * @return the probability of the sequence of being at the end of the table
    */
-  public double unnormalizedConditionalLogProbGivenFirst(int given, int[] of) {
+  public double unnormalizedConditionalLogProbGivenFirst(int given, int... of) {
     if (of.length != windowSize - 1) {
       throw new IllegalArgumentException("unnormalizedConditionalLogProbGivenFirst requires of one less than clique size (" +
               windowSize + ") but was " + Arrays.toString(of));
@@ -349,7 +349,7 @@ public class FactorTable {
     return table[indexOf(of, given)] - z;
   }
 
-  public double unnormalizedLogProbFront(int[] labels) {
+  public double unnormalizedLogProbFront(int... labels) {
     int startIndex = indicesFront(labels);
     int numCellsToSum = SloppyMath.intPow(numClasses, windowSize - labels.length);
     // double[] masses = new double[labels.length];
@@ -359,7 +359,7 @@ public class FactorTable {
     return ArrayMath.logSum(table, startIndex, startIndex + numCellsToSum);
   }
 
-  public double logProbFront(int[] label) {
+  public double logProbFront(int... label) {
     return unnormalizedLogProbFront(label) - totalMass();
   }
 
@@ -372,7 +372,7 @@ public class FactorTable {
     return unnormalizedLogProbFront(label) - totalMass();
   }
 
-  public double unnormalizedLogProbEnd(int[] labels) {
+  public double unnormalizedLogProbEnd(int... labels) {
     labels = indicesEnd(labels);
     double[] masses = new double[labels.length];
     for (int i = 0; i < masses.length; i++) {
@@ -381,7 +381,7 @@ public class FactorTable {
     return ArrayMath.logSum(masses);
   }
 
-  public double logProbEnd(int[] labels) {
+  public double logProbEnd(int... labels) {
     return unnormalizedLogProbEnd(labels) - totalMass();
   }
 
@@ -398,7 +398,7 @@ public class FactorTable {
     return table[index];
   }
 
-  public double getValue(int[] label) {
+  public double getValue(int... label) {
     return table[indexOf(label)];
   }
 
@@ -479,9 +479,9 @@ public class FactorTable {
   }
 
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     int numClasses = 6;
-    final int cliqueSize = 3;
+    int cliqueSize = 3;
     System.err.printf("Creating factor table with %d classes and window (clique) size %d%n", numClasses, cliqueSize);
     FactorTable ft = new FactorTable(numClasses, cliqueSize);
 
@@ -508,7 +508,7 @@ public class FactorTable {
       for (int j = 0; j < numClasses; j++) {
         for (int k = 0; k < numClasses; k++) {
           int[] b = { i, j, k };
-          ft.setValue(b, (i * 4) + (j * 2) + k);
+          ft.setValue(b, (i << 2) + (j << 1) + k);
         }
       }
     }
@@ -518,7 +518,7 @@ public class FactorTable {
     for (int i = 0; i < numClasses; i++) {
       for (int j = 0; j < numClasses; j++) {
         for (int k = 0; k < numClasses; k++) {
-          normalization += ft.unnormalizedLogProb(new int[] {i, j, k});
+          normalization += ft.unnormalizedLogProb(i, j, k);
         }
       }
     }
@@ -545,7 +545,7 @@ public class FactorTable {
         for (int k = 0; k < numClasses; k++) {
           t += Math.exp(ft.conditionalLogProbGivenPrevious(b, k));
           System.err
-              .println(k + "|" + i + "," + j + " : " + Math.exp(ft.conditionalLogProbGivenPrevious(b, k)));
+              .println(k + "|" + i + ',' + j + " : " + Math.exp(ft.conditionalLogProbGivenPrevious(b, k)));
         }
         System.err.println(t);
       }
@@ -559,7 +559,7 @@ public class FactorTable {
         for (int i = 0; i < numClasses; i++) {
           t += ft.unnormalizedConditionalLogProbGivenFirst(i, b);
           System.err
-              .println(i + "|" + j + "," + k + " : " + ft.unnormalizedConditionalLogProbGivenFirst(i, b));
+              .println(i + "|" + j + ',' + k + " : " + ft.unnormalizedConditionalLogProbGivenFirst(i, b));
         }
         System.err.println(t);
       }
@@ -573,7 +573,7 @@ public class FactorTable {
         for (int k = 0; k < numClasses; k++) {
           t += ft.conditionalLogProbGivenNext(b, k);
           System.err
-              .println(i + "," + j + "|" + k + " : " + ft.conditionalLogProbGivenNext(b, k));
+              .println(i + "," + j + '|' + k + " : " + ft.conditionalLogProbGivenNext(b, k));
         }
         System.err.println(t);
       }
@@ -587,8 +587,8 @@ public class FactorTable {
     ft3.setValue(new int[] {0, 1, 1}, Math.log(0.07));
     ft3.setValue(new int[] {1, 0, 0}, Math.log(0.08));
     ft3.setValue(new int[] {1, 0, 1}, Math.log(0.16));
-    ft3.setValue(new int[] {1, 1, 0}, Math.log(1e-50));
-    ft3.setValue(new int[] {1, 1, 1}, Math.log(1e-50));
+    ft3.setValue(new int[] {1, 1, 0}, Math.log(1.0e-50));
+    ft3.setValue(new int[] {1, 1, 1}, Math.log(1.0e-50));
 
     FactorTable ft4 = ft3.sumOutFront();
     System.err.println(ft4.toNonLogString());

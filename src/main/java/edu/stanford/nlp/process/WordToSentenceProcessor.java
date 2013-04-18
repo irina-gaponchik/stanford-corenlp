@@ -85,7 +85,7 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
 
 
   public void setSentenceBoundaryToDiscard(Set<String> regexSet) {
-    sentenceBoundaryToDiscard = new ArrayList<Pattern>(regexSet.size());
+    sentenceBoundaryToDiscard = new ArrayList<>(regexSet.size());
     for (String s: regexSet) {
       sentenceBoundaryToDiscard.add(Pattern.compile(Pattern.quote(s)));
     }
@@ -101,7 +101,7 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
 
   public void addHtmlSentenceBoundaryToDiscard(Set<String> set) {
     if (sentenceBoundaryToDiscard == null) {
-      sentenceBoundaryToDiscard = new ArrayList<Pattern>();
+      sentenceBoundaryToDiscard = new ArrayList<>();
     }
     for (String s: set) {
       sentenceBoundaryToDiscard.add(Pattern.compile("<\\s*/?\\s*" + s + "\\s*/?\\s*>", Pattern.CASE_INSENSITIVE));
@@ -123,7 +123,7 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
   public List<List<IN>> process(List<? extends IN> words) {
     if (isOneSentence) {
       List<List<IN>> sentences = Generics.newArrayList();
-      sentences.add(new ArrayList<IN>(words));
+      sentences.add(new ArrayList<>(words));
       return sentences;
     } else {
       return wordsToSentences(words);
@@ -145,7 +145,7 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
    */
   public List<List<IN>> wordsToSentences(List<? extends IN> words) {
     List<List<IN>> sentences = Generics.newArrayList();
-    List<IN> currentSentence = new ArrayList<IN>();
+    List<IN> currentSentence = new ArrayList<>();
     List<IN> lastSentence = null;
     boolean insideRegion = false;
     for (IN o: words) {
@@ -218,7 +218,7 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
           sentences.add(currentSentence);
           // adds this sentence now that it's complete
           lastSentence = currentSentence;
-          currentSentence = new ArrayList<IN>(); // clears the current sentence
+          currentSentence = new ArrayList<>(); // clears the current sentence
         }
       }
     }
@@ -242,7 +242,7 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
   public static final Set<String> DEFAULT_BOUNDARY_FOLLOWERS = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(")", "]", "\"", "\'", "''", "-RRB-", "-RSB-", "-RCB-")));
 
   /**
-   * Create a <code>WordToSentenceProcessor</code> using a sensible default
+   * Create a {@code WordToSentenceProcessor} using a sensible default
    * list of tokens to split on.  The default set is: {".","?","!"} and
    * any combination of ! or ?, as in !!!?!?!?!!!?!!?!!!
    */

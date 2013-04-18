@@ -61,7 +61,7 @@ public class StringDictionary {
       if (ic == null) {
         ic = new IndexAndCount(mDict.size(), 0);
         mDict.put(s, ic);
-        mInverse.put(Integer.valueOf(ic.mIndex), s);
+        mInverse.put(ic.mIndex, s);
       }
       ic.mCount++;
     }
@@ -80,7 +80,7 @@ public class StringDictionary {
       if (ic == null) {
         ic = new IndexAndCount(mDict.size(), 0);
         mDict.put(s, ic);
-        mInverse.put(Integer.valueOf(ic.mIndex), s);
+        mInverse.put(ic.mIndex, s);
       }
       ic.mCount++;
     }
@@ -128,21 +128,21 @@ public class StringDictionary {
    */
   public void save(String path, String prefix, int threshold) throws java.io.IOException {
 
-    String fileName = path + java.io.File.separator + prefix + "." + mName;
+    String fileName = path + java.io.File.separator + prefix + '.' + mName;
     java.io.PrintStream os = new java.io.PrintStream(new java.io.FileOutputStream(fileName));
 
     Set<String> keys = mDict.keySet();
     int index = 0;
-    for (String key : keys) {
-      IndexAndCount ic = mDict.get(key);
+    for (Map.Entry<String, IndexAndCount> stringIndexAndCountEntry : mDict.entrySet()) {
+      IndexAndCount ic = stringIndexAndCountEntry.getValue();
       if (ic.mCount > threshold) {
-        os.println(key + " " + index + " " + ic.mCount);
+        os.println(stringIndexAndCountEntry.getKey() + ' ' + index + ' ' + ic.mCount);
         index++;
       }
     }
 
     os.close();
-    System.err.println("Saved " + index + "/" + mDict.size() + " entries for dictionary \"" + mName + "\".");
+    System.err.println("Saved " + index + '/' + mDict.size() + " entries for dictionary \"" + mName + "\".");
   }
 
   public void clear() {
@@ -157,7 +157,7 @@ public class StringDictionary {
   /** Loads all saved dictionary entries from disk */
   public void load(String path, String prefix) throws java.io.IOException {
 
-    String fileName = path + java.io.File.separator + prefix + "." + mName;
+    String fileName = path + java.io.File.separator + prefix + '.' + mName;
     BufferedReader is = IOUtils.readerFromString(fileName);
 
     for (String line; (line = is.readLine()) != null; ) {
@@ -173,7 +173,7 @@ public class StringDictionary {
 
       IndexAndCount ic = new IndexAndCount(index, count);
       mDict.put(tokens.get(0), ic);
-      mInverse.put(Integer.valueOf(index), tokens.get(0));
+      mInverse.put(index, tokens.get(0));
     }
 
     is.close();

@@ -30,7 +30,7 @@ final public class ScoredComparator implements Comparator<Scored>, Serializable 
   }
 
   public int compare(Scored o1, Scored o2) {
-    if (o1 == o2) {
+    if (o1.equals(o2)) {
       return 0;
     }
     double d1 = o1.score();
@@ -70,15 +70,11 @@ final public class ScoredComparator implements Comparator<Scored>, Serializable 
    */
   @Override
   public int hashCode() {
-    if (ascending) {
-      return (1 << 23);
-    } else {
-      return (1 << 23) + 1;
-    }
+      return ascending ? 1 << 23 : (1 << 23) + 1;
   }
 
   @Override
   public String toString() {
-    return "ScoredComparator(" + (ascending ? "ascending": "descending") + ")";
+    return "ScoredComparator(" + (ascending ? "ascending": "descending") + ')';
   }
 }

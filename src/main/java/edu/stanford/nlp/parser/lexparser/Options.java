@@ -63,7 +63,7 @@ public class Options implements Serializable {
    *      which options should be processed
    * @throws IllegalArgumentException If an unknown flag is passed in
    */
-  public void setOptions(final String[] flags, final int startIndex, final int endIndexPlusOne) {
+  public void setOptions(String[] flags, int startIndex, int endIndexPlusOne) {
     for (int i = startIndex; i < endIndexPlusOne;) {
       i = setOption(flags, i);
     }
@@ -99,7 +99,7 @@ public class Options implements Serializable {
    *      which options should be processed
    * @throws IllegalArgumentException If an unknown flag is passed in
    */
-  public void setOptionsOrWarn(final String[] flags, final int startIndex, final int endIndexPlusOne) {
+  public void setOptionsOrWarn(String[] flags, int startIndex, int endIndexPlusOne) {
     for (int i = startIndex; i < endIndexPlusOne;) {
       i = setOptionOrWarn(flags, i);
     }
@@ -117,17 +117,17 @@ public class Options implements Serializable {
    * classes (this should be fixed some day).
    * Some options (there are many others; see the source code):
    * <ul>
-   * <li> <code>-maxLength n</code> set the maximum length sentence to parse (inclusively)
-   * <li> <code>-printTT</code> print the training trees in raw, annotated, and annotated+binarized form.  Useful for debugging and other miscellany.
-   * <li> <code>-printAnnotated filename</code> use only in conjunction with -printTT.  Redirects printing of annotated training trees to <code>filename</code>.
-   * <li> <code>-forceTags</code> when the parser is tested against a set of gold standard trees, use the tagged yield, instead of just the yield, as input.
+   * <li> {@code -maxLength n} set the maximum length sentence to parse (inclusively)
+   * <li> {@code -printTT} print the training trees in raw, annotated, and annotated+binarized form.  Useful for debugging and other miscellany.
+   * <li> {@code -printAnnotated filename} use only in conjunction with -printTT.  Redirects printing of annotated training trees to {@code filename}.
+   * <li> {@code -forceTags} when the parser is tested against a set of gold standard trees, use the tagged yield, instead of just the yield, as input.
    * </ul>
    *
    * @param flags An array of options arguments, command-line style.  E.g. {"-maxLength", "50"}.
    * @param i The index in flags to start at when processing an option
    * @return The index in flags of the position after the last element used in
    *      processing this option. If the current array position cannot be processed as a valid
-   *      option, then a warning message is printed to stderr and the return value is <code>i+1</code>
+   *      option, then a warning message is printed to stderr and the return value is {@code i+1}
    */
   public int setOptionOrWarn(String[] flags, int i) {
     int j = setOptionFlag(flags, i);
@@ -153,10 +153,10 @@ public class Options implements Serializable {
    * classes (this should be fixed some day).
    * Some options (there are many others; see the source code):
    * <ul>
-   * <li> <code>-maxLength n</code> set the maximum length sentence to parse (inclusively)
-   * <li> <code>-printTT</code> print the training trees in raw, annotated, and annotated+binarized form.  Useful for debugging and other miscellany.
-   * <li> <code>-printAnnotated filename</code> use only in conjunction with -printTT.  Redirects printing of annotated training trees to <code>filename</code>.
-   * <li> <code>-forceTags</code> when the parser is tested against a set of gold standard trees, use the tagged yield, instead of just the yield, as input.
+   * <li> {@code -maxLength n} set the maximum length sentence to parse (inclusively)
+   * <li> {@code -printTT} print the training trees in raw, annotated, and annotated+binarized form.  Useful for debugging and other miscellany.
+   * <li> {@code -printAnnotated filename} use only in conjunction with -printTT.  Redirects printing of annotated training trees to {@code filename}.
+   * <li> {@code -forceTags} when the parser is tested against a set of gold standard trees, use the tagged yield, instead of just the yield, as input.
    * </ul>
    *
    * @param flags An array of options arguments, command-line style.  E.g. {"-maxLength", "50"}.
@@ -183,10 +183,10 @@ public class Options implements Serializable {
    * options directly known by the Options object.
    * Some options (there are many others; see the source code):
    * <ul>
-   * <li> <code>-maxLength n</code> set the maximum length sentence to parse (inclusively)
-   * <li> <code>-printTT</code> print the training trees in raw, annotated, and annotated+binarized form.  Useful for debugging and other miscellany.
-   * <li> <code>-printAnnotated filename</code> use only in conjunction with -printTT.  Redirects printing of annotated training trees to <code>filename</code>.
-   * <li> <code>-forceTags</code> when the parser is tested against a set of gold standard trees, use the tagged yield, instead of just the yield, as input.
+   * <li> {@code -maxLength n} set the maximum length sentence to parse (inclusively)
+   * <li> {@code -printTT} print the training trees in raw, annotated, and annotated+binarized form.  Useful for debugging and other miscellany.
+   * <li> {@code -printAnnotated filename} use only in conjunction with -printTT.  Redirects printing of annotated training trees to {@code filename}.
+   * <li> {@code -forceTags} when the parser is tested against a set of gold standard trees, use the tagged yield, instead of just the yield, as input.
    * </ul>
    *
    * @param args An array of options arguments, command-line style.  E.g. {"-maxLength", "50"}.
@@ -229,13 +229,13 @@ public class Options implements Serializable {
     } else if (args[i].equalsIgnoreCase("-useNonProjectiveDependencyParser")) {
       testOptions.useNonProjectiveDependencyParser = true;
       i++;
-    } else if (args[i].equalsIgnoreCase("-maxLength") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-maxLength") && i + 1 < args.length) {
       testOptions.maxLength = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-MAX_ITEMS") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-MAX_ITEMS") && i + 1 < args.length) {
       testOptions.MAX_ITEMS = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-trainLength") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-trainLength") && i + 1 < args.length) {
       // train on only short sentences
       trainOptions.trainLengthLimit = Integer.parseInt(args[i + 1]);
       i += 2;
@@ -245,7 +245,7 @@ public class Options implements Serializable {
     } else if (args[i].equalsIgnoreCase("-iterativeCKY")) {
       testOptions.iterativeCKY = true;
       i++;
-    } else if (args[i].equalsIgnoreCase("-vMarkov") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-vMarkov") && i + 1 < args.length) {
       int order = Integer.parseInt(args[i + 1]);
       if (order <= 1) {
         trainOptions.PA = false;
@@ -258,22 +258,22 @@ public class Options implements Serializable {
         trainOptions.gPA = true;
       }
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-vSelSplitCutOff") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-vSelSplitCutOff") && i + 1 < args.length) {
       trainOptions.selectiveSplitCutOff = Double.parseDouble(args[i + 1]);
       trainOptions.selectiveSplit = trainOptions.selectiveSplitCutOff > 0.0;
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-vSelPostSplitCutOff") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-vSelPostSplitCutOff") && i + 1 < args.length) {
       trainOptions.selectivePostSplitCutOff = Double.parseDouble(args[i + 1]);
       trainOptions.selectivePostSplit = trainOptions.selectivePostSplitCutOff > 0.0;
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-deleteSplitters") && (i+1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-deleteSplitters") && i+1 < args.length) {
       String[] toDel = args[i+1].split(" *, *");
       trainOptions.deleteSplitters = Generics.newHashSet(Arrays.asList(toDel));
       i += 2;
     } else if (args[i].equalsIgnoreCase("-postSplitWithBaseCategory")) {
       trainOptions.postSplitWithBaseCategory = true;
       i += 1;
-    } else if (args[i].equalsIgnoreCase("-vPostMarkov") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-vPostMarkov") && i + 1 < args.length) {
       int order = Integer.parseInt(args[i + 1]);
       if (order <= 1) {
         trainOptions.postPA = false;
@@ -286,7 +286,7 @@ public class Options implements Serializable {
         trainOptions.postGPA = true;
       }
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-hMarkov") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-hMarkov") && i + 1 < args.length) {
       int order = Integer.parseInt(args[i + 1]);
       if (order >= 0) {
         trainOptions.markovOrder = order;
@@ -295,7 +295,7 @@ public class Options implements Serializable {
         trainOptions.markovFactor = false;
       }
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-distanceBins") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-distanceBins") && i + 1 < args.length) {
       int numBins = Integer.parseInt(args[i + 1]);
       if (numBins <= 1) {
         distance = false;
@@ -315,28 +315,28 @@ public class Options implements Serializable {
     } else if (args[i].equalsIgnoreCase("-nonDirectional")) {
       directional = false;
       i++;
-    } else if (args[i].equalsIgnoreCase("-depWeight") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-depWeight") && i + 1 < args.length) {
       testOptions.depWeight = Double.parseDouble(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-printPCFGkBest") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-printPCFGkBest") && i + 1 < args.length) {
       testOptions.printPCFGkBest = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-evalPCFGkBest") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-evalPCFGkBest") && i + 1 < args.length) {
       testOptions.evalPCFGkBest = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-printFactoredKGood") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-printFactoredKGood") && i + 1 < args.length) {
       testOptions.printFactoredKGood = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-smoothTagsThresh") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-smoothTagsThresh") && i + 1 < args.length) {
       lexOptions.smoothInUnknownsThreshold = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-unseenSmooth") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-unseenSmooth") && i + 1 < args.length) {
       testOptions.unseenSmooth = Double.parseDouble(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-fractionBeforeUnseenCounting") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-fractionBeforeUnseenCounting") && i + 1 < args.length) {
       trainOptions.fractionBeforeUnseenCounting = Double.parseDouble(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-hSelSplitThresh") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-hSelSplitThresh") && i + 1 < args.length) {
       trainOptions.HSEL_CUT = Integer.parseInt(args[i + 1]);
       trainOptions.hSelSplit = trainOptions.HSEL_CUT > 0;
       i += 2;
@@ -346,30 +346,30 @@ public class Options implements Serializable {
     } else if (args[i].equalsIgnoreCase("-noTagPA")) {
       trainOptions.tagPA = false;
       i += 1;
-    } else if (args[i].equalsIgnoreCase("-tagSelSplitCutOff") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-tagSelSplitCutOff") && i + 1 < args.length) {
       trainOptions.tagSelectiveSplitCutOff = Double.parseDouble(args[i + 1]);
       trainOptions.tagSelectiveSplit = trainOptions.tagSelectiveSplitCutOff > 0.0;
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-tagSelPostSplitCutOff") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-tagSelPostSplitCutOff") && i + 1 < args.length) {
       trainOptions.tagSelectivePostSplitCutOff = Double.parseDouble(args[i + 1]);
       trainOptions.tagSelectivePostSplit = trainOptions.tagSelectivePostSplitCutOff > 0.0;
       i += 2;
     } else if (args[i].equalsIgnoreCase("-noTagSplit")) {
       trainOptions.noTagSplit = true;
       i += 1;
-    } else if (args[i].equalsIgnoreCase("-uwm") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-uwm") && i + 1 < args.length) {
       lexOptions.useUnknownWordSignatures = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-unknownSuffixSize") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-unknownSuffixSize") && i + 1 < args.length) {
       lexOptions.unknownSuffixSize = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-unknownPrefixSize") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-unknownPrefixSize") && i + 1 < args.length) {
       lexOptions.unknownPrefixSize = Integer.parseInt(args[i + 1]);
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-uwModelTrainer") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-uwModelTrainer") && i + 1 < args.length) {
       lexOptions.uwModelTrainer = args[i+1];
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-openClassThreshold") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-openClassThreshold") && i + 1 < args.length) {
       trainOptions.openClassTypesThreshold = Integer.parseInt(args[i + 1]);
       i += 2;
     } else if (args[i].equalsIgnoreCase("-unary") && i+1 < args.length) {
@@ -673,7 +673,7 @@ public class Options implements Serializable {
       // Bracketing F1 is up about 2% and tag accuracy about 1% (exact by 6%)
       dcTags = false;
       // no increment
-    } else if (args[i].equalsIgnoreCase("-printTT") && (i+1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-printTT") && i+1 < args.length) {
       trainOptions.printTreeTransformations = Integer.parseInt(args[i + 1]);
       i += 2;
     } else if (args[i].equalsIgnoreCase("-printAnnotatedRuleCounts")) {
@@ -682,14 +682,14 @@ public class Options implements Serializable {
     } else if (args[i].equalsIgnoreCase("-printAnnotatedStateCounts")) {
       trainOptions.printAnnotatedStateCounts = true;
       i++;
-    } else if (args[i].equalsIgnoreCase("-printAnnotated") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-printAnnotated") && i + 1 < args.length) {
       try {
         trainOptions.printAnnotatedPW = tlpParams.pw(new FileOutputStream(args[i + 1]));
       } catch (IOException ioe) {
         trainOptions.printAnnotatedPW = null;
       }
       i += 2;
-    } else if (args[i].equalsIgnoreCase("-printBinarized") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-printBinarized") && i + 1 < args.length) {
       try {
         trainOptions.printBinarizedPW = tlpParams.pw(new FileOutputStream(args[i + 1]));
       } catch (IOException ioe) {
@@ -699,7 +699,7 @@ public class Options implements Serializable {
     } else if (args[i].equalsIgnoreCase("-printStates")) {
       trainOptions.printStates = true;
       i++;
-    } else if (args[i].equalsIgnoreCase("-preTransformer") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-preTransformer") && i + 1 < args.length) {
       String[] classes = args[i + 1].split(",");
       i += 2;
       if (classes.length == 1) {
@@ -714,7 +714,7 @@ public class Options implements Serializable {
           composite.addTransformer(transformer);
         }
       }
-    } else if (args[i].equalsIgnoreCase("-taggedFiles") && (i + 1 < args.length)) {
+    } else if (args[i].equalsIgnoreCase("-taggedFiles") && i + 1 < args.length) {
       trainOptions.taggedFiles = args[i + 1];
       i += 2;
     } else if (args[i].equalsIgnoreCase("-predictSplits")) {
@@ -781,7 +781,7 @@ public class Options implements Serializable {
      * capitalization of first letter and a suffix of length
      * unknownSuffixSize.
      */
-    public int useUnknownWordSignatures = 0;
+    public int useUnknownWordSignatures;
 
     /**
      * Words more common than this are tagged with MLE P(t|w). Default 100. The
@@ -794,12 +794,12 @@ public class Options implements Serializable {
     /**
      * Smarter smoothing for rare words.
      */
-    public boolean smartMutation = false;
+    public boolean smartMutation;
 
     /**
      * Make use of unicode code point types in smoothing.
      */
-    public boolean useUnicodeType = false;
+    public boolean useUnicodeType;
 
     /** For certain Lexicons, a certain number of word-final letters are
      *  used to subclassify the unknown token. This gives the number of
@@ -830,7 +830,7 @@ public class Options implements Serializable {
      * If floodTags is invoked by the parser, all other tags will also be
      * given a minimal non-zero, non-infinite probability.
      */
-    public boolean flexiTag = false;
+    public boolean flexiTag;
 
     /** Whether to use signature rather than just being unknown as prior in
      *  known word smoothing.  Currently only works if turned on for English.
@@ -858,15 +858,15 @@ public class Options implements Serializable {
 
     @Override
     public String toString() {
-      return params[0] + " " + useUnknownWordSignatures + "\n" +
-        params[1] + " " + smoothInUnknownsThreshold + "\n" +
-        params[2] + " " + smartMutation + "\n" +
-        params[3] + " " + useUnicodeType + "\n" +
-        params[4] + " " + unknownSuffixSize + "\n" +
-        params[5] + " " + unknownPrefixSize + "\n" +
-        params[6] + " " + flexiTag + "\n" +
-        params[7] + " " + useSignatureForKnownSmoothing + "\n" +
-        params[8] + " " + wordClassesFile + "\n";
+      return params[0] + ' ' + useUnknownWordSignatures + '\n' +
+        params[1] + ' ' + smoothInUnknownsThreshold + '\n' +
+        params[2] + ' ' + smartMutation + '\n' +
+        params[3] + ' ' + useUnicodeType + '\n' +
+        params[4] + ' ' + unknownSuffixSize + '\n' +
+        params[5] + ' ' + unknownPrefixSize + '\n' +
+        params[6] + ' ' + flexiTag + '\n' +
+        params[7] + ' ' + useSignatureForKnownSmoothing + '\n' +
+        params[8] + ' ' + wordClassesFile + '\n';
     }
 
     public void readData(BufferedReader in) throws IOException {
@@ -933,7 +933,7 @@ public class Options implements Serializable {
    * Forces parsing with strictly CNF grammar -- unary chains are converted
    * to XP&amp;YP symbols and back
    */
-  public boolean forceCNF = false;
+  public boolean forceCNF;
 
   /**
    * Do a PCFG parse of the sentence.  If both variables are on,
@@ -949,7 +949,7 @@ public class Options implements Serializable {
   /**
    * if true, any child can be the head (seems rather bad!)
    */
-  public boolean freeDependencies = false;
+  public boolean freeDependencies;
 
   /**
    * Whether dependency grammar considers left/right direction. Good.
@@ -957,8 +957,8 @@ public class Options implements Serializable {
   public boolean directional = true;
   public boolean genStop = true;
 
-  public boolean useSmoothTagProjection = false;
-  public boolean useUnigramWordSmoothing = false;
+  public boolean useSmoothTagProjection;
+  public boolean useUnigramWordSmoothing;
 
   /**
    * Use distance bins in the dependency calculations
@@ -967,7 +967,7 @@ public class Options implements Serializable {
   /**
    * Use coarser distance (4 bins) in dependency calculations
    */
-  public boolean coarseDistance = false;
+  public boolean coarseDistance;
 
   /**
    * "double count" tags rewrites as word in PCFG and Dep parser.  Good for
@@ -983,7 +983,7 @@ public class Options implements Serializable {
    * chosen tree which improves the PCFG score. This was added as the
    * dependency factor tends to encourage 'deep' trees.
    */
-  public boolean nodePrune = false;
+  public boolean nodePrune;
 
 
   public TrainOptions trainOptions = new TrainOptions();
@@ -1006,7 +1006,7 @@ public class Options implements Serializable {
    * LexicalizedParserQuery.parse and in the training methods which
    * build a new parser.
    */
-  public Function<String, String> wordFunction = null;
+  public Function<String, String> wordFunction;
 
   /**
    * If the parser has a reranker, it looks at this many trees when
@@ -1018,7 +1018,7 @@ public class Options implements Serializable {
    * If reranking sentences, we can use the score from the original
    * parser as well.  This tells us how much weight to give that score.
    */
-  public double baseParserWeight = 0.0;
+  public double baseParserWeight;
 
   /**
    * Making the TestOptions transient means it won't even be
@@ -1045,17 +1045,17 @@ public class Options implements Serializable {
     PrintWriter out = new PrintWriter(w);
     StringBuilder sb = new StringBuilder();
     sb.append(lexOptions.toString());
-    sb.append("parserParams ").append(tlpParams.getClass().getName()).append("\n");
-    sb.append("forceCNF ").append(forceCNF).append("\n");
-    sb.append("doPCFG ").append(doPCFG).append("\n");
-    sb.append("doDep ").append(doDep).append("\n");
-    sb.append("freeDependencies ").append(freeDependencies).append("\n");
-    sb.append("directional ").append(directional).append("\n");
-    sb.append("genStop ").append(genStop).append("\n");
-    sb.append("distance ").append(distance).append("\n");
-    sb.append("coarseDistance ").append(coarseDistance).append("\n");
-    sb.append("dcTags ").append(dcTags).append("\n");
-    sb.append("nPrune ").append(nodePrune).append("\n");
+    sb.append("parserParams ").append(tlpParams.getClass().getName()).append('\n');
+    sb.append("forceCNF ").append(forceCNF).append('\n');
+    sb.append("doPCFG ").append(doPCFG).append('\n');
+    sb.append("doDep ").append(doDep).append('\n');
+    sb.append("freeDependencies ").append(freeDependencies).append('\n');
+    sb.append("directional ").append(directional).append('\n');
+    sb.append("genStop ").append(genStop).append('\n');
+    sb.append("distance ").append(distance).append('\n');
+    sb.append("coarseDistance ").append(coarseDistance).append('\n');
+    sb.append("dcTags ").append(dcTags).append('\n');
+    sb.append("nPrune ").append(nodePrune).append('\n');
     out.print(sb.toString());
     out.flush();
   }
@@ -1116,7 +1116,7 @@ public class Options implements Serializable {
     value = line.substring(line.indexOf(' ') + 1);
     nodePrune = Boolean.parseBoolean(value);
     line = in.readLine(); // get rid of last line
-    if (line.length() != 0) {
+    if (!line.isEmpty()) {
       throw new RuntimeException("Expected blank line, found: " + line);
     }
   }

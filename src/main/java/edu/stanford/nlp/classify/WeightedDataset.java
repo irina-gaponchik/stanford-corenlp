@@ -17,7 +17,7 @@ public class WeightedDataset<L, F> extends Dataset<L, F> {
   private static final long serialVersionUID = -5435125789127705430L;
   protected float[] weights;
 
-  public WeightedDataset(Index<L> labelIndex, int[] labels, Index<F> featureIndex, int[][] data, int size, float[] weights) {
+  public WeightedDataset(Index<L> labelIndex, int[] labels, Index<F> featureIndex, int[][] data, int size, float... weights) {
     super(labelIndex, labels, featureIndex, data, data.length);
     this.weights = weights;
   }
@@ -31,7 +31,7 @@ public class WeightedDataset<L, F> extends Dataset<L, F> {
     weights = new float[initSize];
   }
 
-  private float[] trimToSize(float[] i) {
+  private float[] trimToSize(float... i) {
     float[] newI = new float[size];
     System.arraycopy(i, 0, newI, 0, size);
     return newI;
@@ -71,7 +71,7 @@ public class WeightedDataset<L, F> extends Dataset<L, F> {
   protected void ensureSize() {
     super.ensureSize();
     if (weights.length == size) {
-      float[] newWeights = new float[size * 2];
+      float[] newWeights = new float[(size << 1)];
       System.arraycopy(weights, 0, newWeights, 0, size);
       weights = newWeights;
     }

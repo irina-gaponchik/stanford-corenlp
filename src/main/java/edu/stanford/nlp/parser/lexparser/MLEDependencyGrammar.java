@@ -69,8 +69,8 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     super(tlpParams.treebankLanguagePack(), tagProjection, directional, useDistance, useCoarseDistance, op, wordIndex, tagIndex);
     useSmoothTagProjection = op.useSmoothTagProjection;
     useUnigramWordSmoothing = op.useUnigramWordSmoothing;
-    argCounter = new ClassicCounter<IntDependency>();
-    stopCounter = new ClassicCounter<IntDependency>();
+    argCounter = new ClassicCounter<>();
+    stopCounter = new ClassicCounter<>();
     double[] smoothParams = tlpParams.MLEDependencyGrammarSmoothingParams();
     smooth_aT_hTWd = smoothParams[0];
     smooth_aTW_hTWd = smoothParams[1];
@@ -98,7 +98,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
 //      }
 //      sb.append("\n");
 //    }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 
@@ -117,57 +117,61 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     public int head;
   }
 
-  /** Adds dependencies to list depList.  These are in terms of the original
-   *  tag set not the reduced (projected) tag set.
-   */
-  protected static EndHead treeToDependencyHelper(Tree tree, List<IntDependency> depList, int loc, Index<String> wordIndex, Index<String> tagIndex) {
-    //       try {
-    // 	PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out,"GB18030"),true);
-    // 	tree.pennPrint(pw);
-    //       }
-    //       catch (UnsupportedEncodingException e) {}
+    /**
+     * Adds dependencies to list depList.  These are in terms of the original
+     * tag set not the reduced (projected) tag set.
+     */
+    protected static EndHead treeToDependencyHelper(Tree tree, List<IntDependency> depList, int loc, Index<String> wordIndex, Index<String> tagIndex) {
+        while (true) {
+            //       try {
+            // 	PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out,"GB18030"),true);
+            // 	tree.pennPrint(pw);
+            //       }
+            //       catch (UnsupportedEncodingException e) {}
 
-    if (tree.isLeaf() || tree.isPreTerminal()) {
-      EndHead tempEndHead = new EndHead();
-      tempEndHead.head = loc;
-      tempEndHead.end = loc + 1;
-      return tempEndHead;
+            if (tree.isLeaf() || tree.isPreTerminal()) {
+                EndHead tempEndHead = new EndHead();
+                tempEndHead.head = loc;
+                tempEndHead.end = loc + 1;
+                return tempEndHead;
+            }
+            Tree[] kids = tree.children();
+            if (kids.length == 1) {
+                tree = kids[0];
+                continue;
+            }
+            EndHead tempEndHead = treeToDependencyHelper(kids[0], depList, loc, wordIndex, tagIndex);
+            int lHead = tempEndHead.head;
+            int split = tempEndHead.end;
+            tempEndHead = treeToDependencyHelper(kids[1], depList, tempEndHead.end, wordIndex, tagIndex);
+            int end = tempEndHead.end;
+            int rHead = tempEndHead.head;
+            String hTag = ((HasTag) tree.label()).tag();
+            String lTag = ((HasTag) kids[0].label()).tag();
+            String rTag = ((HasTag) kids[1].label()).tag();
+            String hWord = ((HasWord) tree.label()).word();
+            String lWord = ((HasWord) kids[0].label()).word();
+            String rWord = ((HasWord) kids[1].label()).word();
+            boolean leftHeaded = hWord.equals(lWord);
+            String aTag = leftHeaded ? rTag : lTag;
+            String aWord = leftHeaded ? rWord : lWord;
+            int hT = tagIndex.indexOf(hTag);
+            int aT = tagIndex.indexOf(aTag);
+            int hW = wordIndex.contains(hWord) ? wordIndex.indexOf(hWord) : wordIndex.indexOf(Lexicon.UNKNOWN_WORD);
+            int aW = wordIndex.contains(aWord) ? wordIndex.indexOf(aWord) : wordIndex.indexOf(Lexicon.UNKNOWN_WORD);
+            int head = leftHeaded ? lHead : rHead;
+            int arg = leftHeaded ? rHead : lHead;
+            IntDependency dependency = new IntDependency(hW, hT, aW, aT, leftHeaded, leftHeaded ? split - head - 1 : head - split);
+            depList.add(dependency);
+            IntDependency stopL = new IntDependency(aW, aT, STOP_WORD_INT, STOP_TAG_INT, false, leftHeaded ? arg - split : arg - loc);
+            depList.add(stopL);
+            IntDependency stopR = new IntDependency(aW, aT, STOP_WORD_INT, STOP_TAG_INT, true, leftHeaded ? end - arg - 1 : split - arg - 1);
+            depList.add(stopR);
+            //System.out.println("Adding: "+dependency+" at "+tree.label());
+            tempEndHead.head = head;
+            return tempEndHead;
+        }
     }
-    Tree[] kids = tree.children();
-    if (kids.length == 1) {
-      return treeToDependencyHelper(kids[0], depList, loc, wordIndex, tagIndex);
-    }
-    EndHead tempEndHead = treeToDependencyHelper(kids[0], depList, loc, wordIndex, tagIndex);
-    int lHead = tempEndHead.head;
-    int split = tempEndHead.end;
-    tempEndHead = treeToDependencyHelper(kids[1], depList, tempEndHead.end, wordIndex, tagIndex);
-    int end = tempEndHead.end;
-    int rHead = tempEndHead.head;
-    String hTag = ((HasTag) tree.label()).tag();
-    String lTag = ((HasTag) kids[0].label()).tag();
-    String rTag = ((HasTag) kids[1].label()).tag();
-    String hWord = ((HasWord) tree.label()).word();
-    String lWord = ((HasWord) kids[0].label()).word();
-    String rWord = ((HasWord) kids[1].label()).word();
-    boolean leftHeaded = hWord.equals(lWord);
-    String aTag = (leftHeaded ? rTag : lTag);
-    String aWord = (leftHeaded ? rWord : lWord);
-    int hT = tagIndex.indexOf(hTag);
-    int aT = tagIndex.indexOf(aTag);
-    int hW = (wordIndex.contains(hWord) ? wordIndex.indexOf(hWord) : wordIndex.indexOf(Lexicon.UNKNOWN_WORD));
-    int aW = (wordIndex.contains(aWord) ? wordIndex.indexOf(aWord) : wordIndex.indexOf(Lexicon.UNKNOWN_WORD));
-    int head = (leftHeaded ? lHead : rHead);
-    int arg = (leftHeaded ? rHead : lHead);
-    IntDependency dependency = new IntDependency(hW, hT, aW, aT, leftHeaded, (leftHeaded ? split - head - 1 : head - split));
-    depList.add(dependency);
-    IntDependency stopL = new IntDependency(aW, aT, STOP_WORD_INT, STOP_TAG_INT, false, (leftHeaded ? arg - split : arg - loc));
-    depList.add(stopL);
-    IntDependency stopR = new IntDependency(aW, aT, STOP_WORD_INT, STOP_TAG_INT, true, (leftHeaded ? end - arg - 1 : split - arg - 1));
-    depList.add(stopR);
-    //System.out.println("Adding: "+dependency+" at "+tree.label());
-    tempEndHead.head = head;
-    return tempEndHead;
-  }
 
 
   public void dumpSizes() {
@@ -185,7 +189,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
    *  @return The list of dependencies in the tree (int format)
    */
   public static List<IntDependency> treeToDependencyList(Tree tree, Index<String> wordIndex, Index<String> tagIndex) {
-    List<IntDependency> depList = new ArrayList<IntDependency>();
+    List<IntDependency> depList = new ArrayList<>();
     treeToDependencyHelper(tree, depList, 0, wordIndex, tagIndex);
     if (DEBUG) {
       System.out.println("----------------------------");
@@ -216,7 +220,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
    */
   @Override
   public void tune(Collection<Tree> trees) {
-    List<IntDependency> deps = new ArrayList<IntDependency>();
+    List<IntDependency> deps = new ArrayList<>();
     for (Tree tree : trees) {
       deps.addAll(treeToDependencyList(tree, wordIndex, tagIndex));
     }
@@ -359,7 +363,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
   }
 
   /** The indices of this list are in the tag binned space. */
-  protected transient List<IntTaggedWord> tagITWList = null; //new ArrayList();
+  protected transient List<IntTaggedWord> tagITWList; //new ArrayList();
 
 
   /** This maps from a tag to a cached IntTagWord that represents the
@@ -373,7 +377,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
   private IntTaggedWord getCachedITW(short tag) {
     // The +2 below is because -1 and -2 are used with special meanings (see IntTaggedWord).
     if (tagITWList == null) {
-      tagITWList = new ArrayList<IntTaggedWord>(numTagBins + 2);
+      tagITWList = new ArrayList<>(numTagBins + 2);
       for (int i=0; i<numTagBins + 2; i++) {
         tagITWList.add(i, null);
       }
@@ -410,7 +414,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
 
   private short tagProject(short tag) {
     if (smoothTPIndex == null) {
-      smoothTPIndex = new HashIndex<String>(tagIndex);
+      smoothTPIndex = new HashIndex<>(tagIndex);
     }
     if (tag < 0) {
       return tag;
@@ -529,11 +533,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
 
     boolean isRoot = rootTW(dependency.head);
     double pb_stop_hTWds;
-    if (isRoot) {
-      pb_stop_hTWds = 0.0;
-    } else {
-      pb_stop_hTWds = getStopProb(dependency);
-    }
+      pb_stop_hTWds = isRoot ? 0.0 : getStopProb(dependency);
 
     if (dependency.arg.word == STOP_WORD_INT) {
       // did we generate stop?
@@ -626,17 +626,17 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     // backoffs either mle or themselves bayesian smoothed depending on useSmoothTagProjection
     if (useSmoothTagProjection) {
       if (useUnigramWordSmoothing) {
-        p_aW = c_aW > 0.0 ? (c_aW / numWordTokens) : 1.0;  // NEED this 1.0 for unknown words!!!
+        p_aW = c_aW > 0.0 ? c_aW / numWordTokens : 1.0;  // NEED this 1.0 for unknown words!!!
         p_aPTW_aPT = (c_aPTW_aPT + smooth_aPTW_aPT * p_aW) / (c_aPT + smooth_aPTW_aPT);
       } else {
-        p_aPTW_aPT = c_aPTW_aPT > 0.0 ? (c_aPTW_aPT / c_aPT) : 1.0;  // NEED this 1.0 for unknown words!!!
+        p_aPTW_aPT = c_aPTW_aPT > 0.0 ? c_aPTW_aPT / c_aPT : 1.0;  // NEED this 1.0 for unknown words!!!
       }
       p_aTW_aT = (c_aTW + smooth_aTW_aT * p_aPTW_aPT) / (c_aT + smooth_aTW_aT);
 
-      p_aPTW_hPTd = c_hPTd > 0.0 ? (c_aPTW_hPTd / c_hPTd): 0.0;
+      p_aPTW_hPTd = c_hPTd > 0.0 ? c_aPTW_hPTd / c_hPTd : 0.0;
       p_aTW_hTd = (c_aTW_hTd + smooth_aTW_hTd * p_aPTW_hPTd) / (c_hTd + smooth_aTW_hTd);
 
-      p_aPT_hPTd = c_hPTd > 0.0 ? (c_aPT_hPTd / c_hPTd) : 0.0;
+      p_aPT_hPTd = c_hPTd > 0.0 ? c_aPT_hPTd / c_hPTd : 0.0;
       p_aT_hTd = (c_aT_hTd + smooth_aT_hTd * p_aPT_hPTd) / (c_hTd + smooth_aT_hTd);
     } else {
       // here word generation isn't smoothed - can't get previously unseen word with tag.  Ugh.
@@ -649,10 +649,10 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
         //                      " oldScore=" + oldScore + " c_aTW=" + c_aTW + " c_aW=" + c_aW);
         // }
       } else {
-        p_aTW_aT = c_aTW > 0.0 ? (c_aTW / c_aT) : 1.0;
+        p_aTW_aT = c_aTW > 0.0 ? c_aTW / c_aT : 1.0;
       }
-      p_aTW_hTd = c_hTd > 0.0 ? (c_aTW_hTd / c_hTd) : 0.0;
-      p_aT_hTd = c_hTd > 0.0 ? (c_aT_hTd / c_hTd) : 0.0;
+      p_aTW_hTd = c_hTd > 0.0 ? c_aTW_hTd / c_hTd : 0.0;
+      p_aT_hTd = c_hTd > 0.0 ? c_aT_hTd / c_hTd : 0.0;
     }
 
     double pb_aTW_hTWd = (c_aTW_hTWd + smooth_aTW_hTWd * p_aTW_hTd) / (c_hTWd + smooth_aTW_hTWd);
@@ -727,7 +727,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     temp = new IntDependency(anyHead, wildTW, dependency.leftHeaded, binDistance);
     double c_hTds = stopCounter.getCount(temp);
 
-    double p_stop_hTds = (c_hTds > 0.0 ? c_stop_hTds / c_hTds : 1.0);
+    double p_stop_hTds = c_hTds > 0.0 ? c_stop_hTds / c_hTds : 1.0;
 
     double pb_stop_hTWds = (c_stop_hTWds + smooth_stop * p_stop_hTds) / (c_hTWds + smooth_stop);
 
@@ -745,9 +745,9 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
 //    System.err.println("stop size: " + stopCounter.size() + "  total: " + stopCounter.totalCount());
 
     ClassicCounter<IntDependency> compressedArgC = argCounter;
-    argCounter = new ClassicCounter<IntDependency>();
+    argCounter = new ClassicCounter<>();
     ClassicCounter<IntDependency> compressedStopC = stopCounter;
-    stopCounter = new ClassicCounter<IntDependency>();
+    stopCounter = new ClassicCounter<>();
     for (IntDependency d : compressedArgC.keySet()) {
       double count = compressedArgC.getCount(d);
       expandArg(d, d.distance, count);
@@ -771,7 +771,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
 //    System.err.println("stop size: " + stopCounter.size() + "  total: " + stopCounter.totalCount());
 
     ClassicCounter<IntDependency> fullArgCounter = argCounter;
-    argCounter = new ClassicCounter<IntDependency>();
+    argCounter = new ClassicCounter<>();
     for (IntDependency dependency : fullArgCounter.keySet()) {
       if (dependency.head != wildTW && dependency.arg != wildTW &&
               dependency.head.word != -1 && dependency.arg.word != -1) {
@@ -780,7 +780,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     }
 
     ClassicCounter<IntDependency> fullStopCounter = stopCounter;
-    stopCounter = new ClassicCounter<IntDependency>();
+    stopCounter = new ClassicCounter<>();
     for (IntDependency dependency : fullStopCounter.keySet()) {
       if (dependency.head.word != -1) {
         stopCounter.incrementCount(dependency, fullStopCounter.getCount(dependency));
@@ -803,12 +803,12 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
    */
   @Override
   public void readData(BufferedReader in) throws IOException {
-    final String LEFT = "left";
+    String LEFT = "left";
     int lineNum = 1;
     // all lines have one rule per line
     boolean doingStop = false;
 
-    for (String line = in.readLine(); line != null && line.length() > 0; line = in.readLine()) {
+    for (String line = in.readLine(); line != null && !line.isEmpty(); line = in.readLine()) {
       try {
         if (line.equals("BEGIN_STOP")) {
           doingStop = true;
@@ -850,7 +850,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
       if (dependency.head != wildTW && dependency.arg != wildTW &&
               dependency.head.word != -1 && dependency.arg.word != -1) {
         double count = argCounter.getCount(dependency);
-        out.println(dependency.toString(wordIndex, tagIndex) + " " + count);
+        out.println(dependency.toString(wordIndex, tagIndex) + ' ' + count);
       }
     }
 
@@ -859,7 +859,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     for (IntDependency dependency : stopCounter.keySet()) {
       if (dependency.head.word != -1) {
         double count = stopCounter.getCount(dependency);
-        out.println(dependency.toString(wordIndex, tagIndex) + " " + count);
+        out.println(dependency.toString(wordIndex, tagIndex) + ' ' + count);
       }
     }
 

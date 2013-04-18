@@ -2,12 +2,12 @@ package edu.stanford.nlp.util;
 
 
 /**
- * An instantiation of this abstract class parses a <code>String</code> and
- * returns an object of type <code>E</code>.  It's called a
- * <code>StringParsingTask</code> (rather than <code>StringParser</code>)
- * because a new instance is constructed for each <code>String</code> to be
+ * An instantiation of this abstract class parses a {@code String} and
+ * returns an object of type {@code E}.  It's called a
+ * {@code StringParsingTask} (rather than {@code StringParser})
+ * because a new instance is constructed for each {@code String} to be
  * parsed.  We do this to be thread-safe: methods in
- * <code>StringParsingTask</code> share state information (e.g. current
+ * {@code StringParsingTask} share state information (e.g. current
  * string index) via instance variables.
  *
  * @author Bill MacCartney
@@ -17,23 +17,23 @@ public abstract class StringParsingTask<E> {
   // This class represents a parser working on a specific string.  We
   // construct from a specific string in order 
   protected String s;
-  protected int index = 0;
-  protected boolean isEOF = false;     // true if we tried to read past end
+  protected int index;
+  protected boolean isEOF;     // true if we tried to read past end
     
   /**
-   * Constructs a new <code>StringParsingTask</code> from the specified
-   * <code>String</code>.  Derived class constructors should be sure to
-   * call <code>super(s)</code>!
+   * Constructs a new {@code StringParsingTask} from the specified
+   * {@code String}.  Derived class constructors should be sure to
+   * call {@code super(s)}!
    */
-  public StringParsingTask(String s) {
+  protected StringParsingTask(String s) {
     this.s = s;
     index = 0;
   }
     
   /**
-   * Parses the <code>String</code> associated with this
-   * <code>StringParsingTask</code> and returns a object of type
-   * <code>E</code>.
+   * Parses the {@code String} associated with this
+   * {@code StringParsingTask} and returns a object of type
+   * {@code E}.
    */
   public abstract E parse();
 
@@ -101,7 +101,7 @@ public abstract class StringParsingTask<E> {
 
   protected void readWhiteSpace() {
     char ch = read();
-    while (isWhiteSpace(ch) && !isEOF()) {
+    while (isWhiteSpace(ch) && !isEOF) {
       ch = read();
     }
     unread();
@@ -134,8 +134,8 @@ public abstract class StringParsingTask<E> {
     return isEOF;
   }
 
-  protected boolean isWhiteSpace(char ch) {
-    return (ch == ' ' || ch == '\t' || ch == '\f' || ch == '\r' || ch == '\n');
+  protected static boolean isWhiteSpace(char ch) {
+    return ch == ' ' || ch == '\t' || ch == '\f' || ch == '\r' || ch == '\n';
   }
 
   protected boolean isPunct(char ch) {
@@ -144,15 +144,15 @@ public abstract class StringParsingTask<E> {
       isRightParen(ch);
   }
 
-  protected boolean isLeftParen(char ch) {
+  protected static boolean isLeftParen(char ch) {
     return ch == '(';
   }
 
-  protected boolean isRightParen(char ch) {
+  protected static boolean isRightParen(char ch) {
     return ch == ')';
   }
 
-  protected boolean isDot(char ch) {
+  protected static boolean isDot(char ch) {
     return ch == '.';
   }
 

@@ -8,7 +8,7 @@ package edu.stanford.nlp.ie.pascal;
  *
  * DO NOT EDIT DefaultTeXHyphenData.java; YOUR CHANGES WILL BE DISCARDED.
  */
-public class DefaultTeXHyphenData {
+public final class DefaultTeXHyphenData {
   public static final String hyphenData =
     ".ach4\n" +
     ".ad4der\n" +
@@ -4458,4 +4458,7 @@ public class DefaultTeXHyphenData {
     "4z1z2\n" +
     "z4zy\n"
   ;
+
+    private DefaultTeXHyphenData() {
+    }
 }

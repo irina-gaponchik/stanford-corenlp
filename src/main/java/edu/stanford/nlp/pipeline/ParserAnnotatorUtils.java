@@ -54,7 +54,7 @@ public class ParserAnnotatorUtils {
       }
 
       Integer sentenceIndex = sentence.get(CoreAnnotations.SentenceIndexAnnotation.class);
-      int index = (sentenceIndex == null) ? 0 : sentenceIndex;
+      int index = sentenceIndex == null ? 0 : sentenceIndex;
 
       // generate the dependency graph
       SemanticGraph deps = SemanticGraphFactory.generateCollapsedDependencies(gsf.newGrammaticalStructure(tree), docID, index);
@@ -123,7 +123,7 @@ public class ParserAnnotatorUtils {
    */
   public static Tree xTree(List<? extends HasWord> words) {
     TreeFactory lstf = new LabeledScoredTreeFactory();
-    List<Tree> lst2 = new ArrayList<Tree>();
+    List<Tree> lst2 = new ArrayList<>();
     for (HasWord obj : words) {
       String s = obj.word();
       Tree t = lstf.newLeaf(s);

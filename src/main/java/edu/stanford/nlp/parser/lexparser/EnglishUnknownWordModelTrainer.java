@@ -30,10 +30,10 @@ public class EnglishUnknownWordModelTrainer
                                  Index<String> tagIndex, double totalTrees) {
     super.initializeTraining(op, lex, wordIndex, tagIndex, totalTrees);
 
-    this.indexToStartUnkCounting = (totalTrees * op.trainOptions.fractionBeforeUnseenCounting);
+    this.indexToStartUnkCounting = totalTrees * op.trainOptions.fractionBeforeUnseenCounting;
 
-    seenCounter = new ClassicCounter<IntTaggedWord>();
-    unSeenCounter = new ClassicCounter<IntTaggedWord>();
+    seenCounter = new ClassicCounter<>();
+    unSeenCounter = new ClassicCounter<>();
 
     model = new EnglishUnknownWordModel(op, lex, wordIndex, tagIndex, 
                                         unSeenCounter);

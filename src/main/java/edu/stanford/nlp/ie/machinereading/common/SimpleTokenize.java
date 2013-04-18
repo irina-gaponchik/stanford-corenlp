@@ -7,10 +7,13 @@ import java.util.StringTokenizer;
 /**
  * Simple string tokenization
  */
-public class SimpleTokenize {
-  /** Basic string tokenization, skipping over white spaces */
+public final class SimpleTokenize {
+    private SimpleTokenize() {
+    }
+
+    /** Basic string tokenization, skipping over white spaces */
   public static ArrayList<String> tokenize(String line) {
-    ArrayList<String> tokens = new ArrayList<String>();
+    ArrayList<String> tokens = new ArrayList<>();
     StringTokenizer tokenizer = new StringTokenizer(line);
     while (tokenizer.hasMoreElements()) {
       tokens.add(tokenizer.nextToken());
@@ -20,7 +23,7 @@ public class SimpleTokenize {
 
   /** Basic string tokenization, skipping over white spaces */
   public static ArrayList<String> tokenize(String line, String separators) {
-    ArrayList<String> tokens = new ArrayList<String>();
+    ArrayList<String> tokens = new ArrayList<>();
     StringTokenizer tokenizer = new StringTokenizer(line, separators);
     while (tokenizer.hasMoreElements()) {
       tokens.add(tokenizer.nextToken());
@@ -33,7 +36,7 @@ public class SimpleTokenize {
    */
   private static int findNonWhitespace(String s, int start) {
     for (; start < s.length(); start++) {
-      if (Character.isWhitespace(s.charAt(start)) == false)
+      if (!Character.isWhitespace(s.charAt(start)))
         return start;
     }
     return -1;
@@ -51,11 +54,10 @@ public class SimpleTokenize {
    * Replaces all occurences of \" with "
    */
   private static String normalizeQuotes(String str) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for (int i = 0; i < str.length(); i++) {
       // do not include \ if followed by "
       if (str.charAt(i) == '\\' && i < str.length() - 1 && str.charAt(i + 1) == '\"') {
-        continue;
       } else {
         buffer.append(str.charAt(i));
       }
@@ -68,7 +70,7 @@ public class SimpleTokenize {
    * Regular quotes inside tokens MUST be preceded by \
    */
   public static ArrayList<String> tokenizeWithQuotes(String line) {
-    ArrayList<String> tokens = new ArrayList<String>();
+    ArrayList<String> tokens = new ArrayList<>();
     int position = 0;
 
     while ((position = findNonWhitespace(line, position)) != -1) {
@@ -103,7 +105,7 @@ public class SimpleTokenize {
         if ((end = findWhitespace(line, position + 1)) == -1)
           end = line.length();
 
-        tokens.add(new String(line.substring(position, end)));
+        tokens.add(line.substring(position, end));
       }
 
       position = end;
@@ -117,7 +119,7 @@ public class SimpleTokenize {
    * \
    */
   public static String quotify(String str) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     buffer.append('\"');
     for (int i = 0; i < str.length(); i++) {
       if (str.charAt(i) == '\"')
@@ -129,7 +131,7 @@ public class SimpleTokenize {
   }
 
   /** Implements a simple test */
-  public static void main(String[] argv) {
+  public static void main(String... argv) {
     String in = "T \"Athens \\\"the beautiful\\\"\" \"Athens\" \"\" \"Greece\"";
     System.err.println("Input: " + in);
     System.err.println(tokenizeWithQuotes(in));

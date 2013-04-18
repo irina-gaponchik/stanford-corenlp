@@ -7,9 +7,9 @@ import java.util.zip.GZIPInputStream;
 import edu.stanford.nlp.ling.HasIndex;
 
 /**
- * A <code>DiskTreebank</code> is a <code>Collection</code> of
- * <code>Tree</code>s.
- * A <code>DiskTreebank</code> object stores merely the information to
+ * A {@code DiskTreebank} is a {@code Collection} of
+ * {@code Tree}s.
+ * A {@code DiskTreebank} object stores merely the information to
  * get at a corpus of trees that is stored on disk.  Access is usually
  * via apply()'ing a TreeVisitor to each Tree in the Treebank or by using
  * an iterator() to get an iteration over the Trees.
@@ -23,10 +23,10 @@ import edu.stanford.nlp.ling.HasIndex;
  */
 public final class DiskTreebank extends Treebank {
 
-  private static boolean PRINT_FILENAMES = false;
+  private static boolean PRINT_FILENAMES;
 
-  private final List<File> filePaths = new ArrayList<File>();
-  private final List<FileFilter> fileFilters = new ArrayList<FileFilter>();
+  private final List<File> filePaths = new ArrayList<>();
+  private final List<FileFilter> fileFilters = new ArrayList<>();
   
   /*
    * Absolute path of the file currently being read.
@@ -35,7 +35,7 @@ public final class DiskTreebank extends Treebank {
   
   
   /**
-   * Create a new DiskTreebank. The trees are made with a <code>LabeledScoredTreeReaderFactory</code>.
+   * Create a new DiskTreebank. The trees are made with a {@code LabeledScoredTreeReaderFactory}.
    */
   public DiskTreebank() {
     this(new LabeledScoredTreeReaderFactory());
@@ -54,7 +54,7 @@ public final class DiskTreebank extends Treebank {
    * Create a new DiskTreebank.
    *
    * @param trf the factory class to be called to create a new
-   *            <code>TreeReader</code>
+   *            {@code TreeReader}
    */
   public DiskTreebank(TreeReaderFactory trf) {
     super(trf);
@@ -64,7 +64,7 @@ public final class DiskTreebank extends Treebank {
    * Create a new DiskTreebank.
    *
    * @param trf      the factory class to be called to create a new
-   *                 <code>TreeReader</code>
+   *                 {@code TreeReader}
    * @param encoding The charset encoding to use for treebank file decoding
    */
   public DiskTreebank(TreeReaderFactory trf, String encoding) {
@@ -72,10 +72,10 @@ public final class DiskTreebank extends Treebank {
   }
   
   /**
-   * Create a new Treebank. The trees are made with a <code>LabeledScoredTreeReaderFactory</code>.
+   * Create a new Treebank. The trees are made with a {@code LabeledScoredTreeReaderFactory}.
    *
    * @param initialCapacity The initial size of the underlying Collection.
-   *                        For a <code>DiskTreebank</code>, this parameter is ignored.
+   *                        For a {@code DiskTreebank}, this parameter is ignored.
    */
   public DiskTreebank(int initialCapacity) {
     this(initialCapacity, new LabeledScoredTreeReaderFactory());
@@ -85,16 +85,16 @@ public final class DiskTreebank extends Treebank {
    * Create a new Treebank.
    *
    * @param initialCapacity The initial size of the underlying Collection,
-   *                        For a <code>DiskTreebank</code>, this parameter is ignored.
+   *                        For a {@code DiskTreebank}, this parameter is ignored.
    * @param trf             the factory class to be called to create a new
-   *                        <code>TreeReader</code>
+   *                        {@code TreeReader}
    */
   public DiskTreebank(int initialCapacity, TreeReaderFactory trf) {
     this(trf);
   }
   
   /**
-   * Empty a <code>Treebank</code>.
+   * Empty a {@code Treebank}.
    */
   @Override
   public void clear() {
@@ -125,7 +125,7 @@ public final class DiskTreebank extends Treebank {
    * @param tp A class that can process trees.
    */
   @Override
-  public void apply(final TreeVisitor tp) {
+  public void apply(TreeVisitor tp) {
     for (Tree t : this) {
       tp.visitTree(t);
     }
@@ -143,21 +143,21 @@ public final class DiskTreebank extends Treebank {
     return Collections.unmodifiableList(filePaths);
   }
   
-  public void printFileNames() {
+  public static void printFileNames() {
     PRINT_FILENAMES = true;
   }
   
   private class DiskTreebankIterator implements Iterator<Tree> {
     
-    private TreeReader tr = null;
-    private Tree storedTree = null;  // null means iterator is exhausted (or not yet constructed)
+    private TreeReader tr;
+    private Tree storedTree;  // null means iterator is exhausted (or not yet constructed)
     
     //Create local copies so that calls to loadPath() in the parent class
     //don't cause exceptions i.e., this iterator is valid over the state of DiskTreebank
     //when the iterator is created.
     private final List<File> localPathList;
     private final List<FileFilter> localFilterList;
-    private int fileListPtr = 0;
+    private int fileListPtr;
     
     private File currentFile;
     private int curLineId = 1;
@@ -166,8 +166,8 @@ public final class DiskTreebank extends Treebank {
     private Iterator<File> curPathIter;
     
     private DiskTreebankIterator() {
-      localPathList = new ArrayList<File>(filePaths);
-      localFilterList = new ArrayList<FileFilter>(fileFilters);
+      localPathList = new ArrayList<>(filePaths);
+      localFilterList = new ArrayList<>(fileFilters);
       
       if(primeNextPath() && primeNextFile())
         storedTree = primeNextTree();
@@ -176,17 +176,17 @@ public final class DiskTreebank extends Treebank {
     //In the case of a recursive file filter, performs a BFS through the directory structure.
     private boolean primeNextPath() {
       while(fileListPtr < localPathList.size() && fileListPtr < localFilterList.size()) {
-        final File nextPath = localPathList.get(fileListPtr);
-        final FileFilter nextFilter = localFilterList.get(fileListPtr);
+        File nextPath = localPathList.get(fileListPtr);
+        FileFilter nextFilter = localFilterList.get(fileListPtr);
         fileListPtr++;
         
-        final List<File> pathListing = ((nextPath.isDirectory()) ? 
-                                        Arrays.asList(nextPath.listFiles(nextFilter)) : Collections.singletonList(nextPath));
+        List<File> pathListing = nextPath.isDirectory() ?
+                                        Arrays.asList(nextPath.listFiles(nextFilter)) : Collections.singletonList(nextPath);
         
         if(pathListing != null) {
           if(pathListing.size() > 1) Collections.sort(pathListing);
           
-          curFileList = new ArrayList<File>();
+          curFileList = new ArrayList<>();
           for(File path : pathListing) {
             if(path.isDirectory()) {
               localPathList.add(path);
@@ -196,7 +196,7 @@ public final class DiskTreebank extends Treebank {
             }
           }
           
-          if(curFileList.size() != 0) {
+          if(!curFileList.isEmpty()) {
             curPathIter = curFileList.iterator();
             return true;
           }
@@ -208,17 +208,13 @@ public final class DiskTreebank extends Treebank {
     
     private boolean primeNextFile() {
       try {
-        if(curPathIter.hasNext() || (primeNextPath() && curPathIter.hasNext())) {
+        if(curPathIter.hasNext() || primeNextPath() && curPathIter.hasNext()) {
           currentFile = curPathIter.next();
           currentFilename = currentFile.getAbsolutePath();
           if(PRINT_FILENAMES) System.err.println(currentFile);
           
           if(tr != null) tr.close();
-          if(currentFile.getPath().endsWith(".gz")){
-            tr = treeReaderFactory().newTreeReader(new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(currentFile)), encoding())));
-          } else {
-            tr = treeReaderFactory().newTreeReader(new BufferedReader(new InputStreamReader(new FileInputStream(currentFile), encoding())));
-          }
+            tr = currentFile.getPath().endsWith(".gz") ? treeReaderFactory().newTreeReader(new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(currentFile)), encoding()))) : treeReaderFactory().newTreeReader(new BufferedReader(new InputStreamReader(new FileInputStream(currentFile), encoding())));
           curLineId = 1;
           
           return true;
@@ -288,7 +284,7 @@ public final class DiskTreebank extends Treebank {
    * Return an Iterator over Trees in the Treebank.  This is implemented
    * by building per-file MemoryTreebanks for the files in the
    * DiskTreebank.  As such, it isn't as efficient as using
-   * <code>apply()</code>.
+   * {@code apply()}.
    */
   @Override
   public Iterator<Tree> iterator() {

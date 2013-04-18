@@ -21,7 +21,7 @@ public class CoreMapSequenceMatcher<T extends CoreMap> extends SequenceMatcher<T
   protected static final Function<List<? extends CoreMap>, String> COREMAP_LIST_TO_STRING_CONVERTER =
           new Function<List<? extends CoreMap>, String>() {
             public String apply(List<? extends CoreMap> in) {
-              return (in != null)? ChunkAnnotationUtils.getTokenText(in, CoreAnnotations.TextAnnotation.class): null;
+              return in != null ? ChunkAnnotationUtils.getTokenText(in, CoreAnnotations.TextAnnotation.class): null;
             }
           };
 
@@ -60,7 +60,7 @@ public class CoreMapSequenceMatcher<T extends CoreMap> extends SequenceMatcher<T
 
   public List<CoreMap> getMergedList(int... groups)
   {
-    List<CoreMap> res = new ArrayList<CoreMap>();
+    List<CoreMap> res = new ArrayList<>();
     int last = 0;
     List<Integer> orderedGroups = CollectionUtils.asList(groups);
     Collections.sort(orderedGroups);

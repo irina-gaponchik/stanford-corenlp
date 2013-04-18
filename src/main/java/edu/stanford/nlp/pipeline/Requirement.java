@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.util.StringUtils;
 
@@ -42,11 +43,12 @@ import edu.stanford.nlp.util.StringUtils;
  */
 public class Requirement {
 
-  private final List<List<String>> requirements = new ArrayList<List<String>>();
+    private static final Pattern COMPILE = Pattern.compile("[ |]+");
+    private final List<List<String>> requirements = new ArrayList<>();
 
   public Requirement(String ... disjunctions) {
       for (String disjunction : disjunctions) {
-        List<String> requirement = Arrays.asList(disjunction.split("[ |]+"));
+        List<String> requirement = Arrays.asList(COMPILE.split(disjunction));
         requirements.add(requirement);
       }
     }

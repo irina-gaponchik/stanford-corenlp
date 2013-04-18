@@ -61,7 +61,7 @@ public class ExactBestSequenceFinder implements BestSequenceFinder {
       return 0;
     }
 
-    public double scoreOf(int[] sequence) {
+    public double scoreOf(int... sequence) {
       throw new UnsupportedOperationException();
     }
 
@@ -78,7 +78,7 @@ public class ExactBestSequenceFinder implements BestSequenceFinder {
   } // end class TestSequenceModel
 
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     BestSequenceFinder ti = new ExactBestSequenceFinder();
     SequenceModel ts = new TestSequenceModel();
     int[] bestTags = ti.bestSequence(ts);
@@ -92,11 +92,7 @@ public class ExactBestSequenceFinder implements BestSequenceFinder {
    * @return An array containing the int tags of the best sequence
    */
   public int[] bestSequence(SequenceModel ts) {
-    if (useOld) {
-      return bestSequenceOld(ts);
-    } else {
-      return bestSequenceNew(ts);
-    }
+      return useOld ? bestSequenceOld(ts) : bestSequenceNew(ts);
   }
 
   private static int[] bestSequenceNew(SequenceModel ts) {
@@ -161,7 +157,7 @@ public class ExactBestSequenceFinder implements BestSequenceFinder {
           if (DEBUG) { System.err.println("scores: " + Arrays.toString(scores)); }
           // fill in the relevant windowScores
           for (int t = 0; t < tagNum[pos]; t++) {
-            if (DEBUG) { System.err.println("Setting value of windowScore[" + pos + "][" + product + "+" + t + "*" + shift + "] = " + scores[t]); }
+            if (DEBUG) { System.err.println("Setting value of windowScore[" + pos + "][" + product + '+' + t + '*' + shift + "] = " + scores[t]); }
             windowScore[pos][product + t * shift] = scores[t];
           }
         }

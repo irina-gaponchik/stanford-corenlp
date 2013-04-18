@@ -49,10 +49,10 @@ public class ScorerBCubed extends CorefScorer {
       double total = 0.0;
 
       for(Mention m2 : doc.corefClusters.get(m.corefClusterID).getCorefMentions()){
-        if(m==m2 ||
-            (goldMentions.containsKey(m.mentionID)
-                && goldMentions.containsKey(m2.mentionID)
-                && goldMentions.get(m.mentionID).goldCorefClusterID == goldMentions.get(m2.mentionID).goldCorefClusterID)) {
+        if(m.equals(m2) ||
+                goldMentions.containsKey(m.mentionID)
+                    && goldMentions.containsKey(m2.mentionID)
+                    && goldMentions.get(m.mentionID).goldCorefClusterID == goldMentions.get(m2.mentionID).goldCorefClusterID) {
           correct++;
         }
         total++;
@@ -74,10 +74,10 @@ public class ScorerBCubed extends CorefScorer {
       double correct = 0.0;
       double total = 0.0;
       for(Mention m2 : doc.goldCorefClusters.get(m.goldCorefClusterID).getCorefMentions()){
-        if(m==m2 ||
-            (predictedMentions.containsKey(m.mentionID)
-                && predictedMentions.containsKey(m2.mentionID)
-                && predictedMentions.get(m.mentionID).corefClusterID == predictedMentions.get(m2.mentionID).corefClusterID)) {
+        if(m.equals(m2) ||
+                predictedMentions.containsKey(m.mentionID)
+                    && predictedMentions.containsKey(m2.mentionID)
+                    && predictedMentions.get(m.mentionID).corefClusterID == predictedMentions.get(m2.mentionID).corefClusterID) {
           correct++;
         }
         total++;
@@ -103,10 +103,10 @@ public class ScorerBCubed extends CorefScorer {
       double correct = 0.0;
       double total = 0.0;
       for(Mention m2 : doc.corefClusters.get(m.corefClusterID).getCorefMentions()){
-        if(m==m2 ||
-            (goldMentions.containsKey(m.mentionID)
-                && goldMentions.containsKey(m2.mentionID)
-                && goldMentions.get(m.mentionID).goldCorefClusterID == goldMentions.get(m2.mentionID).goldCorefClusterID)) {
+        if(m.equals(m2) ||
+                goldMentions.containsKey(m.mentionID)
+                    && goldMentions.containsKey(m2.mentionID)
+                    && goldMentions.get(m.mentionID).goldCorefClusterID == goldMentions.get(m2.mentionID).goldCorefClusterID) {
           correct++;
         }
         total++;
@@ -134,10 +134,10 @@ public class ScorerBCubed extends CorefScorer {
       double correct = 0.0;
       double total = 0.0;
       for(Mention m2 : doc.goldCorefClusters.get(m.goldCorefClusterID).getCorefMentions()){
-        if(m==m2 ||
-            (predictedMentions.containsKey(m.mentionID)
-                && predictedMentions.containsKey(m2.mentionID)
-                && predictedMentions.get(m.mentionID).corefClusterID == predictedMentions.get(m2.mentionID).corefClusterID)) {
+        if(m.equals(m2) ||
+                predictedMentions.containsKey(m.mentionID)
+                    && predictedMentions.containsKey(m2.mentionID)
+                    && predictedMentions.get(m.mentionID).corefClusterID == predictedMentions.get(m2.mentionID).corefClusterID) {
           correct++;
         }
         total++;
@@ -163,10 +163,10 @@ public class ScorerBCubed extends CorefScorer {
       double correct = 0.0;
       double total = 0.0;
       for(Mention m2 : doc.goldCorefClusters.get(m.goldCorefClusterID).getCorefMentions()){
-        if(m==m2 ||
-            (predictedMentions.containsKey(m.mentionID)
-                && predictedMentions.containsKey(m2.mentionID)
-                && predictedMentions.get(m.mentionID).corefClusterID == predictedMentions.get(m2.mentionID).corefClusterID)) {
+        if(m.equals(m2) ||
+                predictedMentions.containsKey(m.mentionID)
+                    && predictedMentions.containsKey(m2.mentionID)
+                    && predictedMentions.get(m.mentionID).corefClusterID == predictedMentions.get(m2.mentionID).corefClusterID) {
           correct++;
         }
         total++;

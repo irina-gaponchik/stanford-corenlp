@@ -31,10 +31,10 @@ public class WhitespaceTokenizerAnnotator extends TokenizerAnnotator {
     boolean eolIsSignificant =
       Boolean.valueOf(props.getProperty(EOL_PROPERTY, "false"));
     eolIsSignificant =
-      (eolIsSignificant ||
-       Boolean.valueOf(props.getProperty
-                       (StanfordCoreNLP.NEWLINE_SPLITTER_PROPERTY, "false")));
-    factory = new WhitespaceTokenizer.WhitespaceTokenizerFactory<CoreLabel>
+            eolIsSignificant ||
+             Boolean.valueOf(props.getProperty
+                             (StanfordCoreNLP.NEWLINE_SPLITTER_PROPERTY, "false"));
+    factory = new WhitespaceTokenizer.WhitespaceTokenizerFactory<>
               (new CoreLabelTokenFactory(), eolIsSignificant);
   }
 

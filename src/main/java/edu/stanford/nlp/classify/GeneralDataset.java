@@ -38,7 +38,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
 
   protected int size;
 
-  public GeneralDataset() { }
+  protected GeneralDataset() { }
 
   public Index<L> labelIndex() { return labelIndex; }
 
@@ -114,7 +114,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
    */
   public void applyFeatureCountThreshold(int k) {
     float[] counts = getFeatureCounts();
-    Index<F> newFeatureIndex = new HashIndex<F>();
+    Index<F> newFeatureIndex = new HashIndex<>();
 
     int[] featMap = new int[featureIndex.size()];
     for (int i = 0; i < featMap.length; i++) {
@@ -133,7 +133,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
     // counts = null; // This is unnecessary; JVM can clean it up
 
     for (int i = 0; i < size; i++) {
-      List<Integer> featList = new ArrayList<Integer>(data[i].length);
+      List<Integer> featList = new ArrayList<>(data[i].length);
       for (int j = 0; j < data[i].length; j++) {
         if (featMap[data[i][j]] >= 0) {
           featList.add(featMap[data[i][j]]);
@@ -153,7 +153,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
    */
   public void applyFeatureMaxCountThreshold(int k) {
     float[] counts = getFeatureCounts();
-    HashIndex<F> newFeatureIndex = new HashIndex<F>();
+    HashIndex<F> newFeatureIndex = new HashIndex<>();
 
     int[] featMap = new int[featureIndex.size()];
     for (int i = 0; i < featMap.length; i++) {
@@ -172,7 +172,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
     // counts = null; // This is unnecessary; JVM can clean it up
 
     for (int i = 0; i < size; i++) {
-      List<Integer> featList = new ArrayList<Integer>(data[i].length);
+      List<Integer> featList = new ArrayList<>(data[i].length);
       for (int j = 0; j < data[i].length; j++) {
         if (featMap[data[i][j]] >= 0) {
           featList.add(featMap[data[i][j]]);
@@ -232,7 +232,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
     labels = trimToSize(labels);
   }
 
-  protected int[] trimToSize(int[] i) {
+  protected int[] trimToSize(int... i) {
     int[] newI = new int[size];
     System.arraycopy(i, 0, newI, 0, size);
     return newI;
@@ -276,9 +276,9 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
   	Random rand = new Random(randomSeed);
   	GeneralDataset<L,F> subset;
   	if(this instanceof RVFDataset)
-  		subset = new RVFDataset<L,F>();
+  		subset = new RVFDataset<>();
   	else if (this instanceof Dataset) {
-  		subset = new Dataset<L,F>();
+  		subset = new Dataset<>();
   	}
   	else {
   		throw new RuntimeException("Can't handle this type of GeneralDataset.");
@@ -325,9 +325,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
    */
   public GeneralDataset<L,F> mapDataset(GeneralDataset<L,F> dataset){
     GeneralDataset<L,F> newDataset;
-    if(dataset instanceof RVFDataset)
-      newDataset = new RVFDataset<L,F>(this.featureIndex,this.labelIndex);
-    else newDataset = new Dataset<L,F>(this.featureIndex,this.labelIndex);
+      newDataset = dataset instanceof RVFDataset ? new RVFDataset<>(this.featureIndex, this.labelIndex) : new Dataset<>(this.featureIndex, this.labelIndex);
     this.featureIndex.lock();
     this.labelIndex.lock();
     //System.out.println("inside mapDataset: dataset size:"+dataset.size());
@@ -351,11 +349,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
       newLabel = defaultLabel;
     }
 
-    if (d instanceof RVFDatum) {
-      return new RVFDatum<L2,F>( ((RVFDatum<L,F>) d).asFeaturesCounter(), newLabel );
-    } else {
-      return new BasicDatum<L2,F>( d.asFeatures(), newLabel );
-    }
+      return d instanceof RVFDatum ? new RVFDatum<>(((RVFDatum<L, F>) d).asFeaturesCounter(), newLabel) : new BasicDatum<>(d.asFeatures(), newLabel);
   }
 
 
@@ -367,9 +361,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
   public <L2> GeneralDataset<L2,F> mapDataset(GeneralDataset<L,F> dataset, Index<L2> newLabelIndex, Map<L,L2> labelMapping, L2 defaultLabel)
  {
     GeneralDataset<L2,F> newDataset;
-    if(dataset instanceof RVFDataset)
-      newDataset = new RVFDataset<L2,F>(this.featureIndex, newLabelIndex);
-    else newDataset = new Dataset<L2,F>(this.featureIndex, newLabelIndex);
+     newDataset = dataset instanceof RVFDataset ? new RVFDataset<>(this.featureIndex, newLabelIndex) : new Dataset<>(this.featureIndex, newLabelIndex);
     this.featureIndex.lock();
     this.labelIndex.lock();
     //System.out.println("inside mapDataset: dataset size:"+dataset.size());
@@ -405,7 +397,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
     String[] labelMap = new String[numClasses()];
     if (numClasses() > 2) {
       for (int i = 0; i < labelMap.length; i++) {
-        labelMap[i] = String.valueOf((i + 1));
+        labelMap[i] = String.valueOf(i + 1);
       }
     } else {
       labelMap = new String[]{"+1", "-1"};
@@ -439,7 +431,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
     for (int i = 0; i < size; i++) {
       RVFDatum<L, F> d = getRVFDatum(i);
       Counter<F> c = d.asFeaturesCounter();
-      ClassicCounter<Integer> printC = new ClassicCounter<Integer>();
+      ClassicCounter<Integer> printC = new ClassicCounter<>();
       for (F f : c.keySet()) {
         printC.setCount(featureIndex.indexOf(f), c.getCount(f));
       }
@@ -458,7 +450,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
       //I think this is what was meant (using printC rather than c), but not sure
       // ~Sarah Spikes (sdspikes@cs.stanford.edu)
       for (int f: features) {
-        sb.append((f + 1)).append(':').append(printC.getCount(f)).append(' ');
+        sb.append(f + 1).append(':').append(printC.getCount(f)).append(' ');
       }
       pw.println(sb.toString());
     }

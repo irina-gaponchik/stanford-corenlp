@@ -2,8 +2,8 @@ package edu.stanford.nlp.ling;
 
 
 /**
- * A <code>LabelFactory</code> object acts as a factory for creating
- * objects of class <code>Label</code>, or some descendant class.
+ * A {@code LabelFactory} object acts as a factory for creating
+ * objects of class {@code Label}, or some descendant class.
  * It can also make Labels from Strings, optionally with options.
  *
  * @author Christopher Manning
@@ -12,9 +12,9 @@ package edu.stanford.nlp.ling;
 public interface LabelFactory {
 
   /**
-   * Make a new label with this <code>String</code> as the
-   * <code>value</code>.
-   * Any other fields of the label would normally be <code>null</code>.
+   * Make a new label with this {@code String} as the
+   * {@code value}.
+   * Any other fields of the label would normally be {@code null}.
    *
    * @param labelStr The String that will be used for value
    * @return The new Label
@@ -23,7 +23,7 @@ public interface LabelFactory {
 
 
   /**
-   * Make a new label with this <code>String</code> as the value, and
+   * Make a new label with this {@code String} as the value, and
    * the type determined in an implementation-dependent way from the
    * options value.
    *
@@ -47,9 +47,9 @@ public interface LabelFactory {
 
 
   /**
-   * Create a new <code>Label</code>, where the label is formed from
-   * the <code>Label</code> object passed in.  The new Label is
-   * guaranteed to at least copy the <code>value()</code> of the
+   * Create a new {@code Label}, where the label is formed from
+   * the {@code Label} object passed in.  The new Label is
+   * guaranteed to at least copy the {@code value()} of the
    * source label (if non-null); it may also copy other components
    * (this is implementation-specific).  However, if oldLabel is of
    * the same type as is produced by the factory, then the whole

@@ -64,7 +64,7 @@ public class WordSegmentingTokenizer extends AbstractTokenizer<HasWord> {
   private static class WordSegmentingTokenizerFactory implements TokenizerFactory<HasWord>, Serializable {
     private static final long serialVersionUID = -4697961121607489828L;
 
-    boolean tokenizeNLs = false;
+    boolean tokenizeNLs;
     private WordSegmenter segmenter;
 
     public WordSegmentingTokenizerFactory(WordSegmenter wordSegmenter) {

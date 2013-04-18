@@ -52,7 +52,7 @@ public interface Lexer {
   public String yytext();
 
   /**
-   * Pushes back <code>length</code> character positions in the
+   * Pushes back {@code length} character positions in the
    * lexer.  Conventionally used to push back exactly one token.
    */
   public void pushBack(int length);

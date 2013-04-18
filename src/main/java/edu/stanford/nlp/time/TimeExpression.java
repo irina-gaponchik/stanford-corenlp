@@ -84,7 +84,7 @@ public class TimeExpression extends MatchedExpression {
   {
     SUTime.Temporal t = getTemporal();
     if (t != null) {
-      if (t != SUTime.TIME_NONE_OK) {
+      if (!t.equals(SUTime.TIME_NONE_OK)) {
         setTemporal(EnglishTimeExpressionPatterns.addMod(text, t));
         return true;
       } else {
@@ -101,11 +101,7 @@ public class TimeExpression extends MatchedExpression {
             //super.extractAnnotation(sourceAnnotation, CoreAnnotations.NumerizedTokensAnnotation.class,
             //CoreMapAttributeAggregator.DEFAULT_NUMERIC_TOKENS_AGGREGATORS,
             //TimeExpression.Annotation.class, TimeExpression.ChildrenAnnotation.class);
-    if (okay) {
-      return addMod();
-    } else {
-      return false;
-    }
+      return okay ? addMod() : false;
   }
 
   public boolean extractAnnotation(Env env, List<? extends CoreMap> source)
@@ -113,11 +109,7 @@ public class TimeExpression extends MatchedExpression {
     boolean okay = super.extractAnnotation(env, source);
             //super.extractAnnotation(source, CoreMapAttributeAggregator.getDefaultAggregators(),
             //TimeExpression.Annotation.class, TimeExpression.ChildrenAnnotation.class);
-    if (okay) {
-      return addMod();
-    } else {
-      return false;
-    }
+      return okay ? addMod() : false;
   }
 
  /* public int getTid() {

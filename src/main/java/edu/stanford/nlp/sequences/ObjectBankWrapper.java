@@ -60,13 +60,13 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
       while ((spilloverIter == null || !spilloverIter.hasNext()) &&
              wrappedIter.hasNext()) {
         List<IN> doc = wrappedIter.next();
-        List<List<IN>> docs = new ArrayList<List<IN>>();
+        List<List<IN>> docs = new ArrayList<>();
         docs.add(doc);
         fixDocLengths(docs);
         spilloverIter = docs.iterator();
       }
       return wrappedIter.hasNext() ||
-        (spilloverIter != null && spilloverIter.hasNext());
+              spilloverIter != null && spilloverIter.hasNext();
     }
 
     @Override
@@ -77,7 +77,7 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
       // -pichuan
       while (spilloverIter == null || !spilloverIter.hasNext()) {
         List<IN> doc = wrappedIter.next();
-        List<List<IN>> docs = new ArrayList<List<IN>>();
+        List<List<IN>> docs = new ArrayList<>();
         docs.add(doc);
         fixDocLengths(docs);
         spilloverIter = docs.iterator();
@@ -96,11 +96,7 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
   }
 
   private String intern(String s) {
-    if (flags.intern) {
-      return s.intern();
-    } else {
-      return s;
-    }
+      return flags.intern ? s.intern() : s;
   }
 
 
@@ -125,10 +121,10 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
     for (IN fl : doc) {
 
       // position in document
-      fl.set(CoreAnnotations.PositionAnnotation.class, Integer.toString((position++)));
+      fl.set(CoreAnnotations.PositionAnnotation.class, Integer.toString(position++));
 
       // word shape
-      if ((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) && (!flags.useShapeStrings)) {
+      if (flags.wordShape > WordShapeClassifier.NOWORDSHAPE && !flags.useShapeStrings) {
         // TODO: if we pass in a FeatureFactory, as suggested by an
         // earlier comment, we should use that FeatureFactory's
         // getWord function
@@ -136,7 +132,7 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
         if (flags.wordFunction != null) {
           word = flags.wordFunction.apply(word);
         }
-        if (word.length() > 0) {
+        if (!word.isEmpty()) {
           char ch = word.charAt(0);
           if (Character.isLowerCase(ch)) {
             knownLCWords.add(word);
@@ -173,10 +169,10 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
    * @param docs The list of documents whose length might be adjusted.
    */
   private void fixDocLengths(List<List<IN>> docs) {
-    final int maxDocSize = flags.maxDocSize;
+    int maxDocSize = flags.maxDocSize;
 
-    WordToSentenceProcessor<IN> wts = new WordToSentenceProcessor<IN>();
-    List<List<IN>> newDocuments = new ArrayList<List<IN>>();
+    WordToSentenceProcessor<IN> wts = new WordToSentenceProcessor<>();
+    List<List<IN>> newDocuments = new ArrayList<>();
     for (List<IN> document : docs) {
       if (maxDocSize <= 0 || document.size() <= maxDocSize) {
         if (flags.keepEmptySentences || !document.isEmpty()) {
@@ -185,13 +181,13 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
         continue;
       }
       List<List<IN>> sentences = wts.process(document);
-      List<IN> newDocument = new ArrayList<IN>();
+      List<IN> newDocument = new ArrayList<>();
       for (List<IN> sentence : sentences) {
         if (newDocument.size() + sentence.size() > maxDocSize) {
           if (!newDocument.isEmpty()) {
             newDocuments.add(newDocument);
           }
-          newDocument = new ArrayList<IN>();
+          newDocument = new ArrayList<>();
         }
         newDocument.addAll(sentence);
       }
@@ -277,6 +273,6 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
   public int size() { return wrapped.size(); }
   @Override
   public Object[] toArray() { return wrapped.toArray(); }
-  public List<IN>[] toArray(List<IN>[] o) { return wrapped.toArray(o); }
+  public List<IN>[] toArray(List<IN>... o) { return wrapped.toArray(o); }
 
 } // end class ObjectBankWrapper

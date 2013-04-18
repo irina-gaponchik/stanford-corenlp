@@ -6,12 +6,12 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
 
-/** This class provides a <code>IdentityHashMap</code>-backed
- *  implementation of the <code>Set</code> interface.  This means that
+/** This class provides a {@code IdentityHashMap}-backed
+ *  implementation of the {@code Set} interface.  This means that
  *  whether an object is an element of the set depends on whether it is ==
- *  (rather than <code>equals()</code>) to an element of the set.  This is
- *  different from a normal <code>HashSet</code>, where set membership
- *  depends on <code>equals()</code>, rather than ==.
+ *  (rather than {@code equals()}) to an element of the set.  This is
+ *  different from a normal {@code HashSet}, where set membership
+ *  depends on {@code equals()}, rather than ==.
  *
  *  Each element in the set is a key in the backing IdentityHashMap; each key
  *  maps to a static token, denoting that the key does, in fact, exist.
@@ -36,7 +36,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
    *  has the default expected maximum size (21);
    */
   public IdentityHashSet() {
-    map = new IdentityHashMap<E, Boolean>();
+    map = new IdentityHashMap<>();
   }
 
   /** Construct a new, empty IdentityHashSet whose backing IdentityHashMap
@@ -47,7 +47,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
    * @param expectedMaxSize the expected maximum size of the set.
    */
   public IdentityHashSet(int expectedMaxSize) {
-    map = new IdentityHashMap<E, Boolean>(expectedMaxSize);
+    map = new IdentityHashMap<>(expectedMaxSize);
   }
 
   /** Construct a new IdentityHashSet with the same elements as the supplied
@@ -58,7 +58,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
    *          be initialized.
    */
   public IdentityHashSet(Collection<? extends E> c) {
-    map = new IdentityHashMap<E, Boolean>();
+    map = new IdentityHashMap<>();
     addAll(c);
   }
 
@@ -68,11 +68,11 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
   /** Adds the specified element to this set if it is not already present.
    *
    *  Remember that this set implementation uses == (not
-   *  <code>equals()</code>) to test whether an element is present in the
+   *  {@code equals()}) to test whether an element is present in the
    *  set.
    *
    * @param       o             element to add to this set
-   * @return      true          if the element was added,
+   * @return true          if the element was added,
    *              false         otherwise
    */
   @Override
@@ -92,7 +92,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
     map.clear();
   }
 
-  /** Returns a shallow copy of this <code>IdentityHashSet</code> instance:
+  /** Returns a shallow copy of this {@code IdentityHashSet} instance:
    *  the elements themselves are not cloned.
    *
    *  @return a shallow copy of this set.
@@ -100,7 +100,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
   @Override
   public Object clone() {
     Iterator<E> it = iterator();
-    IdentityHashSet<E> clone = new IdentityHashSet<E>(size() * 2);
+    IdentityHashSet<E> clone = new IdentityHashSet<>(size() << 1);
     while (it.hasNext()) {
       clone.internalAdd(it.next());
     }
@@ -110,22 +110,22 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
   /** Returns true if this set contains the specified element.
    *
    *  Remember that this set implementation uses == (not
-   *  <code>equals()</code>) to test whether an element is present in the
+   *  {@code equals()}) to test whether an element is present in the
    *  set.
    *
    *  @param o Element whose presence in this set is to be
    *  tested.
    *
-   *  @return <code>true</code> if this set contains the specified element.
+   *  @return {@code true} if this set contains the specified element.
    */
   @Override
   public boolean contains(Object o) {
     return map.containsKey(o);
   }
 
-  /** Returns <code>true</code> if this set contains no elements.
+  /** Returns {@code true} if this set contains no elements.
    *
-   *  @return <code>true</code> if this set contains no elements.
+   *  @return {@code true} if this set contains no elements.
    */
   @Override
   public boolean isEmpty() {
@@ -135,7 +135,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
   /** Returns an iterator over the elements in this set. The elements are
    *  returned in no particular order.
    *
-   *  @return an <code>Iterator</code> over the elements in this set.
+   *  @return an {@code Iterator} over the elements in this set.
    */
   @Override
   public Iterator<E> iterator() {
@@ -145,16 +145,16 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
   /** Removes the specified element from this set if it is present.
    *
    *  Remember that this set implementation uses == (not
-   *  <code>equals()</code>) to test whether an element is present in the
+   *  {@code equals()}) to test whether an element is present in the
    *  set.
    *
    *  @param o Object to be removed from this set, if present.
    *
-   *  @return <code>true</code> if the set contained the specified element.
+   *  @return {@code true} if the set contained the specified element.
    */
   @Override
   public boolean remove(Object o) {
-    return (map.remove(o) != null);
+    return map.remove(o) != null;
   }
 
   /** Returns the number of elements in this set (its cardinality).
@@ -167,16 +167,16 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
   }
 
   /** Just for testing. */
-  public static void main(String[] args) {
-    Integer x = Integer.valueOf(3);
-    Integer y = Integer.valueOf(4);
-    Integer z = Integer.valueOf(5);
-    List<Integer> a = Arrays.asList(new Integer[] {x, y, z});
-    List<String> b = Arrays.asList(new String[] {"Larry", "Moe", "Curly"});
-    List<Integer> c = Arrays.asList(new Integer[] {x, y, z});
-    List<String> d = Arrays.asList(new String[] {"Larry", "Moe", "Curly"});
+  public static void main(String... args) {
+    Integer x = 3;
+    Integer y = 4;
+    Integer z = 5;
+    List<Integer> a = Arrays.asList(x, y, z);
+    List<String> b = Arrays.asList("Larry", "Moe", "Curly");
+    List<Integer> c = Arrays.asList(x, y, z);
+    List<String> d = Arrays.asList("Larry", "Moe", "Curly");
     Set<List<?>> hs = Generics.newHashSet();
-    IdentityHashSet<List<?>> ihs = new IdentityHashSet<List<?>>();
+    IdentityHashSet<List<?>> ihs = new IdentityHashSet<>();
     hs.add(a);
     hs.add(b);
     ihs.add(a);
@@ -214,7 +214,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
    */
   private void writeObject(ObjectOutputStream s) throws IOException {
     Iterator<E> it = iterator();
-    s.writeInt(size() * 2);             // expectedMaxSize
+    s.writeInt(size() << 1);             // expectedMaxSize
     s.writeInt(size());
     while (it.hasNext())
       s.writeObject(it.next());
@@ -231,7 +231,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
     expectedMaxSize = s.readInt();
     size = s.readInt();
 
-    map = new IdentityHashMap<E, Boolean>(expectedMaxSize);
+    map = new IdentityHashMap<>(expectedMaxSize);
     for (int i = 0; i < size; i++) {
       o = s.readObject();
       internalAdd(ErasureUtils.<E>uncheckedCast(o));

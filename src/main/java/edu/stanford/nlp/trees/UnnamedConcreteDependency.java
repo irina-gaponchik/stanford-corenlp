@@ -87,15 +87,16 @@ public class UnnamedConcreteDependency extends UnnamedDependency {
    */
   @Override
   public String toString(String format) {
-    if ("xml".equals(format)) {
-      String govIdxStr = " idx=\"" + headIndex + "\"";
-      String depIdxStr = " idx=\"" + depIndex + "\"";
-      return "  <dep>\n    <governor" + govIdxStr + ">" + XMLUtils.escapeXML(governor().value()) + "</governor>\n    <dependent" + depIdxStr + ">" + XMLUtils.escapeXML(dependent().value()) + "</dependent>\n  </dep>";
-    } else if ("predicate".equals(format)) {
-      return "dep(" + governor() + "," + dependent() + ")";
-    } else {
-      return toString();
-    }
+      switch (format) {
+          case "xml":
+              String govIdxStr = " idx=\"" + headIndex + '"';
+              String depIdxStr = " idx=\"" + depIndex + '"';
+              return "  <dep>\n    <governor" + govIdxStr + '>' + XMLUtils.escapeXML(governor().value()) + "</governor>\n    <dependent" + depIdxStr + '>' + XMLUtils.escapeXML(dependent().value()) + "</dependent>\n  </dep>";
+          case "predicate":
+              return "dep(" + governor() + ',' + dependent() + ')';
+          default:
+              return toString();
+      }
   }
 
   @Override
@@ -113,19 +114,19 @@ public class UnnamedConcreteDependency extends UnnamedDependency {
   }
 
   /**
-   * A <code>DependencyFactory</code> acts as a factory for creating objects
-   * of class <code>Dependency</code>
+   * A {@code DependencyFactory} acts as a factory for creating objects
+   * of class {@code Dependency}
    */
   private static class UnnamedConcreteDependencyFactory implements DependencyFactory {
     /**
-     * Create a new <code>Dependency</code>.
+     * Create a new {@code Dependency}.
      */
     public Dependency<Label, Label, Object> newDependency(Label regent, Label dependent) {
       return newDependency(regent, dependent, null);
     }
 
     /**
-     * Create a new <code>Dependency</code>.
+     * Create a new {@code Dependency}.
      */
     public Dependency<Label, Label, Object> newDependency(Label regent, Label dependent, Object name) {
       return new UnnamedConcreteDependency(regent, dependent);

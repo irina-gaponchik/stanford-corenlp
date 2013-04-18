@@ -21,24 +21,24 @@ import java.util.*;
  *
  * <p>
  * See {@link TokenSequencePattern} for example of how this class can be extended
- * to support a specific type <code>T</code>.
+ * to support a specific type {@code T}.
  * <p>
  * To use
- * <pre><code>
+ * <pre>{@code
  *   SequencePattern p = SequencePattern.compile("....");
  *   SequenceMatcher m = p.getMatcher(tokens);
  *   while (m.find()) ....
- * </code></pre>
+ * }</pre>
  * </p>
  *
  *
  * <p>
- * To support a new type <code>T</code>:
+ * To support a new type {@code T}:
  * <ol>
- * <li> For a type <code>T</code> to be matchable, it has to have a corresponding <code>NodePattern<T></code> that indicates
- *    whether a node is matched or not  (see <code>CoreMapNodePattern</code> for example)</li>
+ * <li> For a type {@code T} to be matchable, it has to have a corresponding {@code NodePattern<T>} that indicates
+ *    whether a node is matched or not  (see {@code CoreMapNodePattern} for example)</li>
  * <li> To compile a string into corresponding pattern, will need to create a parser
- *    (see inner class <code>Parser</code>, <code>TokenSequencePattern</code> and <code>TokenSequenceParser.jj</code>)</li>
+ *    (see inner class {@code Parser}, {@code TokenSequencePattern} and {@code TokenSequenceParser.jj})</li>
  * </ol>
  * </p>
  *
@@ -81,13 +81,13 @@ public class SequencePattern<T> {
   private PatternExpr patternExpr;
   private SequenceMatchAction<T> action;
   State root;
-  int totalGroups = 0;
+  int totalGroups;
 
   // binding of group number to variable name
   VarGroupBindings varGroupBindings;
 
   // Priority associated with pattern
-  double priority = 0.0;
+  double priority;
 
   protected SequencePattern(SequencePattern.PatternExpr nodeSequencePattern) {
     this(null, nodeSequencePattern);
@@ -141,7 +141,7 @@ public class SequencePattern<T> {
   {
     try {
       Pair<PatternExpr, SequenceMatchAction<T>> p = env.parser.parseSequenceWithAction(env, string);
-      return new SequencePattern<T>(string, p.first(), p.second());
+      return new SequencePattern<>(string, p.first(), p.second());
     } catch (Exception ex) {
       throw new RuntimeException("Error compiling " + string + " using environment " + env);
     }
@@ -150,11 +150,11 @@ public class SequencePattern<T> {
 
   protected static <T> SequencePattern<T> compile(SequencePattern.PatternExpr nodeSequencePattern)
   {
-    return new SequencePattern<T>(nodeSequencePattern);
+    return new SequencePattern<>(nodeSequencePattern);
   }
 
   public SequenceMatcher<T> getMatcher(List<? extends T> tokens) {
-    return new SequenceMatcher<T>(this, tokens);
+    return new SequenceMatcher<>(this, tokens);
   }
 
   // Parses string to PatternExpr
@@ -344,7 +344,7 @@ public class SequencePattern<T> {
     protected Frag build()
     {
       Frag frag = null;
-      if (patterns.size() > 0) {
+      if (!patterns.isEmpty()) {
         PatternExpr first = patterns.get(0);
         frag = first.build();
         for (int i = 1; i < patterns.size(); i++) {
@@ -372,7 +372,7 @@ public class SequencePattern<T> {
 
     protected PatternExpr copy()
     {
-      List<PatternExpr> newPatterns = new ArrayList<PatternExpr>(patterns.size());
+      List<PatternExpr> newPatterns = new ArrayList<>(patterns.size());
       for (PatternExpr p:patterns) {
         newPatterns.add(p.copy());
       }
@@ -415,11 +415,11 @@ public class SequencePattern<T> {
     public String toString() {
       StringBuilder sb = new StringBuilder();
       if (captureGroupId >= 0) {
-        sb.append("\\").append(captureGroupId);
+        sb.append('\\').append(captureGroupId);
       } else {
-        sb.append("\\");
+        sb.append('\\');
       }
-      sb.append("{").append(matcher).append("}");
+      sb.append('{').append(matcher).append('}');
       return sb.toString();
     }
   }
@@ -459,7 +459,7 @@ public class SequencePattern<T> {
   // Expression that represents a group
   public static class GroupPatternExpr extends PatternExpr {
     PatternExpr pattern;
-    boolean capture = false; // Do capture or not?  If do capture, an capture group id will be assigned
+    boolean capture; // Do capture or not?  If do capture, an capture group id will be assigned
     int captureGroupId = -1; // -1 if this pattern is not part of a capture group or capture group not yet assigned,
                              // otherwise, capture group number
     String varname;  // Alternate variable with which to refer to this group
@@ -509,14 +509,14 @@ public class SequencePattern<T> {
 
     public String toString() {
       StringBuilder sb = new StringBuilder();
-      sb.append("(");
+      sb.append('(');
       if (!capture) {
         sb.append("?: ");
       } else if (varname != null) {
-        sb.append("?").append(varname).append(" ");
+        sb.append('?').append(varname).append(' ');
       }
       sb.append(pattern);
-      sb.append(")");
+      sb.append(')');
       return sb.toString();
     }
   }
@@ -615,9 +615,9 @@ public class SequencePattern<T> {
     public String toString() {
       StringBuilder sb = new StringBuilder();
       sb.append(pattern);
-      sb.append("{").append(minMatch).append(",").append(maxMatch).append("}");
+      sb.append('{').append(minMatch).append(',').append(maxMatch).append('}');
       if (!greedyMatch) {
-        sb.append("?");
+        sb.append('?');
       }
       return sb.toString();
     }
@@ -677,7 +677,7 @@ public class SequencePattern<T> {
 
     protected PatternExpr copy()
     {
-      List<PatternExpr> newPatterns = new ArrayList<PatternExpr>(patterns.size());
+      List<PatternExpr> newPatterns = new ArrayList<>(patterns.size());
       for (PatternExpr p:patterns) {
         newPatterns.add(p.copy());
       }
@@ -744,7 +744,7 @@ public class SequencePattern<T> {
 
     protected PatternExpr copy()
     {
-      List<PatternExpr> newPatterns = new ArrayList<PatternExpr>(patterns.size());
+      List<PatternExpr> newPatterns = new ArrayList<>(patterns.size());
       for (PatternExpr p:patterns) {
         newPatterns.add(p.copy());
       }
@@ -852,7 +852,7 @@ public class SequencePattern<T> {
      */
     protected void add(State nextState) {
       if (next == null) {
-        next = new LinkedHashSet<State>();
+        next = new LinkedHashSet<>();
       }
       next.add(nextState);
     }
@@ -903,7 +903,7 @@ public class SequencePattern<T> {
         if (matchedStates.matcher.matchWithResult) {
           Object obj = pattern.matchWithResult(node);
           if (obj != null) {
-            if (obj != Boolean.TRUE) {
+            if (!obj.equals(Boolean.TRUE)) {
               matchedStates.branchStates.setMatchedResult(bid, matchedStates.curPosition, obj);
             }
             // If matched, need to add next states to the queue of states to be processed
@@ -952,7 +952,7 @@ public class SequencePattern<T> {
           // TODO: Fix type checking
           Collection<Interval<Integer>> matched = pattern.match(nodes, cur);
           // TODO: Check intervals are valid?   Start at cur and ends after?
-          if (matched != null && matched.size() > 0) {
+          if (matched != null && !matched.isEmpty()) {
             int nBranches = matched.size();
             int i = 0;
             for (Interval<Integer> interval:matched) {
@@ -1052,7 +1052,7 @@ public class SequencePattern<T> {
         for (State s:next) {
           i++;   // Increment branch index
           // Depending on greedy match or not, different priority to branches
-          int pi = (greedyMatch && maxMatchLeft != 0)? i+1:i;
+          int pi = greedyMatch && maxMatchLeft != 0 ? i+1:i;
           int bid2 = matchedStates.getBranchStates().getBranchId(bid,pi,totalBranches);
           matchedStates.getBranchStates().clearMatchedCount(bid2, this);
           boolean m = s.match(bid2, matchedStates, consume);
@@ -1105,7 +1105,7 @@ public class SequencePattern<T> {
       if (matcher.matches(node, matchedStates.elements().get(matchedGroup.matchBegin+matchedNodes))) {
         matchedNodes++;
         matchedStates.getBranchStates().setMatchStateInfo(bid, this,
-                new Pair<SequenceMatcher.MatchedGroup, Integer>(matchedGroup, matchedNodes));
+                new Pair<>(matchedGroup, matchedNodes));
         int len = matchedGroup.matchEnd - matchedGroup.matchBegin;
         if (len == matchedNodes) {
           matchedStates.addStates(bid, next);
@@ -1200,7 +1200,7 @@ public class SequencePattern<T> {
       if (consume) {
         return false;
       } else {
-        Object v = (prevState != null)? prevState.value():null;
+        Object v = prevState != null ? prevState.value():null;
         matchedStates.setGroupEnd(bid, captureGroupId, v);
         return super.match(bid, matchedStates, consume, prevState);
       }
@@ -1248,9 +1248,9 @@ public class SequencePattern<T> {
     private void addChildBid(int i, int bid, int pos)
     {
       if (reachableChildBids[i] == null) {
-        reachableChildBids[i] = new ArraySet<Pair<Integer,Integer>>();
+        reachableChildBids[i] = new ArraySet<>();
       }
-      reachableChildBids[i].add(new Pair<Integer,Integer>(bid,pos) );
+      reachableChildBids[i].add(new Pair<>(bid,pos) );
     }
 
     private boolean isAllChildMatched()
@@ -1331,14 +1331,13 @@ public class SequencePattern<T> {
 
     protected void updateKeepBids(Set<Integer> bids) {
       // TODO: Is there a point when we don't need to keep these bids anymore?
-      for (int i = 0; i < reachableChildBids.length; i++) {
-        Set<Pair<Integer,Integer>> v = reachableChildBids[i];
-        if (v != null) {
-          for (Pair<Integer,Integer> p:v) {
-            bids.add(p.first());
-          }
+        for (Set<Pair<Integer, Integer>> v : reachableChildBids) {
+            if (v != null) {
+                for (Pair<Integer, Integer> p : v) {
+                    bids.add(p.first());
+                }
+            }
         }
-      }
     }
   }
 
@@ -1475,7 +1474,7 @@ public class SequencePattern<T> {
 
     protected Frag(State start) {
       this.start = start;
-      this.out = new LinkedHashSet<State> ();
+      this.out = new LinkedHashSet<>();
       start.updateOutStates(out);
     }
 
@@ -1486,14 +1485,14 @@ public class SequencePattern<T> {
 
     protected void add(State outState) {
       if (out == null) {
-        out = new LinkedHashSet<State>();
+        out = new LinkedHashSet<>();
       }
       out.add(outState);
     }
 
     protected void add(Collection<State> outStates) {
       if (out == null) {
-        out = new LinkedHashSet<State>();
+        out = new LinkedHashSet<>();
       }
       out.addAll(outStates);
     }
@@ -1513,7 +1512,7 @@ public class SequencePattern<T> {
       for (State s:out) {
         s.add(state);
       }
-      out = new LinkedHashSet<State>();
+      out = new LinkedHashSet<>();
       state.updateOutStates(out);
 /*      if (state.next != null) {
         out.addAll(state.next);

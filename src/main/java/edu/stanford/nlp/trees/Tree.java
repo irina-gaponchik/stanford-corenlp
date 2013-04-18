@@ -31,26 +31,26 @@ import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.XMLUtils;
 
 /**
- * The abstract class <code>Tree</code> is used to collect all of the
+ * The abstract class {@code Tree} is used to collect all of the
  * tree types, and acts as a generic extendable type.  This is the
  * standard implementation of inheritance-based polymorphism.
- * All <code>Tree</code> objects support accessors for their children (a
- * <code>Tree[]</code>), their label (a <code>Label</code>), and their
- * score (a <code>double</code>).  However, different concrete
+ * All {@code Tree} objects support accessors for their children (a
+ * {@code Tree[]}), their label (a {@code Label}), and their
+ * score (a {@code double}).  However, different concrete
  * implementations may or may not include the latter two, in which
  * case a default value is returned.  The class Tree defines no data
  * fields.  The two abstract methods that must be implemented are:
- * <code>children()</code>, and <code>treeFactory()</code>.  Notes
- * that <code>setChildren(Tree[])</code> is now an optional
+ * {@code children()}, and {@code treeFactory()}.  Notes
+ * that {@code setChildren(Tree[])} is now an optional
  * operation, whereas it was previously required to be
  * implemented. There is now support for finding the parent of a
  * tree.  This may be done by search from a tree root, or via a
- * directly stored parent.  The <code>Tree</code> class now
- * implements the <code>Collection</code> interface: in terms of
+ * directly stored parent.  The {@code Tree} class now
+ * implements the {@code Collection} interface: in terms of
  * this, each <i>node</i> of the tree is an element of the
  * collection; hence one can explore the tree by using the methods of
- * this interface.  A <code>Tree</code> is regarded as a read-only
- * <code>Collection</code> (even though the <code>Tree</code> class
+ * this interface.  A {@code Tree} is regarded as a read-only
+ * {@code Collection} (even though the {@code Tree} class
  * has various methods that modify trees).  Moreover, the
  * implementation is <i>not</i> thread-safe: no attempt is made to
  * detect and report concurrent modifications.
@@ -71,12 +71,12 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    */
   public static final Tree[] EMPTY_TREE_ARRAY = new Tree[0];
 
-  public Tree() {
+  protected Tree() {
   }
 
   /**
    * Says whether a node is a leaf.  Can be used on an arbitrary
-   * <code>Tree</code>.  Being a leaf is defined as having no
+   * {@code Tree}.  Being a leaf is defined as having no
    * children.  This must be implemented as returning a zero-length
    * Tree[] array for children().
    *
@@ -89,7 +89,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Says how many children a tree node has in its local tree.
-   * Can be used on an arbitrary <code>Tree</code>.  Being a leaf is defined
+   * Can be used on an arbitrary {@code Tree}.  Being a leaf is defined
    * as having no children.
    *
    * @return The number of direct children of the tree node
@@ -101,7 +101,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Says whether the current node has only one child.
-   * Can be used on an arbitrary <code>Tree</code>.
+   * Can be used on an arbitrary {@code Tree}.
    *
    * @return Whether the node heads a unary rewrite
    */
@@ -118,7 +118,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    */
   public boolean isPreTerminal() {
     Tree[] kids = children();
-    return (kids.length == 1) && (kids[0].isLeaf());
+    return kids.length == 1 && kids[0].isLeaf();
   }
 
 
@@ -150,12 +150,12 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * Worded positively, this means that it must have two or more children,
    * or one child that is not a leaf.
    *
-   * @return <code>true</code> if the node is phrasal;
-   *         <code>false</code> otherwise
+   * @return {@code true} if the node is phrasal;
+   *         {@code false} otherwise
    */
   public boolean isPhrasal() {
     Tree[] kids = children();
-    return !(kids == null || kids.length == 0 || (kids.length == 1 && kids[0].isLeaf()));
+    return !(kids == null || kids.length == 0 || kids.length == 1 && kids[0].isLeaf());
   }
 
 
@@ -208,12 +208,12 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   @Override
   public int hashCode() {
     String v = this.value();
-    int hc = (v == null) ? 1 : v.hashCode();
+    int hc = v == null ? 1 : v.hashCode();
     Tree[] kids = children();
     for (int i = 0; i < kids.length; i++) {
       v = kids[i].value();
-      int hc2 = (v == null) ? i : v.hashCode();
-      hc ^= (hc2 << i);
+      int hc2 = v == null ? i : v.hashCode();
+      hc ^= hc2 << i;
     }
     return hc;
   }
@@ -235,7 +235,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   public int objectIndexOf(Tree tree) {
     Tree[] kids = children();
     for (int i = 0; i < kids.length; i++) {
-      if (kids[i] == tree) {
+      if (kids[i].equals(tree)) {
         return i;
       }
     }
@@ -248,7 +248,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * are no children (if the node is a leaf), this must return a
    * Tree[] array of length 0.  A null children() value for tree
    * leaves was previously supported, but no longer is.
-   * A caller may assume that either <code>isLeaf()</code> returns
+   * A caller may assume that either {@code isLeaf()} returns
    * true, or this node has a nonzero number of children.
    *
    * @return The children of the node
@@ -259,7 +259,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Returns a List of children for the current node.  If there are no
-   * children, then a (non-null) <code>List&lt;Tree&gt;</code> of size 0 will
+   * children, then a (non-null) {@code List&lt;Tree&gt;} of size 0 will
    * be returned.  The list has new list structure but pointers to,
    * not copies of the children.  That is, the returned list is mutable,
    * and simply adding to or deleting items from it is safe, but beware
@@ -268,7 +268,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @return The children of the node
    */
   public List<Tree> getChildrenAsList() {
-    return new ArrayList<Tree>(Arrays.asList(children()));
+    return new ArrayList<>(Arrays.asList(children()));
   }
 
 
@@ -283,22 +283,22 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * leaf nodes use this particular zero-length array to represent
    * a leaf node.
    *
-   * @param children The array of children, each a <code>Tree</code>
+   * @param children The array of children, each a {@code Tree}
    * @see #setChildren(List)
    */
-  public void setChildren(Tree[] children) {
+  public void setChildren(Tree... children) {
     throw new UnsupportedOperationException();
   }
 
 
   /**
    * Set the children of this tree node to the given list.  This
-   * method is implemented in the <code>Tree</code> class by
-   * converting the <code>List</code> into a tree array and calling
+   * method is implemented in the {@code Tree} class by
+   * converting the {@code List} into a tree array and calling
    * the array-based method.  Subclasses which use a
-   * <code>List</code>-based representation of tree children should
+   * {@code List}-based representation of tree children should
    * override this method.  This implementation allows the case
-   * that the <code>List</code> is <code>null</code>: it yields a
+   * that the {@code List} is {@code null}: it yields a
    * node with no children (represented by a canonical zero-length
    * children() array).
    *
@@ -368,7 +368,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
 
   /**
-   * Returns the first child of a tree, or <code>null</code> if none.
+   * Returns the first child of a tree, or {@code null} if none.
    *
    * @return The first child
    */
@@ -382,7 +382,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
 
   /**
-   * Returns the last child of a tree, or <code>null</code> if none.
+   * Returns the last child of a tree, or {@code null} if none.
    *
    * @return The last child
    */
@@ -394,26 +394,30 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     return kids[kids.length - 1];
   }
 
-  /** Return the highest node of the (perhaps trivial) unary chain that
-   *  this node is part of.
-   *  In case this node is the only child of its parent, trace up the chain of
-   *  unaries, and return the uppermost node of the chain (the node whose
-   *  parent has multiple children, or the node that is the root of the tree).
-   *
-   *  @param root The root of the tree that contains this subtree
-   *  @return The uppermost node of the unary chain, if this node is in a unary
-   *         chain, or else the current node
-   */
-  public Tree upperMostUnary(Tree root) {
-    Tree parent = parent(root);
-    if (parent == null) {
-      return this;
+    /**
+     * Return the highest node of the (perhaps trivial) unary chain that
+     * this node is part of.
+     * In case this node is the only child of its parent, trace up the chain of
+     * unaries, and return the uppermost node of the chain (the node whose
+     * parent has multiple children, or the node that is the root of the tree).
+     *
+     * @param root The root of the tree that contains this subtree
+     * @return The uppermost node of the unary chain, if this node is in a unary
+     *         chain, or else the current node
+     */
+    public Tree upperMostUnary(Tree root) {
+        Tree result = this;
+        while (true) {
+            Tree parent = result.parent(root);
+            if (parent == null) {
+                return result;
+            }
+            if (parent.numChildren() > 1) {
+                return result;
+            }
+            result = parent;
+        }
     }
-    if (parent.numChildren() > 1) {
-      return this;
-    }
-    return parent.upperMostUnary(root);
-  }
 
   /**
    * Assign a SpanAnnotation on each node of this tree.
@@ -425,7 +429,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Returns SpanAnnotation of this node, or null if annotation is not assigned.
-   * Use <code>setSpans()</code> to assign SpanAnnotations to a tree.
+   * Use {@code setSpans()} to assign SpanAnnotations to a tree.
    *
    * @return an IntPair: the SpanAnnotation of this node.
    */
@@ -440,7 +444,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * are computed with respect to whitespace (e.g., at the word level).
    *
    * @return a Set of the constituents as constituents of
-   *         type <code>Constituent</code>
+   *         type {@code Constituent}
    */
   public Set<Constituent> constituents() {
     return constituents(new SimpleConstituentFactory());
@@ -454,7 +458,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *
    * @param cf ConstituentFactory used to build the Constituent objects
    * @return a Set of the constituents as SimpleConstituent type
-   *         (in the current implementation, a <code>HashSet</code>
+   *         (in the current implementation, a {@code HashSet}
    */
   public Set<Constituent> constituents(ConstituentFactory cf) {
     return constituents(cf,false);
@@ -468,7 +472,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @param cf ConstituentFactory used to build the Constituent objects
    * @param charLevel If true, compute bracketings irrespective of whitespace boundaries.
    * @return a Set of the constituents as SimpleConstituent type
-   *         (in the current implementation, a <code>HashSet</code>
+   *         (in the current implementation, a {@code HashSet}
    */
   public Set<Constituent> constituents(ConstituentFactory cf, boolean charLevel) {
     Set<Constituent> constituentsSet = Generics.newHashSet();
@@ -493,7 +497,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     if (isPreTerminal()) {
       if(label() instanceof CoreLabel)
         ((CoreLabel) label()).set(CoreAnnotations.SpanAnnotation.class, new IntPair(left, left));
-      return (left + 1);
+      return left + 1;
     }
     int position = left;
 
@@ -510,8 +514,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * Adds the constituents derived from <code>this</code> tree to
-   * the ordered <code>Constituent</code> <code>Set</code>, beginning
+   * Adds the constituents derived from {@code this} tree to
+   * the ordered {@code Constituent} {@code Set}, beginning
    * numbering from the second argument and returning the number of
    * the right edge.  The reason for the return of the right frontier
    * is in order to produce bracketings recursively by threading through
@@ -528,7 +532,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   private int constituents(Set<Constituent> constituentsSet, int left, ConstituentFactory cf, boolean charLevel, Filter<Tree> filter) {
 
     if(isPreTerminal())
-      return left + ((charLevel) ? firstChild().value().length() : 1);
+      return left + (charLevel ? firstChild().value().length() : 1);
 
     int position = left;
 
@@ -570,7 +574,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
 
   /**
-   * Returns a set of one level <code>Tree</code>s that ares the local trees
+   * Returns a set of one level {@code Tree}s that ares the local trees
    * of the tree.
    * That is, it builds a new tree that copies the mother and daughter
    * nodes (but not their Labels), for each phrasal node,
@@ -590,20 +594,20 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
 
   /**
-   * Most instances of <code>Tree</code> will take a lot more than
-   * than the default <code>StringBuffer</code> size of 16 to print
+   * Most instances of {@code Tree} will take a lot more than
+   * than the default {@code StringBuffer} size of 16 to print
    * as an indented list of the whole tree, so we enlarge the default.
    */
   private static final int initialPrintStringBuilderSize = 500;
 
   /**
    * Appends the printed form of a parse tree (as a bracketed String)
-   * to an <code>Appendable</code>, such as a <code>StringBuffer</code>.
+   * to an {@code Appendable}, such as a {@code StringBuffer}.
    * The implementation of this may be more efficient than for
-   * <code>toString()</code> on complex trees.
+   * {@code toString()} on complex trees.
    *
-   * @param sb The <code>StringBuilder</code> to which the tree will be appended
-   * @return Returns the <code>StringBuilder</code> passed in with extra stuff in it
+   * @param sb The {@code StringBuilder} to which the tree will be appended
+   * @return Returns the {@code StringBuilder} passed in with extra stuff in it
    */
   public StringBuilder toStringBuilder(StringBuilder sb) {
     return toStringBuilder(sb, true);
@@ -611,13 +615,13 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Appends the printed form of a parse tree (as a bracketed String)
-   * to an <code>Appendable</code>, such as a <code>StringBuffer</code>.
+   * to an {@code Appendable}, such as a {@code StringBuffer}.
    * The implementation of this may be more efficient than for
-   * <code>toString()</code> on complex trees.
+   * {@code toString()} on complex trees.
    *
-   * @param sb The <code>StringBuilder</code> to which the tree will be appended
+   * @param sb The {@code StringBuilder} to which the tree will be appended
    * @param printOnlyLabelValue If true, print only the value() of each node's label
-   * @return Returns the <code>StringBuilder</code> passed in with extra stuff in it
+   * @return Returns the {@code StringBuilder} passed in with extra stuff in it
    */
   public StringBuilder toStringBuilder(StringBuilder sb, boolean printOnlyLabelValue) {
     if (isLeaf()) {
@@ -657,7 +661,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * Converts parse tree to string in Penn Treebank format.
    * <p>
    * Implementation note: Internally, the method gains
-   * efficiency by chaining use of a single <code>StringBuilder</code>
+   * efficiency by chaining use of a single {@code StringBuilder}
    * through all the printing.
    *
    * @return the tree as a bracketed list on one line
@@ -724,10 +728,10 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * indented list notation, with nodel labels followed by node scores.
    * String parameters are used rather than integer levels for efficiency.
    *
-   * @param indent The base <code>String</code> (normally just spaces)
+   * @param indent The base {@code String} (normally just spaces)
    *               to print before each line of tree
-   * @param pad    The additional <code>String</code> (normally just more
-   *               spaces) to add when going to a deeper level of <code>Tree</code>.
+   * @param pad    The additional {@code String} (normally just more
+   *               spaces) to add when going to a deeper level of {@code Tree}.
    * @param pw     The PrintWriter to print the tree to
    * @param printScores Whether to print the scores (log probs) of tree nodes
    */
@@ -744,9 +748,9 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     pw.println(sb.toString());
     Tree[] children = children();
     String newIndent = indent + pad;
-    for (int i = 0, n = children.length; i < n; i++) {
-      children[i].indentedListPrint(newIndent, pad, pw, printScores);
-    }
+      for (Tree aChildren : children) {
+          aChildren.indentedListPrint(newIndent, pad, pw, printScores);
+      }
   }
 
   /**
@@ -775,11 +779,11 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * indented xml notation, with nodel labels followed by node scores.
    * String parameters are used rather than integer levels for efficiency.
    *
-   * @param indent The base <code>String</code> (normally just spaces)
+   * @param indent The base {@code String} (normally just spaces)
    *               to print before each line of tree
-   * @param pad    The additional <code>String</code> (normally just more
+   * @param pad    The additional {@code String} (normally just more
    *               spaces) to add when going to a deeper level of
-   *               <code>Tree</code>.
+   *               {@code Tree}.
    * @param pw     The PrintWriter to print the tree to
    * @param printScores Whether to print the scores (log probs) of tree nodes
    */
@@ -789,14 +793,14 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     Tree[] children = children();
     Label label = label();
     if (label != null) {
-      sb.append("<");
+      sb.append('<');
       sb.append(XMLUtils.escapeXML(Sentence.wordToString(label, true)));
       if (printScores) {
         sb.append(" score=");
         sb.append(score());
       }
       if (children.length > 0) {
-        sb.append(">");
+        sb.append('>');
       } else {
         sb.append("/>");
       }
@@ -804,14 +808,14 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     pw.println(sb.toString());
     if (children.length > 0) {
       String newIndent = indent + pad;
-      for (int i = 0, n = children.length; i < n; i++) {
-        children[i].indentedXMLPrint(newIndent, pad, pw, printScores);
-      }
+        for (Tree aChildren : children) {
+            aChildren.indentedXMLPrint(newIndent, pad, pw, printScores);
+        }
       if (label != null) {
         sb = new StringBuilder(indent);
         sb.append("</");
         sb.append(XMLUtils.escapeXML(Sentence.wordToString(label, true)));
-        sb.append(">");
+        sb.append('>');
         pw.println(sb.toString());
       }
     }
@@ -834,13 +838,13 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    *  Returns the value of the nodes label as a String.  This is done by
-   *  calling <code>toString()</code> on the value, if it exists. Otherwise,
+   *  calling {@code toString()} on the value, if it exists. Otherwise,
    *  an empty string is returned.
    *
    *  @return The label of a tree node as a String
    */
   public String nodeString() {
-    return (value() == null) ? "" : value();
+    return value() == null ? "" : value();
   }
 
   public static boolean DISPLAY_SCORES = true;
@@ -850,7 +854,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    */
   private void display(int indent, boolean parentLabelNull, boolean firstSibling, boolean leftSiblingPreTerminal, boolean topLevel, boolean onlyLabelValue, PrintWriter pw) {
     // the condition for staying on the same line in Penn Treebank
-    boolean suppressIndent = (parentLabelNull || (firstSibling && isPreTerminal()) || (leftSiblingPreTerminal && isPreTerminal() && (label() == null || !label().value().startsWith("CC"))));
+    boolean suppressIndent = parentLabelNull || firstSibling && isPreTerminal() || leftSiblingPreTerminal && isPreTerminal() && (label() == null || !label().value().startsWith("CC"));
     if (suppressIndent) {
       pw.print(" ");
       // pw.flush();
@@ -891,7 +895,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * outer brackets are collapsed onto the same line as the next
    * bracket down.
    *
-   * @param pw The tree is printed to this <code>PrintWriter</code>
+   * @param pw The tree is printed to this {@code PrintWriter}
    */
   public void pennPrint(PrintWriter pw) {
     pennPrint(pw, true);
@@ -915,7 +919,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * outer brackets are collapsed onto the same line as the next
    * bracket down.
    *
-   * @param ps The tree is printed to this <code>PrintStream</code>
+   * @param ps The tree is printed to this {@code PrintStream}
    */
   public void pennPrint(PrintStream ps) {
     pennPrint(new PrintWriter(new OutputStreamWriter(ps), true));
@@ -926,7 +930,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * Calls <code>pennPrint()</code> and saves output to a String
+   * Calls {@code pennPrint()} and saves output to a String
    *
    * @return The indent S-expression representation of a Tree
    */
@@ -940,7 +944,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * Print the tree as done in Penn Treebank merged files.
    * The formatting should be exactly the same, but we don't print the
    * trailing whitespace found in Penn Treebank trees.
-   * The tree is printed to <code>System.out</code>. The basic deviation
+   * The tree is printed to {@code System.out}. The basic deviation
    * from a bracketed indented tree is to in general
    * collapse the printing of adjacent preterminals onto one line of
    * tags and words.  Additional complexities are that conjunctions
@@ -985,10 +989,10 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    */
   public int depth(Tree node) {
     Tree p = node.parent(this);
-    if (this == node) { return 0; }
+    if (this.equals(node)) { return 0; }
     if (p == null) { return -1; }
     int depth = 1;
-    while (this != p) {
+    while (!this.equals(p)) {
       p = p.parent(this);
       depth++;
     }
@@ -996,60 +1000,68 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
 
-  /**
-   * Returns the tree leaf that is the head of the tree.
-   *
-   * @param hf The head-finding algorithm to use
-   * @param parent  The parent of this tree
-   * @return The head tree leaf if any, else <code>null</code>
-   */
-  public Tree headTerminal(HeadFinder hf, Tree parent) {
-    if (isLeaf()) {
-      return this;
+    /**
+     * Returns the tree leaf that is the head of the tree.
+     *
+     * @param hf     The head-finding algorithm to use
+     * @param parent The parent of this tree
+     * @return The head tree leaf if any, else {@code null}
+     */
+    public Tree headTerminal(HeadFinder hf, Tree parent) {
+        Tree result = this;
+        while (true) {
+            if (result.isLeaf()) {
+                return result;
+            }
+            Tree head = hf.determineHead(result, parent);
+            if (head != null) {
+                result = head;
+                continue;
+            }
+            System.err.println("Head is null: " + result);
+            return null;
+        }
     }
-    Tree head = hf.determineHead(this, parent);
-    if (head != null) {
-      return head.headTerminal(hf, parent);
-    }
-    System.err.println("Head is null: " + this);
-    return null;
-  }
 
   /**
    * Returns the tree leaf that is the head of the tree.
    *
    * @param hf The headfinding algorithm to use
-   * @return The head tree leaf if any, else <code>null</code>
+   * @return The head tree leaf if any, else {@code null}
    */
   public Tree headTerminal(HeadFinder hf) {
     return headTerminal(hf, null);
   }
 
 
-  /**
-   * Returns the preterminal tree that is the head of the tree.
-   * See {@link #isPreTerminal()} for
-   * the definition of a preterminal node. Beware that some tree nodes may
-   * have no preterminal head.
-   *
-   * @param hf The headfinding algorithm to use
-   * @return The head preterminal tree, if any, else <code>null</code>
-   * @throws IllegalArgumentException if called on a leaf node
-   */
-  public Tree headPreTerminal(HeadFinder hf) {
-    if (isPreTerminal()) {
-      return this;
-    } else if (isLeaf()) {
-      throw new IllegalArgumentException("Called headPreTerminal on a leaf: " + this);
-    } else {
-      Tree head = hf.determineHead(this);
-      if (head != null) {
-        return head.headPreTerminal(hf);
-      }
-      System.err.println("Head preterminal is null: " + this);
-      return null;
+    /**
+     * Returns the preterminal tree that is the head of the tree.
+     * See {@link #isPreTerminal()} for
+     * the definition of a preterminal node. Beware that some tree nodes may
+     * have no preterminal head.
+     *
+     * @param hf The headfinding algorithm to use
+     * @return The head preterminal tree, if any, else {@code null}
+     * @throws IllegalArgumentException if called on a leaf node
+     */
+    public Tree headPreTerminal(HeadFinder hf) {
+        Tree result = this;
+        while (true) {
+            if (result.isPreTerminal()) {
+                return result;
+            } else if (result.isLeaf()) {
+                throw new IllegalArgumentException("Called headPreTerminal on a leaf: " + result);
+            } else {
+                Tree head = hf.determineHead(result);
+                if (head != null) {
+                    result = head;
+                    continue;
+                }
+                System.err.println("Head preterminal is null: " + result);
+                return null;
+            }
+        }
     }
-  }
 
 
   /**
@@ -1078,19 +1090,19 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
         kid.percolateHeads(hf);
       }
 
-      final Tree head = hf.determineHead(this);
+      Tree head = hf.determineHead(this);
       if (head != null) {
-        final Label headLabel = head.label();
+        Label headLabel = head.label();
 
         // Set the head tag.
-        String headTag = (headLabel instanceof HasTag) ? ((HasTag) headLabel).tag() : null;
+        String headTag = headLabel instanceof HasTag ? ((HasTag) headLabel).tag() : null;
         if (headTag == null && head.isLeaf()) {
           // below us is a leaf
           headTag = nodeLabel.value();
         }
 
         // Set the head word
-        String headWord = (headLabel instanceof HasWord) ? ((HasWord) headLabel).word() : null;
+        String headWord = headLabel instanceof HasWord ? ((HasWord) headLabel).word() : null;
         if (headWord == null && head.isLeaf()) {
           // below us is a leaf
           // this might be useful despite case for leaf above in
@@ -1099,7 +1111,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
         }
 
         // Set the head index
-        int headIndex = (headLabel instanceof HasIndex) ? ((HasIndex) headLabel).index() : -1;
+        int headIndex = headLabel instanceof HasIndex ? ((HasIndex) headLabel).index() : -1;
 
         if (nodeLabel instanceof HasWord) {
           ((HasWord) nodeLabel).setWord(headWord);
@@ -1147,7 +1159,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     if ( ! copyLabel)
       return oldLabel;
 
-    String wordForm = (oldLabel instanceof HasWord) ? ((HasWord) oldLabel).word() : oldLabel.value();
+    String wordForm = oldLabel instanceof HasWord ? ((HasWord) oldLabel).word() : oldLabel.value();
     Label newLabel = oldLabel.labelFactory().newLabel(wordForm);
     if (newLabel instanceof HasWord) ((HasWord) newLabel).setWord(wordForm);
     if (copyPosTag && newLabel instanceof HasTag && oldLabel instanceof HasTag) {
@@ -1185,7 +1197,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
       if (headWord == null) {
         headWord = headLabel.value();
       }
-      int headIndex = (isConcrete && (headLabel instanceof HasIndex)) ? ((HasIndex) headLabel).index() : -1;
+      int headIndex = isConcrete && headLabel instanceof HasIndex ? ((HasIndex) headLabel).index() : -1;
 
       // every child with a different (or repeated) head is an argument
       boolean seenHead = false;
@@ -1195,12 +1207,12 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
         if (depWord == null) {
           depWord = depLabel.value();
         }
-        int depIndex = (isConcrete && (depLabel instanceof HasIndex)) ? ((HasIndex) depLabel).index() : -1;
+        int depIndex = isConcrete && depLabel instanceof HasIndex ? ((HasIndex) depLabel).index() : -1;
 
         if (!seenHead && headIndex == depIndex && headWord.equals(depWord)) {
           seenHead = true;
         } else {
-          Dependency<Label, Label, Object> dependency = (isConcrete && depIndex != headIndex) ?
+          Dependency<Label, Label, Object> dependency = isConcrete && depIndex != headIndex ?
               new UnnamedConcreteDependency(headLabel, depLabel) :
               new UnnamedDependency(headLabel, depLabel);
 
@@ -1222,10 +1234,10 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *           accepted by the Filter
    * @param hf The HeadFinder to use to identify the head of constituents.
    *           The code assumes
-   *           that it can use <code>headPreTerminal(hf)</code> to find a
+   *           that it can use {@code headPreTerminal(hf)} to find a
    *           tag and word to make a CoreLabel.
-   * @return Set of dependencies (each a <code>Dependency</code> between two
-   *           <code>CoreLabel</code>s, which each contain a tag(), word(),
+   * @return Set of dependencies (each a {@code Dependency} between two
+   *           {@code CoreLabel}s, which each contain a tag(), word(),
    *           and value(), the last two of which are identical).
    */
   public Set<Dependency<Label, Label, Object>> mapDependencies(Filter<Dependency<Label, Label, Object>> f, HeadFinder hf) {
@@ -1255,7 +1267,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
         }
         //System.err.println("kid is " + dl);
          //System.err.println("transformed to " + dml.toString("value{map}"));
-        if (dwt != hwt) {
+        if (!dwt.equals(hwt)) {
           Dependency<Label, Label, Object> p = new UnnamedDependency(hwt.label(), dwt.label());
           if (f.accept(p)) {
             deps.add(p);
@@ -1276,11 +1288,11 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *           accepted by the Filter
    * @param hf The HeadFinder to use to identify the head of constituents.
    *           The code assumes
-   *           that it can use <code>headPreTerminal(hf)</code> to find a
+   *           that it can use {@code headPreTerminal(hf)} to find a
    *           tag and word to make a CoreLabel.
    * @param    rootName Name of the root node.
-   * @return   Set of dependencies (each a <code>Dependency</code> between two
-   *           <code>CoreLabel</code>s, which each contain a tag(), word(),
+   * @return Set of dependencies (each a {@code Dependency} between two
+   *           {@code CoreLabel}s, which each contain a tag(), word(),
    *           and value(), the last two of which are identical).
    */
   public Set<Dependency<Label, Label, Object>> mapDependencies(Filter<Dependency<Label, Label, Object>> f, HeadFinder hf, String rootName) {
@@ -1296,20 +1308,20 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * Gets the yield of the tree.  The <code>Label</code> of all leaf nodes
+   * Gets the yield of the tree.  The {@code Label} of all leaf nodes
    * is returned
    * as a list ordered by the natural left to right order of the
    * leaves.  Null values, if any, are inserted into the list like any
    * other value.
    *
-   * @return a <code>List</code> of the data in the tree's leaves.
+   * @return a {@code List} of the data in the tree's leaves.
    */
   public ArrayList<Label> yield() {
     return yield(new ArrayList<Label>());
   }
 
   /**
-   * Gets the yield of the tree.  The <code>Label</code> of all leaf nodes
+   * Gets the yield of the tree.  The {@code Label} of all leaf nodes
    * is returned
    * as a list ordered by the natural left to right order of the
    * leaves.  Null values, if any, are inserted into the list like any
@@ -1322,7 +1334,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @param y The list in which the yield of the tree will be placed.
    *          Normally, this will be empty when the routine is called, but
    *          if not, the new yield is added to the end of the list.
-   * @return a <code>List</code> of the data in the tree's leaves.
+   * @return a {@code List} of the data in the tree's leaves.
    */
   public ArrayList<Label> yield(ArrayList<Label> y) {
     if (isLeaf()) {
@@ -1330,9 +1342,9 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
     } else {
       Tree[] kids = children();
-      for (int i = 0; i < kids.length; i++) {
-        kids[i].yield(y);
-      }
+        for (Tree kid : kids) {
+            kid.yield(y);
+        }
     }
     return y;
   }
@@ -1382,16 +1394,16 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
     } else {
       Tree[] kids = children();
-      for (int i = 0; i < kids.length; i++) {
-        kids[i].yield(y);
-      }
+        for (Tree kid : kids) {
+            kid.yield(y);
+        }
     }
     return y;
   }
 
 
   /**
-   * Gets the yield of the tree.  The <code>Label</code> of all leaf nodes
+   * Gets the yield of the tree.  The {@code Label} of all leaf nodes
    * is returned
    * as a list ordered by the natural left to right order of the
    * leaves.  Null values, if any, are inserted into the list like any
@@ -1401,7 +1413,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @param y The list in which the yield of the tree will be placed.
    *          Normally, this will be empty when the routine is called, but
    *          if not, the new yield is added to the end of the list.
-   * @return a <code>List</code> of the data in the tree's leaves.
+   * @return a {@code List} of the data in the tree's leaves.
    */
   @SuppressWarnings("unchecked")
   public <T> List<T> yield(List<T> y) {
@@ -1414,21 +1426,21 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
     } else {
       Tree[] kids = children();
-      for (int i = 0; i < kids.length; i++) {
-        kids[i].yield(y);
-      }
+        for (Tree kid : kids) {
+            kid.yield(y);
+        }
     }
     return y;
   }
 
   /**
    * Gets the tagged yield of the tree.
-   * The <code>Label</code> of all leaf nodes is returned
+   * The {@code Label} of all leaf nodes is returned
    * as a list ordered by the natural left to right order of the
    * leaves.  Null values, if any, are inserted into the list like any
    * other value.
    *
-   * @return a <code>List</code> of the data in the tree's leaves.
+   * @return a {@code List} of the data in the tree's leaves.
    */
   public ArrayList<TaggedWord> taggedYield() {
     return taggedYield(new ArrayList<TaggedWord>());
@@ -1440,7 +1452,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Gets the tagged yield of the tree -- that is, get the preterminals
-   * as well as the terminals.  The <code>Label</code> of all leaf nodes
+   * as well as the terminals.  The {@code Label} of all leaf nodes
    * is returned
    * as a list ordered by the natural left to right order of the
    * leaves.  Null values, if any, are inserted into the list like any
@@ -1453,7 +1465,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @param ty The list in which the tagged yield of the tree will be
    *           placed. Normally, this will be empty when the routine is called,
    *           but if not, the new yield is added to the end of the list.
-   * @return a <code>List</code> of the data in the tree's leaves.
+   * @return a {@code List} of the data in the tree's leaves.
    */
   public <X extends List<TaggedWord>> X taggedYield(X ty) {
     Tree[] kids = children();
@@ -1482,7 +1494,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   public List<CoreLabel> taggedLabeledYield() {
-  	List<CoreLabel> ty = new ArrayList<CoreLabel>();
+  	List<CoreLabel> ty = new ArrayList<>();
   	taggedLabeledYield(ty,0);
   	return ty;
   }
@@ -1490,7 +1502,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   private int taggedLabeledYield(List<CoreLabel> ty, int termIdx) {
   	if(isPreTerminal()) {
   		CoreLabel taggedWord = new CoreLabel();
-  		final String tag = (value() == null) ? "" : value();
+  		String tag = value() == null ? "" : value();
   		taggedWord.setValue(tag);
   		taggedWord.setTag(tag);
   		taggedWord.setIndex(termIdx);
@@ -1513,7 +1525,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * right order of the tree.  Null values, if any, are inserted into the
    * list like any other value.  Pre-leaves are nodes of height 1.
    *
-   * @return a <code>List</code> of the data in the tree's pre-leaves.
+   * @return a {@code List} of the data in the tree's pre-leaves.
    */
   public List<Label> preTerminalYield() {
     return preTerminalYield(new ArrayList<Label>());
@@ -1529,16 +1541,16 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @param y The list in which the preterminals of the tree will be
    *          placed. Normally, this will be empty when the routine is called,
    *          but if not, the new yield is added to the end of the list.
-   * @return a <code>List</code> of the data in the tree's pre-leaves.
+   * @return a {@code List} of the data in the tree's pre-leaves.
    */
   public List<Label> preTerminalYield(List<Label> y) {
     if (isPreTerminal()) {
       y.add(label());
     } else {
       Tree[] kids = children();
-      for (int i = 0; i < kids.length; i++) {
-        kids[i].preTerminalYield(y);
-      }
+        for (Tree kid : kids) {
+            kid.preTerminalYield(y);
+        }
     }
     return y;
   }
@@ -1548,7 +1560,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * ordered by the natural left to right order of the tree.  Null values,
    * if any, are inserted into the list like any other value.
    *
-   * @return a <code>List</code> of the leaves.
+   * @return a {@code List} of the leaves.
    */
   public <T extends Tree> List<T> getLeaves() {
     return getLeaves(new ArrayList<T>());
@@ -1560,7 +1572,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @param list The list in which the leaves of the tree will be
    *             placed. Normally, this will be empty when the routine is called,
    *             but if not, the new yield is added to the end of the list.
-   * @return a <code>List</code> of the leaves.
+   * @return a {@code List} of the leaves.
    */
   @SuppressWarnings("unchecked")
   public <T extends Tree> List<T> getLeaves(List<T> list) {
@@ -1576,19 +1588,19 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
 
   /**
-   * Get the set of all node and leaf <code>Label</code>s,
+   * Get the set of all node and leaf {@code Label}s,
    * null or otherwise, contained in the tree.
    *
-   * @return the <code>Collection</code> (actually, Set) of all values
+   * @return the {@code Collection} (actually, Set) of all values
    *         in the tree.
    */
   public Collection<Label> labels() {
     Set<Label> n = Generics.newHashSet();
     n.add(label());
     Tree[] kids = children();
-    for (int i = 0; i < kids.length; i++) {
-      n.addAll(kids[i].labels());
-    }
+      for (Tree kid : kids) {
+          n.addAll(kid.labels());
+      }
     return n;
   }
 
@@ -1604,8 +1616,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * binarized version of a dependency grammar tree, then it will be
    * flattened back to a dependency grammar tree representation.  Formally,
    * a node will be removed from the tree when: it is not a terminal or
-   * preterminal, and its <code>label()</code is <code>equal()</code> to
-   * the <code>label()</code> of its parent, and all its children will
+   * preterminal, and its <code>label()</code is {@code equal()} to
+   * the {@code label()} of its parent, and all its children will
    * then be promoted to become children of the parent (in the same
    * position in the sequence of daughters.
    *
@@ -1621,8 +1633,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * binarized version of a dependency grammar tree, then it will be
    * flattened back to a dependency grammar tree representation.  Formally,
    * a node will be removed from the tree when: it is not a terminal or
-   * preterminal, and its <code>label()</code is <code>equal()</code> to
-   * the <code>label()</code> of its parent, and all its children will
+   * preterminal, and its <code>label()</code is {@code equal()} to
+   * the {@code label()} of its parent, and all its children will
    * then be promoted to become children of the parent (in the same
    * position in the sequence of daughters. <p>
    * Note: In the current implementation, the tree structure is mainly
@@ -1636,20 +1648,19 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
       return this;
     }
     Tree[] kids = children();
-    List<Tree> newChildren = new ArrayList<Tree>(kids.length);
-    for (int c = 0; c < kids.length; c++) {
-      Tree child = kids[c];
-      if (child.isLeaf() || child.isPreTerminal()) {
-        newChildren.add(child);
-      } else {
-        Tree newChild = child.flatten(tf);
-        if (label().equals(newChild.label())) {
-          newChildren.addAll(newChild.getChildrenAsList());
-        } else {
-          newChildren.add(newChild);
-        }
+    List<Tree> newChildren = new ArrayList<>(kids.length);
+      for (Tree child : kids) {
+          if (child.isLeaf() || child.isPreTerminal()) {
+              newChildren.add(child);
+          } else {
+              Tree newChild = child.flatten(tf);
+              if (label().equals(newChild.label())) {
+                  newChildren.addAll(newChild.getChildrenAsList());
+              } else {
+                  newChildren.add(newChild);
+              }
+          }
       }
-    }
     return tf.newTreeNode(label(), newChildren);
   }
 
@@ -1664,7 +1675,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * own <code>iterator() method. This will iterate over the exact same
    * elements (but perhaps/probably in a different order).
    *
-   * @return the <code>Set</code> of all subtrees in the tree.
+   * @return the {@code Set} of all subtrees in the tree.
    */
   public Set<Tree> subTrees() {
     return subTrees(Generics.<Tree>newHashSet());
@@ -1680,7 +1691,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * own <code>iterator() method. This will iterate over the exact same
    * elements (but perhaps/probably in a different order).
    *
-   * @return the <code>List</code> of all subtrees in the tree.
+   * @return the {@code List} of all subtrees in the tree.
    */
   public List<Tree> subTreeList() {
     return subTrees(new ArrayList<Tree>());
@@ -1689,7 +1700,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Add the set of all subtrees inside a tree (including the tree itself)
-   * to the given <code>Collection</code>.
+   * to the given {@code Collection}.
    * <p/>
    * <i>Note:</i> If you only want to form this Collection so that you can
    * iterate over it, it is more efficient to simply use the Tree class's
@@ -1702,9 +1713,9 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   public <T extends Collection<Tree>> T subTrees(T n) {
     n.add(this);
     Tree[] kids = children();
-    for (int i = 0; i < kids.length; i++) {
-      kids[i].subTrees(n);
-    }
+      for (Tree kid : kids) {
+          kid.subTrees(n);
+      }
     return n;
   }
 
@@ -1754,7 +1765,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *         Labels of the original tree.
    */
 
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public Tree deepCopy(TreeFactory tf, LabelFactory lf) {
     Label label = lf.newLabel(label());
     if (isLeaf()) {
@@ -1773,8 +1784,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   /**
    * Create a deep copy of the tree structure.  The entire structure is
    * recursively copied, but label data themselves are not cloned.
-   * The copy is built using a <code>TreeFactory</code> that will
-   * produce a <code>Tree</code> like the input one.
+   * The copy is built using a {@code TreeFactory} that will
+   * produce a {@code Tree} like the input one.
    *
    * @return A deep copy of the tree structure (but not its labels).
    */
@@ -1786,11 +1797,11 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   /**
    * Create a deep copy of the tree structure.  The entire structure is
    * recursively copied, but label data themselves are not cloned.
-   * By specifying an appropriate <code>TreeFactory</code>, this
-   * method can be used to change the type of a <code>Tree</code>.
+   * By specifying an appropriate {@code TreeFactory}, this
+   * method can be used to change the type of a {@code Tree}.
    *
-   * @param tf The <code>TreeFactory</code> to be used for creating
-   *           the returned <code>Tree</code>
+   * @param tf The {@code TreeFactory} to be used for creating
+   *           the returned {@code Tree}
    * @return A deep copy of the tree structure (but not its labels).
    */
   public Tree treeSkeletonCopy(TreeFactory tf) {
@@ -1799,7 +1810,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
       t = tf.newLeaf(label());
     } else {
       Tree[] kids = children();
-      List<Tree> newKids = new ArrayList<Tree>(kids.length);
+      List<Tree> newKids = new ArrayList<>(kids.length);
       for (Tree kid : kids) {
         newKids.add(kid.treeSkeletonCopy(tf));
       }
@@ -1811,38 +1822,38 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Create a transformed Tree.  The tree is traversed in a depth-first,
-   * left-to-right order, and the <code>TreeTransformer</code> is called
-   * on each node.  It returns some <code>Tree</code>.  The transformed
+   * left-to-right order, and the {@code TreeTransformer} is called
+   * on each node.  It returns some {@code Tree}.  The transformed
    * tree has a new tree structure (i.e., a "deep copy" is done), but it
    * will usually share its labels with the original tree.
    *
    * @param transformer The function that transforms tree nodes or subtrees
-   * @return a transformation of this <code>Tree</code>
+   * @return a transformation of this {@code Tree}
    */
-  public Tree transform(final TreeTransformer transformer) {
+  public Tree transform(TreeTransformer transformer) {
     return transform(transformer, treeFactory());
   }
 
 
   /**
    * Create a transformed Tree.  The tree is traversed in a depth-first,
-   * left-to-right order, and the <code>TreeTransformer</code> is called
-   * on each node.  It returns some <code>Tree</code>.  The transformed
+   * left-to-right order, and the {@code TreeTransformer} is called
+   * on each node.  It returns some {@code Tree}.  The transformed
    * tree has a new tree structure (i.e., a deep copy of the structure of the tree is done), but it
    * will usually share its labels with the original tree.
    *
    * @param transformer The function that transforms tree nodes or subtrees
-   * @param tf          The <code>TreeFactory</code> which will be used for creating
-   *                    new nodes for the returned <code>Tree</code>
-   * @return a transformation of this <code>Tree</code>
+   * @param tf          The {@code TreeFactory} which will be used for creating
+   *                    new nodes for the returned {@code Tree}
+   * @return a transformation of this {@code Tree}
    */
-  public Tree transform(final TreeTransformer transformer, final TreeFactory tf) {
+  public Tree transform(TreeTransformer transformer, TreeFactory tf) {
     Tree t;
     if (isLeaf()) {
       t = tf.newLeaf(label());
     } else {
       Tree[] kids = children();
-      List<Tree> newKids = new ArrayList<Tree>(kids.length);
+      List<Tree> newKids = new ArrayList<>(kids.length);
       for (Tree kid : kids) {
         newKids.add(kid.transform(transformer, tf));
       }
@@ -1861,7 +1872,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *                   keep this node, false to mean delete it
    * @return a filtered copy of the tree
    */
-  public Tree spliceOut(final Filter<Tree> nodeFilter) {
+  public Tree spliceOut(Filter<Tree> nodeFilter) {
     return spliceOut(nodeFilter, treeFactory());
   }
 
@@ -1869,21 +1880,21 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   /**
    * Creates a (partial) deep copy of the tree, where all nodes that the
    * filter does not accept are spliced out.  That is, the particular
-   * modes for which the <code>Filter</code> returns <code>false</code>
-   * are removed from the <code>Tree</code>, but those nodes' children
-   * are kept (assuming they pass the <code>Filter</code>, and they are
+   * modes for which the {@code Filter} returns {@code false}
+   * are removed from the {@code Tree}, but those nodes' children
+   * are kept (assuming they pass the {@code Filter}, and they are
    * added in the appropriate left-to-right ordering as new children of
    * the parent node.  If the root node is deleted, so that the result
    * would not be a tree (that is, it's a forest), an empty root node is
-   * generated.  If nothing is accepted, <code>null</code> is returned.
+   * generated.  If nothing is accepted, {@code null} is returned.
    *
    * @param nodeFilter a Filter method which returns true to mean
    *                   keep this node, false to mean delete it
-   * @param tf         A <code>TreeFactory</code> for making new trees. Used if
+   * @param tf         A {@code TreeFactory} for making new trees. Used if
    *                   the root node is deleted.
    * @return a filtered copy of the tree.
    */
-  public Tree spliceOut(final Filter<Tree> nodeFilter, final TreeFactory tf) {
+  public Tree spliceOut(Filter<Tree> nodeFilter, TreeFactory tf) {
     List<Tree> l = spliceOutHelper(nodeFilter, tf);
     if (l.isEmpty()) {
       return null;
@@ -1898,7 +1909,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   private List<Tree> spliceOutHelper(Filter<Tree> nodeFilter, TreeFactory tf) {
     // recurse over all children first
     Tree[] kids = children();
-    List<Tree> l = new ArrayList<Tree>();
+    List<Tree> l = new ArrayList<>();
     for (Tree kid : kids) {
       l.addAll(kid.spliceOutHelper(nodeFilter, tf));
     }
@@ -1906,12 +1917,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     if (nodeFilter.accept(this)) {
       // no, so add our children and return
       Tree t;
-      if ( ! l.isEmpty()) {
-        t = tf.newTreeNode(label(), l);
-      } else {
-        t = tf.newLeaf(label());
-      }
-      l = new ArrayList<Tree>(1);
+        t = !l.isEmpty() ? tf.newTreeNode(label(), l) : tf.newLeaf(label());
+      l = new ArrayList<>(1);
       l.add(t);
       return l;
     }
@@ -1924,8 +1931,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * Creates a deep copy of the tree, where all nodes that the filter
    * does not accept and all children of such nodes are pruned.  If all
    * of a node's children are pruned, that node is cut as well.
-   * A <code>Filter</code> can assume
-   * that it will not be called with a <code>null</code> argument.
+   * A {@code Filter} can assume
+   * that it will not be called with a {@code null} argument.
    * <p/>
    * For example, the following code excises all PP nodes from a Tree: <br>
    * <tt>
@@ -1941,9 +1948,9 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *
    * @param filter the filter to be applied
    * @return a filtered copy of the tree, including the possibility of
-   *         <code>null</code> if the root node of the tree is filtered
+   *         {@code null} if the root node of the tree is filtered
    */
-  public Tree prune(final Filter<Tree> filter) {
+  public Tree prune(Filter<Tree> filter) {
     return prune(filter, treeFactory());
   }
 
@@ -1952,13 +1959,13 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * Creates a deep copy of the tree, where all nodes that the filter
    * does not accept and all children of such nodes are pruned.  If all
    * of a node's children are pruned, that node is cut as well.
-   * A <code>Filter</code> can assume
-   * that it will not be called with a <code>null</code> argument.
+   * A {@code Filter} can assume
+   * that it will not be called with a {@code null} argument.
    *
    * @param filter the filter to be applied
    * @param tf     the TreeFactory to be used to make new Tree nodes if needed
    * @return a filtered copy of the tree, including the possibility of
-   *         <code>null</code> if the root node of the tree is filtered
+   *         {@code null} if the root node of the tree is filtered
    */
   public Tree prune(Filter<Tree> filter, TreeFactory tf) {
     // is the current node to be pruned?
@@ -1966,14 +1973,14 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
       return null;
     }
     // if not, recurse over all children
-    List<Tree> l = new ArrayList<Tree>();
+    List<Tree> l = new ArrayList<>();
     Tree[] kids = children();
-    for (int i = 0; i < kids.length; i++) {
-      Tree prunedChild = kids[i].prune(filter, tf);
-      if (prunedChild != null) {
-        l.add(prunedChild);
+      for (Tree kid : kids) {
+          Tree prunedChild = kid.prune(filter, tf);
+          if (prunedChild != null) {
+              l.add(prunedChild);
+          }
       }
-    }
     // and check if this node has lost all its children
     if (l.isEmpty() && !(kids.length == 0)) {
       return null;
@@ -1994,11 +2001,11 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     if(!isUnaryRewrite())
       return this;
     String lab = label().value();
-    return (lab == null || "ROOT".equals(lab) || "".equals(lab)) ? firstChild() : this;
+    return lab == null || "ROOT".equals(lab) || lab != null && lab.isEmpty() ? firstChild() : this;
   }
 
   /**
-   * Return a <code>TreeFactory</code> that produces trees of the
+   * Return a {@code TreeFactory} that produces trees of the
    * appropriate type.
    *
    * @return A factory to produce Trees
@@ -2008,11 +2015,11 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Return the parent of the tree node.  This routine may return
-   * <code>null</code> meaning simply that the implementation doesn't
+   * {@code null} meaning simply that the implementation doesn't
    * know how to determine the parent node, rather than there is no
    * such node.
    *
-   * @return The parent <code>Tree</code> node or <code>null</code>
+   * @return The parent {@code Tree} node or {@code null}
    * @see Tree#parent(Tree)
    */
   public Tree parent() {
@@ -2022,15 +2029,15 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Return the parent of the tree node.  This routine will traverse
-   * a tree (depth first) from the given <code>root</code>, and will
+   * a tree (depth first) from the given {@code root}, and will
    * correctly find the parent, regardless of whether the concrete
-   * class stores parents.  It will only return <code>null</code> if this
-   * node is the <code>root</code> node, or if this node is not
-   * contained within the tree rooted at <code>root</code>.
+   * class stores parents.  It will only return {@code null} if this
+   * node is the {@code root} node, or if this node is not
+   * contained within the tree rooted at {@code root}.
    *
    * @param root The root node of the whole Tree
-   * @return the parent <code>Tree</code> node if any;
-   *         else <code>null</code>
+   * @return the parent {@code Tree} node if any;
+   *         else {@code null}
    */
   public Tree parent(Tree root) {
     Tree[] kids = root.children();
@@ -2039,23 +2046,23 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
 
   private static Tree parentHelper(Tree parent, Tree[] kids, Tree node) {
-    for (int i = 0, n = kids.length; i < n; i++) {
-      if (kids[i] == node) {
-        return parent;
+      for (Tree kid : kids) {
+          if (kid.equals(node)) {
+              return parent;
+          }
+          Tree ret = node.parent(kid);
+          if (ret != null) {
+              return ret;
+          }
       }
-      Tree ret = node.parent(kids[i]);
-      if (ret != null) {
-        return ret;
-      }
-    }
     return null;
   }
 
 
   /**
    * Returns the number of nodes the tree contains.  This method
-   * implements the <code>size()</code> function required by the
-   * <code>Collections</code> interface.  The size of the tree is the
+   * implements the {@code size()} function required by the
+   * {@code Collections} interface.  The size of the tree is the
    * number of nodes it contains (of all types, including the leaf nodes
    * and the root).
    *
@@ -2066,35 +2073,39 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   public int size() {
     int size = 1;
     Tree[] kids = children();
-    for (int i = 0, n = kids.length; i < n; i++) {
-      size += kids[i].size();
-    }
+      for (Tree kid : kids) {
+          size += kid.size();
+      }
     return size;
   }
 
-  /**
-   * Return the ancestor tree node <code>height</code> nodes up from the current node.
-   *
-   * @param height How many nodes up to go. A parameter of 0 means return
-   *               this node, 1 means to return the parent node and so on.
-   * @param root The root node that this Tree is embedded under
-   * @return The ancestor at height <code>height</code>.  It returns null
-   *         if it does not exist or the tree implementation does not keep track
-   *         of parents
-   */
-  public Tree ancestor(int height, Tree root) {
-    if (height < 0) {
-      throw new IllegalArgumentException("ancestor: height cannot be negative");
+    /**
+     * Return the ancestor tree node {@code height} nodes up from the current node.
+     *
+     * @param height How many nodes up to go. A parameter of 0 means return
+     *               this node, 1 means to return the parent node and so on.
+     * @param root   The root node that this Tree is embedded under
+     * @return The ancestor at height {@code height}.  It returns null
+     *         if it does not exist or the tree implementation does not keep track
+     *         of parents
+     */
+    public Tree ancestor(int height, Tree root) {
+        Tree result = this;
+        while (true) {
+            if (height < 0) {
+                throw new IllegalArgumentException("ancestor: height cannot be negative");
+            }
+            if (height == 0) {
+                return result;
+            }
+            Tree par = result.parent(root);
+            if (par == null) {
+                return null;
+            }
+            height = height - 1;
+            result = par;
+        }
     }
-    if (height == 0) {
-      return this;
-    }
-    Tree par = parent(root);
-    if (par == null) {
-      return null;
-    }
-    return par.ancestor(height - 1, root);
-  }
 
 
   private static class TreeIterator implements Iterator<Tree> {
@@ -2102,12 +2113,12 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     private final List<Tree> treeStack;
 
     protected TreeIterator(Tree t) {
-      treeStack = new ArrayList<Tree>();
+      treeStack = new ArrayList<>();
       treeStack.add(t);
     }
 
     public boolean hasNext() {
-      return (!treeStack.isEmpty());
+      return !treeStack.isEmpty();
     }
 
     public Tree next() {
@@ -2141,8 +2152,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Returns an iterator over all the nodes of the tree.  This method
-   * implements the <code>iterator()</code> method required by the
-   * <code>Collections</code> interface.  It does a preorder
+   * implements the {@code iterator()} method required by the
+   * {@code Collections} interface.  It does a preorder
    * (children after node) traversal of the tree.  (A possible
    * extension to the class at some point would be to allow different
    * traversal orderings via variant iterators.)
@@ -2155,7 +2166,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   public List<Tree> postOrderNodeList() {
-    List<Tree> nodes = new ArrayList<Tree>();
+    List<Tree> nodes = new ArrayList<>();
     postOrderRecurse(this, nodes);
     return nodes;
   }
@@ -2167,7 +2178,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   public List<Tree> preOrderNodeList() {
-    List<Tree> nodes = new ArrayList<Tree>();
+    List<Tree> nodes = new ArrayList<>();
     preOrderRecurse(this, nodes);
     return nodes;
   }
@@ -2180,8 +2191,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * This gives you a tree from a String representation (as a
-   * bracketed Tree, of the kind produced by <code>toString()</code>,
-   * <code>pennPrint()</code>, or as in the Penn Treebank).
+   * bracketed Tree, of the kind produced by {@code toString()},
+   * {@code pennPrint()}, or as in the Penn Treebank).
    * It's not the most efficient thing to do for heavy duty usage.
    * The Tree returned is created by a
    * LabeledScoredTreeReaderFactory. This means that "standard"
@@ -2198,8 +2209,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * This gives you a tree from a String representation (as a
-   * bracketed Tree, of the kind produced by <code>toString()</code>,
-   * <code>pennPrint()</code>, or as in the Penn Treebank.
+   * bracketed Tree, of the kind produced by {@code toString()},
+   * {@code pennPrint()}, or as in the Penn Treebank.
    * It's not the most efficient thing to do for heavy duty usage.
    *
    * @param str The tree as a bracketed list in a String.
@@ -2242,11 +2253,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     Tree kid = kids[i];
     Tree[] newKids = new Tree[kids.length - 1];
     for (int j = 0; j < newKids.length; j++) {
-      if (j < i) {
-        newKids[j] = kids[j];
-      } else {
-        newKids[j] = kids[j + 1];
-      }
+        newKids[j] = j < i ? kids[j] : kids[j + 1];
     }
     setChildren(newKids);
     return kid;
@@ -2283,7 +2290,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * Replaces the <code>i</code>th child of <code>this</code> with the tree t.
+   * Replaces the {@code i}th child of {@code this} with the tree t.
    * Note
    * that this method will throw an {@link ArrayIndexOutOfBoundsException} if
    * the child index is too big for the list of children.
@@ -2300,7 +2307,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * Returns true if <code>this</code> dominates the Tree passed in
+   * Returns true if {@code this} dominates the Tree passed in
    * as an argument.  Object equality (==) rather than .equals() is used
    * to determine domination.
    * t.dominates(t) returns false.
@@ -2311,8 +2318,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Returns the path of nodes leading down to a dominated node,
-   * including <code>this</code> and the dominated node itself.
-   * Returns null if t is not dominated by <code>this</code>.  Object
+   * including {@code this} and the dominated node itself.
+   * Returns null if t is not dominated by {@code this}.  Object
    * equality (==) is the relevant criterion.
    * t.dominationPath(t) returns null.
    */
@@ -2342,7 +2349,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   private Tree[] dominationPath(Tree t, int depth) {
-    if (this == t) {
+    if (this.equals(t)) {
       Tree[] result = new Tree[depth + 1];
       result[depth] = this;
       return result;
@@ -2351,7 +2358,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * Given nodes <code>t1</code> and <code>t2</code> which are
+   * Given nodes {@code t1} and {@code t2} which are
    * dominated by this node, returns a list of all the nodes on the
    * path from t1 to t2, inclusive, or null if none found.
    */
@@ -2359,7 +2366,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     if (!contains(t1) || !contains(t2)) {
       return null;
     }
-    if (t1 == t2) {
+    if (t1.equals(t2)) {
       return Collections.singletonList(t1);
     }
     if (t1.dominates(t2)) {
@@ -2379,7 +2386,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     if (t1DomPath == null || t2DomPath == null) {
       return null;
     }
-    ArrayList<Tree> path = new ArrayList<Tree>();
+    ArrayList<Tree> path = new ArrayList<>();
     path.addAll(t1DomPath);
     Collections.reverse(path);
     path.remove(joinNode);
@@ -2388,20 +2395,20 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * Given nodes <code>t1</code> and <code>t2</code> which are
+   * Given nodes {@code t1} and {@code t2} which are
    * dominated by this node, returns their "join node": the node
-   * <code>j</code> such that <code>j</code> dominates both
-   * <code>t1</code> and <code>t2</code>, and every other node which
-   * dominates both <code>t1</code> and <code>t2</code>
-   * dominates <code>j</code>.
+   * {@code j} such that {@code j} dominates both
+   * {@code t1} and {@code t2}, and every other node which
+   * dominates both {@code t1} and {@code t2}
+   * dominates {@code j}.
    * In the special case that t1 dominates t2, return t1, and vice versa.
-   * Return <code>null</code> if no such node can be found.
+   * Return {@code null} if no such node can be found.
    */
   public Tree joinNode(Tree t1, Tree t2) {
     if (!contains(t1) || !contains(t2)) {
       return null;
     }
-    if (this == t1 || this == t2) {
+    if (this.equals(t1) || this.equals(t2)) {
       return this;
     }
     Tree joinNode = null;
@@ -2415,7 +2422,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     while (it1.hasNext() && it2.hasNext()) {
       Tree n1 = it1.next();
       Tree n2 = it2.next();
-      if (n1 != n2) {
+      if (!n1.equals(n2)) {
         break;
       }
       joinNode = n1;
@@ -2435,7 +2442,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
       return false;
     }
     for (Tree sib : sibs) {
-      if (sib == t2 || sib.contains(t2)) {
+      if (sib.equals(t2) || sib.contains(t2)) {
         return true;
       }
     }
@@ -2462,8 +2469,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * insert <code>dtr</code> after <code>position</code> existing
-   * daughters in <code>this</code>.
+   * insert {@code dtr} after {@code position} existing
+   * daughters in {@code this}.
    */
   public void insertDtr(Tree dtr, int position) {
     Tree[] kids = children();
@@ -2513,7 +2520,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Returns a factory that makes labels of the same type as this one.
-   * May return <code>null</code> if no appropriate factory is known.
+   * May return {@code null} if no appropriate factory is known.
    *
    * @return the LabelFactory for this kind of label
    */
@@ -2539,7 +2546,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   private boolean leftCharEdge(Tree node, MutableInteger i) {
-    if (this == node) {
+    if (this.equals(node)) {
       return true;
     } else if (isLeaf()) {
       i.set(i.intValue() + value().length());
@@ -2578,7 +2585,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   private boolean rightCharEdge(Tree node, MutableInteger i) {
-    if (this == node) {
+    if (this.equals(node)) {
       return true;
     } else if (isLeaf()) {
       i.set(i.intValue() - label().value().length());
@@ -2595,9 +2602,9 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Calculates the node's <i>number</i>, defined as the number of nodes traversed in a left-to-right, depth-first search of the
-   * tree starting at <code>root</code> and ending at <code>this</code>.  Returns -1 if <code>root</code> does not contain <code>this</code>.
+   * tree starting at {@code root} and ending at {@code this}.  Returns -1 if {@code root} does not contain {@code this}.
    * @param root the root node of the relevant tree
-   * @return the number of the current node, or -1 if <code>root</code> does not contain <code>this</code>.
+   * @return the number of the current node, or -1 if {@code root} does not contain {@code this}.
    */
   public int nodeNumber(Tree root) {
     MutableInteger i = new MutableInteger(1);
@@ -2607,7 +2614,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   private boolean nodeNumberHelper(Tree t, MutableInteger i) {
-    if(this==t)
+    if(this.equals(t))
       return true;
     i.incValue(1);
     for(int j = 0; j < t.children().length; j++) {
@@ -2618,13 +2625,13 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   /**
-   * Fetches the <code>i</code>th node in the tree, with node numbers defined
+   * Fetches the {@code i}th node in the tree, with node numbers defined
    * as in {@link #nodeNumber(Tree)}.
    *
    * @param i the node number to fetch
-   * @return the <code>i</code>th node in the tree
-   * @throws IndexOutOfBoundsException if <code>i</code> is not between 1 and
-   *    the number of nodes (inclusive) contained in <code>this</code>.
+   * @return the {@code i}th node in the tree
+   * @throws IndexOutOfBoundsException if {@code i} is not between 1 and
+   *    the number of nodes (inclusive) contained in {@code this}.
    */
   public Tree getNodeNumber(int i) {
     return getNodeNumberHelper(new MutableInteger(1),i);
@@ -2647,7 +2654,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Assign sequential integer indices to the leaves of the tree
-   * rooted at this <code>Tree</code>, starting with 1.
+   * rooted at this {@code Tree}, starting with 1.
    * The leaves are traversed from left
    * to right. If the node is already indexed, then it uses the existing index.
    * This will only work if the leaves extend CoreMap.
@@ -2667,8 +2674,8 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Assign sequential integer indices to the leaves of the subtree
-   * rooted at this <code>Tree</code>, beginning with
-   * <code>startIndex</code>, and traversing the leaves from left
+   * rooted at this {@code Tree}, beginning with
+   * {@code startIndex}, and traversing the leaves from left
    * to right. If node is already indexed, then it uses the existing index.
    * This method only works if the labels of the tree implement
    * CoreLabel!
@@ -2763,6 +2770,6 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     CoreLabel afl = (CoreLabel) label();
     afl.set(CoreAnnotations.BeginIndexAnnotation.class, start);
     afl.set(CoreAnnotations.EndIndexAnnotation.class, end);
-    return new Pair<Integer, Integer>(start, end);
+    return new Pair<>(start, end);
   }
 }

@@ -32,7 +32,7 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
   public static CoreMapNodePattern valueOf(Env env, String textAnnotationPattern) {
     CoreMapNodePattern p = new CoreMapNodePattern(new ArrayMap<Class, NodePattern>(1));
     p.annotationPatterns.put(CoreAnnotations.TextAnnotation.class,
-            new StringAnnotationRegexPattern(textAnnotationPattern, (env != null)? env.defaultStringPatternFlags: 0));
+            new StringAnnotationRegexPattern(textAnnotationPattern, env != null ? env.defaultStringPatternFlags: 0));
     return p;
   }
 
@@ -42,39 +42,46 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
 
   public static CoreMapNodePattern valueOf(Env env, Map<String, String> attributes) {
     CoreMapNodePattern p = new CoreMapNodePattern(new ArrayMap<Class,NodePattern>(attributes.size()));
-    for (String attr:attributes.keySet()) {
-      String value = attributes.get(attr);
-      Class c = EnvLookup.lookupAnnotationKey(env, attr);
+    for (Map.Entry<String, String> stringStringEntry : attributes.entrySet()) {
+      String value = stringStringEntry.getValue();
+      Class c = EnvLookup.lookupAnnotationKey(env, stringStringEntry.getKey());
       if (c != null) {
-        if (value.startsWith("\"") && value.endsWith("\"")) {
+        if (!value.isEmpty() && value.charAt(0) == '\"' && !value.isEmpty() && value.charAt(value.length() - 1) == '\"') {
           value = value.substring(1, value.length()-1);
           value = value.replaceAll("\\\\\"", "\""); // Unescape quotes...
           p.annotationPatterns.put(c, new StringAnnotationPattern(value));
-        } else if (value.startsWith("/") && value.endsWith("/")) {
+        } else if (!value.isEmpty() && value.charAt(0) == '/' && !value.isEmpty() && value.charAt(value.length() - 1) == '/') {
           value = value.substring(1, value.length()-1);
           value = value.replaceAll("\\\\/", "/"); // Unescape forward slash
 //          p.annotationPatterns.put(c, new StringAnnotationRegexPattern(value, (env != null)? env.defaultStringPatternFlags: 0));
-          p.annotationPatterns.put(c, new StringAnnotationRegexPattern((env != null)? env.getStringPattern(value): Pattern.compile(value)));
+          p.annotationPatterns.put(c, new StringAnnotationRegexPattern(env != null ? env.getStringPattern(value): Pattern.compile(value)));
         } else if (value.startsWith("::")) {
-          if (value.equals("::IS_NIL") || value.equals("::NOT_EXISTS")) {
-            p.annotationPatterns.put(c, new NilAnnotationPattern());
-          } else if (value.equals("::EXISTS") || value.equals("::NOT_NIL")) {
-            p.annotationPatterns.put(c, new NotNilAnnotationPattern());
-          } else if (value.equals("::IS_NUM")) {
-            p.annotationPatterns.put(c, new NumericAnnotationPattern(0, NumericAnnotationPattern.CmpType.IS_NUM));
-          } else {
-            boolean ok = false;
-            if (env != null) {
-              Object custom = env.get(value);
-              if (custom != null) {
-                p.annotationPatterns.put(c, (NodePattern) custom);
-                ok = true;
-              }
+            switch (value) {
+                case "::IS_NIL":
+                case "::NOT_EXISTS":
+                    p.annotationPatterns.put(c, new NilAnnotationPattern());
+                    break;
+                case "::EXISTS":
+                case "::NOT_NIL":
+                    p.annotationPatterns.put(c, new NotNilAnnotationPattern());
+                    break;
+                case "::IS_NUM":
+                    p.annotationPatterns.put(c, new NumericAnnotationPattern(0, NumericAnnotationPattern.CmpType.IS_NUM));
+                    break;
+                default:
+                    boolean ok = false;
+                    if (env != null) {
+                        Object custom = env.get(value);
+                        if (custom != null) {
+                            p.annotationPatterns.put(c, (NodePattern) custom);
+                            ok = true;
+                        }
+                    }
+                    if (!ok) {
+                        throw new IllegalArgumentException("Invalid value " + value + " for key: " + stringStringEntry.getKey());
+                    }
+                    break;
             }
-            if (!ok) {
-              throw new IllegalArgumentException("Invalid value " + value + " for key: " + attr);
-            }
-          }
         } else if (value.startsWith("<=")) {
           Double v = Double.parseDouble(value.substring(2));
           p.annotationPatterns.put(c, new NumericAnnotationPattern(v, NumericAnnotationPattern.CmpType.LE));
@@ -87,19 +94,19 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
         } else if (value.startsWith("!=")) {
           Double v = Double.parseDouble(value.substring(2));
           p.annotationPatterns.put(c, new NumericAnnotationPattern(v, NumericAnnotationPattern.CmpType.NE));
-        } else if (value.startsWith(">")) {
+        } else if (!value.isEmpty() && value.charAt(0) == '>') {
           Double v = Double.parseDouble(value.substring(1));
           p.annotationPatterns.put(c, new NumericAnnotationPattern(v, NumericAnnotationPattern.CmpType.GT));
-        } else if (value.startsWith("<")) {
+        } else if (!value.isEmpty() && value.charAt(0) == '<') {
           Double v = Double.parseDouble(value.substring(1));
           p.annotationPatterns.put(c, new NumericAnnotationPattern(v, NumericAnnotationPattern.CmpType.LT));
         } else if (value.matches("[A-Za-z0-9_]+")) {
           p.annotationPatterns.put(c, new StringAnnotationPattern(value));
         } else {
-          throw new IllegalArgumentException("Invalid value " + value + " for key: " + attr);
+          throw new IllegalArgumentException("Invalid value " + value + " for key: " + stringStringEntry.getKey());
         }
       } else {
-        throw new IllegalArgumentException("Unknown annotation key: " + attr);
+        throw new IllegalArgumentException("Unknown annotation key: " + stringStringEntry.getKey());
       }
     }
     return p;
@@ -123,11 +130,7 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
   @Override
   public Object matchWithResult(CoreMap token) {
     Map<Class,Object> matchResults = Generics.newHashMap();
-    if (match(token, matchResults)) {
-      return matchResults;
-    } else {
-      return null;
-    }
+      return match(token, matchResults) ? matchResults : null;
   }
 
   // Does matching, returning match results
@@ -150,11 +153,11 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
 
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    for (Class k:annotationPatterns.keySet()) {
+    for (Map.Entry<Class, NodePattern> classNodePatternEntry : annotationPatterns.entrySet()) {
       if (sb.length() > 0) {
         sb.append(", ");
       }
-      sb.append(k).append(annotationPatterns.get(k));
+      sb.append(classNodePatternEntry.getKey()).append(classNodePatternEntry.getValue());
     }
     return sb.toString();
   }
@@ -198,15 +201,11 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
 
     public Object matchWithResult(List<T> list) {
       SequenceMatcher<T> m = pattern.getMatcher(list);
-      if (m.matches()) {
-        return m.toBasicSequenceMatchResult();
-      } else {
-        return null;
-      }
+        return m.matches() ? m.toBasicSequenceMatchResult() : null;
     }
 
     public String toString() {
-      return ":" + pattern.toString();
+      return ':' + pattern.toString();
     }
   }
 
@@ -230,24 +229,16 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
     }
 
     public boolean match(String str) {
-      if (str == null) {
-        return false;
-      } else {
-        return pattern.matcher(str).matches();
-      }
+        return str == null ? false : pattern.matcher(str).matches();
     }
 
     public Object matchWithResult(String str) {
       Matcher m = pattern.matcher(str);
-      if (m.matches()) {
-        return m.toMatchResult();
-      } else {
-        return null;
-      }
+        return m.matches() ? m.toMatchResult() : null;
     }
 
     public String toString() {
-      return ":/" + pattern.pattern() + "/";
+      return ":/" + pattern.pattern() + '/';
     }
   }
 
@@ -269,20 +260,16 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
     }
 
     public boolean match(String str) {
-      if (ignoreCase) {
-        return target.equalsIgnoreCase(str);
-      } else {
-        return target.equals(str);
-      }
+        return ignoreCase ? target.equalsIgnoreCase(str) : target.equals(str);
     }
 
     public String toString() {
-      return ":" + target;
+      return ':' + target;
     }
   }
 
   public static class NumericAnnotationPattern extends NodePattern<Object> {
-    static enum CmpType {
+    enum CmpType {
       IS_NUM { boolean accept(double v1, double v2) { return true; } },
       EQ { boolean accept(double v1, double v2) { return v1 == v2; } },   // TODO: equal with doubles is not so good
       NE { boolean accept(double v1, double v2) { return v1 != v2; } },   // TODO: equal with doubles is not so good
@@ -304,19 +291,11 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
     public boolean match(Object node) {
       if (node instanceof String) {
         return match((String) node);
-      } else if (node instanceof Number) {
-        return match((Number) node);
-      } else {
-        return false;
-      }
+      } else return node instanceof Number ? match((Number) node) : false;
     }
 
     public boolean match(Number number) {
-      if (number != null) {
-        return cmpType.accept(number.doubleValue(), value);
-      } else {
-        return false;
-      }
+        return number != null ? cmpType.accept(number.doubleValue(), value) : false;
     }
 
     public boolean match(String str) {
@@ -331,7 +310,7 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
     }
 
     public String toString() {
-      return " " + cmpType + " " + value;
+      return " " + cmpType + ' ' + value;
     }
   }
 

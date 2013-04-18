@@ -7,10 +7,10 @@ public class Comparators {
 
   // Copied from edu.stanford.nlp.natlog.util
   /**
-   * Returns a new <code>Comparator</code> which is the result of chaining the
-   * given <code>Comparator</code>s.  If the first <code>Comparator</code>
+   * Returns a new {@code Comparator} which is the result of chaining the
+   * given {@code Comparator}s.  If the first {@code Comparator}
    * considers two objects unequal, its result is returned; otherwise, the
-   * result of the second <code>Comparator</code> is returned.  Facilitates
+   * result of the second {@code Comparator} is returned.  Facilitates
    * sorting on primary and secondary keys.
    */
   public static <T> Comparator<T> chain(final Comparator<? super T> c1,
@@ -18,15 +18,15 @@ public class Comparators {
     return new Comparator<T>() {
       public int compare(T o1, T o2) {
         int x = c1.compare(o1, o2);
-        return (x == 0 ? c2.compare(o1, o2) : x);
+        return x == 0 ? c2.compare(o1, o2) : x;
       }
     };
   }
 
   // Copied from edu.stanford.nlp.natlog.util
   /**
-   * Returns a new <code>Comparator</code> which is the result of chaining the
-   * given <code>Comparator</code>s.  Facilitates sorting on multiple keys.
+   * Returns a new {@code Comparator} which is the result of chaining the
+   * given {@code Comparator}s.  Facilitates sorting on multiple keys.
    */
   public static <T> Comparator<T> chain(final List<Comparator<? super T>> c) {
     return new Comparator<T>() {
@@ -46,8 +46,8 @@ public class Comparators {
   }
 
   /**
-   * Returns a new <code>Comparator</code> which is the reverse of the
-   * given <code>Comparator</code>.
+   * Returns a new {@code Comparator} which is the reverse of the
+   * given {@code Comparator}.
    */
   public static <T> Comparator<T> reverse(final Comparator<? super T> c) {
     return new Comparator<T>() {
@@ -64,9 +64,9 @@ public class Comparators {
    * 
    * Adapted from http://stackoverflow.com/a/481836
    */
-  public static <T extends Comparable<? super T>> int nullSafeComparator(final T one, final T two) {
+  public static <T extends Comparable<? super T>> int nullSafeComparator(T one, T two) {
     if (one == null ^ two == null) {
-      return (one == null) ? -1 : 1;
+      return one == null ? -1 : 1;
     }
 
     if (one == null && two == null) {

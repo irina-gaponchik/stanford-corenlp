@@ -1,11 +1,11 @@
 package edu.stanford.nlp.ling;
 
 /**
- * Something that implements the <code>Label</code> interface can act as a
+ * Something that implements the {@code Label} interface can act as a
  * constituent, node, or word label with linguistic attributes.
- * A <code>Label</code> is required to have a "primary" <code>String</code>
- * <code>value()</code> (although this may be null).  This is referred to as
- * its <code>value</code>.
+ * A {@code Label} is required to have a "primary" {@code String}
+ * {@code value()} (although this may be null).  This is referred to as
+ * its {@code value}.
  * <p>
  * Implementations of Label split into two groups with
  * respect to equality. Classes that extend ValueLabel define equality
@@ -16,7 +16,7 @@ package edu.stanford.nlp.ling;
  * with their own type and require all fields of the type to be equal.
  * <p>
  * A subclass that extends another Label class <i>should</i> override
- * the definition of <code>labelFactory()</code>, since the contract for
+ * the definition of {@code labelFactory()}, since the contract for
  * this method is that it should return a factory for labels of the
  * exact same object type.
 
@@ -42,9 +42,9 @@ public interface Label {
 
   /**
    * Return a String representation of the label.  For a multipart label,
-   * this will return all parts.  The <code>toString()</code> method
+   * this will return all parts.  The {@code toString()} method
    * causes a label to spill its guts.  It should always return an
-   * empty string rather than <code>null</code> if there is no value.
+   * empty string rather than {@code null} if there is no value.
    *
    * @return a text representation of the full label contents
    */
@@ -52,13 +52,13 @@ public interface Label {
 
 
   /**
-   * Set the contents of this label to this <code>String</code>
+   * Set the contents of this label to this {@code String}
    * representing the
    * complete contents of the label.  A class implementing label may
-   * throw an <code>UnsupportedOperationException</code> for this
+   * throw an {@code UnsupportedOperationException} for this
    * method (only).  Typically, this method would do
    * some appropriate decoding of the string in a way that sets
-   * multiple fields in an inverse of the <code>toString()</code>
+   * multiple fields in an inverse of the {@code toString()}
    * method.
    *
    * @param labelStr the String that translates into the content of the
@@ -68,7 +68,7 @@ public interface Label {
 
   /**
    * Returns a factory that makes labels of the exact same type as this one.
-   * May return <code>null</code> if no appropriate factory is known.
+   * May return {@code null} if no appropriate factory is known.
    *
    * @return the LabelFactory for this kind of label
    */

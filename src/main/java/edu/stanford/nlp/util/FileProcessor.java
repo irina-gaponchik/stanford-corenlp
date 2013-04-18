@@ -13,8 +13,8 @@ import java.io.File;
 public interface FileProcessor {
 
   /**
-   * Apply this predicate to a <code>File</code>.  This method can
-   * assume the <code>file</code> is a file and not a directory.
+   * Apply this predicate to a {@code File}.  This method can
+   * assume the {@code file} is a file and not a directory.
    *
    * @see FilePathProcessor for traversing directories
    */

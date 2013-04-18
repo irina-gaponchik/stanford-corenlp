@@ -37,7 +37,7 @@ class CoordinationPattern extends TregexPattern {
 
   @Override
   public String localString() {
-    return (isConj ? "and" : "or");
+    return isConj ? "and" : "or";
   }
 
   @Override
@@ -103,22 +103,22 @@ class CoordinationPattern extends TregexPattern {
     @Override
     void resetChildIter() {
       currChild = 0;
-      for (int i = 0; i < children.length; i++) {
-        if (children[i] != null) {
-          children[i].resetChildIter();
+        for (TregexMatcher aChildren : children) {
+            if (aChildren != null) {
+                aChildren.resetChildIter();
+            }
         }
-      }
     }
 
     @Override
     void resetChildIter(Tree tree) {
       this.tree = tree;
       currChild = 0;
-      for (int i = 0; i < children.length; i++) {
-        if (children[i] != null) {
-          children[i].resetChildIter(tree);
+        for (TregexMatcher aChildren : children) {
+            if (aChildren != null) {
+                aChildren.resetChildIter(tree);
+            }
         }
-      }
     }
 
     @Override

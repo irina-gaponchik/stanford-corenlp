@@ -11,13 +11,9 @@ import java.util.*;
 public abstract class CollectionFactory<T> implements Serializable {
 
   private static final long serialVersionUID = 3711321773145894069L;
-  @SuppressWarnings("unchecked")
   public static final CollectionFactory ARRAY_LIST_FACTORY = new ArrayListFactory();
-  @SuppressWarnings("unchecked")
   public static final CollectionFactory LINKED_LIST_FACTORY = new LinkedListFactory();
-  @SuppressWarnings("unchecked")
   public static final CollectionFactory HASH_SET_FACTORY = new HashSetFactory();
-  @SuppressWarnings("unchecked")
   public static final CollectionFactory TREE_SET_FACTORY = new TreeSetFactory();
 
 
@@ -56,7 +52,7 @@ public abstract class CollectionFactory<T> implements Serializable {
 
     @Override
     public Collection<T> newCollection() {
-      return new ArrayList<T>();
+      return new ArrayList<>();
     }
 
     @Override
@@ -76,7 +72,7 @@ public abstract class CollectionFactory<T> implements Serializable {
 
     @Override
     public Collection<T> newCollection() {
-      return new ArrayList<T>(defaultSize);
+      return new ArrayList<>(defaultSize);
     }
 
     @Override
@@ -90,7 +86,7 @@ public abstract class CollectionFactory<T> implements Serializable {
 
     @Override
     public Collection<T> newCollection() {
-      return new LinkedList<T>();
+      return new LinkedList<>();
     }
 
     @Override
@@ -119,7 +115,7 @@ public abstract class CollectionFactory<T> implements Serializable {
 
     @Override
     public Collection<T> newCollection() {
-      return new TreeSet<T>();
+      return new TreeSet<>();
     }
 
     @Override

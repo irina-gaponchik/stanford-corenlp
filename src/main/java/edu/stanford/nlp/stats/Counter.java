@@ -132,11 +132,11 @@ public interface Counter<E> extends PrettyLoggable {
    * If the key hasn't been seen before, it is assumed to have count 0.0, and
    * thus this  method will set its count to the negative of the given amount.
    * <i>Note that this is true regardless of the setting of defaultReturnValue.</i>
-   * Negative increments are equivalent to calling <code>incrementCount</code>.
+   * Negative increments are equivalent to calling {@code incrementCount}.
    * To more conveniently decrement the count by 1.0, use
    * {@link #decrementCount(Object)}.
    * To set a count to a specific value instead of decrementing it, use
-   * {@link #setCount(Object,double)}.
+   * {@link #setCount(Object, double)}.
    *
    * @param key The key to decrement
    * @param value The amount to decrement it by
@@ -185,8 +185,8 @@ public interface Counter<E> extends PrettyLoggable {
    *
    * @param counter The Counter whose counts will be added. For each key in
    *   counter, if it is not in this, then it will be added with value
-   *   <code>counter.getCount(key)</code>. Otherwise, it will have value
-   *   <code>this.getCount(key) + counter.getCount(key)</code>.
+   *   {@code counter.getCount(key)}. Otherwise, it will have value
+   *   {@code this.getCount(key) + counter.getCount(key)}.
    */
   public void addAll(Counter<E> counter);
 

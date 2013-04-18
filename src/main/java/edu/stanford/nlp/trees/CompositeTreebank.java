@@ -53,7 +53,7 @@ public class CompositeTreebank extends Treebank {
     }
 
     public boolean hasNext() {
-      return (it1.hasNext() || it2.hasNext());
+      return it1.hasNext() || it2.hasNext();
     }
 
     public Tree next() {

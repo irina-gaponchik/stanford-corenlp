@@ -20,7 +20,7 @@ public class LineIterator<X> extends AbstractIterator<X> {
   private BufferedReader in;
   private X nextToken; // = null;
 
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public LineIterator(Reader r) {
     this(r, new IdentityFunction());  // it seems like this can't be generified: seems a weird brokenness of Java to me! [cdm]
   }
@@ -38,11 +38,7 @@ public class LineIterator<X> extends AbstractIterator<X> {
     } catch (IOException ioe) {
       ioe.printStackTrace();
     }
-    if (line != null) {
-      nextToken = op.apply(line);
-    } else {
-      nextToken = null;
-    }
+      nextToken = line != null ? op.apply(line) : null;
   }
 
   @Override
@@ -72,7 +68,7 @@ public class LineIterator<X> extends AbstractIterator<X> {
    * @return An iterator over the lines of a file
    */
   public static <X> IteratorFromReaderFactory<X> getFactory() {
-    return new LineIteratorFactory<X>();
+    return new LineIteratorFactory<>();
   }
 
   /**
@@ -83,7 +79,7 @@ public class LineIterator<X> extends AbstractIterator<X> {
    * @return An iterator over the lines of a file
    */
   public static <X> IteratorFromReaderFactory<X> getFactory(Function<String,X> op) {
-    return new LineIteratorFactory<X>(op);
+    return new LineIteratorFactory<>(op);
   }
 
 
@@ -91,10 +87,10 @@ public class LineIterator<X> extends AbstractIterator<X> {
 
     private static final long serialVersionUID = 1L;
 
-    @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+    @SuppressWarnings("NonSerializableFieldInSerializableClass")
     private Function<String,X> oper;
 
-    @SuppressWarnings({"unchecked"})
+    @SuppressWarnings("unchecked")
     public LineIteratorFactory() {
       this(new IdentityFunction());  // it seems like this can't be generified: seems a weird brokenness of Java to me! [cdm]
     }
@@ -104,14 +100,14 @@ public class LineIterator<X> extends AbstractIterator<X> {
     }
 
     public Iterator<X> getIterator(Reader r) {
-      return new LineIterator<X>(r, oper);
+      return new LineIterator<>(r, oper);
     }
 
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     String s = "\n\n@@123\nthis\nis\na\nsentence\n\n@@124\nThis\nis\nanother\n.\n\n@125\nThis\nis\nthe\nlast\n";
-    Iterator<String> di = new LineIterator<String>(new StringReader(s), new IdentityFunction<String>());
+    Iterator<String> di = new LineIterator<>(new StringReader(s), new IdentityFunction<String>());
     System.out.println("--- start ---");
     while (di.hasNext()) {
       System.out.println(di.next());

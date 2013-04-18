@@ -7,11 +7,11 @@ import edu.stanford.nlp.util.Pair;
 import java.util.*;
 
 
-class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, TsurgeonParserConstants {/*@bgen(jjtree)*/
+class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
   protected JJTTsurgeonParserState jjtree = new JJTTsurgeonParserState();
   private TreeFactory treeFactory = new LabeledScoredTreeFactory();
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     System.out.println("Reading from standard input...");
     TsurgeonParser t = new TsurgeonParser(System.in);
     try {
@@ -27,7 +27,7 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 
   final public TsurgeonPattern Root() throws ParseException {
  /*@bgen(jjtree) Root */
-  SimpleNode jjtn000 = new SimpleNode(JJTROOT);
+  SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTROOT);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);TsurgeonPattern result;
     try {
@@ -35,7 +35,7 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       jj_consume_token(25);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    {if (true) return result;}
+        if (true) return result;
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -44,12 +44,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-      {if (true) throw (RuntimeException)jjte000;}
+        if (true) throw (RuntimeException)jjte000;
     }
     if (jjte000 instanceof ParseException) {
-      {if (true) throw (ParseException)jjte000;}
+        if (true) throw (ParseException)jjte000;
     }
-    {if (true) throw (Error)jjte000;}
+        if (true) throw (Error)jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -60,7 +60,7 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 
   final public TsurgeonPattern Operation() throws ParseException {
  /*@bgen(jjtree) Operation */
-  SimpleNode jjtn000 = new SimpleNode(JJTOPERATION);
+  SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTOPERATION);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);TsurgeonPattern child1;
   TsurgeonPattern child2 = null;
@@ -72,132 +72,132 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
   Token regex;
   Token hash_int;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case DELETE:
-        operator = jj_consume_token(DELETE);
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+      case TsurgeonParserConstants.DELETE:
+        operator = jj_consume_token(TsurgeonParserConstants.DELETE);
         nodeSelections = NodeSelectionList(new ArrayList<TsurgeonPattern>());
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new DeleteNode(nodeSelections);}
-        break;
-      case PRUNE:
-        operator = jj_consume_token(PRUNE);
+          if (true) return new DeleteNode(nodeSelections);
+          break;
+      case TsurgeonParserConstants.PRUNE:
+        operator = jj_consume_token(TsurgeonParserConstants.PRUNE);
         nodeSelections = NodeSelectionList(new ArrayList<TsurgeonPattern>());
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new PruneNode(nodeSelections);}
-        break;
-      case EXCISE:
-        operator = jj_consume_token(EXCISE);
+          if (true) return new PruneNode(nodeSelections);
+          break;
+      case TsurgeonParserConstants.EXCISE:
+        operator = jj_consume_token(TsurgeonParserConstants.EXCISE);
         child1 = NodeSelection();
         child2 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new ExciseNode(child1,child2);}
-        break;
+          if (true) return new ExciseNode(child1,child2);
+          break;
       default:
         jj_la1[0] = jj_gen;
         if (jj_2_1(3)) {
-          operator = jj_consume_token(RELABEL);
+          operator = jj_consume_token(TsurgeonParserConstants.RELABEL);
           child1 = NodeSelection();
-          newLabel = jj_consume_token(IDENTIFIER);
+          newLabel = jj_consume_token(TsurgeonParserConstants.IDENTIFIER);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new RelabelNode(child1,newLabel.image);}
+            if (true) return new RelabelNode(child1,newLabel.image);
         } else if (jj_2_2(3)) {
-          operator = jj_consume_token(RELABEL);
+          operator = jj_consume_token(TsurgeonParserConstants.RELABEL);
           child1 = NodeSelection();
-          newLabel = jj_consume_token(QUOTEX);
+          newLabel = jj_consume_token(TsurgeonParserConstants.QUOTEX);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new RelabelNode(child1, newLabel.image);}
+            if (true) return new RelabelNode(child1, newLabel.image);
         } else if (jj_2_3(3)) {
-          operator = jj_consume_token(RELABEL);
+          operator = jj_consume_token(TsurgeonParserConstants.RELABEL);
           child1 = NodeSelection();
-          regex = jj_consume_token(REGEX);
+          regex = jj_consume_token(TsurgeonParserConstants.REGEX);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new RelabelNode(child1, regex.image);}
+            if (true) return new RelabelNode(child1, regex.image);
         } else if (jj_2_4(3)) {
-          operator = jj_consume_token(RELABEL);
+          operator = jj_consume_token(TsurgeonParserConstants.RELABEL);
           child1 = NodeSelection();
-          newLabel = jj_consume_token(GENERAL_RELABEL);
+          newLabel = jj_consume_token(TsurgeonParserConstants.GENERAL_RELABEL);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new RelabelNode(child1, newLabel.image);}
+            if (true) return new RelabelNode(child1, newLabel.image);
         } else if (jj_2_5(3)) {
-          operator = jj_consume_token(REPLACE);
+          operator = jj_consume_token(TsurgeonParserConstants.REPLACE);
           child1 = NodeSelection();
           child2 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new ReplaceNode(child1,child2);}
+            if (true) return new ReplaceNode(child1,child2);
         } else if (jj_2_6(3)) {
-          operator = jj_consume_token(REPLACE);
+          operator = jj_consume_token(TsurgeonParserConstants.REPLACE);
           child1 = NodeSelection();
           tree = TreeRoot(false);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new ReplaceNode(child1,tree);}
+            if (true) return new ReplaceNode(child1,tree);
         } else {
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case MOVE:
-            operator = jj_consume_token(MOVE);
+          switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+          case TsurgeonParserConstants.MOVE:
+            operator = jj_consume_token(TsurgeonParserConstants.MOVE);
             child1 = NodeSelection();
             loc = Location();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new MoveNode(child1, loc);}
-            break;
+              if (true) return new MoveNode(child1, loc);
+              break;
           default:
             jj_la1[1] = jj_gen;
             if (jj_2_7(3)) {
-              operator = jj_consume_token(INSERT);
+              operator = jj_consume_token(TsurgeonParserConstants.INSERT);
               child1 = NodeSelection();
               loc = Location();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new InsertNode(child1, loc);}
+                if (true) return new InsertNode(child1, loc);
             } else if (jj_2_8(3)) {
-              operator = jj_consume_token(INSERT);
+              operator = jj_consume_token(TsurgeonParserConstants.INSERT);
               tree = TreeRoot(false);
               loc = Location();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new InsertNode(tree, loc);}
+                if (true) return new InsertNode(tree, loc);
             } else {
-              switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-              case ADJOIN:
-                operator = jj_consume_token(ADJOIN);
+              switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+              case TsurgeonParserConstants.ADJOIN:
+                operator = jj_consume_token(TsurgeonParserConstants.ADJOIN);
                 tree = TreeRoot(true);
                 child1 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new AdjoinNode(tree, child1);}
-                break;
-              case ADJOIN_TO_HEAD:
-                operator = jj_consume_token(ADJOIN_TO_HEAD);
+                  if (true) return new AdjoinNode(tree, child1);
+                  break;
+              case TsurgeonParserConstants.ADJOIN_TO_HEAD:
+                operator = jj_consume_token(TsurgeonParserConstants.ADJOIN_TO_HEAD);
                 tree = TreeRoot(true);
                 child1 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new AdjoinToHeadNode(tree, child1);}
-                break;
-              case ADJOIN_TO_FOOT:
-                operator = jj_consume_token(ADJOIN_TO_FOOT);
+                  if (true) return new AdjoinToHeadNode(tree, child1);
+                  break;
+              case TsurgeonParserConstants.ADJOIN_TO_FOOT:
+                operator = jj_consume_token(TsurgeonParserConstants.ADJOIN_TO_FOOT);
                 tree = TreeRoot(true);
                 child1 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new AdjoinToFootNode(tree, child1);}
-                break;
-              case COINDEX:
-                operator = jj_consume_token(COINDEX);
+                  if (true) return new AdjoinToFootNode(tree, child1);
+                  break;
+              case TsurgeonParserConstants.COINDEX:
+                operator = jj_consume_token(TsurgeonParserConstants.COINDEX);
                 nodeSelections = NodeSelectionList(new ArrayList<TsurgeonPattern>());
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new CoindexNodes(nodeSelections.toArray(new TsurgeonPattern[] {}));}
-                break;
+                  if (true) return new CoindexNodes(nodeSelections.toArray(new TsurgeonPattern[nodeSelections.size()]));
+                  break;
               default:
                 jj_la1[2] = jj_gen;
                 jj_consume_token(-1);
@@ -215,12 +215,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-      {if (true) throw (RuntimeException)jjte000;}
+        if (true) throw (RuntimeException)jjte000;
     }
     if (jjte000 instanceof ParseException) {
-      {if (true) throw (ParseException)jjte000;}
+        if (true) throw (ParseException)jjte000;
     }
-    {if (true) throw (Error)jjte000;}
+        if (true) throw (Error)jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -231,16 +231,16 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 
   final public TreeLocation Location() throws ParseException {
  /*@bgen(jjtree) Location */
-  SimpleNode jjtn000 = new SimpleNode(JJTLOCATION);
+  SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTLOCATION);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);Token rel;
   TsurgeonPattern child;
     try {
-      rel = jj_consume_token(LOCATION_RELATION);
+      rel = jj_consume_token(TsurgeonParserConstants.LOCATION_RELATION);
       child = NodeSelection();
      jjtree.closeNodeScope(jjtn000, true);
      jjtc000 = false;
-     {if (true) return new TreeLocation(rel.image, child);}
+        if (true) return new TreeLocation(rel.image, child);
     } catch (Throwable jjte000) {
    if (jjtc000) {
      jjtree.clearNodeScope(jjtn000);
@@ -249,12 +249,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
      jjtree.popNode();
    }
    if (jjte000 instanceof RuntimeException) {
-     {if (true) throw (RuntimeException)jjte000;}
+       if (true) throw (RuntimeException)jjte000;
    }
    if (jjte000 instanceof ParseException) {
-     {if (true) throw (ParseException)jjte000;}
+       if (true) throw (ParseException)jjte000;
    }
-   {if (true) throw (Error)jjte000;}
+        if (true) throw (Error)jjte000;
     } finally {
    if (jjtc000) {
      jjtree.closeNodeScope(jjtn000, true);
@@ -265,7 +265,7 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 
   final public List<TsurgeonPattern> NodeSelectionList(List<TsurgeonPattern> l) throws ParseException {
  /*@bgen(jjtree) NodeSelectionList */
-  SimpleNode jjtn000 = new SimpleNode(JJTNODESELECTIONLIST);
+  SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTNODESELECTIONLIST);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);TsurgeonPattern result;
     try {
@@ -273,10 +273,9 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
                                   l.add(result);
       label_1:
       while (true) {
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case IDENTIFIER:
-          ;
-          break;
+        switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+        case TsurgeonParserConstants.IDENTIFIER:
+            break;
         default:
           jj_la1[3] = jj_gen;
           break label_1;
@@ -286,7 +285,7 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       }
      jjtree.closeNodeScope(jjtn000, true);
      jjtc000 = false;
-     {if (true) return l;}
+        if (true) return l;
     } catch (Throwable jjte000) {
    if (jjtc000) {
      jjtree.clearNodeScope(jjtn000);
@@ -295,12 +294,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
      jjtree.popNode();
    }
    if (jjte000 instanceof RuntimeException) {
-     {if (true) throw (RuntimeException)jjte000;}
+       if (true) throw (RuntimeException)jjte000;
    }
    if (jjte000 instanceof ParseException) {
-     {if (true) throw (ParseException)jjte000;}
+       if (true) throw (ParseException)jjte000;
    }
-   {if (true) throw (Error)jjte000;}
+        if (true) throw (Error)jjte000;
     } finally {
    if (jjtc000) {
      jjtree.closeNodeScope(jjtn000, true);
@@ -312,14 +311,14 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 // we'll also put in a way to use a SELECTION with a list of nodes.
   final public TsurgeonPattern NodeSelection() throws ParseException {
  /*@bgen(jjtree) NodeSelection */
-  SimpleNode jjtn000 = new SimpleNode(JJTNODESELECTION);
+  SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTNODESELECTION);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);TsurgeonPattern result;
     try {
       result = NodeName();
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    {if (true) return result;}
+        if (true) return result;
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -328,12 +327,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-      {if (true) throw (RuntimeException)jjte000;}
+        if (true) throw (RuntimeException)jjte000;
     }
     if (jjte000 instanceof ParseException) {
-      {if (true) throw (ParseException)jjte000;}
+        if (true) throw (ParseException)jjte000;
     }
-    {if (true) throw (Error)jjte000;}
+        if (true) throw (Error)jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -344,14 +343,14 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 
   final public TsurgeonPattern NodeName() throws ParseException {
  /*@bgen(jjtree) NodeName */
-  SimpleNode jjtn000 = new SimpleNode(JJTNODENAME);
+  SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTNODENAME);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);Token t;
     try {
-      t = jj_consume_token(IDENTIFIER);
+      t = jj_consume_token(TsurgeonParserConstants.IDENTIFIER);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-    {if (true) return new FetchNode(t.image);}
+        if (true) return new FetchNode(t.image);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -363,14 +362,14 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 // the argument says whether there must be a foot node on the aux tree.
   final public AuxiliaryTree TreeRoot(boolean requiresFoot) throws ParseException {
  /*@bgen(jjtree) TreeRoot */
-  SimpleNode jjtn000 = new SimpleNode(JJTTREEROOT);
+  SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTTREEROOT);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);Tree t;
     try {
       t = TreeNode();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return new AuxiliaryTree(t,requiresFoot);}
+        if (true) return new AuxiliaryTree(t,requiresFoot);
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -379,12 +378,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-      {if (true) throw (RuntimeException)jjte000;}
+        if (true) throw (RuntimeException)jjte000;
     }
     if (jjte000 instanceof ParseException) {
-      {if (true) throw (ParseException)jjte000;}
+        if (true) throw (ParseException)jjte000;
     }
-    {if (true) throw (Error)jjte000;}
+        if (true) throw (Error)jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -395,27 +394,27 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 
   final public Tree TreeNode() throws ParseException {
  /*@bgen(jjtree) TreeNode */
- SimpleNode jjtn000 = new SimpleNode(JJTTREENODE);
+ SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTTREENODE);
  boolean jjtc000 = true;
  jjtree.openNodeScope(jjtn000);Token label;
  List<Tree> dtrs = null;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TREE_NODE_NONTERMINAL_LABEL:
-        label = jj_consume_token(TREE_NODE_NONTERMINAL_LABEL);
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+      case TsurgeonParserConstants.TREE_NODE_NONTERMINAL_LABEL:
+        label = jj_consume_token(TsurgeonParserConstants.TREE_NODE_NONTERMINAL_LABEL);
         dtrs = TreeDtrs(new ArrayList<Tree>());
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return treeFactory.newTreeNode(label.image.substring(1),dtrs);}
-        break;
-      case IDENTIFIER:
-      case TREE_NODE_TERMINAL_LABEL:
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case TREE_NODE_TERMINAL_LABEL:
-          label = jj_consume_token(TREE_NODE_TERMINAL_LABEL);
+          if (true) return treeFactory.newTreeNode(label.image.substring(1),dtrs);
           break;
-        case IDENTIFIER:
-          label = jj_consume_token(IDENTIFIER);
+      case TsurgeonParserConstants.IDENTIFIER:
+      case TsurgeonParserConstants.TREE_NODE_TERMINAL_LABEL:
+        switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+        case TsurgeonParserConstants.TREE_NODE_TERMINAL_LABEL:
+          label = jj_consume_token(TsurgeonParserConstants.TREE_NODE_TERMINAL_LABEL);
+          break;
+        case TsurgeonParserConstants.IDENTIFIER:
+          label = jj_consume_token(TsurgeonParserConstants.IDENTIFIER);
           break;
         default:
           jj_la1[4] = jj_gen;
@@ -424,8 +423,8 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
         }
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-      {if (true) return treeFactory.newTreeNode(label.image,new ArrayList<Tree>());}
-        break;
+          if (true) return treeFactory.newTreeNode(label.image,new ArrayList<Tree>());
+          break;
       default:
         jj_la1[5] = jj_gen;
         jj_consume_token(-1);
@@ -439,12 +438,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
      jjtree.popNode();
    }
    if (jjte000 instanceof RuntimeException) {
-     {if (true) throw (RuntimeException)jjte000;}
+       if (true) throw (RuntimeException)jjte000;
    }
    if (jjte000 instanceof ParseException) {
-     {if (true) throw (ParseException)jjte000;}
+       if (true) throw (ParseException)jjte000;
    }
-   {if (true) throw (Error)jjte000;}
+        if (true) throw (Error)jjte000;
     } finally {
    if (jjtc000) {
      jjtree.closeNodeScope(jjtn000, true);
@@ -455,26 +454,27 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 
   final public List<Tree> TreeDtrs(List<Tree> dtrs) throws ParseException {
  /*@bgen(jjtree) TreeDtrs */
-  SimpleNode jjtn000 = new SimpleNode(JJTTREEDTRS);
+  SimpleNode jjtn000 = new SimpleNode(TsurgeonParserTreeConstants.JJTTREEDTRS);
   boolean jjtc000 = true;
   jjtree.openNodeScope(jjtn000);Tree tree;
     try {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case IDENTIFIER:
-      case TREE_NODE_TERMINAL_LABEL:
-      case TREE_NODE_NONTERMINAL_LABEL:
+      switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
+      case TsurgeonParserConstants.IDENTIFIER:
+      case TsurgeonParserConstants.TREE_NODE_TERMINAL_LABEL:
+      case TsurgeonParserConstants.TREE_NODE_NONTERMINAL_LABEL:
         tree = TreeNode();
         TreeDtrs(dtrs);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-     dtrs.add(0,tree); {if (true) return dtrs;}
-        break;
+     dtrs.add(0,tree);
+          if (true) return dtrs;
+          break;
       case 26:
         jj_consume_token(26);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-   {if (true) return dtrs;}
-        break;
+          if (true) return dtrs;
+          break;
       default:
         jj_la1[6] = jj_gen;
         jj_consume_token(-1);
@@ -488,12 +488,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-      {if (true) throw (RuntimeException)jjte000;}
+        if (true) throw (RuntimeException)jjte000;
     }
     if (jjte000 instanceof ParseException) {
-      {if (true) throw (ParseException)jjte000;}
+        if (true) throw (ParseException)jjte000;
     }
-    {if (true) throw (Error)jjte000;}
+        if (true) throw (Error)jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
@@ -559,56 +559,47 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
   }
 
   private boolean jj_3R_3() {
-    if (jj_3R_6()) return true;
-    return false;
+      return jj_3R_6();
   }
 
   private boolean jj_3R_5() {
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
+      return jj_scan_token(TsurgeonParserConstants.IDENTIFIER);
   }
 
   private boolean jj_3_8() {
-    if (jj_scan_token(INSERT)) return true;
+    if (jj_scan_token(TsurgeonParserConstants.INSERT)) return true;
     if (jj_3R_3()) return true;
-    if (jj_3R_4()) return true;
-    return false;
+      return jj_3R_4();
   }
 
   private boolean jj_3_7() {
-    if (jj_scan_token(INSERT)) return true;
+    if (jj_scan_token(TsurgeonParserConstants.INSERT)) return true;
     if (jj_3R_2()) return true;
-    if (jj_3R_4()) return true;
-    return false;
+      return jj_3R_4();
   }
 
   private boolean jj_3R_2() {
-    if (jj_3R_5()) return true;
-    return false;
+      return jj_3R_5();
   }
 
   private boolean jj_3_6() {
-    if (jj_scan_token(REPLACE)) return true;
+    if (jj_scan_token(TsurgeonParserConstants.REPLACE)) return true;
     if (jj_3R_2()) return true;
-    if (jj_3R_3()) return true;
-    return false;
+      return jj_3R_3();
   }
 
   private boolean jj_3_5() {
-    if (jj_scan_token(REPLACE)) return true;
+    if (jj_scan_token(TsurgeonParserConstants.REPLACE)) return true;
     if (jj_3R_2()) return true;
-    if (jj_3R_2()) return true;
-    return false;
+      return jj_3R_2();
   }
 
   private boolean jj_3R_11() {
-    if (jj_scan_token(26)) return true;
-    return false;
+      return jj_scan_token(26);
   }
 
   private boolean jj_3R_10() {
-    if (jj_3R_6()) return true;
-    return false;
+      return jj_3R_6();
   }
 
   private boolean jj_3R_9() {
@@ -622,31 +613,27 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
   }
 
   private boolean jj_3_4() {
-    if (jj_scan_token(RELABEL)) return true;
+    if (jj_scan_token(TsurgeonParserConstants.RELABEL)) return true;
     if (jj_3R_2()) return true;
-    if (jj_scan_token(GENERAL_RELABEL)) return true;
-    return false;
+      return jj_scan_token(TsurgeonParserConstants.GENERAL_RELABEL);
   }
 
   private boolean jj_3_3() {
-    if (jj_scan_token(RELABEL)) return true;
+    if (jj_scan_token(TsurgeonParserConstants.RELABEL)) return true;
     if (jj_3R_2()) return true;
-    if (jj_scan_token(REGEX)) return true;
-    return false;
+      return jj_scan_token(TsurgeonParserConstants.REGEX);
   }
 
   private boolean jj_3_2() {
-    if (jj_scan_token(RELABEL)) return true;
+    if (jj_scan_token(TsurgeonParserConstants.RELABEL)) return true;
     if (jj_3R_2()) return true;
-    if (jj_scan_token(QUOTEX)) return true;
-    return false;
+      return jj_scan_token(TsurgeonParserConstants.QUOTEX);
   }
 
   private boolean jj_3_1() {
-    if (jj_scan_token(RELABEL)) return true;
+    if (jj_scan_token(TsurgeonParserConstants.RELABEL)) return true;
     if (jj_3R_2()) return true;
-    if (jj_scan_token(IDENTIFIER)) return true;
-    return false;
+      return jj_scan_token(TsurgeonParserConstants.IDENTIFIER);
   }
 
   private boolean jj_3R_8() {
@@ -670,14 +657,12 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
   }
 
   private boolean jj_3R_7() {
-    if (jj_scan_token(TREE_NODE_NONTERMINAL_LABEL)) return true;
-    if (jj_3R_9()) return true;
-    return false;
+    if (jj_scan_token(TsurgeonParserConstants.TREE_NODE_NONTERMINAL_LABEL)) return true;
+      return jj_3R_9();
   }
 
   private boolean jj_3R_4() {
-    if (jj_scan_token(LOCATION_RELATION)) return true;
-    return false;
+      return jj_scan_token(TsurgeonParserConstants.LOCATION_RELATION);
   }
 
   /** Generated Token Manager. */
@@ -700,8 +685,8 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       jj_la1_0 = new int[] {0xb0,0x200,0x7800,0x20000,0x820000,0x1820000,0x5820000,};
    }
   final private JJCalls[] jj_2_rtns = new JJCalls[8];
-  private boolean jj_rescan = false;
-  private int jj_gc = 0;
+  private boolean jj_rescan;
+  private int jj_gc;
 
   /** Constructor with InputStream. */
   public TsurgeonParser(java.io.InputStream stream) {
@@ -780,20 +765,19 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
 
   private Token jj_consume_token(int kind) throws ParseException {
     Token oldToken;
-    if ((oldToken = token).next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
+      token = (oldToken = token).next != null ? token.next : (token.next = token_source.getNextToken());
     jj_ntk = -1;
     if (token.kind == kind) {
       jj_gen++;
       if (++jj_gc > 100) {
         jj_gc = 0;
-        for (int i = 0; i < jj_2_rtns.length; i++) {
-          JJCalls c = jj_2_rtns[i];
-          while (c != null) {
-            if (c.gen < jj_gen) c.first = null;
-            c = c.next;
+          for (JJCalls jj_2_rtn : jj_2_rtns) {
+              JJCalls c = jj_2_rtn;
+              while (c != null) {
+                  if (c.gen < jj_gen) c.first = null;
+                  c = c.next;
+              }
           }
-        }
       }
       return token;
     }
@@ -805,31 +789,26 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
   static private final class LookaheadSuccess extends java.lang.Error { }
   final private LookaheadSuccess jj_ls = new LookaheadSuccess();
   private boolean jj_scan_token(int kind) {
-    if (jj_scanpos == jj_lastpos) {
+    if (jj_scanpos.equals(jj_lastpos)) {
       jj_la--;
-      if (jj_scanpos.next == null) {
-        jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
-      } else {
-        jj_lastpos = jj_scanpos = jj_scanpos.next;
-      }
+        jj_lastpos = jj_scanpos.next == null ? (jj_scanpos = jj_scanpos.next = token_source.getNextToken()) : (jj_scanpos = jj_scanpos.next);
     } else {
       jj_scanpos = jj_scanpos.next;
     }
     if (jj_rescan) {
       int i = 0; Token tok = token;
-      while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
+      while (tok != null && !tok.equals(jj_scanpos)) { i++; tok = tok.next; }
       if (tok != null) jj_add_error_token(kind, i);
     }
     if (jj_scanpos.kind != kind) return true;
-    if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+    if (jj_la == 0 && jj_scanpos.equals(jj_lastpos)) throw jj_ls;
     return false;
   }
 
 
 /** Get the next Token. */
   final public Token getNextToken() {
-    if (token.next != null) token = token.next;
-    else token = token.next = token_source.getNextToken();
+      token = token.next != null ? token.next : (token.next = token_source.getNextToken());
     jj_ntk = -1;
     jj_gen++;
     return token;
@@ -839,20 +818,16 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
   final public Token getToken(int index) {
     Token t = token;
     for (int i = 0; i < index; i++) {
-      if (t.next != null) t = t.next;
-      else t = t.next = token_source.getNextToken();
+        t = t.next != null ? t.next : (t.next = token_source.getNextToken());
     }
     return t;
   }
 
   private int jj_ntk() {
-    if ((jj_nt=token.next) == null)
-      return (jj_ntk = (token.next=token_source.getNextToken()).kind);
-    else
-      return (jj_ntk = jj_nt.kind);
+      return (jj_nt = token.next) == null ? (jj_ntk = (token.next = token_source.getNextToken()).kind) : (jj_ntk = jj_nt.kind);
   }
 
-  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
+  private java.util.List<int[]> jj_expentries = new java.util.ArrayList<>();
   private int[] jj_expentry;
   private int jj_kind = -1;
   private int[] jj_lasttokens = new int[100];
@@ -864,20 +839,18 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
       jj_lasttokens[jj_endpos++] = kind;
     } else if (jj_endpos != 0) {
       jj_expentry = new int[jj_endpos];
-      for (int i = 0; i < jj_endpos; i++) {
-        jj_expentry[i] = jj_lasttokens[i];
-      }
-      jj_entries_loop: for (java.util.Iterator<?> it = jj_expentries.iterator(); it.hasNext();) {
-        int[] oldentry = (int[])(it.next());
-        if (oldentry.length == jj_expentry.length) {
-          for (int i = 0; i < jj_expentry.length; i++) {
-            if (oldentry[i] != jj_expentry[i]) {
-              continue jj_entries_loop;
-            }
+        System.arraycopy(jj_lasttokens, 0, jj_expentry, 0, jj_endpos);
+      jj_entries_loop:
+      for (int[] oldentry : jj_expentries) {
+          if (oldentry.length == jj_expentry.length) {
+              for (int i = 0; i < jj_expentry.length; i++) {
+                  if (oldentry[i] != jj_expentry[i]) {
+                      continue jj_entries_loop;
+                  }
+              }
+              jj_expentries.add(jj_expentry);
+              break jj_entries_loop;
           }
-          jj_expentries.add(jj_expentry);
-          break jj_entries_loop;
-        }
       }
       if (pos != 0) jj_lasttokens[(jj_endpos = pos) - 1] = kind;
     }
@@ -894,7 +867,7 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
     for (int i = 0; i < 7; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
-          if ((jj_la1_0[i] & (1<<j)) != 0) {
+          if ((jj_la1_0[i] & 1<<j) != 0) {
             la1tokens[j] = true;
           }
         }
@@ -914,7 +887,7 @@ class TsurgeonParser/*@bgen(jjtree)*/implements TsurgeonParserTreeConstants, Tsu
     for (int i = 0; i < jj_expentries.size(); i++) {
       exptokseq[i] = jj_expentries.get(i);
     }
-    return new ParseException(token, exptokseq, tokenImage);
+    return new ParseException(token, exptokseq, TsurgeonParserConstants.tokenImage);
   }
 
   /** Enable tracing. */

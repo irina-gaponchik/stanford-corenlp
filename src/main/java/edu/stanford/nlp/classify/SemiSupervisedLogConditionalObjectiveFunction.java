@@ -30,7 +30,7 @@ public class SemiSupervisedLogConditionalObjectiveFunction extends AbstractCachi
   }
 
   @Override
-  protected void calculate(double[] x) {
+  protected void calculate(double... x) {
     if (derivative == null) {
       derivative = new double[domainDimension()];
     }

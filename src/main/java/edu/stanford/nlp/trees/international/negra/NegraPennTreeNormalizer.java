@@ -22,7 +22,7 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
   private final int nodeCleanup;
   private static final String nonUnaryRoot = "NUR"; // non-unary root
   protected final TreebankLanguagePack tlp;
-  private boolean insertNPinPP = false;
+  private boolean insertNPinPP;
 
   private final Filter<Tree> emptyFilter;
   private final Filter<Tree> aOverAFilter;
@@ -44,9 +44,7 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
       public boolean accept(Tree t) {
         Tree[] kids = t.children();
         Label l = t.label();
-        if ((l != null) && l.value() != null && (l.value().matches("^\\*T.*$")) && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf())
-          return false;
-        return true;
+          return !(l != null && l.value() != null && l.value().matches("^\\*T.*$") && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf());
       }
     };
     aOverAFilter = new Filter<Tree>() {
@@ -54,9 +52,7 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
       public boolean accept(Tree t) {
         if (t.isLeaf() || t.isPreTerminal() || t.children().length != 1)
           return true;
-        if (t.label() != null && t.label().equals(t.children()[0].label()))
-          return false;
-        return true;
+          return !(t.label() != null && t.label().equals(t.children()[0].label()));
       }
     };
   }
@@ -66,7 +62,7 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
     return tlp.startSymbol();
   }
 
-  public String nonUnaryRootSymbol() {
+  public static String nonUnaryRootSymbol() {
     return nonUnaryRoot;
   }
 
@@ -103,7 +99,7 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
     //Accommodate the null root nodes in Negra/Tiger trees
     category = cleanUpLabel(category);
 
-    return (category == null) ? null : category.intern();
+    return category == null ? null : category.intern();
   }
 
   private Tree fixNonUnaryRoot(Tree t, TreeFactory tf) {
@@ -147,14 +143,14 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
 
     for(Tree t : tree) {
       if(t.isLeaf() || t.isPreTerminal()) continue;
-      if(t.value() == null || t.value().equals("")) t.setValue("DUMMY");
+      if(t.value() == null || t.value().isEmpty()) t.setValue("DUMMY");
 
       // there's also a '--' category
       if(t.value().matches("--.*")) continue;
 
       // fix a bug in the ACL08 German tiger treebank
       String cat = t.value();
-      if(cat == null || cat.equals("")) {
+      if(cat == null || cat.isEmpty()) {
         if (t.numChildren() == 3 && t.firstChild().label().value().equals("NN") && t.getChild(1).label().value().equals("$.")) {
           System.err.println("Correcting treebank error: giving phrase label DL to " + t);
           t.label().setValue("DL");
@@ -172,9 +168,9 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
 
   private void insertNPinPPall(Tree t) {
     Tree[] kids = t.children();
-    for (int i = 0, n = kids.length; i < n; i++) {
-      insertNPinPPall(kids[i]);
-    }
+      for (Tree kid : kids) {
+          insertNPinPPall(kid);
+      }
     insertNPinPP(t);
   }
 

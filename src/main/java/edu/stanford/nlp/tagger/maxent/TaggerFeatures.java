@@ -44,8 +44,7 @@ public class TaggerFeatures extends Features {
   final TaggerExperiments domain;
 
   TaggerFeatures(TTags ttags, TaggerExperiments domain) {
-    super();
-    this.ttags = ttags;
+      this.ttags = ttags;
     this.domain = domain;
   }
 

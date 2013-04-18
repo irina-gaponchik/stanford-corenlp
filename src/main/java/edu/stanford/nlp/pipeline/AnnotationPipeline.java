@@ -37,10 +37,10 @@ public class AnnotationPipeline implements Annotator {
     this.annotators = annotators;
     if (TIME) {
       int num = annotators.size();
-      accumulatedTime = new ArrayList<MutableInteger>(annotators.size());
-      for (int i = 0; i < num; i++) {
-        accumulatedTime.add(new MutableInteger());
-      }
+      accumulatedTime = new ArrayList<>(annotators.size());
+        for (Annotator annotator : annotators) {
+            accumulatedTime.add(new MutableInteger());
+        }
     }
   }
 
@@ -91,7 +91,7 @@ public class AnnotationPipeline implements Annotator {
 	 * @param annotations The input annotations to process
 	 * @param callback A function to be called when an annotation finishes. The return value of the callback is ignored
 	 */
-  public void annotate(final Iterable<Annotation> annotations, final Function<Annotation,Object> callback){
+  public void annotate(Iterable<Annotation> annotations, Function<Annotation,Object> callback){
     annotate(annotations, Runtime.getRuntime().availableProcessors(), callback);
   }
 
@@ -101,7 +101,7 @@ public class AnnotationPipeline implements Annotator {
 	 * @param annotations The input annotations to process
 	 * @param numThreads The number of threads to run on
 	 */
-  public void annotate(final Iterable<Annotation> annotations, int numThreads){
+  public void annotate(Iterable<Annotation> annotations, int numThreads){
     annotate(annotations, numThreads, new Function<Annotation, Object>() {
       public Object apply(Annotation in) { return null; }
     });
@@ -174,7 +174,7 @@ public class AnnotationPipeline implements Annotator {
    *  how much time was spent by each annotator and by the entire annotation
    *  pipeline.  This String includes newline characters but does not end
    *  with one, and so it is suitable to be printed out with a 
-   *  <code>println()</code>.
+   *  {@code println()}.
    *
    *  @return Human readable information on time spent in processing.
    */
@@ -204,14 +204,14 @@ public class AnnotationPipeline implements Annotator {
   }
 
   public Set<Requirement> requires() {
-    if (annotators.size() == 0) {
+    if (annotators.isEmpty()) {
       return Collections.emptySet();
     }
     return annotators.get(0).requires();
   }
 
 
-  public static void main(String[] args) throws IOException, ClassNotFoundException {
+  public static void main(String... args) throws IOException, ClassNotFoundException {
     Timing tim = new Timing();
     AnnotationPipeline ap = new AnnotationPipeline();
     boolean verbose = false;
@@ -230,7 +230,7 @@ public class AnnotationPipeline implements Annotator {
 **/
 //    ap.addAnnotator(new SRLAnnotator());
 
-    String text = ("USAir said in the filings that Mr. Icahn first contacted Mr. Colodny last September to discuss the benefits of combining TWA and USAir -- either by TWA's acquisition of USAir, or USAir's acquisition of TWA.");
+    String text = "USAir said in the filings that Mr. Icahn first contacted Mr. Colodny last September to discuss the benefits of combining TWA and USAir -- either by TWA's acquisition of USAir, or USAir's acquisition of TWA.";
     Annotation a = new Annotation(text);
     ap.annotate(a);
     System.out.println(a.get(CoreAnnotations.TokensAnnotation.class));

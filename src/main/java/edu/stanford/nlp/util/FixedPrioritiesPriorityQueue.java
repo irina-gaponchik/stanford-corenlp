@@ -142,7 +142,7 @@ public class FixedPrioritiesPriorityQueue<E>
   }
 
   public List<E> toSortedList() {
-    List<E> list = new ArrayList<E>();
+    List<E> list = new ArrayList<>();
     while (hasNext()) {
       list.add(next());
     }
@@ -175,7 +175,7 @@ public class FixedPrioritiesPriorityQueue<E>
   // -----------------------------------------------------------------------
 
   private void grow(int newCapacity) {
-    List<E> newElements = new ArrayList<E>(newCapacity);
+    List<E> newElements = new ArrayList<>(newCapacity);
     double[] newPriorities = new double[newCapacity];
     if (size > 0) {
       newElements.addAll(elements);
@@ -266,7 +266,7 @@ public class FixedPrioritiesPriorityQueue<E>
     }
     if (numKeysPrinted < size())
       sb.append("...");
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 
@@ -276,10 +276,10 @@ public class FixedPrioritiesPriorityQueue<E>
    */
   @Override
   public FixedPrioritiesPriorityQueue<E> clone() {
-    FixedPrioritiesPriorityQueue<E> clonePQ = new FixedPrioritiesPriorityQueue<E>();
+    FixedPrioritiesPriorityQueue<E> clonePQ = new FixedPrioritiesPriorityQueue<>();
     clonePQ.size = size;
     clonePQ.capacity = capacity;
-    clonePQ.elements = new ArrayList<E>(capacity);
+    clonePQ.elements = new ArrayList<>(capacity);
     clonePQ.priorities = new double[capacity];
     if (size() > 0) {
       clonePQ.elements.addAll(elements);
@@ -291,8 +291,8 @@ public class FixedPrioritiesPriorityQueue<E>
 
   // -----------------------------------------------------------------------
 
-  public static void main(String[] args) {
-    FixedPrioritiesPriorityQueue<String> pq = new FixedPrioritiesPriorityQueue<String>();
+  public static void main(String... args) {
+    FixedPrioritiesPriorityQueue<String> pq = new FixedPrioritiesPriorityQueue<>();
     System.out.println(pq);
     pq.add("one",1);
     System.out.println(pq);

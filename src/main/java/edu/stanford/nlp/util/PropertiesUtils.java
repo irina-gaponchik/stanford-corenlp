@@ -45,7 +45,7 @@ public class PropertiesUtils {
     } else {
       List<Map.Entry<String, String>> entries = getSortedEntries(properties);
       for (Map.Entry<String, String> entry : entries) {
-        if ( ! "".equals(entry.getKey())) {
+        if (entry.getKey() != null && !entry.getKey().isEmpty()) {
           stream.format("  %-30s = %s%n", entry.getKey(), entry.getValue());
         }
       }
@@ -73,7 +73,7 @@ public class PropertiesUtils {
   }
 
   /**
-   * Checks to make sure that all properties specified in <code>properties</code>
+   * Checks to make sure that all properties specified in {@code properties}
    * are known to the program by checking that each simply overrides
    * a default value
    * @param properties Current properties
@@ -106,14 +106,9 @@ public class PropertiesUtils {
    * need to specify the desired type (e.g. Double.class) and the default value
    * is an object of that type, i.e. a double 0.0 instead of the String "0.0".
    */
-  @SuppressWarnings("unchecked")
   public static <E> E get(Properties props, String key, E defaultValue, Type type) {
     String value = props.getProperty(key);
-    if (value == null) {
-      return defaultValue;
-    } else {
-      return (E) MetaClass.cast(value, type);
-    }
+      return value == null ? defaultValue : (E) MetaClass.cast(value, type);
   }
   
   /**
@@ -128,11 +123,7 @@ public class PropertiesUtils {
    */
   public static int getInt(Properties props, String key, int defaultValue) {
     String value = props.getProperty(key);
-    if (value != null) {
-      return Integer.parseInt(value);
-    } else {
-      return defaultValue;
-    }
+      return value != null ? Integer.parseInt(value) : defaultValue;
   }
     
   /**
@@ -141,11 +132,7 @@ public class PropertiesUtils {
    */
   public static long getLong(Properties props, String key, long defaultValue) {
     String value = props.getProperty(key);
-    if (value != null) {
-      return Long.parseLong(value);
-    } else {
-      return defaultValue;
-    }
+      return value != null ? Long.parseLong(value) : defaultValue;
   }
 
   /**
@@ -160,11 +147,7 @@ public class PropertiesUtils {
    */
   public static double getDouble(Properties props, String key, double defaultValue) {
     String value = props.getProperty(key);
-    if (value != null) {
-      return Double.parseDouble(value);
-    } else {
-      return defaultValue;
-    }
+      return value != null ? Double.parseDouble(value) : defaultValue;
   }
  
   /**
@@ -180,11 +163,7 @@ public class PropertiesUtils {
   public static boolean getBool(Properties props, String key, 
                                 boolean defaultValue) {
     String value = props.getProperty(key);
-    if (value != null) {
-      return Boolean.parseBoolean(value);
-    } else {
-      return defaultValue;
-    }
+      return value != null ? Boolean.parseBoolean(value) : defaultValue;
   }  
   
   /**

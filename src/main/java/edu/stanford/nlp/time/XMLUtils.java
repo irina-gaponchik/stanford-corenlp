@@ -87,7 +87,7 @@ public class XMLUtils {
   // Like element.getAttribute except returns null if attribute not present
   public static String getAttribute(Element element, String name) {
     Attr attr = element.getAttributeNode(name);
-    return (attr != null)? attr.getValue(): null;
+    return attr != null ? attr.getValue(): null;
   }
 
   public static void removeChildren(Element e) {

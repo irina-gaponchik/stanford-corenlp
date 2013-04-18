@@ -26,12 +26,12 @@ public class Edge extends Item {
   public String toString() {
     // TODO: used to contain more useful information
     //return "Edge(" + Numberer.getGlobalNumberer("states").object(state) + ":" + start + "-" + end + "," + head + "/" + Numberer.getGlobalNumberer("tags").object(tag) + ")";
-    return "Edge(" + state + ":" + start + "-" + end + "," + head + "/" + tag + ")";
+    return "Edge(" + state + ':' + start + '-' + end + ',' + head + '/' + tag + ')';
   }
 
   @Override
   public int hashCode() {
-    return (state << 1) ^ (head << 8) ^ (tag << 16) ^ (start << 4) ^ (end << 24);
+    return state << 1 ^ head << 8 ^ tag << 16 ^ start << 4 ^ end << 24;
   }
 
   @Override

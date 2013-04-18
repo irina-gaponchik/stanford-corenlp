@@ -1,7 +1,7 @@
 package edu.stanford.nlp.ling;
 
 /**
- * A <code>StringLabel</code> object acts as a Label by containing a
+ * A {@code StringLabel} object acts as a Label by containing a
  * single String, which it sets or returns in response to requests.
  * The hashCode() and compareTo() methods for this class assume that this
  * string value is non-null.  equals() is correctly implemented
@@ -25,14 +25,14 @@ public class StringLabel extends ValueLabel implements HasOffset {
 
 
   /**
-   * Create a new <code>StringLabel</code> with a null content (i.e., str).
+   * Create a new {@code StringLabel} with a null content (i.e., str).
    */
   public StringLabel() {
   }
 
 
   /**
-   * Create a new <code>StringLabel</code> with the given content.
+   * Create a new {@code StringLabel} with the given content.
    *
    * @param str The new label's content
    */
@@ -41,7 +41,7 @@ public class StringLabel extends ValueLabel implements HasOffset {
   }
 
   /**
-   * Create a new <code>StringLabel</code> with the given content.
+   * Create a new {@code StringLabel} with the given content.
    *
    * @param str The new label's content
    * @param beginPosition Start offset in original text
@@ -49,14 +49,14 @@ public class StringLabel extends ValueLabel implements HasOffset {
    */
   public StringLabel(String str, int beginPosition, int endPosition) {
     this.str = str;
-    setBeginPosition(beginPosition);
-    setEndPosition(endPosition);
+      this.beginPosition = beginPosition;
+      this.endPosition = endPosition;
   }
 
 
   /**
-   * Create a new <code>StringLabel</code> with the
-   * <code>value()</code> of another label as its label.
+   * Create a new {@code StringLabel} with the
+   * {@code value()} of another label as its label.
    *
    * @param label The other label
    */
@@ -64,8 +64,8 @@ public class StringLabel extends ValueLabel implements HasOffset {
     this.str = label.value();
     if (label instanceof HasOffset) {
       HasOffset ofs = (HasOffset) label;
-      setBeginPosition(ofs.beginPosition());
-      setEndPosition(ofs.endPosition());
+        beginPosition = ofs.beginPosition();
+        endPosition = ofs.endPosition();
     }
   }
 
@@ -87,7 +87,7 @@ public class StringLabel extends ValueLabel implements HasOffset {
    * @param value The value for the label
    */
   @Override
-  public void setValue(final String value) {
+  public void setValue(String value) {
     str = value;
   }
 
@@ -98,7 +98,7 @@ public class StringLabel extends ValueLabel implements HasOffset {
    * @param str The str for the label
    */
   @Override
-  public void setFromString(final String str) {
+  public void setFromString(String str) {
     this.str = str;
   }
 
@@ -110,14 +110,12 @@ public class StringLabel extends ValueLabel implements HasOffset {
   // extra class guarantees correct lazy loading (Bloch p.194)
   private static class StringLabelFactoryHolder {
 
-    private StringLabelFactoryHolder() {}
-
-    static final LabelFactory lf = new StringLabelFactory();
+      static final LabelFactory lf = new StringLabelFactory();
   }
 
   /**
    * Return a factory for this kind of label
-   * (i.e., <code>StringLabel</code>).
+   * (i.e., {@code StringLabel}).
    * The factory returned is always the same one (a singleton).
    *
    * @return The label factory

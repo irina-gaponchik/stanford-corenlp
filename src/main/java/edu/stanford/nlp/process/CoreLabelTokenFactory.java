@@ -38,8 +38,7 @@ public class CoreLabelTokenFactory implements CoreTokenFactory<CoreLabel>, Lexed
    * @param addIndices if true, begin and end position annotations will be included (this is the default)
    */
   public CoreLabelTokenFactory(boolean addIndices) {
-    super();
-    this.addIndices = addIndices;
+      this.addIndices = addIndices;
   }
 
   /**
@@ -72,7 +71,7 @@ public class CoreLabelTokenFactory implements CoreTokenFactory<CoreLabel>, Lexed
     return l;
   }
 
-  public CoreLabel makeToken(String[] keys, String[] values) {
+  public CoreLabel makeToken(String[] keys, String... values) {
     CoreLabel l = new CoreLabel(keys, values);
     return l;
   }

@@ -65,12 +65,12 @@ public class Timing {
    */
   public long report(String str, PrintStream stream) {
     long elapsed = this.report();
-    stream.println(str + " Time elapsed: " + (elapsed) + " ms");
+    stream.println(str + " Time elapsed: " + elapsed + " ms");
     return elapsed;
   }
 
   /**
-   * Print elapsed time to <code>System.err</code> (without stopping timer).
+   * Print elapsed time to {@code System.err} (without stopping timer).
    *
    * @param str Additional prefix string to be printed
    * @return Number of milliseconds elapsed
@@ -88,7 +88,7 @@ public class Timing {
    */
   public long report(String str, PrintWriter writer) {
     long elapsed = this.report();
-    writer.println(str + " Time elapsed: " + (elapsed) + " ms");
+    writer.println(str + " Time elapsed: " + elapsed + " ms");
     return elapsed;
   }
 
@@ -97,7 +97,7 @@ public class Timing {
   }
 
   public static String toSecondsString(long elapsed) {
-    return nf.format(((double) elapsed) / 1000);
+    return nf.format((double) elapsed / 1000);
   }
 
 
@@ -128,7 +128,7 @@ public class Timing {
   }
 
   /**
-   * Print elapsed time to <code>System.err</code> and restart timer.
+   * Print elapsed time to {@code System.err} and restart timer.
    *
    * @param str Additional prefix string to be printed
    * @return Number of milliseconds elapsed
@@ -176,7 +176,7 @@ public class Timing {
   }
 
   /**
-   * Print elapsed time to <code>System.err</code> and stop timer.
+   * Print elapsed time to {@code System.err} and stop timer.
    *
    * @param str Additional prefix string to be printed
    * @return Number of milliseconds elapsed
@@ -226,13 +226,13 @@ public class Timing {
    */
   public static long endTime(String str, PrintStream stream) {
     long elapsed = endTime();
-    stream.println(str + " Time elapsed: " + (elapsed) + " ms");
+    stream.println(str + " Time elapsed: " + elapsed + " ms");
     return elapsed;
   }
 
   /**
    * Print elapsed time on (static) timer to
-   * <code>System.err</code> (without stopping timer).
+   * {@code System.err} (without stopping timer).
    *
    * @param str Additional prefix string to be printed
    * @return Number of milliseconds elapsed
@@ -278,7 +278,7 @@ public class Timing {
    */
   public static void endDoing() {
     long elapsed = System.currentTimeMillis() - startTime;
-    System.err.println("done [" + nf.format(((double) elapsed) / 1000) +
+    System.err.println("done [" + nf.format((double) elapsed / 1000) +
                        " sec].");
   }
 
@@ -287,7 +287,7 @@ public class Timing {
    */
   public static void endDoing(String msg) {
     long elapsed = System.currentTimeMillis() - startTime;
-    System.err.println(msg + " done [" + nf.format(((double) elapsed) / 1000) +
+    System.err.println(msg + " done [" + nf.format((double) elapsed / 1000) +
                        " sec].");
   }
 
@@ -313,12 +313,12 @@ public class Timing {
    */
   public static long tick(String str, PrintStream stream) {
     long elapsed = tick();
-    stream.println(str + " Time elapsed: " + (elapsed) + " ms");
+    stream.println(str + " Time elapsed: " + elapsed + " ms");
     return elapsed;
   }
 
   /**
-   * Print elapsed time to <code>System.err</code> and restart (static) timer.
+   * Print elapsed time to {@code System.err} and restart (static) timer.
    *
    * @param str Additional prefix string to be printed
    * @return Number of milliseconds elapsed
@@ -340,7 +340,7 @@ public class Timing {
 
   @Override
   public String toString() {
-    return "Timing[start=" + startTime + "]";
+    return "Timing[start=" + startTime + ']';
   }
 
 }

@@ -19,7 +19,7 @@ import edu.stanford.nlp.util.Generics;
  * Produces a list of sentences from either a plain text or XML document.
  * <p>
  * Tokenization: The default tokenizer is {@link PTBTokenizer}. If null is passed
- * to <code>setTokenizerFactory</code>, then whitespace tokenization is assumed.
+ * to {@code setTokenizerFactory}, then whitespace tokenization is assumed.
  * <p>
  * Adding a new document type requires two steps:
  * <ol>
@@ -35,7 +35,7 @@ import edu.stanford.nlp.util.Generics;
  */
 public class DocumentPreprocessor implements Iterable<List<HasWord>> {
 
-  public static enum DocType {Plain, XML}
+  public enum DocType {Plain, XML}
 
   // inputReader is used in a fairly yucky way at the moment to communicate
   // from a XMLIterator across to a PlainTextIterator.  Maybe redo by making
@@ -46,13 +46,13 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
   //Configurable options
   private TokenizerFactory<? extends HasWord> tokenizerFactory = PTBTokenizer.coreLabelFactory();
   private String[] sentenceFinalPuncWords = {".", "?", "!"};
-  private Function<List<HasWord>,List<HasWord>> escaper = null;
-  private String sentenceDelimiter = null;
+  private Function<List<HasWord>,List<HasWord>> escaper;
+  private String sentenceDelimiter;
   /**
    * Example: if the words are already POS tagged and look like
    * foo_VB, you want to set the tagDelimiter to "_"
    */
-  private String tagDelimiter = null;
+  private String tagDelimiter;
   /**
    * When doing XML parsing, only accept text in between tags that
    * match this regular expression.  Defaults to everything.
@@ -119,7 +119,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
    *
    * @param sentenceFinalPuncWords
    */
-  public void setSentenceFinalPuncWords(String[] sentenceFinalPuncWords) {
+  public void setSentenceFinalPuncWords(String... sentenceFinalPuncWords) {
     this.sentenceFinalPuncWords = sentenceFinalPuncWords;
   }
 
@@ -196,8 +196,8 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
     private final Set<String> sentDelims;
     private final Set<String> delimFollowers;
     private Function<String, String[]> splitTag;
-    private List<HasWord> nextSent = null;
-    private final List<HasWord> nextSentCarryover = new ArrayList<HasWord>();
+    private List<HasWord> nextSent;
+    private final List<HasWord> nextSentCarryover = new ArrayList<>();
 
     public PlainTextIterator() {
       // Establish how to find sentence boundaries
@@ -222,11 +222,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
         tokenizer = WhitespaceTokenizer.
           newWordWhitespaceTokenizer(inputReader, eolIsSignificant);
       } else {
-        if (eolIsSignificant) {
-          tokenizer = tokenizerFactory.getTokenizer(inputReader, "tokenizeNLs");
-        } else {
-          tokenizer = tokenizerFactory.getTokenizer(inputReader);
-        }
+          tokenizer = eolIsSignificant ? tokenizerFactory.getTokenizer(inputReader, "tokenizeNLs") : tokenizerFactory.getTokenizer(inputReader);
       }
 
       // If tokens are tagged, then we must split them
@@ -236,7 +232,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
         splitTag = new Function<String,String[]>() {
           private final String splitRegex = String.format("%s(?!.*%s)", tagDelimiter, tagDelimiter);
           public String[] apply(String in) {
-            final String[] splits = in.trim().split(splitRegex);
+            String[] splits = in.trim().split(splitRegex);
             if(splits.length == 2)
               return splits;
             else {
@@ -249,7 +245,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
     }
 
     private void primeNext() {
-      nextSent = new ArrayList<HasWord>(nextSentCarryover);
+      nextSent = new ArrayList<>(nextSentCarryover);
       nextSentCarryover.clear();
       boolean seenBoundary = false;
 
@@ -291,8 +287,8 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
         // sentence, which at this point means the sentence delimiter
         // was a whitespace token such as \n.  We might as well keep
         // going as if we had never seen anything.
-        if (seenBoundary && delimFollowers.size() == 0) {
-          if (nextSent.size() > 0) {
+        if (seenBoundary && delimFollowers.isEmpty()) {
+          if (!nextSent.isEmpty()) {
             break;
           } else {
             seenBoundary = false;
@@ -300,7 +296,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
         }
       }
 
-      if (nextSent.size() == 0 && nextSentCarryover.size() == 0) {
+      if (nextSent.isEmpty() && nextSentCarryover.isEmpty()) {
         IOUtils.closeIgnoringExceptions(inputReader);
         inputReader = null;
         nextSent = null;
@@ -340,7 +336,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
     private List<HasWord> nextSent; // = null;
 
     public XMLIterator() {
-      xmlItr = new XMLBeginEndIterator<String>(inputReader, elementDelimiter);
+      xmlItr = new XMLBeginEndIterator<>(inputReader, elementDelimiter);
       originalDocReader = inputReader;
       primeNext();
     }
@@ -357,11 +353,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
           String block = xmlItr.next();
           inputReader = new BufferedReader(new StringReader(block));
           plainItr = new PlainTextIterator();
-          if (plainItr.hasNext()) {
-            nextSent = plainItr.next();
-          } else {
-            nextSent = null;
-          }
+            nextSent = plainItr.hasNext() ? plainItr.next() : null;
         } else {
           IOUtils.closeIgnoringExceptions(originalDocReader);
           nextSent = null;
@@ -401,7 +393,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
    *
    * @param args Command-line arguments
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     if (args.length < 1) {
       System.err.println("usage: DocumentPreprocessor OPT* filename");
       System.err.println("    OPT = -xml|-encoding ENC|-tokenizerOptions opts|-tag delim|...");
@@ -419,7 +411,7 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
 
     int i = 0;
     for ( ; i < args.length; i++) {
-      if (args[i].length() == 0 || ! args[i].startsWith("-")) {
+      if (args[i].isEmpty() || !(!args[i].isEmpty() && args[i].charAt(0) == '-')) {
         break;
       }
       if (args[i].equals("-xml")) {
@@ -463,14 +455,14 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
     for ( ; i < args.length; i++) {
       DocumentPreprocessor docPreprocessor = new DocumentPreprocessor(args[i], docType, encoding);
       if (docType == DocType.XML) {
-        docPreprocessor.setElementDelimiter(xmlElementDelimiter);
+          docPreprocessor.elementDelimiter = xmlElementDelimiter;
       }
-      docPreprocessor.setTokenizerFactory(tf);
+        docPreprocessor.tokenizerFactory = tf;
       if (sentenceDelimiter != null) {
-        docPreprocessor.setSentenceDelimiter(sentenceDelimiter);
+          docPreprocessor.sentenceDelimiter = sentenceDelimiter;
       }
       if (tagDelimiter != null) {
-        docPreprocessor.setTagDelimiter(args[++i]);
+          docPreprocessor.tagDelimiter = args[++i];
       }
 
       for (List<HasWord> sentence : docPreprocessor) {

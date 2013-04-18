@@ -10,10 +10,10 @@ import java.util.Iterator;
  * @author Dan Klein (klein@cs.stanford.edu)
  */
 public class FilteredIterator<T> implements Iterator<T> {
-  Iterator<T> iterator = null;
-  Filter<T> filter = null;
-  T current = null;
-  boolean hasCurrent = false;
+  Iterator<T> iterator;
+  Filter<T> filter;
+  T current;
+  boolean hasCurrent;
 
   T currentCandidate() {
     return current;
@@ -65,9 +65,9 @@ public class FilteredIterator<T> implements Iterator<T> {
     skipUnacceptableCandidates();
   }
 
-  public static void main(String[] args) {
-    Collection<String> c = Arrays.asList(new String[]{"a", "aa", "b", "bb", "cc"});
-    Iterator<String> i = new FilteredIterator<String>(c.iterator(), new Filter<String>() {
+  public static void main(String... args) {
+    Collection<String> c = Arrays.asList("a", "aa", "b", "bb", "cc");
+    Iterator<String> i = new FilteredIterator<>(c.iterator(), new Filter<String>() {
       private static final long serialVersionUID = 1L;
 
       public boolean accept(String o) {

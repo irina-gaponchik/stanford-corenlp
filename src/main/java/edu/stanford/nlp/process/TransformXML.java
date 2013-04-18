@@ -21,7 +21,7 @@ import edu.stanford.nlp.util.XMLUtils;
  * Reads XML from an input file or stream and writes XML to an output
  * file or stream, while transforming text appearing inside specified
  * XML tags by applying a specified {@link Function
- * <code>Function</code>}.  See TransformXMLApplications for examples.
+ * {@code Function}}.  See TransformXMLApplications for examples.
  * <i>Implementation note:</i> This is done using SAX2.
  *
  * @param <T> The type of the output of the Function (from String to T)
@@ -32,7 +32,7 @@ public class TransformXML<T> {
 
   private final SAXParser saxParser;
 
-  public SAXInterface<T> buildSaxInterface() { return new SAXInterface<T>(); }
+  public SAXInterface<T> buildSaxInterface() { return new SAXInterface<>(); }
 
   public static class SAXInterface<T> extends DefaultHandler {
 
@@ -46,19 +46,19 @@ public class TransformXML<T> {
      * seen &lt;foo&gt; &lt;bar&gt; and "foo" and "bar" are both tags
      * we care about, then depth = 2.
      */
-    protected int depth = 0;
+    protected int depth;
 
     public SAXInterface() {
-      elementsToBeTransformed = new ArrayList<String>();
+      elementsToBeTransformed = new ArrayList<>();
       depth = 0;
       openingTag = null;
       textToBeTransformed = new StringBuffer();
     }
 
     /**
-     * The first tag from {@link <code>elementsToBeTransformed</code>}
-     * that we saw the last time {@link <code>depth</code>} was
-     * <code>0</code>.
+     * The first tag from {@link {@code elementsToBeTransformed}}
+     * that we saw the last time {@link {@code depth}} was
+     * {@code 0}.
      * <br>
      * You would expect incoming XML to be well-formatted, but just in
      * case it isn't, we keep track of this so we can output the
@@ -152,7 +152,7 @@ public class TransformXML<T> {
     }
 
     public void processText(String text) {
-      if (text.length() > 0) {
+      if (!text.isEmpty()) {
         text = function.apply(text).toString();
         outWriter.print(XMLUtils.escapeXML(text));
         outWriter.print('\n');
@@ -180,7 +180,7 @@ public class TransformXML<T> {
   public static class NoEscapingSAXInterface<T> extends SAXInterface<T> {
     @Override
     public void processText(String text) {
-      if (text.length() > 0) {
+      if (!text.isEmpty()) {
         text = function.apply(text).toString();
         outWriter.print(text);
         outWriter.print('\n');
@@ -203,16 +203,16 @@ public class TransformXML<T> {
    * Read XML from the specified file and write XML to stdout,
    * while transforming text appearing inside the specified XML
    * tags by applying the specified {@link Function
-   * <code>Function</code>}.  Note that the <code>Function</code>
-   * you supply must be prepared to accept <code>String</code>s as
-   * input; if your <code>Function</code> doesn't handle
-   * <code>String</code>s, you need to write a wrapper for it that
+   * {@code Function}}.  Note that the {@code Function}
+   * you supply must be prepared to accept {@code String}s as
+   * input; if your {@code Function} doesn't handle
+   * {@code String}s, you need to write a wrapper for it that
    * does.
    *
-   * @param tags an array of <code>String</code>s, each an XML tag
+   * @param tags an array of {@code String}s, each an XML tag
    *             within which the transformation should be applied
-   * @param fn   the {@link Function <code>Function</code>} to apply
-   * @param in   the <code>File</code> to read from
+   * @param fn   the {@link Function {@code Function}} to apply
+   * @param in   the {@code File} to read from
    */
   public void transformXML(String[] tags, Function<String,T> fn, File in) {
     InputStream ins = null;
@@ -230,17 +230,17 @@ public class TransformXML<T> {
   /**
    * Read XML from the specified file and write XML to specified file,
    * while transforming text appearing inside the specified XML tags
-   * by applying the specified {@link Function <code>Function</code>}.
-   * Note that the <code>Function</code> you supply must be
-   * prepared to accept <code>String</code>s as input; if your
-   * <code>Function</code> doesn't handle <code>String</code>s, you
+   * by applying the specified {@link Function {@code Function}}.
+   * Note that the {@code Function} you supply must be
+   * prepared to accept {@code String}s as input; if your
+   * {@code Function} doesn't handle {@code String}s, you
    * need to write a wrapper for it that does.
    *
-   * @param tags an array of <code>String</code>s, each an XML tag
+   * @param tags an array of {@code String}s, each an XML tag
    *             within which the transformation should be applied
-   * @param fn   the {@link Function <code>Function</code>} to apply
-   * @param in   the <code>File</code> to read from
-   * @param out  the <code>File</code> to write to
+   * @param fn   the {@link Function {@code Function}} to apply
+   * @param in   the {@code File} to read from
+   * @param out  the {@code File} to write to
    */
   public void transformXML(String[] tags, Function<String,T> fn, File in, File out) {
     InputStream ins = null;
@@ -261,16 +261,16 @@ public class TransformXML<T> {
   /**
    * Read XML from input stream and write XML to stdout, while
    * transforming text appearing inside the specified XML tags by
-   * applying the specified {@link Function <code>Function</code>}.
-   * Note that the <code>Function</code> you supply must be
-   * prepared to accept <code>String</code>s as input; if your
-   * <code>Function</code> doesn't handle <code>String</code>s, you
+   * applying the specified {@link Function {@code Function}}.
+   * Note that the {@code Function} you supply must be
+   * prepared to accept {@code String}s as input; if your
+   * {@code Function} doesn't handle {@code String}s, you
    * need to write a wrapper for it that does.
    *
-   * @param tags an array of <code>String</code>s, each an XML tag
+   * @param tags an array of {@code String}s, each an XML tag
    *             within which the transformation should be applied
-   * @param fn   the {@link Function <code>Function</code>} to apply
-   * @param in   the <code>InputStream</code> to read from
+   * @param fn   the {@link Function {@code Function}} to apply
+   * @param in   the {@code InputStream} to read from
    */
   public void transformXML(String[] tags, Function<String,T> fn, InputStream in) {
     transformXML(tags, fn, in, System.out);
@@ -279,17 +279,17 @@ public class TransformXML<T> {
   /**
    * Read XML from input stream and write XML to output stream,
    * while transforming text appearing inside the specified XML tags
-   * by applying the specified {@link Function <code>Function</code>}.
-   * Note that the <code>Function</code> you supply must be
-   * prepared to accept <code>String</code>s as input; if your
-   * <code>Function</code> doesn't handle <code>String</code>s, you
+   * by applying the specified {@link Function {@code Function}}.
+   * Note that the {@code Function} you supply must be
+   * prepared to accept {@code String}s as input; if your
+   * {@code Function} doesn't handle {@code String}s, you
    * need to write a wrapper for it that does.
    *
-   * @param tags an array of <code>String</code>s, each an XML tag
+   * @param tags an array of {@code String}s, each an XML tag
    *             within which the transformation should be applied
-   * @param fn   the {@link Function <code>Function</code>} to apply
-   * @param in   the <code>InputStream</code> to read from
-   * @param out  the <code>OutputStream</code> to write to
+   * @param fn   the {@link Function {@code Function}} to apply
+   * @param in   the {@code InputStream} to read from
+   * @param out  the {@code OutputStream} to write to
    */
   public void transformXML(String[] tags, Function<String,T> fn, InputStream in, OutputStream out) {
     transformXML(tags, fn, in, new OutputStreamWriter(out), 
@@ -299,10 +299,10 @@ public class TransformXML<T> {
   /**
    * Read XML from input stream and write XML to output stream,
    * while transforming text appearing inside the specified XML tags
-   * by applying the specified {@link Function <code>Function</code>}.
-   * Note that the <code>Function</code> you supply must be
-   * prepared to accept <code>String</code>s as input; if your
-   * <code>Function</code> doesn't handle <code>String</code>s, you
+   * by applying the specified {@link Function {@code Function}}.
+   * Note that the {@code Function} you supply must be
+   * prepared to accept {@code String}s as input; if your
+   * {@code Function} doesn't handle {@code String}s, you
    * need to write a wrapper for it that does.
    * <p><i>Implementation notes:</i> The InputStream is assumed to already
    * be buffered if useful, and we need a stream, so that the XML decoder
@@ -310,11 +310,11 @@ public class TransformXML<T> {
    * is to a Writer, and the provided Writer should again be buffered if
    * desirable.  Internally, this Writer is wrapped as a PrintWriter.
    *
-   * @param tags an array of <code>String</code>s, each an XML entity
+   * @param tags an array of {@code String}s, each an XML entity
    *             within which the transformation should be applied
-   * @param fn   the {@link Function <code>Function</code>} to apply
-   * @param in   the <code>InputStream</code> to read from
-   * @param w    the <code>Writer</code> to write to
+   * @param fn   the {@link Function {@code Function}} to apply
+   * @param in   the {@code InputStream} to read from
+   * @param w    the {@code Writer} to write to
    */
   public void transformXML(String[] tags, Function<String,T> fn, InputStream in, Writer w) {
     transformXML(tags, fn, in, w, buildSaxInterface());
@@ -322,7 +322,7 @@ public class TransformXML<T> {
 
   /**
    * Calls the fully specified transformXML with an InputSource
-   * constructed from <code>in</code>.
+   * constructed from {@code in}.
    */
   public void transformXML(String[] tags, Function<String,T> fn, InputStream in, Writer w, SAXInterface<T> handler) {
     transformXML(tags, fn, new InputSource(in), w, handler);
@@ -330,7 +330,7 @@ public class TransformXML<T> {
 
   /**
    * Calls the fully specified transformXML with an InputSource
-   * constructed from <code>in</code>.
+   * constructed from {@code in}.
    */
   public void transformXML(String[] tags, Function<String,T> fn, Reader in, Writer w, SAXInterface<T> handler) {
     transformXML(tags, fn, new InputSource(in), w, handler);
@@ -339,10 +339,10 @@ public class TransformXML<T> {
   /**
    * Read XML from input source and write XML to output writer,
    * while transforming text appearing inside the specified XML tags
-   * by applying the specified {@link Function <code>Function</code>}.
-   * Note that the <code>Function</code> you supply must be
-   * prepared to accept <code>String</code>s as input; if your
-   * <code>Function</code> doesn't handle <code>String</code>s, you
+   * by applying the specified {@link Function {@code Function}}.
+   * Note that the {@code Function} you supply must be
+   * prepared to accept {@code String}s as input; if your
+   * {@code Function} doesn't handle {@code String}s, you
    * need to write a wrapper for it that does.
    * <br>
    * <p><i>Implementation notes:</i> The InputSource is assumed to already
@@ -355,17 +355,17 @@ public class TransformXML<T> {
    * be buffered if desirable.  Internally, this Writer is wrapped as
    * a PrintWriter.
    *
-   * @param tags an array of <code>String</code>s, each an XML entity
+   * @param tags an array of {@code String}s, each an XML entity
    *             within which the transformation should be applied
-   * @param fn   the {@link Function <code>Function</code>} to apply
-   * @param in   the <code>InputStream</code> to read from
-   * @param w    the <code>Writer</code> to write to
+   * @param fn   the {@link Function {@code Function}} to apply
+   * @param in   the {@code InputStream} to read from
+   * @param w    the {@code Writer} to write to
    * @param saxInterface the sax handler you would like to use (default is SaxInterface, defined in this class, but you may define your own handler)
    */
   public void transformXML(String[] tags, Function<String,T> fn, InputSource in, Writer w, SAXInterface<T> saxInterface) {
     saxInterface.outWriter = new PrintWriter(w, true);
     saxInterface.function = fn;
-    saxInterface.elementsToBeTransformed = new ArrayList<String>();
+    saxInterface.elementsToBeTransformed = new ArrayList<>();
     saxInterface.elementsToBeTransformed.addAll(Arrays.asList(tags));
     try {
       saxParser.parse(in, saxInterface);

@@ -43,11 +43,7 @@ public class IntTaggedWord implements Serializable, Comparable<IntTaggedWord> {
     String wordStr;
     if (word >= 0) {
       wordStr = wordIndex.get(word);
-    } else if (word == ANY_WORD_INT) {
-      wordStr = ANY;
-    } else {
-      wordStr = STOP;
-    }
+    } else wordStr = word == ANY_WORD_INT ? ANY : STOP;
     return wordStr;
   }
 
@@ -55,17 +51,13 @@ public class IntTaggedWord implements Serializable, Comparable<IntTaggedWord> {
     String tagStr;
     if (tag >= 0) {
       tagStr = tagIndex.get(tag);
-    } else if (tag == ANY_TAG_INT) {
-      tagStr = ANY;
-    } else {
-      tagStr = STOP;
-    }
+    } else tagStr = tag == ANY_TAG_INT ? ANY : STOP;
     return tagStr;
   }
 
   @Override
   public int hashCode() {
-    return word ^ (tag << 16);
+    return word ^ tag << 16;
   }
 
   @Override
@@ -74,18 +66,14 @@ public class IntTaggedWord implements Serializable, Comparable<IntTaggedWord> {
       return true;
     } else if (o instanceof IntTaggedWord) {
       IntTaggedWord i = (IntTaggedWord) o;
-      return (word == i.word && tag == i.tag);
+      return word == i.word && tag == i.tag;
     } else {
       return false;
     }
   }
 
   public int compareTo(IntTaggedWord that) {
-    if (tag != that.tag) {
-      return tag - that.tag;
-    } else {
-      return word - that.word;
-    }
+      return tag != that.tag ? tag - that.tag : word - that.word;
   }
 
   private static final char[] charsToEscape = { '\"' };
@@ -109,12 +97,8 @@ public class IntTaggedWord implements Serializable, Comparable<IntTaggedWord> {
 
   public String toString(String arg,
                          Index<String> wordIndex, Index<String> tagIndex) {
-    if (arg.equals("verbose")) {
-      return (wordString(wordIndex) + '[' + word + "]/" +
-              tagString(tagIndex) + '[' + tag + ']');
-    } else {
-      return toString(wordIndex, tagIndex);
-    }
+      return arg.equals("verbose") ? wordString(wordIndex) + '[' + word + "]/" +
+              tagString(tagIndex) + '[' + tag + ']' : toString(wordIndex, tagIndex);
   }
 
   public IntTaggedWord(int word, int tag) {
@@ -163,20 +147,28 @@ public class IntTaggedWord implements Serializable, Comparable<IntTaggedWord> {
    */
   public IntTaggedWord(String wordString, String tagString,
                        Index<String> wordIndex, Index<String> tagIndex) {
-    if (wordString.equals(ANY)) {
-      word = ANY_WORD_INT;
-    } else if (wordString.equals(STOP)) {
-      word = STOP_WORD_INT;
-    } else {
-      word = wordIndex.indexOf(wordString, true);
-    }
-    if (tagString.equals(ANY)) {
-      tag = (short) ANY_TAG_INT;
-    } else if (tagString.equals(STOP)) {
-      tag = (short) STOP_TAG_INT;
-    } else {
-      tag = (short) tagIndex.indexOf(tagString, true);
-    }
+      switch (wordString) {
+          case ANY:
+              word = ANY_WORD_INT;
+              break;
+          case STOP:
+              word = STOP_WORD_INT;
+              break;
+          default:
+              word = wordIndex.indexOf(wordString, true);
+              break;
+      }
+      switch (tagString) {
+          case ANY:
+              tag = (short) ANY_TAG_INT;
+              break;
+          case STOP:
+              tag = (short) STOP_TAG_INT;
+              break;
+          default:
+              tag = (short) tagIndex.indexOf(tagString, true);
+              break;
+      }
   }
 
   private static final long serialVersionUID = 1L;

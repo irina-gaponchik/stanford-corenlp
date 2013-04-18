@@ -39,7 +39,7 @@ public class Extractors implements Serializable {
    *
    * @param extrs The array of extractors.  It is copied in this init.
    */
-  public Extractors(Extractor[] extrs) {
+  public Extractors(Extractor... extrs) {
     v = new Extractor[extrs.length];
     System.arraycopy(extrs, 0, v, 0, extrs.length);
     initTypes();
@@ -51,9 +51,9 @@ public class Extractors implements Serializable {
    */
   void initTypes() {
 
-    local = new ArrayList<Pair<Integer,Extractor>>();
-    localContext = new ArrayList<Pair<Integer,Extractor>>();
-    dynamic = new ArrayList<Pair<Integer,Extractor>>();
+    local = new ArrayList<>();
+    localContext = new ArrayList<>();
+    dynamic = new ArrayList<>();
 
     for(int i=0; i<v.length; ++i) {
       Extractor e = v[i];
@@ -89,7 +89,7 @@ public class Extractors implements Serializable {
 
   boolean equals(History h, History h1) {
     for (Extractor extractor : v) {
-      if ( ! (extractor.extract(h).equals(extractor.extract(h1)))) {
+      if ( !extractor.extract(h).equals(extractor.extract(h1))) {
         return false;
       }
     }
@@ -186,12 +186,12 @@ public class Extractors implements Serializable {
 
 
   /**
-   * Prints out the pair of <code>Extractors</code> objects found in the
+   * Prints out the pair of {@code Extractors} objects found in the
    * file that is the first and only argument.
    * @param args Filename of extractors file (standardly written with
    *       <code>.ex<code> extension)
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     try {
       ObjectInputStream in = new ObjectInputStream(new FileInputStream(args[0]));
       Extractors extrs = (Extractors) in.readObject();

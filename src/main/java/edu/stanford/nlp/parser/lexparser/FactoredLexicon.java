@@ -41,18 +41,18 @@ public class FactoredLexicon extends BaseLexicon {
   
   private static final String NO_MORPH_ANALYSIS = "xXxNONExXx";
   
-  private Index<String> morphIndex = new HashIndex<String>();
+  private Index<String> morphIndex = new HashIndex<>();
   
-  private TwoDimensionalIntCounter<Integer,Integer> wordTag = new TwoDimensionalIntCounter<Integer,Integer>(40000);
-  private Counter<Integer> wordTagUnseen = new ClassicCounter<Integer>(500);
+  private TwoDimensionalIntCounter<Integer,Integer> wordTag = new TwoDimensionalIntCounter<>(40000);
+  private Counter<Integer> wordTagUnseen = new ClassicCounter<>(500);
   
-  private TwoDimensionalIntCounter<Integer,Integer> lemmaTag = new TwoDimensionalIntCounter<Integer,Integer>(40000);
-  private Counter<Integer> lemmaTagUnseen = new ClassicCounter<Integer>(500);
+  private TwoDimensionalIntCounter<Integer,Integer> lemmaTag = new TwoDimensionalIntCounter<>(40000);
+  private Counter<Integer> lemmaTagUnseen = new ClassicCounter<>(500);
   
-  private TwoDimensionalIntCounter<Integer,Integer> morphTag = new TwoDimensionalIntCounter<Integer,Integer>(500);
-  private Counter<Integer> morphTagUnseen = new ClassicCounter<Integer>(500);
+  private TwoDimensionalIntCounter<Integer,Integer> morphTag = new TwoDimensionalIntCounter<>(500);
+  private Counter<Integer> morphTagUnseen = new ClassicCounter<>(500);
   
-  private Counter<Integer> tagCounter = new ClassicCounter<Integer>(300);
+  private Counter<Integer> tagCounter = new ClassicCounter<>(300);
   
   public FactoredLexicon(MorphoFeatureSpecification morphoSpec, Index<String> wordIndex, Index<String> tagIndex) {
     super(wordIndex, tagIndex);
@@ -94,13 +94,13 @@ public class FactoredLexicon extends BaseLexicon {
   
   @Override
   public float score(IntTaggedWord iTW, int loc, String word, String featureSpec) {
-    final int wordId = iTW.word();
-    final int tagId = iTW.tag();
+    int wordId = iTW.word();
+    int tagId = iTW.tag();
     
     // Force 1-best path to go through the boundary symbol
     // (deterministic tagging)
-    final int boundaryId = wordIndex.indexOf(BOUNDARY);
-    final int boundaryTagId = tagIndex.indexOf(BOUNDARY_TAG);
+    int boundaryId = wordIndex.indexOf(BOUNDARY);
+    int boundaryTagId = tagIndex.indexOf(BOUNDARY_TAG);
     if (wordId == boundaryId && tagId == boundaryTagId) {
       return 0.0f;
     }
@@ -112,7 +112,7 @@ public class FactoredLexicon extends BaseLexicon {
     int lemmaId = wordIndex.indexOf(lemma);
     String richMorphTag = lemmaMorph.second();
     String reducedMorphTag = morphoSpec.strToFeatures(richMorphTag).toString().trim();
-    reducedMorphTag = reducedMorphTag.length() == 0 ? NO_MORPH_ANALYSIS : reducedMorphTag;
+    reducedMorphTag = reducedMorphTag.isEmpty() ? NO_MORPH_ANALYSIS : reducedMorphTag;
     int morphId = morphIndex.indexOf(reducedMorphTag, true);
     
     // Score the factors and create the rule score p_W_T
@@ -261,7 +261,7 @@ public class FactoredLexicon extends BaseLexicon {
     // Train uw model on words
     uwModelTrainer.train(trees, weight);
     
-    final double numTrees = trees.size();
+    double numTrees = trees.size();
     Iterator<Tree> rawTreesItr = rawTrees == null ? null : rawTrees.iterator();
     Iterator<Tree> treeItr = trees.iterator();
     
@@ -288,7 +288,7 @@ public class FactoredLexicon extends BaseLexicon {
         int lemmaId = wordIndex.indexOf(lemma, true);
         String richMorphTag = lemmaMorph.second();
         String reducedMorphTag = morphoSpec.strToFeatures(richMorphTag).toString().trim();
-        reducedMorphTag = reducedMorphTag.length() == 0 ? NO_MORPH_ANALYSIS : reducedMorphTag;
+        reducedMorphTag = reducedMorphTag.isEmpty() ? NO_MORPH_ANALYSIS : reducedMorphTag;
         int morphId = morphIndex.indexOf(reducedMorphTag, true);
         
         // Seen event counts
@@ -312,10 +312,10 @@ public class FactoredLexicon extends BaseLexicon {
       }
       ++treeId;
 
-      if (DEBUG && (treeId % 100) == 0) {
+      if (false) {
         System.err.printf("[%d]",treeId);
       }
-      if (DEBUG && (treeId % 10000) == 0) {
+      if (false) {
         System.err.println();
       }
     }
@@ -332,10 +332,10 @@ public class FactoredLexicon extends BaseLexicon {
     int boundaryTagId = tagIndex.indexOf(BOUNDARY_TAG, true);
     
     // Initialize rules table
-    final int numWords = wordIndex.size();
+    int numWords = wordIndex.size();
     rulesWithWord = new List[numWords];
     for (int w = 0; w < numWords; w++) {
-      rulesWithWord[w] = new ArrayList<IntTaggedWord>(1);
+      rulesWithWord[w] = new ArrayList<>(1);
     }
     
     // Collect rules, indexed by word
@@ -366,7 +366,7 @@ public class FactoredLexicon extends BaseLexicon {
 
     System.err.print("The " + rulesWithWord[unkWord].size() + " open class tags are: [");
     for (IntTaggedWord item : rulesWithWord[unkWord]) {
-      System.err.print(" " + tagIndex.get(item.tag()));
+      System.err.print(' ' + tagIndex.get(item.tag()));
     }
     System.err.println(" ] ");
 
@@ -385,7 +385,7 @@ public class FactoredLexicon extends BaseLexicon {
    */
   private static List<FactoredLexiconEvent> treebankToLexiconEvents(List<Tree> treebank, 
       FactoredLexicon lexicon) {
-    List<FactoredLexiconEvent> events = new ArrayList<FactoredLexiconEvent>(70000);
+    List<FactoredLexiconEvent> events = new ArrayList<>(70000);
     for (Tree tree : treebank) {
       List<Label> yield = tree.yield();
       List<Label> preterm = tree.preTerminalYield();
@@ -398,7 +398,7 @@ public class FactoredLexicon extends BaseLexicon {
         int wordId = lexicon.wordIndex.indexOf(word);
         // Two checks to see if we keep this example
         if (tagId < 0) {
-          System.err.println("Discarding training example: " + word + " " + tag);
+          System.err.println("Discarding training example: " + word + ' ' + tag);
           continue;
         }
 //        if (counts.probWordTag(wordId, tagId) == 0.0) {
@@ -411,7 +411,7 @@ public class FactoredLexicon extends BaseLexicon {
         String lemma = lemmaMorph.first();
         String richTag = lemmaMorph.second();
         String reducedTag = lexicon.morphoSpec.strToFeatures(richTag).toString();
-        reducedTag = reducedTag.length() == 0 ? NO_MORPH_ANALYSIS : reducedTag;
+        reducedTag = reducedTag.isEmpty() ? NO_MORPH_ANALYSIS : reducedTag;
         
         int lemmaId = lexicon.wordIndex.indexOf(lemma);
         int morphId = lexicon.morphIndex.indexOf(reducedTag);
@@ -424,7 +424,7 @@ public class FactoredLexicon extends BaseLexicon {
   
   private static List<FactoredLexiconEvent> getTuningSet(Treebank devTreebank,
       FactoredLexicon lexicon, TreebankLangParserParams tlpp) {
-    List<Tree> devTrees = new ArrayList<Tree>(3000);
+    List<Tree> devTrees = new ArrayList<>(3000);
     for (Tree tree : devTreebank) {
       for (Tree subTree : tree) {
         if (!subTree.isLeaf()) {
@@ -459,7 +459,7 @@ public class FactoredLexicon extends BaseLexicon {
   /**
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if (args.length != 4) {
       System.err.printf("Usage: java %s language features train_file dev_file%n", FactoredLexicon.class.getName());
       System.exit(-1);
@@ -495,9 +495,9 @@ public class FactoredLexicon extends BaseLexicon {
     // Create word and tag indices
     // Save trees in a collection since the interface requires that....
     System.out.print("Loading training trees...");
-    List<Tree> trainTrees = new ArrayList<Tree>(19000);
-    Index<String> wordIndex = new HashIndex<String>();
-    Index<String> tagIndex = new HashIndex<String>();
+    List<Tree> trainTrees = new ArrayList<>(19000);
+    Index<String> wordIndex = new HashIndex<>();
+    Index<String> tagIndex = new HashIndex<>();
     for (Tree tree : trainTreebank) {
       for (Tree subTree : tree) {
         if (!subTree.isLeaf()) {
@@ -525,10 +525,10 @@ public class FactoredLexicon extends BaseLexicon {
     // Print the probabilities that we obtain
     // TODO(spenceg): Implement tagging accuracy with FactLex
     int nCorrect = 0;
-    Counter<String> errors = new ClassicCounter<String>();
+    Counter<String> errors = new ClassicCounter<>();
     for (FactoredLexiconEvent event : tuningSet) {
       Iterator<IntTaggedWord> itr = lexicon.ruleIteratorByWord(event.word(), event.getLoc(), event.featureStr());
-      Counter<Integer> logScores = new ClassicCounter<Integer>();
+      Counter<Integer> logScores = new ClassicCounter<>();
       boolean noRules = true;
       int goldTagId = -1;
       while (itr.hasNext()) {
@@ -560,7 +560,7 @@ public class FactoredLexicon extends BaseLexicon {
     double acc = (double) nCorrect / (double) tuningSet.size();
     System.err.printf("%n%nACCURACY: %.2f%n%n", acc*100.0);
     System.err.println("% of errors by type:");
-    List<String> biggestKeys = new ArrayList<String>(errors.keySet());
+    List<String> biggestKeys = new ArrayList<>(errors.keySet());
     Collections.sort(biggestKeys, Counters.toComparator(errors, false, true));
     Counters.normalize(errors);
     for (String key : biggestKeys) {

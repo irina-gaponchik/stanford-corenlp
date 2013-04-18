@@ -46,7 +46,7 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
   /**
    * Label(s) for this document.
    */
-  protected final List<L> labels = new ArrayList<L>();
+  protected final List<L> labels = new ArrayList<>();
 
   /**
    * TokenizerFactory used to convert the text into words inside
@@ -69,7 +69,7 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
    * from a desired source.
    */
   public BasicDocument(TokenizerFactory<Word> tokenizerFactory) {
-    setTokenizerFactory(tokenizerFactory);
+      this.tokenizerFactory = tokenizerFactory;
   }
 
   public BasicDocument(Document<L, Word, Word> d) {
@@ -91,16 +91,12 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
    * for convenience (so it's more like a constructor, but inherited).
    */
   public static <L> BasicDocument<L> init(String text, String title, boolean keepOriginalText) {
-    BasicDocument<L> basicDocument = new BasicDocument<L>();
+    BasicDocument<L> basicDocument = new BasicDocument<>();
     // initializes the List of labels and sets the title
     basicDocument.setTitle(title);
 
     // stores the original text as specified
-    if (keepOriginalText) {
-      basicDocument.originalText = text;
-    } else {
-      basicDocument.originalText = null;
-    }
+      basicDocument.originalText = keepOriginalText ? text : null;
 
     // populates the words by parsing the text
     basicDocument.parse(text == null ? "" : text);
@@ -171,7 +167,7 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
    *
    * @see #init(String,String,boolean)
    */
-  public BasicDocument<L> init(File textFile, String title, boolean keepOriginalText) throws FileNotFoundException, IOException {
+  public BasicDocument<L> init(File textFile, String title, boolean keepOriginalText) throws IOException {
     Reader in = DocumentReader.getReader(textFile);
     BasicDocument<L> bd = init(in, title, keepOriginalText);
     in.close();
@@ -181,21 +177,21 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
   /**
    * Calls init(textFile,title,true)
    */
-  public BasicDocument<L> init(File textFile, String title) throws FileNotFoundException, IOException {
+  public BasicDocument<L> init(File textFile, String title) throws IOException {
     return init(textFile, title, true);
   }
 
   /**
    * Calls init(textFile,textFile.getCanonicalPath(),keepOriginalText)
    */
-  public BasicDocument<L> init(File textFile, boolean keepOriginalText) throws FileNotFoundException, IOException {
+  public BasicDocument<L> init(File textFile, boolean keepOriginalText) throws IOException {
     return init(textFile, textFile.getCanonicalPath(), keepOriginalText);
   }
 
   /**
    * Calls init(textFile,textFile.getCanonicalPath(),true)
    */
-  public BasicDocument<L> init(File textFile) throws FileNotFoundException, IOException {
+  public BasicDocument<L> init(File textFile) throws IOException {
     return init(textFile, textFile.getCanonicalPath(), true);
   }
 
@@ -211,21 +207,21 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
   /**
    * Calls init(textURL,title,true)
    */
-  public BasicDocument<L> init(URL textURL, String title) throws FileNotFoundException, IOException {
+  public BasicDocument<L> init(URL textURL, String title) throws IOException {
     return init(textURL, title, true);
   }
 
   /**
    * Calls init(textURL,textFile.toExternalForm(),keepOriginalText)
    */
-  public BasicDocument<L> init(URL textURL, boolean keepOriginalText) throws FileNotFoundException, IOException {
+  public BasicDocument<L> init(URL textURL, boolean keepOriginalText) throws IOException {
     return init(textURL, textURL.toExternalForm(), keepOriginalText);
   }
 
   /**
    * Calls init(textURL,textURL.toExternalForm(),true)
    */
-  public BasicDocument<L> init(URL textURL) throws FileNotFoundException, IOException {
+  public BasicDocument<L> init(URL textURL) throws IOException {
     return init(textURL, textURL.toExternalForm(), true);
   }
 
@@ -239,7 +235,7 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
     originalText = null;
     // adds all of the given words to the list maintained by this document
     addAll(words);
-    return (this);
+    return this;
   }
 
   /**
@@ -277,7 +273,7 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
    * set.
    */
   public L label() {
-    return (labels.size() > 0) ? labels.get(0) : null;
+    return !labels.isEmpty() ? labels.get(0) : null;
   }
 
   /**
@@ -323,7 +319,7 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
    * never be null.
    */
   public String title() {
-    return (title);
+    return title;
   }
 
   /**
@@ -331,18 +327,14 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
    * is null, sets the title to "".
    */
   public void setTitle(String title) {
-    if (title == null) {
-      this.title = "";
-    } else {
-      this.title = title;
-    }
+      this.title = title == null ? "" : title;
   }
 
   /**
    * Returns the current TokenizerFactory used by {@link #parse(String)}.
    */
   public TokenizerFactory<Word> tokenizerFactory() {
-    return (tokenizerFactory);
+    return tokenizerFactory;
   }
 
 
@@ -388,13 +380,13 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
     try {
       bd = ErasureUtils.<BasicDocument<L>>uncheckedCast(getClass().newInstance());
     } catch (Exception e) {
-      bd = new BasicDocument<L>();
+      bd = new BasicDocument<>();
     }
 
     // copies over basic meta-data
     bd.setTitle(title());
     bd.setLabels(labels());
-    bd.setTokenizerFactory(tokenizerFactory);
+      bd.tokenizerFactory = tokenizerFactory;
 
     // cast to the new output type
     return ErasureUtils.<Document<L, Word, OUT>>uncheckedCast(bd);
@@ -405,7 +397,7 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
    * there was no original text.
    */
   public String originalText() {
-    return (originalText);
+    return originalText;
   }
 
   /**
@@ -427,14 +419,14 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
       }
       sb.append(cur.word());
     }
-    return (sb.toString());
+    return sb.toString();
   }
 
   /**
    * For internal debugging purposes only. Creates and tests various instances
    * of BasicDocument.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     try {
       printState(BasicDocument.init("this is the text", "this is the title [String]", true));
       printState(BasicDocument.init(new StringReader("this is the text"), "this is the title [Reader]", true));

@@ -1,8 +1,8 @@
 package edu.stanford.nlp.ling;
 
 /**
- * A <code>TaggedWord</code> object contains a word and its tag.
- * The <code>value()</code> of a TaggedWord is the Word.  The tag
+ * A {@code TaggedWord} object contains a word and its tag.
+ * The {@code value()} of a TaggedWord is the Word.  The tag
  * is secondary.
  *
  * @author Christopher Manning
@@ -14,24 +14,23 @@ public class TaggedWord extends Word implements HasTag {
   private static final String DIVIDER = "/";
 
   /**
-   * Create a new <code>TaggedWord</code>.
-   * It will have <code>null</code> for its content fields.
+   * Create a new {@code TaggedWord}.
+   * It will have {@code null} for its content fields.
    */
   public TaggedWord() {
-    super();
   }
 
   /**
-   * Create a new <code>TaggedWord</code>.
+   * Create a new {@code TaggedWord}.
    *
-   * @param word The word, which will have a <code>null</code> tag
+   * @param word The word, which will have a {@code null} tag
    */
   public TaggedWord(String word) {
     super(word);
   }
 
   /**
-   * Create a new <code>TaggedWord</code>.
+   * Create a new {@code TaggedWord}.
    *
    * @param word The word
    * @param tag  The tag
@@ -42,7 +41,7 @@ public class TaggedWord extends Word implements HasTag {
   }
 
   /**
-   * Create a new <code>TaggedWord</code>.
+   * Create a new {@code TaggedWord}.
    *
    * @param oldLabel A Label.  If it implements the HasWord and/or
    *                 HasTag interface, then the corresponding value will be set
@@ -55,10 +54,10 @@ public class TaggedWord extends Word implements HasTag {
   }
 
   /**
-   * Create a new <code>TaggedWord</code>.
+   * Create a new {@code TaggedWord}.
    *
    * @param word This word is passed to the supertype constructor
-   * @param tag  The <code>value()</code> of this label is set as the
+   * @param tag  The {@code value()} of this label is set as the
    *             tag of this Label
    */
   public TaggedWord(Label word, Label tag) {
@@ -86,15 +85,15 @@ public class TaggedWord extends Word implements HasTag {
 
   /**
    * Sets a TaggedWord from decoding
-   * the <code>String</code> passed in.  The String is divided according
+   * the {@code String} passed in.  The String is divided according
    * to the divider character (usually, "/").  We assume that we can
    * always just
    * divide on the rightmost divider character, rather than trying to
    * parse up escape sequences.  If the divider character isn't found
    * in the word, then the whole string becomes the word, and the tag
-   * is <code>null</code>.
+   * is {@code null}.
    *
-   * @param taggedWord The word that will go into the <code>Word</code>
+   * @param taggedWord The word that will go into the {@code Word}
    */
   public void setFromString(String taggedWord) {
     setFromString(taggedWord, DIVIDER);
@@ -104,10 +103,10 @@ public class TaggedWord extends Word implements HasTag {
     int where = taggedWord.lastIndexOf(divider);
     if (where >= 0) {
       setWord(taggedWord.substring(0, where));
-      setTag(taggedWord.substring(where + 1));
+        tag = taggedWord.substring(where + 1);
     } else {
       setWord(taggedWord);
-      setTag(null);
+        tag = null;
     }
   }
 
@@ -115,15 +114,13 @@ public class TaggedWord extends Word implements HasTag {
   // extra class guarantees correct lazy loading (Bloch p.194)
   private static class LabelFactoryHolder {
 
-    private LabelFactoryHolder() {}
-
-    private static final LabelFactory lf = new TaggedWordFactory();
+      private static final LabelFactory lf = new TaggedWordFactory();
 
   }
 
   /**
    * Return a factory for this kind of label
-   * (i.e., <code>TaggedWord</code>).
+   * (i.e., {@code TaggedWord}).
    * The factory returned is always the same one (a singleton).
    *
    * @return The label factory

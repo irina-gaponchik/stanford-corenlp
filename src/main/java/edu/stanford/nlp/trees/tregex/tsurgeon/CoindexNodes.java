@@ -10,7 +10,7 @@ public class CoindexNodes extends TsurgeonPattern {
 
   private static String coindexationIntroductionString = "-";
 
-  public CoindexNodes(TsurgeonPattern[] children) {
+  public CoindexNodes(TsurgeonPattern... children) {
     super("coindex", children);
   }
 

@@ -17,19 +17,19 @@ public final class MutableDouble extends Number implements Comparable<MutableDou
   @Override
   public int hashCode() {
     long bits = Double.doubleToLongBits(d);
-    return (int) (bits ^ (bits >>> 32));
+    return (int) (bits ^ bits >>> 32);
   }
 
   /**
    * Compares this object to the specified object.  The result is
-   * <code>true</code> if and only if the argument is not
-   * <code>null</code> and is an <code>MutableDouble</code> object that
-   * contains the same <code>double</code> value as this object.
+   * {@code true} if and only if the argument is not
+   * {@code null} and is an {@code MutableDouble} object that
+   * contains the same {@code double} value as this object.
    * Note that a MutableDouble isn't and can't be equal to an Double.
    *
    * @param obj the object to compare with.
-   * @return <code>true</code> if the objects are the same;
-   *         <code>false</code> otherwise.
+   * @return {@code true} if the objects are the same;
+   *         {@code false} otherwise.
    */
   @Override
   public boolean equals(Object obj) {
@@ -44,22 +44,22 @@ public final class MutableDouble extends Number implements Comparable<MutableDou
   // Comparable interface
 
   /**
-   * Compares two <code>MutableDouble</code> objects numerically.
+   * Compares two {@code MutableDouble} objects numerically.
    *
-   * @param anotherMutableDouble the <code>MutableDouble</code> to be
+   * @param anotherMutableDouble the {@code MutableDouble} to be
    *                             compared.
-   * @return Tthe value <code>0</code> if this <code>MutableDouble</code> is
-   *         equal to the argument <code>MutableDouble</code>; a value less than
-   *         <code>0</code> if this <code>MutableDouble</code> is numerically less
-   *         than the argument <code>MutableDouble</code>; and a value greater
-   *         than <code>0</code> if this <code>MutableDouble</code> is numerically
-   *         greater than the argument <code>MutableDouble</code> (signed
+   * @return Tthe value {@code 0} if this {@code MutableDouble} is
+   *         equal to the argument {@code MutableDouble}; a value less than
+   *         {@code 0} if this {@code MutableDouble} is numerically less
+   *         than the argument {@code MutableDouble}; and a value greater
+   *         than {@code 0} if this {@code MutableDouble} is numerically
+   *         greater than the argument {@code MutableDouble} (signed
    *         comparison).
    */
   public int compareTo(MutableDouble anotherMutableDouble) {
     double thisVal = this.d;
     double anotherVal = anotherMutableDouble.d;
-    return (thisVal < anotherVal ? -1 : (thisVal == anotherVal ? 0 : 1));
+    return thisVal < anotherVal ? -1 : thisVal == anotherVal ? 0 : 1;
   }
 
   // Number interface

@@ -4,9 +4,9 @@ import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.LabelFactory;
 
 /**
- * A <code>SimpleConstituent</code> object defines a generic edge in a graph.
- * The <code>SimpleConstituent</code> records only the endpoints of the
- * <code>Constituent</code>, as two integers.
+ * A {@code SimpleConstituent} object defines a generic edge in a graph.
+ * The {@code SimpleConstituent} records only the endpoints of the
+ * {@code Constituent}, as two integers.
  * It doesn't label the edges.
  * (It doesn't implement equals() since this actually decreases
  * performance on a non-final class (requires dynamic resolution of which
@@ -28,7 +28,7 @@ public class SimpleConstituent extends Constituent {
 
 
   /**
-   * Create an empty <code>SimpleConstituent</code> object.
+   * Create an empty {@code SimpleConstituent} object.
    */
   public SimpleConstituent() {
     // implicitly super();
@@ -36,7 +36,7 @@ public class SimpleConstituent extends Constituent {
 
 
   /**
-   * Create a <code>SimpleConstituent</code> object with given values.
+   * Create a {@code SimpleConstituent} object with given values.
    *
    * @param start start node of edge
    * @param end   end node of edge
@@ -84,50 +84,50 @@ public class SimpleConstituent extends Constituent {
 
 
   /**
-   * A <code>SimpleConstituentLabelFactory</code> object makes a
-   * <code>StringLabel</code> <code>LabeledScoredConstituent</code>.
+   * A {@code SimpleConstituentLabelFactory} object makes a
+   * {@code StringLabel} {@code LabeledScoredConstituent}.
    */
   private static class SimpleConstituentLabelFactory implements LabelFactory {
 
     /**
-     * Make a new <code>SimpleConstituent</code>.
+     * Make a new {@code SimpleConstituent}.
      *
      * @param labelStr A string.
      * @return The created label
      */
-    public Label newLabel(final String labelStr) {
+    public Label newLabel(String labelStr) {
       return new SimpleConstituent(0, 0);
     }
 
 
     /**
-     * Make a new <code>SimpleConstituent</code>.
+     * Make a new {@code SimpleConstituent}.
      *
      * @param labelStr A string.
      * @param options  The options are ignored.
      * @return The created label
      */
-    public Label newLabel(final String labelStr, final int options) {
+    public Label newLabel(String labelStr, int options) {
       return newLabel(labelStr);
     }
 
 
     /**
-     * Make a new <code>SimpleConstituent</code>.
+     * Make a new {@code SimpleConstituent}.
      *
      * @param labelStr A string.
      * @return The created label
      */
-    public Label newLabelFromString(final String labelStr) {
+    public Label newLabelFromString(String labelStr) {
       return newLabel(labelStr);
     }
 
 
     /**
-     * Create a new <code>SimpleConstituent</code>.
+     * Create a new {@code SimpleConstituent}.
      *
-     * @param oldLabel A <code>Label</code>.
-     * @return A new <code>SimpleConstituent</code>
+     * @param oldLabel A {@code Label}.
+     * @return A new {@code SimpleConstituent}
      */
     public Label newLabel(Label oldLabel) {
       return new SimpleConstituent(0, 0);
@@ -157,8 +157,8 @@ public class SimpleConstituent extends Constituent {
   private static class ConstituentFactoryHolder {
 
     /**
-     * A <code>SimpleConstituentFactory</code> acts as a factory for
-     * creating objects of class <code>SimpleConstituent</code>.
+     * A {@code SimpleConstituentFactory} acts as a factory for
+     * creating objects of class {@code SimpleConstituent}.
      */
     private static class SimpleConstituentFactory implements ConstituentFactory {
 

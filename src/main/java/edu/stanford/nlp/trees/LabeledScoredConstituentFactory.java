@@ -3,8 +3,8 @@ package edu.stanford.nlp.trees;
 import edu.stanford.nlp.ling.Label;
 
 /**
- * A <code>LabeledScoredConstituentFactory</code> acts as a factory for
- * creating objects of class <code>LabeledScoredConstituent</code>.
+ * A {@code LabeledScoredConstituentFactory} acts as a factory for
+ * creating objects of class {@code LabeledScoredConstituent}.
  *
  * @author Christopher Manning
  */

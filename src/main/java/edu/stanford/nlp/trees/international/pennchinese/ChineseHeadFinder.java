@@ -32,8 +32,8 @@ public class ChineseHeadFinder extends AbstractCollinsHeadFinder {
     nonTerminalInfo = Generics.newHashMap();
     // these are first-cut rules
 
-    String left = (coordSwitch ? "right" : "left");
-    String right = (coordSwitch ? "left" : "right");
+    String left = coordSwitch ? "right" : "left";
+    String right = coordSwitch ? "left" : "right";
     String rightdis = "rightdis";
 
     defaultRule = new String[]{right};

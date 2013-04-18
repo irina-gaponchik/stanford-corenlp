@@ -40,17 +40,17 @@ import java.io.Serializable;
  * <h3>Example Usages:</h3>
  * The general case is covered below, but the most common thing people
  * <i>actually</i> want to do is read lines from a file.  There are special
- * methods to make this easy!  You use the <code>getLineIterator</code> method.
+ * methods to make this easy!  You use the {@code getLineIterator} method.
  * In its simplest use, it returns an ObjectBank&lt;String&gt;, which is a subclass of
  * Collection&lt;String&gt;.  So, statements like these work:
  * <blockquote>
- * <code>
+ * {@code
  * for (String str : ObjectBank.getLineIterator(filename) { <br>
  *   System.out.println(str); <br>
  * } <br><br>
  * String[] strings = ObjectBank.getLineIterator(filename).toArray(new String[0]); <br><br>
  * String[] strings = ObjectBank.getLineIterator(filename, "GB18030").toArray(new String[0]);
- * </code>
+ * }
  * </blockquote>
  * More complex uses of getLineIterator let you interpret each line of a file
  * as an object of arbitrary type via a transformer Function.
@@ -146,13 +146,13 @@ public class ObjectBank<E> implements Collection<E>, Serializable {
   }
 
 
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
   protected ReaderIteratorFactory rif;
 
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
   protected IteratorFromReaderFactory<E> ifrf;
 
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
   private List<E> contents; // = null;
 
 
@@ -175,7 +175,7 @@ public class ObjectBank<E> implements Collection<E>, Serializable {
   public static <X> ObjectBank<X> getLineIterator(Reader reader, Function<String,X> op) {
     ReaderIteratorFactory rif = new ReaderIteratorFactory(reader);
     IteratorFromReaderFactory<X> ifrf = LineIterator.getFactory(op);
-    return new ObjectBank<X>(rif, ifrf);
+    return new ObjectBank<>(rif, ifrf);
   }
 
   public static ObjectBank<String> getLineIterator(File file) {
@@ -193,13 +193,13 @@ public class ObjectBank<E> implements Collection<E>, Serializable {
   public static <X> ObjectBank<X> getLineIterator(File file, Function<String,X> op, String encoding) {
     ReaderIteratorFactory rif = new ReaderIteratorFactory(file, encoding);
     IteratorFromReaderFactory<X> ifrf = LineIterator.getFactory(op);
-    return new ObjectBank<X>(rif, ifrf);
+    return new ObjectBank<>(rif, ifrf);
   }
 
   public static <X> ObjectBank<X> getLineIterator(Collection<?> filesStringsAndReaders, Function<String,X> op) {
     ReaderIteratorFactory rif = new ReaderIteratorFactory(filesStringsAndReaders);
     IteratorFromReaderFactory<X> ifrf = LineIterator.getFactory(op);
-    return new ObjectBank<X>(rif, ifrf);
+    return new ObjectBank<>(rif, ifrf);
   }
 
   public static ObjectBank<String> getLineIterator(Collection<?> filesStringsAndReaders, String encoding) {
@@ -209,7 +209,7 @@ public class ObjectBank<E> implements Collection<E>, Serializable {
   public static <X> ObjectBank<X> getLineIterator(Collection<?> filesStringsAndReaders, Function<String,X> op, String encoding) {
     ReaderIteratorFactory rif = new ReaderIteratorFactory(filesStringsAndReaders, encoding);
     IteratorFromReaderFactory<X> ifrf = LineIterator.getFactory(op);
-    return new ObjectBank<X>(rif, ifrf);
+    return new ObjectBank<>(rif, ifrf);
   }
 
   /** This is handy for having getLineIterator return a collection of files for feeding into another ObjectBank. */
@@ -230,7 +230,7 @@ public class ObjectBank<E> implements Collection<E>, Serializable {
     // each java.io.Reader.
     if (keepInMemory) {
       if (contents == null) {
-        contents = new ArrayList<E>();
+        contents = new ArrayList<>();
         Iterator<E> iter = new OBIterator();
         while (iter.hasNext()) {
           contents.add(iter.next());
@@ -322,7 +322,7 @@ public class ObjectBank<E> implements Collection<E>, Serializable {
 
   public Object[] toArray() {
     Iterator<E> iter = iterator();
-    ArrayList<Object> al = new ArrayList<Object>();
+    ArrayList<Object> al = new ArrayList<>();
     while (iter.hasNext()) {
       al.add(iter.next());
     }
@@ -333,10 +333,10 @@ public class ObjectBank<E> implements Collection<E>, Serializable {
    * Can be slow.  Usage not recommended.
    */
   @Override
-  @SuppressWarnings({"SuspiciousToArrayCall"})
+  @SuppressWarnings("SuspiciousToArrayCall")
   public <T> T[] toArray(T[] o) {
     Iterator<E> iter = iterator();
-    ArrayList<E> al = new ArrayList<E>();
+    ArrayList<E> al = new ArrayList<>();
     while (iter.hasNext()) {
       al.add(iter.next());
     }

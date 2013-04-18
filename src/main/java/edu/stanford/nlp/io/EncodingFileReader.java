@@ -4,10 +4,10 @@ import java.io.*;
 
 /**
  * This is a convenience class which works almost exactly like 
- * <code>FileReader</code>
+ * {@code FileReader}
  * but allows for the specification of input encoding.
  *
- * @author	Alex Kleeman
+ * @author Alex Kleeman
  */
 
 public class EncodingFileReader extends InputStreamReader {

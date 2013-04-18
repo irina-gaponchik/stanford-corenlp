@@ -43,7 +43,7 @@ public class PascalTemplate {
   private static final Index<String> fieldIndices;
 
   static {
-    fieldIndices = new HashIndex<String>();
+    fieldIndices = new HashIndex<>();
     for (String field : fields) {
       fieldIndices.add(field);
     }
@@ -63,11 +63,7 @@ public class PascalTemplate {
   public PascalTemplate(PascalTemplate pt) {
     this.values = new String[fields.length];
     for (int i = 0; i < values.length; i++) {
-      if (pt.values[i] == null) {
-        this.values[i] = null;
-      } else {
-        this.values[i] = pt.values[i];
-      }
+        this.values[i] = pt.values[i] == null ? null : pt.values[i];
     }
   }
 
@@ -100,7 +96,7 @@ public class PascalTemplate {
     }
 
     String stemmed = matcher.group(1).toLowerCase();
-    if (stemmed.endsWith("-")) {
+    if (!stemmed.isEmpty() && stemmed.charAt(stemmed.length() - 1) == '-') {
       stemmed = stemmed.substring(0, stemmed.length() - 1);
     }
 
@@ -123,7 +119,7 @@ public class PascalTemplate {
  * @param dt date template
  * @param location location
  * @param wi workshop/conference info template
- * @return the {@link PascalTemplate} resulting from this merge.
+ * @return the  resulting from this merge.
  */
 
   public static PascalTemplate mergeCliqueTemplates(DateTemplate dt, String location, InfoTemplate wi) {
@@ -148,7 +144,7 @@ public class PascalTemplate {
  */
   public void setValue(String fieldName, String value) {
     int index = getFieldIndex(fieldName);
-    assert(index != -1);
+    assert index != -1;
     values[index] = value;
   }
 
@@ -160,11 +156,7 @@ public class PascalTemplate {
 
   public String getValue(String fieldName) {
     int i = getFieldIndex(fieldName);
-    if (i == -1 || i == values.length - 1) {
-      return null;
-    } else {
-      return values[i];
-    }
+      return i == -1 || i == values.length - 1 ? null : values[i];
   }
 
   @Override
@@ -206,11 +198,7 @@ public class PascalTemplate {
     int tally = 37;
     for (int i = 0; i < values.length - 1; i++) {
       int n;
-      if (values[i] == null) {
-        n = 11;
-      } else {
-        n = values[i].hashCode();
-      }
+        n = values[i] == null ? 11 : values[i].hashCode();
       tally = 17 * tally + n;
     }
     return tally;
@@ -222,11 +210,11 @@ public class PascalTemplate {
    * @return the reference of that field in the underlying {@link edu.stanford.nlp.util.Index}
    */
   public static int getFieldIndex(String tag) {
-    return (fieldIndices.indexOf(tag));
+    return fieldIndices.indexOf(tag);
   }
 
   /**
-   * Should be passed a <code>Counter[]</code>, each entry of which
+   * Should be passed a {@code Counter[]}, each entry of which
    * keeps scores for possibilities in that template slot.  The counter
    * for each template value is incremented by the corresponding score of
    * this PascalTemplate.
@@ -237,7 +225,7 @@ public class PascalTemplate {
 
   public void writeToFieldValueCounter(Counter<String>[] fieldValueCounter, double score) {
     for (int i = 0; i < fields.length; i++) {
-      if ((values[i] != null) && !values[i].equals("NULL")) {
+      if (values[i] != null && !values[i].equals("NULL")) {
         fieldValueCounter[i].incrementCount(values[i], score);
       }
     }
@@ -269,8 +257,8 @@ public class PascalTemplate {
     String str = "\n====================\n";
     for (int i = 0; i < values.length; i++) {
       if (values[i] != null) {
-        if (!(values[i].equalsIgnoreCase("NULL"))) {
-          str = str.concat(fields[i] + " : " + values[i] + "\n");
+        if (!values[i].equalsIgnoreCase("NULL")) {
+          str = str + fields[i] + " : " + values[i] + '\n';
         }
       }
     }

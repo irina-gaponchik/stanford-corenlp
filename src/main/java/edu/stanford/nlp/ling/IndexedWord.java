@@ -37,7 +37,6 @@ public class IndexedWord extends CoreLabel implements Comparable<IndexedWord> {
    * Default constructor; uses {@link CoreLabel} default constructor
    */
   public IndexedWord() {
-    super();
   }
 
 
@@ -85,8 +84,7 @@ public class IndexedWord extends CoreLabel implements Comparable<IndexedWord> {
    * @param index The index of the word in the sentence (normally 0-based)
    */
   public IndexedWord(String docID, int sentenceIndex, int index) {
-    super();
-    this.set(CoreAnnotations.DocIDAnnotation.class, docID);
+      this.set(CoreAnnotations.DocIDAnnotation.class, docID);
     this.set(CoreAnnotations.SentenceIndexAnnotation.class, sentenceIndex);
     this.set(CoreAnnotations.IndexAnnotation.class, index);
   }
@@ -122,7 +120,7 @@ public class IndexedWord extends CoreLabel implements Comparable<IndexedWord> {
     if (!(o instanceof IndexedWord)) return false;
 
     //now compare on appropriate keys
-    final IndexedWord otherWord = (IndexedWord) o;
+    IndexedWord otherWord = (IndexedWord) o;
     String myDocID = getString(CoreAnnotations.DocIDAnnotation.class);
     String otherDocID = otherWord.getString(CoreAnnotations.DocIDAnnotation.class);
     if (myDocID == null) {
@@ -195,11 +193,7 @@ public class IndexedWord extends CoreLabel implements Comparable<IndexedWord> {
    */
   public int compareTo(IndexedWord w) {
     if (this.equals(IndexedWord.NO_WORD)) {
-      if (w.equals(IndexedWord.NO_WORD)) {
-        return 0;
-      } else {
-        return -1;
-      }
+        return w.equals(IndexedWord.NO_WORD) ? 0 : -1;
     }
     if (w.equals(IndexedWord.NO_WORD)) {
       return 1;
@@ -241,27 +235,27 @@ public class IndexedWord extends CoreLabel implements Comparable<IndexedWord> {
     StringBuilder result = new StringBuilder();
 
     // word
-    if (format == WORD_FORMAT ||
-        format == WORD_TAG_FORMAT ||
-        format == WORD_TAG_INDEX_FORMAT) {
+    if (format.equals(WORD_FORMAT) ||
+            format.equals(WORD_TAG_FORMAT) ||
+            format.equals(WORD_TAG_INDEX_FORMAT)) {
       result.append(word());
 
       // tag
-      if (format == WORD_TAG_FORMAT ||
-          format == WORD_TAG_INDEX_FORMAT) {
+      if (format.equals(WORD_TAG_FORMAT) ||
+              format.equals(WORD_TAG_INDEX_FORMAT)) {
         String tag = tag();
-        if (tag != null && tag.length() != 0) {
+        if (tag != null && !tag.isEmpty()) {
           result.append('-').append(tag);
         }
 
         // index
-        if (format == WORD_TAG_INDEX_FORMAT) {
+        if (format.equals(WORD_TAG_INDEX_FORMAT)) {
           result.append('-').append(sentIndex()).append(':').append(index());
         }
       }
 
       // value format
-    } else if (format == VALUE_FORMAT) {
+    } else if (format.equals(VALUE_FORMAT)) {
       result.append(value());
       if (index() >= 0) {
         result.append(':').append(index());

@@ -16,7 +16,7 @@ import java.util.*;
  * and provides various options to percolate that option downwards
  * to the head noun, and perhaps also to inherit this from a PP-TMP.<br>
  * 2) Annotates S nodes which contain a gapped subject: i.e.,
- * <code>S &lt; (/^NP-SBJ/ &lt; -NONE-) --> S-G</code>  <br>
+ * {@code S &lt; (/^NP-SBJ/ &lt; -NONE-) --> S-G}  <br>
  * 3) Leave all functional tags on nodes. <br>
  * 4) Keeps -ADV labels on NP and marks head tag with &`^ADV
  * <p/>
@@ -227,11 +227,7 @@ public class NPTmpRetainingTreeNormalizer extends BobChrisTreeNormalizer {
         if ("RS".equals(t.label().value()) || "RM".equals(t.label().value()) || "IP".equals(t.label().value()) || "CODE".equals(t.label().value())) {
           return false;
         }
-        if ((l != null) && l.value() != null && (l.value().equals("-NONE-")) && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf()) {
-          // Delete empty/trace nodes (ones marked '-NONE-')
-          return false;
-        }
-        return true;
+          return !(l != null && l.value() != null && l.value().equals("-NONE-") && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf());
       }
     };
     Filter<Tree> nodeFilter = new Filter<Tree>() {
@@ -251,10 +247,7 @@ public class NPTmpRetainingTreeNormalizer extends BobChrisTreeNormalizer {
         if (t.numChildren() != 1) {
           return true;
         }
-        if (t.label() != null && t.label().value() != null && t.label().value().equals(t.children()[0].label().value())) {
-          return false;
-        }
-        return true;
+          return !(t.label() != null && t.label().value() != null && t.label().value().equals(t.children()[0].label().value()));
       }
     };
     TreeTransformer transformer2 = new TreeTransformer() {
@@ -429,7 +422,7 @@ public class NPTmpRetainingTreeNormalizer extends BobChrisTreeNormalizer {
               }
               oldT = ht;
             } while (!ht.isPreTerminal());
-            if ( ! onlyTagAnnotateNstar || ht.label().value().startsWith("N")) {
+            if (!ht.label().value().isEmpty() && ht.label().value().charAt(0) == 'N') {
               LabelFactory lf = ht.label().labelFactory();
               // Note: this changes the tree label, rather than
               // creating a new tree node.  Beware!
@@ -487,7 +480,7 @@ public class NPTmpRetainingTreeNormalizer extends BobChrisTreeNormalizer {
    * Add -TMP when not present within an NP
    * @param tree The tree to add temporal info to.
    */
-  private void addTMP9(final Tree tree) {
+  private void addTMP9(Tree tree) {
     // do the head chain under it
     Tree ht = headFinder.determineHead(tree);
     // special fix for possessives! -- make noun before head
@@ -514,29 +507,29 @@ public class NPTmpRetainingTreeNormalizer extends BobChrisTreeNormalizer {
     }
     // do the NPs under it (which may or may not be the head chain
     Tree[] kidlets = tree.children();
-    for (int k = 0; k < kidlets.length; k++) {
-      ht = kidlets[k];
-      LabelFactory lf;
-      if (tree.isPrePreTerminal() && !TmpPattern.matcher(ht.value()).matches()) {
-        // System.err.println("TMP: Changing " + ht.value() + " to " +
-        //                   ht.value() + "-TMP");
-        lf = ht.labelFactory();
-        // Note: this next bit changes the tree label, rather
-        // than creating a new tree node.  Beware!
-        ht.setLabel(lf.newLabel(ht.value() + "-TMP"));
-      } else if (ht.value().startsWith("NP")) {
-        // don't add -TMP twice!
-        if (!TmpPattern.matcher(ht.value()).matches()) {
-          lf = ht.labelFactory();
-          // System.err.println("TMP: Changing " + ht.value() + " to " +
-          //                   ht.value() + "-TMP");
-          // Note: this next bit changes the tree label, rather
-          // than creating a new tree node.  Beware!
-          ht.setLabel(lf.newLabel(ht.value() + "-TMP"));
-        }
-        addTMP9(ht);
+      for (Tree kidlet : kidlets) {
+          ht = kidlet;
+          LabelFactory lf;
+          if (tree.isPrePreTerminal() && !TmpPattern.matcher(ht.value()).matches()) {
+              // System.err.println("TMP: Changing " + ht.value() + " to " +
+              //                   ht.value() + "-TMP");
+              lf = ht.labelFactory();
+              // Note: this next bit changes the tree label, rather
+              // than creating a new tree node.  Beware!
+              ht.setLabel(lf.newLabel(ht.value() + "-TMP"));
+          } else if (ht.value().startsWith("NP")) {
+              // don't add -TMP twice!
+              if (!TmpPattern.matcher(ht.value()).matches()) {
+                  lf = ht.labelFactory();
+                  // System.err.println("TMP: Changing " + ht.value() + " to " +
+                  //                   ht.value() + "-TMP");
+                  // Note: this next bit changes the tree label, rather
+                  // than creating a new tree node.  Beware!
+                  ht.setLabel(lf.newLabel(ht.value() + "-TMP"));
+              }
+              addTMP9(ht);
+          }
       }
-    }
   }
 
   /** Implementation of TreeReaderFactory, mainly for convenience of constructing by reflection */

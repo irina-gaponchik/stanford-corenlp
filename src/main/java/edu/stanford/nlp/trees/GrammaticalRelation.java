@@ -13,54 +13,54 @@ import java.util.regex.Pattern;
 
 
 /**
- * <code>GrammaticalRelation</code> is used to define a
+ * {@code GrammaticalRelation} is used to define a
  * standardized, hierarchical set of grammatical relations,
  * together with patterns for identifying them in
  * parse trees.<p>
  *
- * Each <code>GrammaticalRelation</code> has:
+ * Each {@code GrammaticalRelation} has:
  * <ul>
- *   <li>A <code>String</code> short name, which should be a lowercase
+ *   <li>A {@code String} short name, which should be a lowercase
  *       abbreviation of some kind.</li>
- *   <li>A <code>String</code> long name, which should be descriptive.</li>
- *   <li>A parent in the <code>GrammaticalRelation</code> hierarchy.</li>
- *   <li>A {@link Pattern <code>Pattern</code>} called
- *   <code>sourcePattern</code> which matches (parent) nodes from which
- *   this <code>GrammaticalRelation</code> could hold.  (Note: this is done
- *   with the Java regex Pattern <code>matches()</code> predicate: the pattern
+ *   <li>A {@code String} long name, which should be descriptive.</li>
+ *   <li>A parent in the {@code GrammaticalRelation} hierarchy.</li>
+ *   <li>A {@link Pattern {@code Pattern}} called
+ *   {@code sourcePattern} which matches (parent) nodes from which
+ *   this {@code GrammaticalRelation} could hold.  (Note: this is done
+ *   with the Java regex Pattern {@code matches()} predicate: the pattern
  *   must match the
- *   whole node name, and <code>^</code> or <code>$</code> aren't needed.
+ *   whole node name, and {@code ^} or {@code $} aren't needed.
  *   Tregex constructions like __ do not work. Use ".*" to be applicable
  *   at all nodes.)</li>
  *   <li>A list of zero or more {@link TregexPattern
- *   <code>TregexPattern</code>s} called <code>targetPatterns</code>,
+ *   {@code TregexPattern}s} called {@code targetPatterns},
  *   which describe the local tree structure which must hold between
  *   the source node and a target node for the
- *   <code>GrammaticalRelation</code> to apply. (Note <code>tregex</code>
- *   regular expressions match with the <code>find()</code> method - though
+ *   {@code GrammaticalRelation} to apply. (Note {@code tregex}
+ *   regular expressions match with the {@code find()} method - though
  *   literal string label descriptions that are not regular expressions must
- *   be <code>equals()</code>.)</li>
+ *   be {@code equals()}.)</li>
  * </ul>
  *
- * The <code>targetPatterns</code> associated
- * with a <code>GrammaticalRelation</code> are designed as follows.
+ * The {@code targetPatterns} associated
+ * with a {@code GrammaticalRelation} are designed as follows.
  * In order to recognize a grammatical relation X holding between
  * nodes A and B in a parse tree, we want to associate with
- * <code>GrammaticalRelation</code> X a {@link TregexPattern
- * <code>TregexPattern</code>} such that:
+ * {@code GrammaticalRelation} X a {@link TregexPattern
+ * {@code TregexPattern}} such that:
  * <ul>
  *   <li>the root of the pattern matches A, and</li>
  *   <li>the pattern includes a special node label, "target", which matches B.</li>
  * </ul>
- * For example, for the grammatical relation <code>PREDICATE</code>
+ * For example, for the grammatical relation {@code PREDICATE}
  * which holds between a clause and its primary verb phrase, we might
- * want to use the pattern <code>"S &lt; VP=target"</code>, in which the
- * root will match a clause and the node labeled <code>"target"</code>
+ * want to use the pattern {@code "S &lt; VP=target"}, in which the
+ * root will match a clause and the node labeled {@code "target"}
  * will match the verb phrase.<p>
  *
  * For a given grammatical relation, the method {@link
- * GrammaticalRelation#getRelatedNodes <code>getRelatedNodes()</code>}
- * takes a <code>Tree</code> node as an argument and attempts to
+ * GrammaticalRelation#getRelatedNodes {@code getRelatedNodes()}}
+ * takes a {@code Tree} node as an argument and attempts to
  * return other nodes which have this grammatical relation to the
  * argument node.  By default, this method operates as follows: it
  * steps through the patterns in the pattern list, trying to match
@@ -71,7 +71,7 @@ import java.util.regex.Pattern;
  *
  * For some grammatical relations, we need more sophisticated logic to
  * identify related nodes.  In such cases, {@link
- * GrammaticalRelation#getRelatedNodes <code>getRelatedNodes()</code>}
+ * GrammaticalRelation#getRelatedNodes {@code getRelatedNodes()}}
  * can be overridden on a per-relation basis using anonymous subclassing.<p>
  *
  * @see GrammaticalStructure
@@ -90,7 +90,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
   private static final boolean DEBUG = false;
 
   public abstract static class GrammaticalRelationAnnotation implements CoreAnnotation<Set<TreeGraphNode>> {
-    @SuppressWarnings({"unchecked", "RedundantCast"})
+    @SuppressWarnings({"unchecked"})
     public Class<Set<TreeGraphNode>> getType() {  return (Class) Set.class; }
   }
 
@@ -99,12 +99,12 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
   private static Map<GrammaticalRelation, Class<? extends GrammaticalRelationAnnotation>>
     relationsToAnnotations = Generics.newHashMap();
   private static EnumMap<Language, Map<String, GrammaticalRelation>>
-    stringsToRelations = new EnumMap<Language, Map<String, GrammaticalRelation>>(Language.class);
+    stringsToRelations = new EnumMap<>(Language.class);
 
   /**
    * The "governor" grammatical relation, which is the inverse of "dependent".<p>
    * <p/>
-   * Example: "the red car" &rarr; <code>gov</code>(red, car)
+   * Example: "the red car" &rarr; {@code gov}(red, car)
    */
   public static final GrammaticalRelation GOVERNOR =
     new GrammaticalRelation(Language.Any, "gov", "governor", GovernorGRAnnotation.class, null);
@@ -114,7 +114,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
   /**
    * The "dependent" grammatical relation, which is the inverse of "governor".<p>
    * <p/>
-   * Example: "the red car" &rarr; <code>dep</code>(car, red)
+   * Example: "the red car" &rarr; {@code dep}(car, red)
    */
   public static final GrammaticalRelation DEPENDENT =
     new GrammaticalRelation(Language.Any, "dep", "dependent", DependentGRAnnotation.class, null);
@@ -177,7 +177,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
    *  @return The grammatical relation represented by this String
    */
   public static GrammaticalRelation valueOf(Language language, String s) {
-    GrammaticalRelation reln = (stringsToRelations.get(language) != null ? valueOf(s, stringsToRelations.get(language).values()) : null);
+    GrammaticalRelation reln = stringsToRelations.get(language) != null ? valueOf(s, stringsToRelations.get(language).values()) : null;
     if (reln == null) {
       // TODO this breaks the hierarchical structure of the classes,
       //      but it makes English relations that much likelier to work.
@@ -232,10 +232,10 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
   private final String shortName;
   private final String longName;
   private final GrammaticalRelation parent;
-  private final List<GrammaticalRelation> children = new ArrayList<GrammaticalRelation>();
+  private final List<GrammaticalRelation> children = new ArrayList<>();
   // a regexp for node values at which this relation can hold
   private final Pattern sourcePattern;
-  private final List<TregexPattern> targetPatterns = new ArrayList<TregexPattern>();
+  private final List<TregexPattern> targetPatterns = new ArrayList<>();
   private final String specific; // to hold the specific prep or conjunction associated with the grammatical relation
 
   // TODO document constructor
@@ -313,7 +313,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
                              GrammaticalRelation parent,
                              String sourcePattern,
                              TregexPatternCompiler tregexCompiler,
-                             String[] targetPatterns) {
+                             String... targetPatterns) {
     this(language, shortName, longName, annotation, parent, sourcePattern, tregexCompiler, targetPatterns, null);
   }
 
@@ -338,8 +338,8 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
     children.add(child);
   }
 
-  /** Given a <code>Tree</code> node <code>t</code>, attempts to
-   *  return a list of nodes to which node <code>t</code> has this
+  /** Given a {@code Tree} node {@code t}, attempts to
+   *  return a list of nodes to which node {@code t} has this
    *  grammatical relation.
    *
    *  @param t Target for finding governors of t related by this GR
@@ -350,13 +350,13 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
     if (root.value() == null) {
       root.setValue("ROOT");  // todo: cdm: it doesn't seem like this line should be here
     }
-    Set<Tree> nodeList = new LinkedHashSet<Tree>();
+    Set<Tree> nodeList = new LinkedHashSet<>();
     for (TregexPattern p : targetPatterns) {    // cdm: I deleted: && nodeList.isEmpty()
       TregexMatcher m = p.matcher(root);
       while (m.findAt(t)) {
         nodeList.add(m.getNode("target"));
         if (DEBUG) {
-          System.err.println("found " + this + "(" + t + ", " + m.getNode("target") + ") using pattern " + p);
+          System.err.println("found " + this + '(' + t + ", " + m.getNode("target") + ") using pattern " + p);
           for (String nodeName : m.getNodeNames()) {
             if (nodeName.equals("target")) 
               continue;
@@ -368,15 +368,15 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
     return nodeList;
   }
 
-  /** Returns <code>true</code> iff the value of <code>Tree</code>
-   *  node <code>t</code> matches the <code>sourcePattern</code> for
-   *  this <code>GrammaticalRelation</code>, indicating that this
-   *  <code>GrammaticalRelation</code> is one that could hold between
-   *  <code>Tree</code> node <code>t</code> and some other node.
+  /** Returns {@code true} iff the value of {@code Tree}
+   *  node {@code t} matches the {@code sourcePattern} for
+   *  this {@code GrammaticalRelation}, indicating that this
+   *  {@code GrammaticalRelation} is one that could hold between
+   *  {@code Tree} node {@code t} and some other node.
    */
   public boolean isApplicable(Tree t) {
     // System.err.println("Testing whether " + sourcePattern + " matches " + ((TreeGraphNode) t).toOneLineString());
-    return (sourcePattern != null) && (t.value() != null) &&
+    return sourcePattern != null && t.value() != null &&
              sourcePattern.matcher(t.value()).matches();
   }
 
@@ -392,27 +392,23 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
 
   /**
    * Returns short name (abbreviation) for this
-   * <code>GrammaticalRelation</code>.
+   * {@code GrammaticalRelation}.
    *
    * <i>Implementation note:</i> Note that this method must be synced with
    * the equals() and valueOf(String) methods
    */
   @Override
   public final String toString() {
-    if (specific == null) {
-      return shortName;
-    } else {
-      return shortName + '_' + specific;
-    }
+      return specific == null ? shortName : shortName + '_' + specific;
   }
 
   /**
-   * Returns a <code>String</code> representation of this
-   * <code>GrammaticalRelation</code> and the hierarchy below
+   * Returns a {@code String} representation of this
+   * {@code GrammaticalRelation} and the hierarchy below
    * it, with one node per line, indented according to level.
    *
-   * @return <code>String</code> representation of this
-   *         <code>GrammaticalRelation</code>
+   * @return {@code String} representation of this
+   *         {@code GrammaticalRelation}
    */
   public String toPrettyString() {
     StringBuilder buf = new StringBuilder("\n");
@@ -421,10 +417,10 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
   }
 
   /**
-   * Returns a <code>String</code> representation of this
-   * <code>GrammaticalRelation</code> and the hierarchy below
+   * Returns a {@code String} representation of this
+   * {@code GrammaticalRelation} and the hierarchy below
    * it, with one node per line, indented according to
-   * <code>indentLevel</code>.
+   * {@code indentLevel}.
    *
    * @param indentLevel how many levels to indent (0 for root node)
    *
@@ -448,7 +444,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
    *  @param o Object to be compared
    *  @return Whether equal
    */
-  @SuppressWarnings({"StringEquality", "ThrowableInstanceNeverThrown"})
+  @SuppressWarnings({"StringEquality"})
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -459,12 +455,12 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
     }
     if (!(o instanceof GrammaticalRelation)) return false;
 
-    final GrammaticalRelation gr = (GrammaticalRelation) o;
+    GrammaticalRelation gr = (GrammaticalRelation) o;
     // == okay for language as enum!
     return this.language == gr.language &&
              this.shortName.equals(gr.shortName) &&
              (this.specific == gr.specific ||
-              (this.specific != null && this.specific.equals(gr.specific)));
+                     this.specific != null && this.specific.equals(gr.specific));
   }
 
   @Override
@@ -496,20 +492,20 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
   }
 
   /**
-   * Returns the parent of this <code>GrammaticalRelation</code>.
+   * Returns the parent of this {@code GrammaticalRelation}.
    */
   public GrammaticalRelation getParent() {
     return parent;
   }
 
-  public static void main(String[] args) {
-    final String[] names = {"dep", "pred", "prep_to","rcmod"};
+  public static void main(String... args) {
+    String[] names = {"dep", "pred", "prep_to","rcmod"};
     for (String name : names) {
       GrammaticalRelation reln = valueOf(Language.English, name);
       System.out.println("Data for GrammaticalRelation loaded as valueOf(\"" + name + "\"):");
-      System.out.println("\tShort name:    " + reln.getShortName());
-      System.out.println("\tLong name:     " + reln.getLongName());
-      System.out.println("\tSpecific name: " + reln.getSpecific());
+      System.out.println("\tShort name:    " + reln.shortName);
+      System.out.println("\tLong name:     " + reln.longName);
+      System.out.println("\tSpecific name: " + reln.specific);
     }
   }
 

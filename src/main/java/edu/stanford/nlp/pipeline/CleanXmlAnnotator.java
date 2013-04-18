@@ -68,39 +68,31 @@ public class CleanXmlAnnotator implements Annotator{
     this.allowFlawedXml = allowFlawedXml;
     if (xmlTagsToRemove != null) {
       xmlTagMatcher = Pattern.compile(xmlTagsToRemove);
-      if (sentenceEndingTags != null &&
-          sentenceEndingTags.length() > 0) {
-        sentenceEndingTagMatcher = Pattern.compile(sentenceEndingTags);
-      } else {
-        sentenceEndingTagMatcher = null;
-      }
+        sentenceEndingTagMatcher = sentenceEndingTags != null &&
+                !sentenceEndingTags.isEmpty() ? Pattern.compile(sentenceEndingTags) : null;
     } else {
       xmlTagMatcher = null;
       sentenceEndingTagMatcher = null;
     }
 
-    if(dateTags != null){
-      dateTagMatcher = Pattern.compile(dateTags, Pattern.CASE_INSENSITIVE);
-    } else {
-      dateTagMatcher = null;
-    }
+      dateTagMatcher = dateTags != null ? Pattern.compile(dateTags, Pattern.CASE_INSENSITIVE) : null;
   }
 
   public void annotate(Annotation annotation) {
     if (annotation.has(CoreAnnotations.TokensAnnotation.class)) {
       List<CoreLabel> tokens = annotation.get(CoreAnnotations.TokensAnnotation.class);
-      List<CoreLabel> dateTokens = new ArrayList<CoreLabel>();
+      List<CoreLabel> dateTokens = new ArrayList<>();
       List<CoreLabel> newTokens = process(tokens, dateTokens);
       // We assume that if someone is using this annotator, they don't
       // want the old tokens any more and get rid of them
       annotation.set(CoreAnnotations.TokensAnnotation.class, newTokens);
 
       // if the doc date was found, save it. it is used by SUTime (inside the "ner" annotator)
-      if(dateTokens.size() > 0){
-        StringBuffer os = new StringBuffer();
+      if(!dateTokens.isEmpty()){
+        StringBuilder os = new StringBuilder();
         boolean first = true;
         for (CoreLabel t : dateTokens) {
-          if (!first) os.append(" ");
+          if (!first) os.append(' ');
           os.append(t.word());
           first = false;
         }
@@ -117,14 +109,14 @@ public class CleanXmlAnnotator implements Annotator{
   public List<CoreLabel> process(List<CoreLabel> tokens, List<CoreLabel> dateTokens) {
     // As we are processing, this stack keeps track of which tags we
     // are currently inside
-    Stack<String> enclosingTags = new Stack<String>();
+    Stack<String> enclosingTags = new Stack<>();
     // here we keep track of the current enclosingTags
     // this lets multiple tokens reuse the same tag stack
     List<String> currentTagSet = null;
     // How many matching tags we've seen
     int matchDepth = 0;
     // stores the filtered tags as we go
-    List<CoreLabel> newTokens = new ArrayList<CoreLabel>();
+    List<CoreLabel> newTokens = new ArrayList<>();
 
     // we use this to store the before & after annotations if the
     // tokens were tokenized for "invertible"
@@ -170,13 +162,13 @@ public class CleanXmlAnnotator implements Annotator{
           // the same list object many times.  We don't want to
           // let someone modify one list and screw up all the others.
           currentTagSet =
-            Collections.unmodifiableList(new ArrayList<String>(enclosingTags));
+            Collections.unmodifiableList(new ArrayList<>(enclosingTags));
         }
         token.set(CoreAnnotations.XmlContextAnnotation.class, currentTagSet);
 
         // is this token part of the doc date sequence?
         if (dateTagMatcher != null &&
-            currentTagSet.size() > 0 &&
+                !currentTagSet.isEmpty() &&
             dateTagMatcher.matcher(currentTagSet.get(currentTagSet.size() - 1)).matches()) {
           dateTokens.add(token);
         }
@@ -205,7 +197,7 @@ public class CleanXmlAnnotator implements Annotator{
       // to end the sentence.
       if (sentenceEndingTagMatcher != null &&
           sentenceEndingTagMatcher.matcher(tag.name).matches() &&
-          newTokens.size() > 0) {
+              !newTokens.isEmpty()) {
         CoreLabel previous = newTokens.get(newTokens.size() - 1);
         previous.set(CoreAnnotations.ForcedSentenceEndAnnotation.class, true);
       }
@@ -221,7 +213,7 @@ public class CleanXmlAnnotator implements Annotator{
       currentTagSet = null;
       if (tag.isEndTag) {
         while (true) {
-          if (enclosingTags.size() == 0) {
+          if (enclosingTags.isEmpty()) {
             throw new IllegalArgumentException("Got a close tag " + tag.name +
                                                "which does not match " +
                                                "any open tag");
@@ -251,7 +243,7 @@ public class CleanXmlAnnotator implements Annotator{
       }
     }
 
-    if (enclosingTags.size() > 0 && !allowFlawedXml) {
+    if (!enclosingTags.isEmpty() && !allowFlawedXml) {
       throw new IllegalArgumentException("Unclosed tags, starting with " +
                                          enclosingTags.pop());
     }
@@ -263,7 +255,7 @@ public class CleanXmlAnnotator implements Annotator{
     // dropped an xml tag.  Therefore we ignore that old After
     // annotation, since that text was already absorbed in the Before
     // annotation of the xml tag we threw away
-    if (newTokens.size() > 0 && removedText.length() > 0) {
+    if (!newTokens.isEmpty() && removedText.length() > 0) {
       CoreLabel lastToken = newTokens.get(newTokens.size() - 1);
       // sometimes AfterAnnotation seems to be null even when we are
       // collecting before & after annotations, but OriginalTextAnnotation

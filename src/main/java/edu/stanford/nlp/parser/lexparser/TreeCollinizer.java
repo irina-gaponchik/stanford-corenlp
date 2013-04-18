@@ -2,6 +2,7 @@ package edu.stanford.nlp.parser.lexparser;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.trees.*;
 
@@ -19,7 +20,10 @@ import edu.stanford.nlp.trees.*;
  */
 public class TreeCollinizer implements TreeTransformer {
 
-  private final TreebankLanguagePack tlp;
+    private static final Pattern COMPILE = Pattern.compile("^WP");
+    private static final Pattern PATTERN = Pattern.compile("^WDT");
+    private static final Pattern COMPILE1 = Pattern.compile("^WRB");
+    private final TreebankLanguagePack tlp;
   private final boolean deletePunct;
   private final boolean fixCollinsBaseNP;
   /** whOption: 0 = do nothing, 1 = also collapse WH phrasal categories in gold tree,
@@ -44,66 +48,71 @@ public class TreeCollinizer implements TreeTransformer {
     this.whOption = whOption;
   }
 
-  public Tree transformTree(Tree tree) {
-    if (tree == null) return null;
-    TreeFactory tf = tree.treeFactory();
+    public Tree transformTree(Tree tree) {
+        while (true) {
+            if (tree == null) return null;
+            TreeFactory tf = tree.treeFactory();
 
-    String s = tree.value();
-    if (tlp.isStartSymbol(s))
-      return transformTree(tree.firstChild());
+            String s = tree.value();
+            if (tlp.isStartSymbol(s)) {
+                tree = tree.firstChild();
+                continue;
+            }
 
-    if (tree.isLeaf()) {
-      return tf.newLeaf(tree.label());
-    }
-    s = tlp.basicCategory(s);
-    if (((whOption & 1) != 0) && s.startsWith("WH")) {
-      s = s.substring(2);
-    }
-    if ((whOption & 2) != 0) {
-      s = s.replaceAll("^WP", "PRP"); // does both WP and WP$ !!
-      s = s.replaceAll("^WDT", "DT");
-      s = s.replaceAll("^WRB", "RB");
-    }
-    if (((whOption & 4) != 0) && s.startsWith("WH")) {
-      s = s.substring(2);
-    }
+            if (tree.isLeaf()) {
+                return tf.newLeaf(tree.label());
+            }
+            s = tlp.basicCategory(s);
+            if ((whOption & 1) != 0 && s.startsWith("WH")) {
+                s = s.substring(2);
+            }
+            if ((whOption & 2) != 0) {
+                s = COMPILE.matcher(s).replaceAll("PRP"); // does both WP and WP$ !!
+                s = PATTERN.matcher(s).replaceAll("DT");
+                s = COMPILE1.matcher(s).replaceAll("RB");
+            }
+            if ((whOption & 4) != 0 && s.startsWith("WH")) {
+                s = s.substring(2);
+            }
 
-    // wsg2010: Might need a better way to deal with tag ambiguity. This still doesn't handle the
-    // case where the GOLD tree does not label a punctuation mark as such (common in French), and
-    // the guess tree does.
-    if (deletePunct && tree.isPreTerminal() &&
-        (tlp.isEvalBIgnoredPunctuationTag(s) ||
-        tlp.isPunctuationWord(tree.firstChild().value()))) {
-      return null;
-    }
+            // wsg2010: Might need a better way to deal with tag ambiguity. This still doesn't handle the
+            // case where the GOLD tree does not label a punctuation mark as such (common in French), and
+            // the guess tree does.
+            if (deletePunct && tree.isPreTerminal() &&
+                    (tlp.isEvalBIgnoredPunctuationTag(s) ||
+                            tlp.isPunctuationWord(tree.firstChild().value()))) {
+                return null;
+            }
 
-    // remove the extra NPs inserted in the collinsBaseNP option
-    if (fixCollinsBaseNP && s.equals("NP")) {
-      Tree[] kids = tree.children();
-      if (kids.length == 1 && tlp.basicCategory(kids[0].value()).equals("NP")) {
-        return transformTree(kids[0]);
-      }
-    }
-    // Magerman erased this distinction, and everyone else has followed like sheep...
-    if (s.equals("PRT")) {
-      s = "ADVP";
-    }
-    List<Tree> children = new ArrayList<Tree>();
-    for (int cNum = 0, numKids = tree.numChildren(); cNum < numKids; cNum++) {
-      Tree child = tree.children()[cNum];
-      Tree newChild = transformTree(child);
-      if (newChild != null) {
-        children.add(newChild);
-      }
-    }
-    if (children.isEmpty()) {
-      return null;
-    }
+            // remove the extra NPs inserted in the collinsBaseNP option
+            if (fixCollinsBaseNP && s.equals("NP")) {
+                Tree[] kids = tree.children();
+                if (kids.length == 1 && tlp.basicCategory(kids[0].value()).equals("NP")) {
+                    tree = kids[0];
+                    continue;
+                }
+            }
+            // Magerman erased this distinction, and everyone else has followed like sheep...
+            if (s.equals("PRT")) {
+                s = "ADVP";
+            }
+            List<Tree> children = new ArrayList<>();
+            for (int cNum = 0, numKids = tree.numChildren(); cNum < numKids; cNum++) {
+                Tree child = tree.children()[cNum];
+                Tree newChild = transformTree(child);
+                if (newChild != null) {
+                    children.add(newChild);
+                }
+            }
+            if (children.isEmpty()) {
+                return null;
+            }
 
-    Tree node = tf.newTreeNode(tree.label(), children);
-    node.setValue(s);
+            Tree node = tf.newTreeNode(tree.label(), children);
+            node.setValue(s);
 
-    return node;
-  }
+            return node;
+        }
+    }
 
 } // end class TreeCollinizer

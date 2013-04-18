@@ -25,7 +25,7 @@ import java.util.Set;
  */
 public class MorphaAnnotator implements Annotator{
 
-  private boolean VERBOSE = false;
+  private boolean VERBOSE;
 
 
   private static final String[] prep = {"abroad", "across", "after", "ahead", "along", "aside", "away", "around", "back", "down", "forward", "in", "off", "on", "over", "out", "round", "together", "through", "up"};
@@ -53,7 +53,7 @@ public class MorphaAnnotator implements Annotator{
         for (CoreLabel token : tokens) {
           String text = token.get(CoreAnnotations.TextAnnotation.class);
           String posTag = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
-          this.addLemma(morphology, CoreAnnotations.LemmaAnnotation.class, token, text, posTag);
+          addLemma(morphology, CoreAnnotations.LemmaAnnotation.class, token, text, posTag);
         }
       }
     } else {
@@ -66,7 +66,7 @@ public class MorphaAnnotator implements Annotator{
   private static void addLemma(Morphology morpha,
                         Class<? extends CoreAnnotation<String>> ann,
                         CoreMap map, String word, String tag) {
-    if (tag.length() > 0) {
+    if (!tag.isEmpty()) {
       String phrasalVerb = phrasalVerb(morpha, word, tag);
       if (phrasalVerb == null) {
         map.set(ann, morpha.lemma(word, tag));
@@ -85,8 +85,8 @@ public class MorphaAnnotator implements Annotator{
   private static String phrasalVerb(Morphology morpha, String word, String tag) {
 
     // must be a verb and contain an underscore
-    assert(word != null);
-    assert(tag != null);
+    assert word != null;
+    assert tag != null;
     if(!tag.startsWith("VB")  || !word.contains("_")) return null;
 
     // check whether the last part is a particle

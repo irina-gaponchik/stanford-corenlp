@@ -58,7 +58,7 @@ import edu.stanford.nlp.util.StringUtils;
  * @param <L> The type of the labels in the Dataset
  * @param <F> The type of the features in the Dataset
  */
-public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable, RVFClassifier<L, F> {
+public class LogisticClassifier<L, F> implements Classifier<L, F>, RVFClassifier<L, F> {
 
   //TODO make it implement ProbabilisticClassifier as well. --Ramesh 12/03/2009.
   /**
@@ -71,7 +71,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
   @Deprecated
   private LogPrior prior;
   @Deprecated
-  private boolean biased = false;
+  private boolean biased;
 
   @Override
   public String toString() {
@@ -97,7 +97,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
 
   // todo [cdm]: This method should be removed, and weightsAsGenericCounter renamed as weightsAsCounter!
   public Counter<String> weightsAsCounter() {
-    Counter<String> c = new ClassicCounter<String>();
+    Counter<String> c = new ClassicCounter<>();
     for (F f : featureIndex) {
       c.incrementCount(classes[1]+" / "+f, weights[featureIndex.indexOf(f)]);
     }
@@ -106,7 +106,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
   }
 
   public Counter<F> weightsAsGenericCounter() {
-    Counter<F> c = new ClassicCounter<F>();
+    Counter<F> c = new ClassicCounter<>();
     for (F f : featureIndex) {
       double w =  weights[featureIndex.indexOf(f)];
       if(w != 0.0)
@@ -124,7 +124,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
   }
 
 
-  public LogisticClassifier(double[] weights, Index<F> featureIndex, L[] classes){
+  public LogisticClassifier(double[] weights, Index<F> featureIndex, L... classes){
     this.weights = weights;
     this.featureIndex = featureIndex;
     this.classes = classes;
@@ -149,7 +149,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
   }
 
   public Collection<L> labels() {
-    Collection<L> l = new LinkedList<L>();
+    Collection<L> l = new LinkedList<>();
     l.add(classes[0]);
     l.add(classes[1]);
     return l;
@@ -212,7 +212,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
    * nmramesh@cs.stanford.edu
    */
   public Counter<F> justificationOf(Counter<F> features){
-    Counter<F> fWts = new ClassicCounter<F>();
+    Counter<F> fWts = new ClassicCounter<>();
     for (F feature : features.keySet()) {
       int f = featureIndex.indexOf(feature);
       if (f >= 0) {
@@ -225,7 +225,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
    * returns the weights assigned by the classifier to each feature
    */
   public Counter<F> justificationOf(Collection<F> features){
-    Counter<F> fWts = new ClassicCounter<F>();
+    Counter<F> fWts = new ClassicCounter<>();
     for (F feature : features) {
       int f = featureIndex.indexOf(feature);
       if (f >= 0) {
@@ -242,7 +242,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
     if(datum instanceof RVFDatum<?,?>)return scoresOfRVFDatum((RVFDatum<L,F>)datum);
     Collection<F> features = datum.asFeatures();
     double sum = scoreOf(features);
-    Counter<L> c = new ClassicCounter<L>();
+    Counter<L> c = new ClassicCounter<>();
     c.setCount(classes[0], -sum);
     c.setCount(classes[1], sum);
     return c;
@@ -258,7 +258,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
   private Counter<L> scoresOfRVFDatum(RVFDatum<L, F> example) {
     Counter<F> features = example.asFeaturesCounter();
     double sum = scoreOf(features);
-    Counter<L> c = new ClassicCounter<L>();
+    Counter<L> c = new ClassicCounter<>();
     c.setCount(classes[0], -sum);
     c.setCount(classes[1], sum);
     return c;
@@ -293,7 +293,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
    * @param dataWeights weights of the data.
    */
   @Deprecated //Use LogisticClassifierFactory to train instead.
-  public void trainWeightedData(GeneralDataset<L,F> data, float[] dataWeights){
+  public void trainWeightedData(GeneralDataset<L,F> data, float... dataWeights){
     if (data.labelIndex.size() != 2) {
       throw new RuntimeException("LogisticClassifier is only for binary classification!");
     }
@@ -305,7 +305,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
       else if(data instanceof RVFDataset<?,?>)
         lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getValuesArray(), data.getLabelsArray(), prior,dataWeights);
       minim = new QNMinimizer(lof);
-      weights = minim.minimize(lof, 1e-4, new double[data.numFeatureTypes()]);
+      weights = minim.minimize(lof, 1.0e-4, new double[data.numFeatureTypes()]);
 
     featureIndex = data.featureIndex;
     classes[0] = data.labelIndex.get(0);
@@ -314,7 +314,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
 
   @Deprecated //Use LogisticClassifierFactory to train instead.
   public void train(GeneralDataset<L, F> data) {
-    train(data, 0.0, 1e-4);
+    train(data, 0.0, 1.0e-4);
   }
 
   @Deprecated //Use LogisticClassifierFactory to train instead.
@@ -330,19 +330,11 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
         lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getLabelsArray(), prior);
       else if(data instanceof RVFDataset<?,?>)
         lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getValuesArray(), data.getLabelsArray(), prior);
-      if (l1reg > 0.0) {
-        minim = ReflectionLoading.loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg);
-      } else {
-        minim = new QNMinimizer(lof);
-      }
+        minim = l1reg > 0.0 ? ReflectionLoading.<Minimizer<DiffFunction>>loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg) : new QNMinimizer(lof);
       weights = minim.minimize(lof, tol, new double[data.numFeatureTypes()]);
     } else {
       BiasedLogisticObjectiveFunction lof = new BiasedLogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getLabelsArray(), prior);
-      if (l1reg > 0.0) {
-        minim = ReflectionLoading.loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg);
-      } else {
-        minim = new QNMinimizer(lof);
-      }
+        minim = l1reg > 0.0 ? ReflectionLoading.<Minimizer<DiffFunction>>loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg) : new QNMinimizer(lof);
       weights = minim.minimize(lof, tol, new double[data.numFeatureTypes()]);
     }
 
@@ -352,15 +344,15 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
   }
 
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     Properties prop = StringUtils.argsToProperties(args);
 
     double l1reg = Double.parseDouble(prop.getProperty("l1reg","0.0"));
 
-    Dataset<String, String> ds = new Dataset<String, String>();
+    Dataset<String, String> ds = new Dataset<>();
     for (String line : ObjectBank.getLineIterator(new File(prop.getProperty("trainFile")))) {
       String[] bits = line.split("\\s+");
-      Collection<String> f = new LinkedList<String>(Arrays.asList(bits).subList(1, bits.length));
+      Collection<String> f = new LinkedList<>(Arrays.asList(bits).subList(1, bits.length));
       String l = bits[0];
       ds.add(f, l);
     }
@@ -368,13 +360,13 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, Serializable,
     ds.summaryStatistics();
 
     boolean biased = prop.getProperty("biased", "false").equals("true");
-    LogisticClassifierFactory<String, String> factory = new LogisticClassifierFactory<String, String>();
-    LogisticClassifier<String, String> lc = factory.trainClassifier(ds, l1reg, 1e-4, biased);
+    LogisticClassifierFactory<String, String> factory = new LogisticClassifierFactory<>();
+    LogisticClassifier<String, String> lc = factory.trainClassifier(ds, l1reg, 1.0e-4, biased);
 
 
     for (String line : ObjectBank.getLineIterator(new File(prop.getProperty("testFile")))) {
       String[] bits = line.split("\\s+");
-      Collection<String> f = new LinkedList<String>(Arrays.asList(bits).subList(1, bits.length));
+      Collection<String> f = new LinkedList<>(Arrays.asList(bits).subList(1, bits.length));
       //String l = bits[0];
       String g = lc.classOf(f);
       System.out.println(g + '\t' + line);

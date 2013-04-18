@@ -54,7 +54,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
 
   @Override
   public void initializeTraining(double numTrees) {
-    trainingSentences = new ArrayList<List<TaggedWord>>();
+    trainingSentences = new ArrayList<>();
   }
 
   /**
@@ -110,21 +110,21 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
   @Override
   public void finishTraining() {
     Timing.tick("Counting characters...");
-    ClassicCounter<Symbol> charCounter = new ClassicCounter<Symbol>();
+    ClassicCounter<Symbol> charCounter = new ClassicCounter<>();
 
     // first find all chars that occur only once
     for (List<TaggedWord> labels : trainingSentences) {
-      for (int i = 0, size = labels.size(); i < size; i++) {
-        String word = labels.get(i).word();
-        if (word.equals(BOUNDARY)) {
-          continue;
+        for (TaggedWord label : labels) {
+            String word = label.word();
+            if (word.equals(BOUNDARY)) {
+                continue;
+            }
+            for (int j = 0, length = word.length(); j < length; j++) {
+                Symbol sym = Symbol.cannonicalSymbol(word.charAt(j));
+                charCounter.incrementCount(sym);
+            }
+            charCounter.incrementCount(Symbol.END_WORD);
         }
-        for (int j = 0, length = word.length(); j < length; j++) {
-          Symbol sym = Symbol.cannonicalSymbol(word.charAt(j));
-          charCounter.incrementCount(sym);
-        }
-        charCounter.incrementCount(Symbol.END_WORD);
-      }
     }
 
     Set<Symbol> singletons = Counters.keysBelow(charCounter, 1.5);
@@ -136,8 +136,8 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
       POSspecificCharNGrams[i] = new GeneralizedCounter(i + 2);
     }
 
-    ClassicCounter<String> POSCounter = new ClassicCounter<String>();
-    List<Serializable> context = new ArrayList<Serializable>(CONTEXT_LENGTH + 1);
+    ClassicCounter<String> POSCounter = new ClassicCounter<>();
+    List<Serializable> context = new ArrayList<>(CONTEXT_LENGTH + 1);
     for (List<TaggedWord> words : trainingSentences) {
       for (TaggedWord taggedWord : words) {
         String word = taggedWord.word();
@@ -203,20 +203,20 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
     //    charCounter.incrementCount(Symbol.UNKNOWN, singletons.size());
     int numberOfKeys = charCounter.size() + singletons.size();
     Distribution<Symbol> prior = Distribution.goodTuringSmoothedCounter(charCounter, numberOfKeys);
-    charDistributions.put(Collections.EMPTY_LIST, prior);
+    charDistributions.put(Collections.emptyList(), prior);
 
     for (int i = 0; i <= CONTEXT_LENGTH; i++) {
       Set counterEntries = POSspecificCharNGrams[i].lowestLevelCounterEntrySet();
       Timing.tick("Creating " + counterEntries.size() + " character " + (i + 1) + "-gram distributions...");
-      for (Iterator it = counterEntries.iterator(); it.hasNext();) {
-        Map.Entry<List,ClassicCounter> entry = (Map.Entry<List,ClassicCounter>) it.next();
-        context = entry.getKey();
-        ClassicCounter<Symbol> c = entry.getValue();
-        Distribution<Symbol> thisPrior = charDistributions.get(context.subList(0, context.size() - 1));
-        double priorWeight = thisPrior.getNumberOfKeys() / 200.0;
-        Distribution<Symbol> newDist = Distribution.dynamicCounterWithDirichletPrior(c, thisPrior, priorWeight);
-        charDistributions.put(context, newDist);
-      }
+        for (Object counterEntry : counterEntries) {
+            Map.Entry<List, ClassicCounter> entry = (Map.Entry<List, ClassicCounter>) counterEntry;
+            context = entry.getKey();
+            ClassicCounter<Symbol> c = entry.getValue();
+            Distribution<Symbol> thisPrior = charDistributions.get(context.subList(0, context.size() - 1));
+            double priorWeight = thisPrior.getNumberOfKeys() / 200.0;
+            Distribution<Symbol> newDist = Distribution.dynamicCounterWithDirichletPrior(c, thisPrior, priorWeight);
+            charDistributions.put(context, newDist);
+        }
     }
   }
 
@@ -235,18 +235,14 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
   }
 
   private Symbol unknownCharClass(Symbol ch) {
-    if (useUnknownCharacterModel) {
-      return new Symbol(Character.toString(RadicalMap.getRadical(ch.getCh()))).intern();
-    } else {
-      return Symbol.UNKNOWN;
-    }
+      return useUnknownCharacterModel ? new Symbol(Character.toString(RadicalMap.getRadical(ch.getCh()))).intern() : Symbol.UNKNOWN;
   }
 
   public float score(IntTaggedWord iTW, int loc, String word, String featureSpec) {
     String tag = tagIndex.get(iTW.tag);
     assert !word.equals(BOUNDARY);
     char[] chars = word.toCharArray();
-    List<Serializable> charList = new ArrayList<Serializable>(chars.length + CONTEXT_LENGTH + 1); // this starts of storing Symbol's and then starts storing String's. Clean this up someday!
+    List<Serializable> charList = new ArrayList<>(chars.length + CONTEXT_LENGTH + 1); // this starts of storing Symbol's and then starts storing String's. Clean this up someday!
 
     // charList is constructed backward
     // END_WORD char[length-1] char[length-2] ... char[0] BEGIN_WORD BEGIN_WORD
@@ -276,7 +272,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
         break;
 
       case 1:
-        score -= (chars.length * (chars.length + 1)) * (lengthPenalty / 2);
+        score -= (chars.length * (chars.length + 1)) * lengthPenalty / 2;
         break;
 
       case 2:
@@ -290,7 +286,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
   // this is where we do backing off for unseen contexts
   // (backing off for rarely seen contexts is done implicitly
   // because the distributions are smoothed)
-  private Distribution<Symbol> getBackedOffDist(List<Serializable> context) {
+  private Distribution getBackedOffDist(List<Serializable> context) {
     // context contains [tag prevChar prevPrevChar]
     for (int i = CONTEXT_LENGTH + 1; i >= 0; i--) {
       List<Serializable> l = context.subList(0, i);
@@ -309,7 +305,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
    */
   public String sampleFrom(String tag) {
     StringBuilder buf = new StringBuilder();
-    List<Serializable> context = new ArrayList<Serializable>(CONTEXT_LENGTH + 1);
+    List<Serializable> context = new ArrayList<>(CONTEXT_LENGTH + 1);
 
     // context must contain [tag prevChar prevPrevChar]
     context.add(tag);
@@ -375,10 +371,10 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
 
   private Distribution<Integer> getWordLengthDistribution() {
     int samples = 0;
-    ClassicCounter<Integer> c = new ClassicCounter<Integer>();
+    ClassicCounter<Integer> c = new ClassicCounter<>();
     while (samples++ < 10000) {
       String s = sampleFrom();
-      c.incrementCount(Integer.valueOf(s.length()));
+      c.incrementCount(s.length());
       if (samples % 1000 == 0) {
         System.out.print(".");
       }
@@ -424,7 +420,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
     public static final Symbol BEGIN_WORD = new Symbol(BEGIN_WORD_TYPE);
     public static final Symbol END_WORD = new Symbol(END_WORD_TYPE);
 
-    public static final Interner<Symbol> interner = new Interner<Symbol>();
+    public static final Interner<Symbol> interner = new Interner<>();
 
     public Symbol(char ch) {
       type = CHAR_TYPE;
@@ -454,11 +450,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
     }
 
     public char getCh() {
-      if (type == CHAR_TYPE) {
-        return ch;
-      } else {
-        return '*';
-      }
+        return type == CHAR_TYPE ? ch : '*';
     }
 
     public Symbol intern() {
@@ -468,12 +460,8 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
     @Override
     public String toString() {
       if (type == CHAR_TYPE) {
-        return "[u" + (int) ch + "]";
-      } else if (type == UNK_CLASS_TYPE) {
-        return "UNK:" + unkClass;
-      } else {
-        return Integer.toString(type);
-      }
+        return "[u" + (int) ch + ']';
+      } else return type == UNK_CLASS_TYPE ? "UNK:" + unkClass : Integer.toString(type);
     }
 
     private Object readResolve() throws ObjectStreamException {
@@ -506,7 +494,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
         return false;
       }
 
-      final Symbol symbol = (Symbol) o;
+      Symbol symbol = (Symbol) o;
 
       if (ch != symbol.ch) {
         return false;
@@ -514,11 +502,8 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
       if (type != symbol.type) {
         return false;
       }
-      if (unkClass != null ? !unkClass.equals(symbol.unkClass) : symbol.unkClass != null) {
-        return false;
-      }
+        return !(unkClass != null ? !unkClass.equals(symbol.unkClass) : symbol.unkClass != null);
 
-      return true;
     }
 
     @Override

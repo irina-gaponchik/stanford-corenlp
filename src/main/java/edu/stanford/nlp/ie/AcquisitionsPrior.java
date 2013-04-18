@@ -23,7 +23,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
     super(backgroundSymbol, classIndex, doc);
   }
 
-  public double scoreOf(int[] sequence) {
+  public double scoreOf(int... sequence) {
 
     Set<String> purchasers = Generics.newHashSet();
     Set<String> purchabrs = Generics.newHashSet();
@@ -32,42 +32,49 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
     Set<String> acquireds = Generics.newHashSet();
     Set<String> acqabrs = Generics.newHashSet();
 
-    List<Entity> purchasersL = new ArrayList<Entity>();
-    List<Entity> purchabrsL = new  ArrayList<Entity>();
-    List<Entity> sellersL = new  ArrayList<Entity>();
-    List<Entity> sellerabrsL = new  ArrayList<Entity>();
-    List<Entity> acquiredsL = new  ArrayList<Entity>();
-    List<Entity> acqabrsL = new  ArrayList<Entity>();
+    List<Entity> purchasersL = new ArrayList<>();
+    List<Entity> purchabrsL = new  ArrayList<>();
+    List<Entity> sellersL = new  ArrayList<>();
+    List<Entity> sellerabrsL = new  ArrayList<>();
+    List<Entity> acquiredsL = new  ArrayList<>();
+    List<Entity> acqabrsL = new  ArrayList<>();
 
     double p = 0.0;
     for (int i = 0; i < entities.length; i++) {
       Entity entity = entities[i];
-      if ((i == 0 || entities[i-1] != entity) && entity != null) {
+      if ((i == 0 || !entities[i - 1].equals(entity)) && entity != null) {
 
         String type = classIndex.get(entity.type);
         String phrase = StringUtils.join(entity.words, " ").toLowerCase();
-        if (type.equals("purchaser")) {
-          purchasers.add(phrase);
-          purchasersL.add(entity);
-        } else if (type.equals("purchabr")) {
-          purchabrs.add(phrase);
-          purchabrsL.add(entity);
-        } else if (type.equals("seller")) {
-          sellers.add(phrase);
-          sellersL.add(entity);
-        } else if (type.equals("sellerabr")) {
-          sellerabrs.add(phrase);
-          sellerabrsL.add(entity);
-        } else if (type.equals("acquired")) {
-          acquireds.add(phrase);
-          acquiredsL.add(entity);
-        } else if (type.equals("acqabr")) {
-          acqabrs.add(phrase);
-          acqabrsL.add(entity);
-        } else {
-          System.err.println("unknown entity type: "+type);
-          System.exit(0);
-        }
+          switch (type) {
+              case "purchaser":
+                  purchasers.add(phrase);
+                  purchasersL.add(entity);
+                  break;
+              case "purchabr":
+                  purchabrs.add(phrase);
+                  purchabrsL.add(entity);
+                  break;
+              case "seller":
+                  sellers.add(phrase);
+                  sellersL.add(entity);
+                  break;
+              case "sellerabr":
+                  sellerabrs.add(phrase);
+                  sellerabrsL.add(entity);
+                  break;
+              case "acquired":
+                  acquireds.add(phrase);
+                  acquiredsL.add(entity);
+                  break;
+              case "acqabr":
+                  acqabrs.add(phrase);
+                  acqabrsL.add(entity);
+                  break;
+              default:
+                  System.err.println("unknown entity type: " + type);
+                  System.exit(0);
+          }
       }
     }
     
@@ -81,12 +88,12 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(purchabr.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s1.length() - 2) {
-        if (s.indexOf(s1) >= 0) {
+        if (s.contains(s1)) {
           match = true;
           break;
         }
       }
-      if (!match && purchabrs.size() > 0) {
+      if (!match && !purchabrs.isEmpty()) {
         p -= purchaser.words.size() * penalty;
       }
     }
@@ -101,12 +108,12 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(sellerabr.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s1.length() - 2) {
-        if (s.indexOf(s1) >= 0) {
+        if (s.contains(s1)) {
           match = true;
           break;
         }
       }
-      if (!match && sellerabrs.size() > 0) {
+      if (!match && !sellerabrs.isEmpty()) {
         p -= seller.words.size() * penalty;
       }
     }
@@ -121,12 +128,12 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(acqabr.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s1.length() - 2) {
-        if (s.indexOf(s1) >= 0) {
+        if (s.contains(s1)) {
           match = true;
           break;
         }
       }
-      if (!match && acqabrs.size() > 0) {
+      if (!match && !acqabrs.isEmpty()) {
         p -= acquired.words.size() * penalty;
       }
     }
@@ -140,7 +147,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(purchaser.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s1.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           match = true;
           break;
         }
@@ -154,7 +161,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(acquired.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           match = true;
           break;
         }
@@ -163,7 +170,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(seller.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           match = true;
           break;
         }
@@ -181,7 +188,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(seller.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s1.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           match = true;
           break;
         }
@@ -196,7 +203,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(acquired.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           match = true;
           break;
         }
@@ -205,7 +212,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(purchaser.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           match = true;
           break;
         }
@@ -224,7 +231,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(acquired.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s1.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           match = true;
           break;
         }
@@ -238,7 +245,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(seller.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           //System.err.println(acqabr.toString(classIndex)+"\n"+seller.toString(classIndex)+"\n");
           match = true;
             break;
@@ -248,7 +255,7 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
         String s1 = StringUtils.join(purchaser.words, "").toLowerCase();
         //int dist = StringUtils.longestCommonSubstring(s, s1);          
         //if (dist > s.length() - 2) {
-        if (s1.indexOf(s) >= 0) {
+        if (s1.contains(s)) {
           match = true;
           break;
         }

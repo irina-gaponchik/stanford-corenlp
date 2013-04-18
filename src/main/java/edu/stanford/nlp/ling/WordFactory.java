@@ -1,26 +1,20 @@
 package edu.stanford.nlp.ling;
 
 /**
- * A <code>WordFactory</code> acts as a factory for creating objects of
- * class <code>Word</code>.
+ * A {@code WordFactory} acts as a factory for creating objects of
+ * class {@code Word}.
  *
  * @author Christopher Manning
  * @version 2000/12/20
  */
 public class WordFactory implements LabelFactory {
 
-  /**
-   * Creates a new WordFactory.
-   */
-  public WordFactory() {
-  }
 
-
-  /**
+    /**
    * Create a new word, where the label is formed from
-   * the <code>String</code> passed in.
+   * the {@code String} passed in.
    *
-   * @param word The word that will go into the <code>Word</code>
+   * @param word The word that will go into the {@code Word}
    * @return The new label
    */
   public Label newLabel(String word) {
@@ -30,9 +24,9 @@ public class WordFactory implements LabelFactory {
 
   /**
    * Create a new word, where the label is formed from
-   * the <code>String</code> passed in.
+   * the {@code String} passed in.
    *
-   * @param word    The word that will go into the <code>Word</code>
+   * @param word    The word that will go into the {@code Word}
    * @param options is ignored by a WordFactory
    * @return The new label
    */
@@ -43,9 +37,9 @@ public class WordFactory implements LabelFactory {
 
   /**
    * Create a new word, where the label is formed from
-   * the <code>String</code> passed in.
+   * the {@code String} passed in.
    *
-   * @param word The word that will go into the <code>Word</code>
+   * @param word The word that will go into the {@code Word}
    * @return The new label
    */
   public Label newLabelFromString(String word) {
@@ -54,10 +48,10 @@ public class WordFactory implements LabelFactory {
 
 
   /**
-   * Create a new <code>Word Label</code>, where the label is
+   * Create a new {@code Word Label}, where the label is
    * formed from
-   * the <code>Label</code> object passed in.  Depending on what fields
-   * each label has, other things will be <code>null</code>.
+   * the {@code Label} object passed in.  Depending on what fields
+   * each label has, other things will be {@code null}.
    *
    * @param oldLabel The Label that the new label is being created from
    * @return a new label of a particular type

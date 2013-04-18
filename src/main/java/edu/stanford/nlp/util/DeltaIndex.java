@@ -49,11 +49,7 @@ public class DeltaIndex<E> extends AbstractCollection<E> implements Index<E> {
   }
 
   public E get(int i) {
-    if (i < backingIndexSize) {
-      return backingIndex.get(i);
-    } else {
-      return spilloverIndex.get(i - backingIndexSize);
-    }
+      return i < backingIndexSize ? backingIndex.get(i) : spilloverIndex.get(i - backingIndexSize);
   }
 
   public int indexOf(E o) {
@@ -74,7 +70,7 @@ public class DeltaIndex<E> extends AbstractCollection<E> implements Index<E> {
   }
 
   public List<E> objectsList() {
-    List<E> result = new ArrayList<E>();
+    List<E> result = new ArrayList<>();
     if (result.size() > backingIndexSize) {
       // we told you not to do this
       result.addAll(backingIndex.objectsList().subList(0, backingIndexSize));
@@ -86,8 +82,8 @@ public class DeltaIndex<E> extends AbstractCollection<E> implements Index<E> {
     return Collections.unmodifiableList(result);
   }
 
-  public Collection<E> objects(int[] indices) {
-    List<E> result = new ArrayList<E>();
+  public Collection<E> objects(int... indices) {
+    List<E> result = new ArrayList<>();
     for (int index : indices) {
       result.add(get(index));
     }
@@ -128,9 +124,7 @@ public class DeltaIndex<E> extends AbstractCollection<E> implements Index<E> {
 
   @Override
   public boolean add(E e) {
-    if (backingIndex.contains(e))
-      return false;
-    return spilloverIndex.add(e);
+      return !backingIndex.contains(e) && spilloverIndex.add(e);
   }
 
   @Override
@@ -175,11 +169,7 @@ public class DeltaIndex<E> extends AbstractCollection<E> implements Index<E> {
       }
 
       public E next() {
-        if (backingIterator.hasNext()) {
-          return backingIterator.next();
-        } else {
-          return spilloverIterator.next();
-        }
+          return backingIterator.hasNext() ? backingIterator.next() : spilloverIterator.next();
       }
 
       public void remove() {
@@ -192,6 +182,6 @@ public class DeltaIndex<E> extends AbstractCollection<E> implements Index<E> {
    * super ghetto
    */
   public String toString() {
-    return backingIndex.toString() + "," + spilloverIndex.toString();
+    return backingIndex.toString() + ',' + spilloverIndex.toString();
   }
 }

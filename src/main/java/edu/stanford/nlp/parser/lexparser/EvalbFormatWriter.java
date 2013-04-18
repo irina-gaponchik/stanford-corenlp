@@ -11,7 +11,7 @@ public class EvalbFormatWriter {
   public final static String DEFAULT_TEST_FILENAME = "parses.tst";
   private PrintWriter goldWriter;
   private PrintWriter testWriter;
-  private int count = 0;
+  private int count;
   private final static EvalbFormatWriter DEFAULT_WRITER = new EvalbFormatWriter();
 
   public void initFiles(TreebankLangParserParams tlpParams, String goldFilename, String testFilename) {
@@ -36,15 +36,15 @@ public class EvalbFormatWriter {
 
   public void writeTree(Tree test)
   {
-    testWriter.println((test == null) ? "(())" : test.toString());
+    testWriter.println(test == null ? "(())" : test.toString());
     count++;
 //    System.err.println("Wrote EVALB lines.");
   }
 
   public void writeTrees(Tree gold, Tree test)
   {
-    goldWriter.println((gold == null) ? "(())" : gold.toString());
-    testWriter.println((test == null) ? "(())" : test.toString());
+    goldWriter.println(gold == null ? "(())" : gold.toString());
+    testWriter.println(test == null ? "(())" : test.toString());
     count++;
 //    System.err.println("Wrote EVALB lines.");
   }

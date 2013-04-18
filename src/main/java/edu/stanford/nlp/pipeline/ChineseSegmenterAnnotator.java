@@ -27,10 +27,10 @@ import edu.stanford.nlp.util.Timing;
  */
 public class ChineseSegmenterAnnotator implements Annotator {
 
-  private AbstractSequenceClassifier<?> segmenter = null;
+  private AbstractSequenceClassifier<?> segmenter;
 
   private Timing timer = new Timing();
-  private static long millisecondsAnnotating = 0;
+  private static long millisecondsAnnotating;
   private boolean VERBOSE = true;
   
   private static final String DEFAULT_SEG_LOC =
@@ -67,7 +67,7 @@ public class ChineseSegmenterAnnotator implements Annotator {
     // Keep only the properties that apply to this annotator
     Properties modelProps = new Properties();
     for (String key : props.stringPropertyNames()) {
-      if (key.startsWith(name + ".")) {
+      if (key.startsWith(name + '.')) {
         // skip past name and the subsequent "."
         String modelKey = key.substring(name.length() + 1);
         if (modelKey.equals("model")) {
@@ -140,7 +140,7 @@ public class ChineseSegmenterAnnotator implements Annotator {
     String origText = annotation.get(CoreAnnotations.TextAnnotation.class);
     
     boolean seg = true;
-    List<CoreLabel> words = new ArrayList<CoreLabel>();
+    List<CoreLabel> words = new ArrayList<>();
 
     for (int i = 0; i < origText.length(); i++) {
       CoreLabel wi = new CoreLabel();
@@ -150,7 +150,6 @@ public class ChineseSegmenterAnnotator implements Annotator {
       // if this word is a whitespace or a control character, set 'seg' to true for next word, and break
       if (Character.isWhitespace(origText.charAt(i)) || Character.isISOControl(origText.charAt(i))) {
         seg = true;
-        continue;
       } else {
         // if this word is a word, put it as a feature label and set seg to false for next word
         wi.set(CoreAnnotations.ChineseCharAnnotation.class, wordString);
@@ -160,7 +159,7 @@ public class ChineseSegmenterAnnotator implements Annotator {
           wi.set(CoreAnnotations.ChineseSegAnnotation.class, "0");
         }
         wi.set(CoreAnnotations.CharacterOffsetBeginAnnotation.class, i);
-        wi.set(CoreAnnotations.CharacterOffsetEndAnnotation.class, (i + 1));
+        wi.set(CoreAnnotations.CharacterOffsetEndAnnotation.class, i + 1);
         words.add(wi);
         seg = false;
       }
@@ -181,7 +180,7 @@ public class ChineseSegmenterAnnotator implements Annotator {
     
     String text = annotation.get(CoreAnnotations.TextAnnotation.class);
     List<CoreLabel> sentChars = annotation.get(ChineseCoreAnnotations.CharactersAnnotation.class);
-    List<CoreLabel> tokens = new ArrayList<CoreLabel>();
+    List<CoreLabel> tokens = new ArrayList<>();
     annotation.set(CoreAnnotations.TokensAnnotation.class, tokens);
 
     List<String> words = segmenter.segmentString(text);

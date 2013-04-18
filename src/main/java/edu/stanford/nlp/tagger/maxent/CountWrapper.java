@@ -31,7 +31,7 @@ public class CountWrapper {
   }
 
   protected CountWrapper(String word, int countPart, int countThat, int countIn, int countRB) {
-    assert(word != null);
+    assert word != null;
     this.word = word;
     this.countPart = countPart;
     this.countThat = countThat;
@@ -109,7 +109,7 @@ public class CountWrapper {
       byte[] buff = new byte[len];
       if (rf.read(buff) != len) { System.err.println("Error: rewrite CountWrapper.read"); }
       word = new String(buff);
-      assert(word != null);
+      assert word != null;
       countPart = rf.readInt();
       countThat = rf.readInt();
       countIn = rf.readInt();

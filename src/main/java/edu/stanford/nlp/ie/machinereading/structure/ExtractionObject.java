@@ -66,7 +66,7 @@ public class ExtractionObject implements Serializable {
     this.sentence = sentence;
     this.extentTokenSpan = span;
     this.type = type.intern();
-    this.subType = (subtype != null ? subtype.intern() : null);
+    this.subType = subtype != null ? subtype.intern() : null;
     this.attributeMap = null;
   }
 
@@ -101,7 +101,7 @@ public class ExtractionObject implements Serializable {
     StringBuilder sb = new StringBuilder();
     for (int i = extentTokenSpan.start(); i < extentTokenSpan.end(); i ++){
       CoreLabel token = tokens.get(i);
-      if(i > extentTokenSpan.start()) sb.append(" ");
+      if(i > extentTokenSpan.start()) sb.append(' ');
       sb.append(token.word());
     }
     return sb.toString();
@@ -115,8 +115,7 @@ public class ExtractionObject implements Serializable {
   public boolean equals(Object other) {
     if(! (other instanceof ExtractionObject)) return false;
     ExtractionObject o = (ExtractionObject) other;
-    if(o.objectId.equals(objectId) && o.sentence == sentence) return true;
-    return false;
+      return o.objectId.equals(objectId) && o.sentence == sentence;
   }
 
   static class CompByExtent implements Comparator<ExtractionObject> {
@@ -127,11 +126,7 @@ public class ExtractionObject implements Serializable {
         return 1;
       } else if(o1.getExtentTokenEnd() < o2.getExtentTokenEnd()) {
         return -1;
-      } else if(o1.getExtentTokenEnd() > o2.getExtentTokenEnd()) {
-        return 1;
-      } else {
-        return 0;
-      }
+      } else return o1.getExtentTokenEnd() > o2.getExtentTokenEnd() ? 1 : 0;
     }
   }
   
@@ -146,16 +141,16 @@ public class ExtractionObject implements Serializable {
   public static Span getSpan(ExtractionObject ... objs) {
     int left = Integer.MAX_VALUE;
     int right = Integer.MIN_VALUE;
-    for(int i = 0; i < objs.length; i ++){
-      if(objs[i].getExtentTokenStart() < left){
-        left = objs[i].getExtentTokenStart();
+      for (ExtractionObject obj : objs) {
+          if (obj.getExtentTokenStart() < left) {
+              left = obj.getExtentTokenStart();
+          }
+          if (obj.getExtentTokenEnd() > right) {
+              right = obj.getExtentTokenEnd();
+          }
       }
-      if(objs[i].getExtentTokenEnd() > right) {
-        right = objs[i].getExtentTokenEnd();
-      }
-    }
-    assert(left < Integer.MAX_VALUE);
-    assert(right > Integer.MIN_VALUE);
+    assert left < Integer.MAX_VALUE;
+    assert right > Integer.MIN_VALUE;
     return new Span(left, right);
   }
   
@@ -175,7 +170,7 @@ public class ExtractionObject implements Serializable {
     StringBuilder sb = new StringBuilder();
     if(tokens != null && extentTokenSpan != null){
       for(int i = extentTokenSpan.start(); i < extentTokenSpan.end(); i ++){
-        if(i > extentTokenSpan.start()) sb.append(" ");
+        if(i > extentTokenSpan.start()) sb.append(' ');
         sb.append(tokens.get(i).word());
       }
     }
@@ -197,12 +192,12 @@ public class ExtractionObject implements Serializable {
     String [] t1Toks = t1.split(TYPE_SEP);
     String [] t2Toks = t2.split(TYPE_SEP);
     Set<String> uniqueTypes = Generics.newHashSet();
-    for(String t: t1Toks) uniqueTypes.add(t);
-    for(String t: t2Toks) uniqueTypes.add(t);
+      Collections.addAll(uniqueTypes, t1Toks);
+      Collections.addAll(uniqueTypes, t2Toks);
     String [] types = new String[uniqueTypes.size()];
     uniqueTypes.toArray(types);
     Arrays.sort(types);
-    StringBuffer os = new StringBuffer();
+    StringBuilder os = new StringBuilder();
     for(int i = 0; i < types.length; i ++){
       if(i > 0) os.append(TYPE_SEP);
       os.append(types[i]);
@@ -225,15 +220,15 @@ public class ExtractionObject implements Serializable {
   }
   String probsToString() {
     List<Pair<String, Double>> sorted = Counters.toDescendingMagnitudeSortedListWithCounts(typeProbabilities);
-    StringBuffer os = new StringBuffer();
-    os.append("{");
+    StringBuilder os = new StringBuilder();
+    os.append('{');
     boolean first = true;
     for(Pair<String, Double> lv: sorted) {
       if(! first) os.append("; ");
-      os.append(lv.first + ", " + lv.second);
+      os.append(lv.first).append(", ").append(lv.second);
       first = false;
     }
-    os.append("}");
+    os.append('}');
     return os.toString();
   }
   
@@ -249,16 +244,13 @@ public class ExtractionObject implements Serializable {
     List<Pair<String, Double>> sorted = Counters.toDescendingMagnitudeSortedListWithCounts(typeProbabilities);
     
     // first choice not nil
-    if(sorted.size() > 0 && ! sorted.get(0).first.equals(nilLabel)){
+    if(!sorted.isEmpty() && ! sorted.get(0).first.equals(nilLabel)){
       return true;
     }
     
     // first choice is nil, but second is within beam
-    if(sorted.size() > 1 && sorted.get(0).first.equals(nilLabel) && beam > 0 &&
-        100.0 * (sorted.get(0).second - sorted.get(1).second) < beam){
-      return true;
-    }
+      return sorted.size() > 1 && sorted.get(0).first.equals(nilLabel) && beam > 0 &&
+              100.0 * (sorted.get(0).second - sorted.get(1).second) < beam;
 
-    return false;
   }
 }

@@ -25,11 +25,11 @@ public abstract class OutputHandler extends LogRecordHandler{
    * A list of tracks which have been started but not yet printed as no
    * log messages are in them yet.
    */
-  protected LinkedList<Record> queuedTracks = new LinkedList<Record>();
+  protected LinkedList<Record> queuedTracks = new LinkedList<>();
   /**
    * Information about the current and higher level tracks
    */
-  protected Stack<TrackInfo> trackStack = new Stack<TrackInfo>();
+  protected Stack<TrackInfo> trackStack = new Stack<>();
   /**
    * The current track info; used to avoid trackStack.peek() calls
    */
@@ -46,7 +46,7 @@ public abstract class OutputHandler extends LogRecordHandler{
    * The length of the left margin in which to print channel information.
    * If this is set to a value < 3, then no channel information is printed.
    */
-  protected int leftMargin = 0;
+  protected int leftMargin;
   /**
    * Number of lines above which the closing brace of a track shows the name of the
    * track
@@ -56,20 +56,20 @@ public abstract class OutputHandler extends LogRecordHandler{
   /**
    * True if we have not printed the opening bracket for a track yet
    */
-  private boolean missingOpenBracket = false;
+  private boolean missingOpenBracket;
 
   /**
    * The color to use for track beginning and ends
    */
   protected Color trackColor = Color.NONE;
-  protected Map<String,Color> channelColors = null;
-  protected boolean addRandomColors = false;
+  protected Map<String,Color> channelColors;
+  protected boolean addRandomColors;
 
   /**
    * The style to use for track beginning and ends
    */
   protected Style trackStyle = Style.NONE;
-  protected Map<String,Style> channelStyles = null;
+  protected Map<String,Style> channelStyles;
 
   /**
    * Print a string to an output without the trailing newline.
@@ -120,7 +120,7 @@ public abstract class OutputHandler extends LogRecordHandler{
    * @param style The style to use
    * @return The SringBuilder b
    */
-  protected StringBuilder style(StringBuilder b, String line, Color color, Style style){
+  protected static StringBuilder style(StringBuilder b, String line, Color color, Style style){
     if(color != Color.NONE || style != Style.NONE){
       b.append(color.ansiCode);
       b.append(style.ansiCode);
@@ -157,7 +157,7 @@ public abstract class OutputHandler extends LogRecordHandler{
           color = candColor;
         } else if(addRandomColors){
           //((case: random colors))
-          color = Color.values()[(Math.abs(channelToString.hashCode()) % (Color.values().length-3))+3];
+          color = Color.values()[Math.abs(channelToString.hashCode()) % (Color.values().length-3) +3];
           if(channelToString.equals(Redwood.ERR.toString().toLowerCase())){
             color = Color.RED;
           } else if(channelToString.equals(Redwood.WARN.toString().toLowerCase())){
@@ -200,13 +200,13 @@ public abstract class OutputHandler extends LogRecordHandler{
       }
       //(write margin)
       for(int i=0; i<leftMargin; i++){
-        b.append(" ");
+        b.append(' ');
       }
       //(write name)
       writeContent(signal.depth,signal.content,b);
-      if(signal.content.toString().length() > 0){ b.append(" "); }
+      if(!signal.content.toString().isEmpty()){ b.append(' '); }
       //(print)
-      print(null, this.style(new StringBuilder(), b.toString(), trackColor, trackStyle).toString() );
+      print(null, style(new StringBuilder(), b.toString(), trackColor, trackStyle).toString() );
       this.missingOpenBracket = true;  //only set to false if actually updated track state
       //(update lines printed)
       if(info != null){
@@ -223,7 +223,7 @@ public abstract class OutputHandler extends LogRecordHandler{
     String[] content;
     if (record.content instanceof Throwable) {
       //(vars)
-      List<String> lines = new ArrayList<String>();
+      List<String> lines = new ArrayList<>();
       StackTraceElement[] trace = null;
       StackTraceElement topTraceElement= null;
       //(root message)
@@ -259,16 +259,12 @@ public abstract class OutputHandler extends LogRecordHandler{
       //(set content array)
       content = new String[lines.size()];
       content = lines.toArray(content);
-    } else if(record.content == null){
-      content = new String[]{"null"};
-    } else {
-      content = record.content.toString().split("\n"); //would be nice to get rid of this 'split()' call at some point
-    }
+    } else content = record.content == null ? new String[]{"null"} : record.content.toString().split("\n");
     
     //--Handle Tracks
     updateTracks(record.depth);
     if(this.missingOpenBracket){
-      this.style(b, "{\n", trackColor, trackStyle);
+      style(b, "{\n", trackColor, trackStyle);
       this.missingOpenBracket = false;
     }
     //--Process Record
@@ -279,7 +275,7 @@ public abstract class OutputHandler extends LogRecordHandler{
     Color color = Color.NONE;
     Style style = Style.NONE;
     //(get channels)
-    ArrayList<Object> printableChannels = new ArrayList<Object>();
+    ArrayList<Object> printableChannels = new ArrayList<>();
     for(Object chan : record.channels()){
       if(chan instanceof Color){ color = (Color) chan; }
       else if(chan instanceof Style){ style = (Style) chan; }
@@ -288,7 +284,7 @@ public abstract class OutputHandler extends LogRecordHandler{
     //--Write Channels
     if(leftMargin > 2) {	//don't print if not enough space
       //((print channels)
-      b.append("["); cursorPos += 1;
+      b.append('['); cursorPos += 1;
       Object lastChan = null;
       boolean wasAnyChannelPrinted = false;
       for(int i=0; i<printableChannels.size(); i++) {
@@ -300,7 +296,7 @@ public abstract class OutputHandler extends LogRecordHandler{
         if(toPrint.length() > leftMargin-1){ toPrint = toPrint.substring(0,leftMargin-2); }
         if(cursorPos+toPrint.length() >= leftMargin){
           //(case: doesn't fit)
-          while(cursorPos < leftMargin){ b.append(" "); cursorPos += 1; }
+          while(cursorPos < leftMargin){ b.append(' '); cursorPos += 1; }
           if(contentLinesPrinted < content.length){
             writeContent(record.depth, style(new StringBuilder(),content[contentLinesPrinted],color,style).toString(), b);
             contentLinesPrinted += 1;
@@ -315,7 +311,7 @@ public abstract class OutputHandler extends LogRecordHandler{
         cursorPos += toPrint.length();
       }
       if (wasAnyChannelPrinted) {
-        b.append("]");
+        b.append(']');
         cursorPos += 1;
       } else {
         b.setLength(b.length() - 1);  // remove leading "["
@@ -325,21 +321,21 @@ public abstract class OutputHandler extends LogRecordHandler{
     //--Content
     //(write content)
     while(contentLinesPrinted < content.length) {
-      while(cursorPos < leftMargin){ b.append(" "); cursorPos += 1; }
+      while(cursorPos < leftMargin){ b.append(' '); cursorPos += 1; }
       writeContent(record.depth, style(new StringBuilder(),content[contentLinesPrinted],color,style).toString(), b);
       contentLinesPrinted += 1;
-      if(contentLinesPrinted < content.length){ b.append("\n"); cursorPos = 0; }
+      if(contentLinesPrinted < content.length){ b.append('\n'); cursorPos = 0; }
     }
     //(print)
     if (b.length() == 0 || b.charAt(b.length() - 1) != '\n') {
-      b.append("\n");
+      b.append('\n');
     }
     print(record.channels(), b.toString());
     //--Continue
     if(info != null){
       info.numElementsPrinted += 1;
     }
-    ArrayList<Record> rtn = new ArrayList<Record>();
+    ArrayList<Record> rtn = new ArrayList<>();
     rtn.add(record);
     return rtn;
   }
@@ -383,7 +379,7 @@ public abstract class OutputHandler extends LogRecordHandler{
       if(!this.missingOpenBracket){
         //(write margin)
         for(int i=0; i<this.leftMargin; i++){
-          b.append(" ");
+          b.append(' ');
         }
         //(null content)
         writeContent(newDepth, "", b);
@@ -393,17 +389,17 @@ public abstract class OutputHandler extends LogRecordHandler{
       this.missingOpenBracket = false;
       //(write matching line)
       if(childInfo != null && childInfo.numElementsPrinted > this.minLineCountForTrackNameReminder){
-        b.append("<< ").append(childInfo.name).append(" ");
+        b.append("<< ").append(childInfo.name).append(' ');
       }
       //(write time)
       if(childInfo != null && timeOfEnd-childInfo.beginTime > 100){
-        b.append("[");
+        b.append('[');
         Redwood.formatTimeDifference(timeOfEnd-childInfo.beginTime,b);
-        b.append("]");
+        b.append(']');
       }
       //(print)
-      b.append("\n");
-      print(null, this.style(new StringBuilder(), b.toString(), trackColor, trackStyle).toString());
+      b.append('\n');
+      print(null, style(new StringBuilder(), b.toString(), trackColor, trackStyle).toString());
     } else {
       this.queuedTracks.removeLast();
     }
@@ -417,7 +413,7 @@ public abstract class OutputHandler extends LogRecordHandler{
   private static class TrackInfo{
     public final long beginTime;
     public final String name;
-    protected int numElementsPrinted = 0;
+    protected int numElementsPrinted;
     private TrackInfo(String name, long timestamp){
       this.name = name;
       this.beginTime = timestamp;

@@ -52,10 +52,7 @@ public class ArabicTreeReaderFactory implements TreeReaderFactory, Serializable 
 
   public TreeReader newTreeReader(Reader in) {
     TreeReader tr = null;
-    if(noNormalization) {
-      tr = new PennTreeReader(in, new LabeledScoredTreeFactory(), new TreeNormalizer(), new ArabicTreebankTokenizer(in));
-    } else
-      tr = new PennTreeReader(in, new LabeledScoredTreeFactory(), new ArabicTreeNormalizer(retainNPTmp,retainPRD,changeNoLabels, retainNPSbj, retainPPClr), new ArabicTreebankTokenizer(in));
+      tr = noNormalization ? new PennTreeReader(in, new LabeledScoredTreeFactory(), new TreeNormalizer(), new ArabicTreebankTokenizer(in)) : new PennTreeReader(in, new LabeledScoredTreeFactory(), new ArabicTreeNormalizer(retainNPTmp, retainPRD, changeNoLabels, retainNPSbj, retainPPClr), new ArabicTreebankTokenizer(in));
 
     if (filterX)
       tr = new FilteringTreeReader(tr, new XFilter());

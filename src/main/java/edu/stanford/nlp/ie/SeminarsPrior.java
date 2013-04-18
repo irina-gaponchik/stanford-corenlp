@@ -39,22 +39,22 @@ public class SeminarsPrior<IN extends CoreMap> extends EntityCachingAbstractSequ
 
   private String[] interned;
 
-  public double scoreOf(int[] sequence) {
+  public double scoreOf(int... sequence) {
 
     Set<String> speakers = Generics.newHashSet();
     Set<String> locations = Generics.newHashSet();
     Set<String> stimes = Generics.newHashSet();
     Set<String> etimes = Generics.newHashSet();
 
-    List<Entity> speakersL = new ArrayList<Entity>();
-    List<Entity> locationsL = new  ArrayList<Entity>();
-    List<Entity> stimesL = new  ArrayList<Entity>();
-    List<Entity> etimesL = new  ArrayList<Entity>();
+    List<Entity> speakersL = new ArrayList<>();
+    List<Entity> locationsL = new  ArrayList<>();
+    List<Entity> stimesL = new  ArrayList<>();
+    List<Entity> etimesL = new  ArrayList<>();
 
     double p = 0.0;
     for (int i = 0; i < entities.length; i++) {
       Entity entity = entities[i];
-      if ((i == 0 || entities[i-1] != entity) && entity != null) {
+      if ((i == 0 || !entities[i - 1].equals(entity)) && entity != null) {
 
         String type = classIndex.get(entity.type);
         String phrase = StringUtils.join(entity.words, " ").toLowerCase();
@@ -161,7 +161,7 @@ public class SeminarsPrior<IN extends CoreMap> extends EntityCachingAbstractSequ
       
       for (int i = 0; i < interned.length; i++) {
         String w = interned[i];
-        if (w == lastName) {
+        if (w.equals(lastName)) {
           if (sequence[i] != speakerIndex) {
             p -= penalty;
           }

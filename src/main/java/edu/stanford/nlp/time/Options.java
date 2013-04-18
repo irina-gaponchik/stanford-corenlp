@@ -16,28 +16,28 @@ public class Options {
 
   // Whether to mark time ranges like from 1991 to 1992 as one timex
   // or leave it separate
-  public boolean markTimeRanges = false;
+  public boolean markTimeRanges;
   // Whether include non timex3 temporal expressions
-  boolean restrictToTimex3 = false;
+  boolean restrictToTimex3;
   // Heuristics for determining relative time
   // level 1 = no heuristics (default)
   // level 2 = basic heuristics taking into past tense
   // level 3 = more heuristics with since/until
   RelativeHeuristicLevel teRelHeurLevel = RelativeHeuristicLevel.NONE;
   // Include nested time expressions
-  boolean includeNested = false;
+  boolean includeNested;
   // Create range for all temporals and include range attribute in timex annotation
-  boolean includeRange = false;
+  boolean includeRange;
   // TODO: Add default country for holidays and default time format
   // would want a per document default as well
-  String grammarFilename = null;
-  Env.Binder[] binders = null;
+  String grammarFilename;
+  Env.Binder[] binders;
 
   static final String DEFAULT_GRAMMAR_FILES = "edu/stanford/nlp/models/sutime/defs.sutime.txt,edu/stanford/nlp/models/sutime/english.sutime.txt,edu/stanford/nlp/models/sutime/english.holidays.sutime.txt";
   static final String[] DEFAULT_BINDERS = { "edu.stanford.nlp.time.JollyDayHolidays" };
   //static final String[] DEFAULT_BINDERS = { };
 
-  boolean verbose = false;
+  boolean verbose;
 
   public Options()
   {
@@ -81,7 +81,7 @@ public class Options {
         String binderPrefix = name + ".binder." + bi;
         try {
           Class binderClass = Class.forName(binderClasses[i]);
-          binderPrefix = binderPrefix + ".";
+          binderPrefix = binderPrefix + '.';
           binders[i] = (Env.Binder) binderClass.newInstance();
           binders[i].init(binderPrefix, props);
         } catch (Exception ex) {

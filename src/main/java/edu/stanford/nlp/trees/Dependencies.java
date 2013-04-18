@@ -1,12 +1,6 @@
 package edu.stanford.nlp.trees;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import edu.stanford.nlp.ling.HasTag;
 import edu.stanford.nlp.ling.HasWord;
@@ -97,9 +91,7 @@ public class Dependencies {
   // extra class guarantees correct lazy loading (Bloch p.194)
   private static class ComparatorHolder {
 
-    private ComparatorHolder() {}
-
-    private static class DependencyIdxComparator implements Comparator<Dependency> {
+      private static class DependencyIdxComparator implements Comparator<Dependency> {
 
       public int compare(Dependency dep1, Dependency dep2) {
         CoreMap dep1lab = (CoreMap) dep1.dependent();
@@ -122,7 +114,7 @@ public class Dependencies {
       
       List<TypedDependency> depList = govToDepMap.get(gov);
       if (depList == null) {
-        depList = new ArrayList<TypedDependency>();        
+        depList = new ArrayList<>();
         govToDepMap.put(gov, depList);
       }
       depList.add(dep);
@@ -139,15 +131,15 @@ public class Dependencies {
         TreeGraphNode childNode = child.dep();
         if (childNode == null) continue;
         Set<List<TypedDependency>> childDepLists = getGovMaxChains(govToDepMap, childNode, depth-1);
-        if (childDepLists.size() != 0) {
+        if (!childDepLists.isEmpty()) {
           for (List<TypedDependency> childDepList : childDepLists) {
-            List<TypedDependency> depList = new ArrayList<TypedDependency>(childDepList.size() + 1);
+            List<TypedDependency> depList = new ArrayList<>(childDepList.size() + 1);
             depList.add(child);
             depList.addAll(childDepList);
             depLists.add(depList);
           }
         } else {
-          depLists.add(Arrays.asList(child));
+          depLists.add(Collections.singletonList(child));
         }
       }
     }
@@ -156,7 +148,7 @@ public class Dependencies {
   
   public static Counter<List<TypedDependency>> getTypedDependencyChains(List<TypedDependency> deps, int maxLength) {
     Map<TreeGraphNode,List<TypedDependency>> govToDepMap = govToDepMap(deps);
-    Counter<List<TypedDependency>> tdc = new ClassicCounter<List<TypedDependency>>();
+    Counter<List<TypedDependency>> tdc = new ClassicCounter<>();
     for (TreeGraphNode gov : govToDepMap.keySet()) {      
       Set<List<TypedDependency>> maxChains = getGovMaxChains(govToDepMap, gov, maxLength);
       for (List<TypedDependency> maxChain : maxChains) {

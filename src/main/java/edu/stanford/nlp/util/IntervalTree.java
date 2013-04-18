@@ -39,13 +39,13 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
       if (target.getInterval().getBegin().compareTo(value.getInterval().getBegin()) <= 0) {
         // Should go on left
         if (left == null) {
-          left = new IntervalTree<E,T>();
+          left = new IntervalTree<>();
         }
         left.add(target);
       } else {
         // Should go on right
         if (right == null) {
-          right = new IntervalTree<E,T>();
+          right = new IntervalTree<>();
         }
         right.add(target);
       }
@@ -62,8 +62,8 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
     if (target == null) return false;
     if (value == null) return false;
     if (target.equals(value)) {
-      int leftSize = (left != null)? left.size():0;
-      int rightSize = (right != null)? right.size():0;
+      int leftSize = left != null ? left.size():0;
+      int rightSize = right != null ? right.size():0;
       if (leftSize == 0) {
         if (rightSize == 0) {
           value = null;
@@ -124,14 +124,12 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
 
   public IntervalTree<E,T> getLeftmostNode()
   {
-    if (left == null) return this;
-    else { return left.getLeftmostNode(); }
+      return left == null ? this : left.getLeftmostNode();
   }
 
   public IntervalTree<E,T> getRightmostNode()
   {
-    if (right == null) return this;
-    else { return right.getRightmostNode(); }
+      return right == null ? this : right.getRightmostNode();
   }
 
 //  public Iterator<Interval<E>> iterator()
@@ -163,14 +161,14 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
 
   public static <E extends Comparable<E>, T extends HasInterval<E>> List<T> getOverlapping(IntervalTree<E,T> n, E p)
   {
-    List<T> overlapping = new ArrayList<T>();
+    List<T> overlapping = new ArrayList<>();
     getOverlapping(n, p, overlapping);
     return overlapping;
   }
 
   public static <E extends Comparable<E>, T extends HasInterval<E>> List<T> getOverlapping(IntervalTree<E,T> n, Interval<E> target)
   {
-    List<T> overlapping = new ArrayList<T>();
+    List<T> overlapping = new ArrayList<>();
     getOverlapping(n, target, overlapping);
     return overlapping;
   }
@@ -215,35 +213,40 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
   public static <E extends Comparable<E>, T extends HasInterval<E>> boolean overlaps(IntervalTree<E,T> n, E p) {
     return overlaps(n, Interval.toInterval(p,p));
   }
-  public static <E extends Comparable<E>, T extends HasInterval<E>> boolean overlaps(IntervalTree<E,T> n, Interval<E> target) {
-    // Don't search nodes that don't exist
-    if (n == null || n.isEmpty())
-        return false;
 
-    // If target is to the right of the rightmost point of any interval
-    // in this node and all children, there won't be any matches.
-    if (target.first.compareTo(n.maxEnd) > 0)
-        return false;
+    public static <E extends Comparable<E>, T extends HasInterval<E>> boolean overlaps(IntervalTree<E, T> n, Interval<E> target) {
+        while (true) {
+            // Don't search nodes that don't exist
+            if (n == null || n.isEmpty())
+                return false;
 
-    // Check this node
-    if (n.value.getInterval().overlaps(target)) {
-        return true;
+            // If target is to the right of the rightmost point of any interval
+            // in this node and all children, there won't be any matches.
+            if (target.first.compareTo(n.maxEnd) > 0)
+                return false;
+
+            // Check this node
+            if (n.value.getInterval().overlaps(target)) {
+                return true;
+            }
+
+            // If target is to the left of the start of this interval, then search left
+            if (target.second.compareTo(n.value.getInterval().first()) <= 0) {
+                // Search left children
+                if (n.left != null) {
+                    n = n.left;
+                    continue;
+                }
+            } else {
+                if (n.right != null) {
+                    n = n.right;
+                    continue;
+                }
+            }
+
+            return false;
+        }
     }
-
-    // If target is to the left of the start of this interval, then search left
-    if (target.second.compareTo(n.value.getInterval().first()) <= 0)  {
-       // Search left children
-      if (n.left != null) {
-        return overlaps(n.left, target);
-      }
-    } else {
-       if (n.right != null)  {
-           return overlaps(n.right, target);
-       }
-    }
-
-    return false;
-  }
 
   public boolean contains(T target) {
     return contains(this, target.getInterval());
@@ -253,41 +256,45 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
     return contains(n, Interval.toInterval(p, p));
   }
 
-  public static <E extends Comparable<E>, T extends HasInterval<E>> boolean contains(IntervalTree<E,T> n, Interval<E> target) {
-    // Don't search nodes that don't exist
-    if (n == null || n.isEmpty())
-      return false;
+    public static <E extends Comparable<E>, T extends HasInterval<E>> boolean contains(IntervalTree<E, T> n, Interval<E> target) {
+        while (true) {
+            // Don't search nodes that don't exist
+            if (n == null || n.isEmpty())
+                return false;
 
-    // If target is to the right of the rightmost point of any interval
-    // in this node and all children, there won't be any matches.
-    if (target.first.compareTo(n.maxEnd) > 0)
-      return false;
+            // If target is to the right of the rightmost point of any interval
+            // in this node and all children, there won't be any matches.
+            if (target.first.compareTo(n.maxEnd) > 0)
+                return false;
 
-    // Check this node
-    if (n.value.getInterval().contains(target)) {
-      return true;
+            // Check this node
+            if (n.value.getInterval().contains(target)) {
+                return true;
+            }
+
+            // If target is to the left of the start of this interval, then search left
+            if (target.second.compareTo(n.value.getInterval().first()) <= 0) {
+                // Search left children
+                if (n.left != null) {
+                    n = n.left;
+                    continue;
+                }
+            } else {
+                if (n.right != null) {
+                    n = n.right;
+                    continue;
+                }
+            }
+
+            return false;
+        }
     }
-
-    // If target is to the left of the start of this interval, then search left
-    if (target.second.compareTo(n.value.getInterval().first()) <= 0)  {
-      // Search left children
-      if (n.left != null) {
-        return contains(n.left, target);
-      }
-    } else {
-      if (n.right != null)  {
-        return contains(n.right, target);
-      }
-    }
-
-    return false;
-  }
 
   public static <T, E extends Comparable<E>> List<T> getNonOverlapping(
           List<? extends T> items, Function<? super T,Interval<E>> toIntervalFunc)
   {
-    List<T> nonOverlapping = new ArrayList<T>();
-    IntervalTree<E,Interval<E>> intervals = new IntervalTree<E, Interval<E>>();
+    List<T> nonOverlapping = new ArrayList<>();
+    IntervalTree<E,Interval<E>> intervals = new IntervalTree<>();
     for (T item:items) {
       Interval<E> i = toIntervalFunc.apply(item);
       boolean addOk = intervals.addNonOverlapping(i);
@@ -301,7 +308,7 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
   public static <T, E extends Comparable<E>> List<T> getNonOverlapping(
           List<? extends T> items, Function<? super T,Interval<E>> toIntervalFunc, Comparator<? super T> compareFunc)
   {
-    List<T> sorted = new ArrayList<T>(items);
+    List<T> sorted = new ArrayList<>(items);
     Collections.sort(sorted, compareFunc);
     return getNonOverlapping(sorted, toIntervalFunc);
   }
@@ -331,10 +338,10 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
   public static <T, E extends Comparable<E>> List<T> getNonNested(
           List<? extends T> items, Function<? super T,Interval<E>> toIntervalFunc, Comparator<? super T> compareFunc)
   {
-    List<T> sorted = new ArrayList<T>(items);
+    List<T> sorted = new ArrayList<>(items);
     Collections.sort(sorted, compareFunc);
-    List<T> res = new ArrayList<T>();
-    IntervalTree<E,Interval<E>> intervals = new IntervalTree<E, Interval<E>>();
+    List<T> res = new ArrayList<>();
+    IntervalTree<E,Interval<E>> intervals = new IntervalTree<>();
     for (T item:sorted) {
       Interval<E> i = toIntervalFunc.apply(item);
       boolean addOk = intervals.addNonNested(i);

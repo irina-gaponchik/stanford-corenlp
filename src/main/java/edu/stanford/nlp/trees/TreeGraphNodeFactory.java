@@ -8,9 +8,9 @@ import java.util.List;
 
 
 /**
- * A <code>TreeGraphNodeFactory</code> acts as a factory for creating
- * nodes in a {@link TreeGraph <code>TreeGraph</code>}.  Unless
- * another {@link LabelFactory <code>LabelFactory</code>} is
+ * A {@code TreeGraphNodeFactory} acts as a factory for creating
+ * nodes in a {@link TreeGraph {@code TreeGraph}}.  Unless
+ * another {@link LabelFactory {@code LabelFactory}} is
  * supplied, it will use a CoreLabelFactory
  * by default.
  *
@@ -21,9 +21,9 @@ public class TreeGraphNodeFactory implements TreeFactory {
   private LabelFactory mlf;
 
   /**
-   * Make a <code>TreeFactory</code> that produces
-   * <code>TreeGraphNode</code>s.  The labels are of class
-   * <code>CoreLabel</code>.
+   * Make a {@code TreeFactory} that produces
+   * {@code TreeGraphNode}s.  The labels are of class
+   * {@code CoreLabel}.
    */
   public TreeGraphNodeFactory() {
     this(CoreLabel.factory());
@@ -34,7 +34,7 @@ public class TreeGraphNodeFactory implements TreeFactory {
   }
 
   // docs inherited
-  public Tree newLeaf(final String word) {
+  public Tree newLeaf(String word) {
     return newLeaf(mlf.newLabel(word));
   }
 
@@ -44,7 +44,7 @@ public class TreeGraphNodeFactory implements TreeFactory {
   }
 
   // docs inherited
-  public Tree newTreeNode(final String parent, final List<Tree> children) {
+  public Tree newTreeNode(String parent, List<Tree> children) {
     return newTreeNode(mlf.newLabel(parent), children);
   }
 

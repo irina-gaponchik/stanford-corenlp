@@ -15,14 +15,8 @@ import edu.stanford.nlp.util.Filter;
  */
 public class PennTreebankLanguagePack extends AbstractTreebankLanguagePack {
 
-  /**
-   * Gives a handle to the TreebankLanguagePack
-   */
-  public PennTreebankLanguagePack() {
-  }
 
-
-  private static String[] pennPunctTags = {"''", "``", "-LRB-", "-RRB-", ".", ":", ","};
+    private static String[] pennPunctTags = {"''", "``", "-LRB-", "-RRB-", ".", ":", ","};
 
   private static String[] pennSFPunctTags = {"."};
 
@@ -195,11 +189,11 @@ public class PennTreebankLanguagePack extends AbstractTreebankLanguagePack {
 
   /** Prints a few aspects of the TreebankLanguagePack, just for debugging.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     TreebankLanguagePack tlp = new PennTreebankLanguagePack();
     System.out.println("Start symbol: " + tlp.startSymbol());
     String start = tlp.startSymbol();
-    System.out.println("Should be true: " + (tlp.isStartSymbol(start)));
+    System.out.println("Should be true: " + tlp.isStartSymbol(start));
     String[] strs = {"-", "-LLB-", "NP-2", "NP=3", "NP-LGS", "NP-TMP=3"};
     for (String str : strs) {
       System.out.println("String: " + str + " basic: " + tlp.basicCategory(str) + " basicAndFunc: " + tlp.categoryAndFunction(str));

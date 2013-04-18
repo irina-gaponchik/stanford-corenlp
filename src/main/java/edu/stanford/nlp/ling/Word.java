@@ -2,9 +2,9 @@ package edu.stanford.nlp.ling;
 
 
 /**
- * A <code>Word</code> object acts as a Label by containing a String.
- * This class is in essence identical to a <code>StringLabel</code>, but
- * it also uses the value to implement the <code>HasWord</code> interface.
+ * A {@code Word} object acts as a Label by containing a String.
+ * This class is in essence identical to a {@code StringLabel}, but
+ * it also uses the value to implement the {@code HasWord} interface.
  *
  * @author Christopher Manning
  * @version 2000/12/20
@@ -22,10 +22,9 @@ public class Word extends StringLabel implements HasWord {
   public static final Word EMPTY = new Word(EMPTY_STRING);
 
   /**
-   * Construct a new word with a <code>null</code> value.
+   * Construct a new word with a {@code null} value.
    */
   public Word() {
-    super();
   }
 
   /**
@@ -49,7 +48,7 @@ public class Word extends StringLabel implements HasWord {
 
   /**
    * Creates a new word whose word value is the value of any
-   * class that supports the <code>Label</code> interface.
+   * class that supports the {@code Label} interface.
    *
    * @param lab The label to be used as the basis of the new Word
    */
@@ -73,8 +72,6 @@ public class Word extends StringLabel implements HasWord {
   private static class WordFactoryHolder {
 
     private static final LabelFactory lf = new WordFactory();
-
-    private WordFactoryHolder() { }
 
   }
 

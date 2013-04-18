@@ -103,7 +103,7 @@ class DescriptionPattern extends TregexPattern {
     }
     this.name = name;
     setChild(null);
-    this.basicCatFunction = (useBasicCat ? basicCatFunction : null);
+    this.basicCatFunction = useBasicCat ? basicCatFunction : null;
     //    System.out.println("Made " + (negDesc ? "negated " : "") + "DescNode with " + desc);
     this.variableGroups = variableGroups;
   }
@@ -152,18 +152,14 @@ class DescriptionPattern extends TregexPattern {
 
   public void setChild(TregexPattern n) {
     child = n;
-    changesVariables = ((descriptionMode != null || isLink) && name != null);
-    changesVariables = (changesVariables ||
-                        (child != null && child.getChangesVariables()));
+    changesVariables = (descriptionMode != null || isLink) && name != null;
+    changesVariables = changesVariables ||
+            child != null && child.getChangesVariables();
   }
 
   @Override
   public List<TregexPattern> getChildren() {
-    if (child == null) {
-      return Collections.emptyList();
-    } else {
-      return Collections.singletonList(child);
-    }
+      return   child == null ? Collections.<TregexPattern>emptyList() : Collections.singletonList(child);
   }
 
   @Override
@@ -195,9 +191,9 @@ class DescriptionPattern extends TregexPattern {
     // myNode.child == null OR resetChild has never been called
     private TregexMatcher childMatcher;
     private Tree nextTreeNodeMatchCandidate; // the Tree node that this DescriptionMatcher node is trying to match on.
-    private boolean finished = false; // when finished = true, it means I have exhausted my potential tree node match candidates.
-    private boolean matchedOnce = false;
-    private boolean committedVariables = false;
+    private boolean finished; // when finished = true, it means I have exhausted my potential tree node match candidates.
+    private boolean matchedOnce;
+    private boolean committedVariables;
 
 
     public DescriptionMatcher(DescriptionPattern n, Tree root, Tree tree,
@@ -261,7 +257,7 @@ class DescriptionPattern extends TregexPattern {
                 break;
               }
             }
-          } else if (namesToNodes.get(myNode.name) == nextTreeNodeMatchCandidate) {
+          } else if (namesToNodes.get(myNode.name).equals(nextTreeNodeMatchCandidate)) {
             finished = false;
             break;
           }

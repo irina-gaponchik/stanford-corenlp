@@ -4,6 +4,7 @@ package edu.stanford.nlp.ie.machinereading.domains.ace.reader;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -15,7 +16,8 @@ import edu.stanford.nlp.trees.Span;
 import edu.stanford.nlp.util.Generics;
 
 public class AceToken {
-  /**
+    private static final Pattern COMPILE = Pattern.compile(" ");
+    /**
    * The actual token bytes
    * Normally we work with mWord (see below), but mLiteral is needed when
    *   we need to check if a sequence of tokens exists in a gazetteer
@@ -68,16 +70,16 @@ public class AceToken {
   private static final int PROXIMITY_CLASS_SIZE = 5;
 
   /** The location gazetteer */
-  private static Map<String, String> LOC_GAZ = null;
+  private static Map<String, String> LOC_GAZ;
 
   /** The person first name dictionary */
-  private static Map<String, String> FIRST_GAZ = null;
+  private static Map<String, String> FIRST_GAZ;
 
   /** The person last name dictionary */
-  private static Map<String, String> LAST_GAZ = null;
+  private static Map<String, String> LAST_GAZ;
 
   /** List of trigger words */
-  private static Map<String, String> TRIGGER_GAZ = null;
+  private static Map<String, String> TRIGGER_GAZ;
 
   private final static Pattern SGML_PATTERN;
 
@@ -93,7 +95,7 @@ public class AceToken {
     SGML_PATTERN = Pattern.compile("<[^<>]+>");
   }
 
-  public static void loadGazetteers(String dataPath) throws java.io.FileNotFoundException, java.io.IOException {
+  public static void loadGazetteers(String dataPath) throws IOException {
 
     System.err.print("Loading location gazetteer... ");
     LOC_GAZ = Generics.newHashMap();
@@ -117,15 +119,15 @@ public class AceToken {
   }
 
   /** Loads one dictionary from disk */
-  private static void loadDictionary(Map<String, String> dict, String file) throws java.io.FileNotFoundException,
-      java.io.IOException {
+  private static void loadDictionary(Map<String, String> dict, String file) throws
+          IOException {
 
     BufferedReader in = new BufferedReader(new FileReader(file));
 
     String line;
     while ((line = in.readLine()) != null) {
       ArrayList<String> tokens = SimpleTokenize.tokenize(line);
-      if (tokens.size() > 0) {
+      if (!tokens.isEmpty()) {
         String lower = tokens.get(0).toLowerCase();
         if (tokens.size() == 1)
           dict.put(lower, "true");
@@ -155,23 +157,21 @@ public class AceToken {
    * Verifies if the given string exists in the given dictionary
    */
   public static boolean exists(Map<String, String> dict, String elem) {
-    if (dict.get(elem) != null)
-      return true;
-    return false;
+      return dict.get(elem) != null;
   }
 
   /**
    * Loads all proximity classes from the hard disk The WORDS map must be
    * created before!
    */
-  public static void loadProximityClasses(String proxFileName) throws java.io.IOException {
+  public static void loadProximityClasses(String proxFileName) throws IOException {
 
     System.err.println("Loading proximity classes...");
 
     BufferedReader in = null;
     try {
       in = new BufferedReader(new FileReader(proxFileName));
-    } catch (java.io.IOException e) {
+    } catch (IOException e) {
       System.err.println("Warning: no proximity database found.");
       return;
     }
@@ -179,9 +179,9 @@ public class AceToken {
     String line;
     while ((line = in.readLine()) != null) {
       ArrayList<String> tokens = SimpleTokenize.tokenize(line);
-      if (tokens.size() > 0) {
+      if (!tokens.isEmpty()) {
         Integer key = WORDS.get(tokens.get(0));
-        ArrayList<Integer> value = new ArrayList<Integer>();
+        ArrayList<Integer> value = new ArrayList<>();
 
         for (int i = 0; i < tokens.size() && i < PROXIMITY_CLASS_SIZE; i++) {
           Integer word = WORDS.get(tokens.get(i));
@@ -288,7 +288,7 @@ public class AceToken {
   public static String removeSpaces(String s) {
     if (s == null)
       return s;
-    return s.replaceAll(" ", "_");
+    return COMPILE.matcher(s).replaceAll("_");
   }
 
   public static final int CASE_OTHER = 0;
@@ -388,13 +388,13 @@ public class AceToken {
 
   private static int[] extractSuffixes(String word) {
     String lower = word.toLowerCase();
-    ArrayList<Integer> suffixes = new ArrayList<Integer>();
+    ArrayList<Integer> suffixes = new ArrayList<>();
     for (int i = 2; i <= 4; i++) {
       if (lower.length() >= i) {
         try {
           String suf = lower.substring(lower.length() - i);
           suffixes.add(WORDS.get(suf));
-        } catch (java.lang.RuntimeException e) {
+        } catch (RuntimeException e) {
           // unknown suffix
         }
       } else {
@@ -426,25 +426,13 @@ public class AceToken {
       mSuffixes = extractSuffixes(word);
     }
 
-    if (lemma == null)
-      mLemma = -1;
-    else
-      mLemma = LEMMAS.get(removeSpaces(lemma), false);
+      mLemma = lemma == null ? -1 : LEMMAS.get(removeSpaces(lemma), false);
 
-    if (pos == null)
-      mPos = -1;
-    else
-      mPos = OTHERS.get(pos, false);
+      mPos = pos == null ? -1 : OTHERS.get(pos, false);
 
-    if (chunk == null)
-      mChunk = -1;
-    else
-      mChunk = OTHERS.get(chunk, false);
+      mChunk = chunk == null ? -1 : OTHERS.get(chunk, false);
 
-    if (nerc == null)
-      mNerc = -1;
-    else
-      mNerc = OTHERS.get(nerc, false);
+      mNerc = nerc == null ? -1 : OTHERS.get(nerc, false);
 
     if (start != null && end != null) {
       mByteOffset = new Span(Integer.parseInt(start), Integer.parseInt(end));
@@ -483,10 +471,10 @@ public class AceToken {
   public String display() {
     if (mByteOffset != null) {
       return "['" + WORDS.get(mWord) + "', " + OTHERS.get(mPos) + ", " + mByteOffset.start() + ", "
-          + mByteOffset.end() + "]";
+          + mByteOffset.end() + ']';
     }
 
-    return "['" + WORDS.get(mWord) + "', " + OTHERS.get(mPos) + "]";
+    return "['" + WORDS.get(mWord) + "', " + OTHERS.get(mPos) + ']';
   }
 
   public String toString() {

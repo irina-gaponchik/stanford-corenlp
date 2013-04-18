@@ -56,10 +56,10 @@ import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
  * You shouldn't casually add further methods to
  * this interface. Rather, they should be added to the {@link Counters} class.
  * Note that this class stores a
- * <code>totalCount</code> field as well as the map.  This makes certain
+ * {@code totalCount} field as well as the map.  This makes certain
  * operations much more efficient, but means that any methods that change the
- * map must also update <code>totalCount</code> appropriately. If you use the
- * <code>setCount</code> method, then you cannot go wrong.
+ * map must also update {@code totalCount} appropriately. If you use the
+ * {@code setCount} method, then you cannot go wrong.
  * This class is not threadsafe: If multiple threads are accessing the same
  * counter, then access should be synchronized externally to this class.
  *
@@ -128,7 +128,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   public ClassicCounter(Counter<E> c) {
     this();
     Counters.addInPlace(this, c);
-    setDefaultReturnValue(c.defaultReturnValue());
+      defaultValue = c.defaultReturnValue();
   }
 
   /**
@@ -163,7 +163,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   /** {@inheritDoc} */
   @Override
   public Factory<Counter<E>> getFactory() {
-    return new ClassicCounterFactory<E>(getMapFactory());
+    return new ClassicCounterFactory<>(mapFactory);
   }
 
   private static class ClassicCounterFactory<E> implements Factory<Counter<E>> {
@@ -178,7 +178,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
 
     @Override
     public Counter<E> create() {
-      return new ClassicCounter<E>(mf);
+      return new ClassicCounter<>(mf);
     }
   }
 
@@ -321,7 +321,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
           @Override
           public Double next() {
             // copy so as to give safety to mutable internal representation
-            return Double.valueOf(inner.next().doubleValue());
+            return inner.next().doubleValue();
           }
 
           @Override
@@ -368,7 +368,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
               }
 
               public double setValue(double value) {
-                final double old = e.getValue().doubleValue();
+                double old = e.getValue().doubleValue();
                 e.getValue().set(value);
                 totalCount = totalCount - old + value;
                 return old;
@@ -508,7 +508,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
       return Counters.equals(this, (Counter<E>) o);
     }
 
-    final ClassicCounter<E> counter = (ClassicCounter<E>) o;
+    ClassicCounter<E> counter = (ClassicCounter<E>) o;
     return totalCount == counter.totalCount && map.equals(counter.map);
   }
 
@@ -552,12 +552,12 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
    * @return The Counter with String keys
    */
   public static ClassicCounter<String> valueOfIgnoreComments(String s) {
-      ClassicCounter<String> result = new ClassicCounter<String>();
+      ClassicCounter<String> result = new ClassicCounter<>();
       String[] lines = s.split("\n");
       for (String line : lines) {
         String[] fields = line.split("\t");
         if (fields.length != 2) {
-          if (line.startsWith("#")) {
+          if (!line.isEmpty() && line.charAt(0) == '#') {
             continue;
           } else {
             throw new RuntimeException("Got unsplittable line: \"" + line + '\"');
@@ -579,8 +579,8 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
    * @return The Counter
    */
   public static ClassicCounter<String> fromString(String s) {
-    ClassicCounter<String> result = new ClassicCounter<String>();
-    if (!s.startsWith("{") || !s.endsWith("}")) {
+    ClassicCounter<String> result = new ClassicCounter<>();
+    if (!(!s.isEmpty() && s.charAt(0) == '{') || !(!s.isEmpty() && s.charAt(s.length() - 1) == '}')) {
       throw new RuntimeException("invalid format: ||"+s+"||");
     }
     s = s.substring(1, s.length()-1);

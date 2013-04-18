@@ -33,12 +33,12 @@ public class Hook extends Item {
   public String toString() {
     // TODO: used to have more useful information
     //return (isPreHook() ? "Pre" : "Post") + "Hook(" + Numberer.getGlobalNumberer("states").object(state) + "|" + Numberer.getGlobalNumberer("states").object(subState) + ":" + start + "-" + end + "," + head + "/" + Numberer.getGlobalNumberer("tags").object(tag) + ")";
-    return (isPreHook() ? "Pre" : "Post") + "Hook(" + state + "|" + subState + ":" + start + "-" + end + "," + head + "/" + tag + ")";
+    return (isPreHook() ? "Pre" : "Post") + "Hook(" + state + '|' + subState + ':' + start + '-' + end + ',' + head + '/' + tag + ')';
   }
 
   @Override
   public int hashCode() {
-    return 1 + (state << 14) ^ (subState << 16) ^ (head << 22) ^ (tag << 27) ^ (start << 1) ^ (end << 7);
+    return 1 + (state << 14) ^ subState << 16 ^ head << 22 ^ tag << 27 ^ start << 1 ^ end << 7;
   }
 
   /** Hooks are equal if they have same state, substate, head, tag, start, 

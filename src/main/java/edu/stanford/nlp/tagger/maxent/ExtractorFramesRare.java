@@ -228,14 +228,14 @@ public class ExtractorFramesRare {
    *  @return A set of extractors for rare word features
    */
   protected static Extractor[] getExtractorFramesRare(String identifier, TTags ttags) {
-    ArrayList<Extractor> extrs = new ArrayList<Extractor>();
+    ArrayList<Extractor> extrs = new ArrayList<>();
     List<String> args = StringUtils.valueSplit(identifier, "[a-zA-Z0-9]*(?:\\([^)]*\\))?", "\\s*,\\s*");
 
     for (String arg : args) {
       if ("naacl2003unknowns".equalsIgnoreCase(arg)) {
         extrs.addAll(Arrays.asList(eFrames_motley_naacl2003));
         getNaaclExtractors(extrs);
-      } else if (("lnaacl2003unknowns").equalsIgnoreCase(arg)) {
+      } else if ("lnaacl2003unknowns".equalsIgnoreCase(arg)) {
         extrs.addAll(Arrays.asList(eFrames_motley_naacl2003_left));
         getNaaclExtractors(extrs);
       } else if ("caselessnaacl2003unknowns".equalsIgnoreCase(arg)) {
@@ -511,7 +511,6 @@ class RareExtractor extends Extractor {
   static final String naTag = "NA";
 
   RareExtractor() {
-    super();
   }
 
   RareExtractor(int position) {
@@ -519,7 +518,7 @@ class RareExtractor extends Extractor {
   }
 
   static boolean startsUpperCase(String s) {
-    if (s == null || s.length() == 0) {
+    if (s == null || s.isEmpty()) {
       return false;
     }
     char ch = s.charAt(0);
@@ -823,7 +822,7 @@ class ExtractorLetterDashDigit extends RareExtractor {
  */
 class ExtractorCapDistLC extends RareExtractor {
 
-  boolean verbose = false;
+  boolean verbose;
 
   public ExtractorCapDistLC() {
   }
@@ -838,11 +837,7 @@ class ExtractorCapDistLC extends RareExtractor {
       }
       return "0";
     }
-    if (allUpperCase(word)) {
-      ret = "all:";
-    } else {
-      ret = "start";
-    }
+      ret = allUpperCase(word) ? "all:" : "start";
 
     //now find the distance
     int current = -1;
@@ -913,11 +908,7 @@ class ExtractorCapLCSeen extends RareExtractor {
     }
     //otherwise it is capitalized
     String word = pH.getWord(h, 0);
-    if (dict.getCount(word, tag) > cutoff) {
-      return res + tag;
-    } else {
-      return "0";
-    }
+      return dict.getCount(word, tag) > cutoff ? res + tag : "0";
   }
 
   @Override public boolean isLocal() { return false; }
@@ -1182,10 +1173,10 @@ class ExtractorWordSuff extends RareExtractor {
 
   @Override
   public String toString() {
-    return getClass().getName() + "(len" + num + ",w" + position + ")";
+    return getClass().getName() + "(len" + num + ",w" + position + ')';
   }
 
-  @Override public boolean isLocal() { return (position == 0); }
+  @Override public boolean isLocal() { return position == 0; }
   @Override public boolean isDynamic() { return false; }
 
 }
@@ -1204,21 +1195,17 @@ class ExtractorWordPref extends RareExtractor {
   String extract(History h, PairsHolder pH) {
     // String word = TestSentence.toNice(pH.getWord(h, 0));
     String word = pH.getWord(h, position);
-    if (word.length() < num) {
-      return "######";
-    } else {
-      return word.substring(0, num);
-    }
+      return word.length() < num ? "######" : word.substring(0, num);
   }
 
   private static final long serialVersionUID = 724767436531L;
 
   @Override
   public String toString() {
-    return getClass().getName() + "(len" + num + ",w" + position + ")";
+    return getClass().getName() + "(len" + num + ",w" + position + ')';
   }
 
-  @Override public boolean isLocal() { return (position == 0); }
+  @Override public boolean isLocal() { return position == 0; }
   @Override public boolean isDynamic() { return false; }
 } // end class ExtractorWordPref
 
@@ -1312,7 +1299,7 @@ class CtbPreDetector extends RareExtractor {
   String extract(History h, PairsHolder pH) {
     String s = TestSentence.toNice(pH.getWord(h, position));
 
-    if (!s.equals("") && CtbDict.getTagPre(t1, s.substring(0, 1)).equals("1"))
+    if (!s.isEmpty() && CtbDict.getTagPre(t1, s.substring(0, 1)).equals("1"))
       return "1:"+t1;
     return "0:"+t1;
   }
@@ -1343,7 +1330,7 @@ class CtbSufDetector extends RareExtractor {
   String extract(History h, PairsHolder pH) {
     String s=TestSentence.toNice(pH.getWord(h, position));
 
-    if(!s.equals("") && CtbDict.getTagSuf(t1, s.substring(s.length()-1, s.length())).equals("1"))
+    if(!s.isEmpty() && CtbDict.getTagSuf(t1, s.substring(s.length()-1, s.length())).equals("1"))
       return "1:"+t1;
     return "0:"+t1;
   }

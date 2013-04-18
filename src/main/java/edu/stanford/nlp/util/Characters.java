@@ -19,12 +19,10 @@ public class Characters {
 
     private static final Character[] canonicalCharacters = new Character[65536];
 
-    private CharacterHolder() { }
-    
   }
 
 
-  @SuppressWarnings({"UnnecessaryBoxing"})
+  @SuppressWarnings("UnnecessaryBoxing")
   public static Character getCharacter(char c) {
     Character cC = CharacterHolder.canonicalCharacters[c];
     if (cC == null) {

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 /**
  * Filters repeated messages and replaces them with the number of times they were logged.
@@ -16,7 +17,7 @@ import java.util.Stack;
  */
 public class RepeatedRecordHandler extends LogRecordHandler {
 
-  private Stack<RepeatedRecordInfo> stack = new Stack<RepeatedRecordInfo>();
+  private Stack<RepeatedRecordInfo> stack = new Stack<>();
   RepeatedRecordInfo current = new RepeatedRecordInfo();
   private RepeatSemantics repeatSemantics;
 
@@ -56,7 +57,7 @@ public class RepeatedRecordHandler extends LogRecordHandler {
   }
 
   private void flushParents(List<Record> willReturn){
-    Stack<RepeatedRecordInfo> reverseStack = new Stack<RepeatedRecordInfo>();
+    Stack<RepeatedRecordInfo> reverseStack = new Stack<>();
       while(!stack.isEmpty()){
         reverseStack.push(stack.pop());
       }
@@ -111,11 +112,7 @@ public class RepeatedRecordHandler extends LogRecordHandler {
         return recordVerdict(record, true, true, willReturn);
       }
       //(check num printed)
-      if(this.current.timesSeen < this.repeatSemantics.numToForcePrint()){
-        return recordVerdict(record, true, true, willReturn);
-      } else {
-        return recordVerdict(record, true, false, willReturn);
-      }
+        return this.current.timesSeen < this.repeatSemantics.numToForcePrint() ? recordVerdict(record, true, true, willReturn) : recordVerdict(record, true, false, willReturn);
     } else {
       //(different record)
       return recordVerdict(record, false, true, willReturn);
@@ -124,7 +121,7 @@ public class RepeatedRecordHandler extends LogRecordHandler {
 
   /** {@inheritDoc} */
   public List<Record> handle(Record record) {
-    List<Record> willReturn = new ArrayList<Record>();
+    List<Record> willReturn = new ArrayList<>();
     if(internalHandle(record, willReturn)){
       willReturn.add(record);
     }
@@ -135,7 +132,7 @@ public class RepeatedRecordHandler extends LogRecordHandler {
   @Override
   public List<Record> signalStartTrack(Record signal) {
     //(handle record)
-    List<Record> willReturn = new ArrayList<Record>();
+    List<Record> willReturn = new ArrayList<>();
     boolean isPrinting = internalHandle(signal, willReturn);
     //(adjust state for track)
     if(!signal.force()){
@@ -157,7 +154,7 @@ public class RepeatedRecordHandler extends LogRecordHandler {
   /** {@inheritDoc} */
   @Override
   public List<Record> signalEndTrack(int newDepth, long timeEnded) {
-    List<Record> willReturn = new ArrayList<Record>();
+    List<Record> willReturn = new ArrayList<>();
     //(get state info)
     boolean trackWasNonempty = current.somethingPrinted;
     //(flush)
@@ -184,20 +181,20 @@ public class RepeatedRecordHandler extends LogRecordHandler {
   /** {@inheritDoc} */
   @Override
   public List<Record> signalShutdown(){
-    List<Record> willReturn = new ArrayList<Record>();
+    List<Record> willReturn = new ArrayList<>();
     flush(current,willReturn);
     return willReturn;
   }
 
-  private static enum PendingType{ NONE, PRINTING, SEEN }
+  private enum PendingType{ NONE, PRINTING, SEEN }
 
   private static class RepeatedRecordInfo {
-    private Record lastRecord = null;
-    private int timesSeen = 0;
-    private int timesPrinted = 0;
-    private long timeOfLastPrintedRecord = 0L;
-    private boolean suppressRecord = false;
-    private boolean somethingPrinted = false;
+    private Record lastRecord;
+    private int timesSeen;
+    private int timesPrinted;
+    private long timeOfLastPrintedRecord;
+    private boolean suppressRecord;
+    private boolean somethingPrinted;
     private PendingType trackCountPending = PendingType.NONE;
   }
 
@@ -216,9 +213,11 @@ public class RepeatedRecordHandler extends LogRecordHandler {
    *  and begin with the same string, modulo numbers
    */
   public static class ApproximateRepeatSemantics implements RepeatSemantics {
-    private boolean sameMessage(String last, String current){
-      String lastNoNumbers = last.replaceAll("[0-9\\.\\-]+","#");
-      String currentNoNumbers = current.replaceAll("[0-9\\.\\-]+","#");
+      public static final Pattern COMPILE1 = Pattern.compile("[0-9\\.\\-]+");
+
+      private static boolean sameMessage(String last, String current){
+      String lastNoNumbers = COMPILE1.matcher(last).replaceAll("#");
+      String currentNoNumbers = COMPILE1.matcher(current).replaceAll("#");
       return lastNoNumbers.startsWith(currentNoNumbers.substring(0, Math.min(7, currentNoNumbers.length())));
     }
     public boolean equals(Record lastRecord, Record record) {
@@ -251,8 +250,8 @@ public class RepeatedRecordHandler extends LogRecordHandler {
       return record.callingClass.equals(lastRecord.callingClass) &&
           record.callingMethod.equals(lastRecord.callingMethod) &&
           Arrays.equals(record.channels(), lastRecord.channels()) &&
-          ( (record.content == null && lastRecord.content == null) ||
-            (record.content != null && record.content.equals(lastRecord.content)) );
+          ( record.content == null && lastRecord.content == null ||
+                  record.content != null && record.content.equals(lastRecord.content));
     }
     public long maxWaitTimeInMillis() {
       return Long.MAX_VALUE;

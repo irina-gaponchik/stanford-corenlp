@@ -22,13 +22,13 @@ import edu.stanford.nlp.util.StringUtils;
 /**
  * A "treegraph" is a tree with additional directed, labeled arcs
  * between arbitrary pairs of nodes.  (So, it's a graph with a tree
- * skeleton.)  A <code>TreeGraphNode</code> represents any node in a
+ * skeleton.)  A {@code TreeGraphNode} represents any node in a
  * treegraph.  The additional labeled arcs are represented by using
- * {@link CoreLabel <code>CoreLabel</code>} labels at each node, which
- * contain <code>Map</code>s from arc label strings to
- * <code>Set</code>s of <code>TreeGraphNode</code>s.  Each
- * <code>TreeGraphNode</code> should contain a reference to a {@link
- * TreeGraph <code>TreeGraph</code>} object, which is a container for
+ * {@link CoreLabel {@code CoreLabel}} labels at each node, which
+ * contain {@code Map}s from arc label strings to
+ * {@code Set}s of {@code TreeGraphNode}s.  Each
+ * {@code TreeGraphNode} should contain a reference to a {@link
+ * TreeGraph {@code TreeGraph}} object, which is a container for
  * the complete treegraph structure.<p>
  *
  * <p>This class makes the horrible mistake of changing the semantics of
@@ -57,7 +57,7 @@ public class TreeGraphNode extends Tree implements HasParent {
   protected TreeGraphNode[] children = ZERO_TGN_CHILDREN;
 
   /**
-   * The {@link TreeGraph <code>TreeGraph</code>} of which this
+   * The {@link TreeGraph {@code TreeGraph}} of which this
    * node is part.
    */
   protected TreeGraph tg;
@@ -73,13 +73,13 @@ public class TreeGraphNode extends Tree implements HasParent {
   private static LabelFactory mlf = CoreLabel.factory();
 
   /**
-   * Create a new empty <code>TreeGraphNode</code>.
+   * Create a new empty {@code TreeGraphNode}.
    */
   public TreeGraphNode() {
   }
 
   /**
-   * Create a new <code>TreeGraphNode</code> with the supplied
+   * Create a new {@code TreeGraphNode} with the supplied
    * label.
    *
    * @param label the label for this node.
@@ -89,11 +89,11 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Create a new <code>TreeGraphNode</code> with the supplied
+   * Create a new {@code TreeGraphNode} with the supplied
    * label and list of child nodes.
    *
    * @param label    the label for this node.
-   * @param children the list of child <code>TreeGraphNode</code>s
+   * @param children the list of child {@code TreeGraphNode}s
    *                 for this node.
    */
   public TreeGraphNode(Label label, List<Tree> children) {
@@ -102,7 +102,7 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Create a new <code>TreeGraphNode</code> having the same tree
+   * Create a new {@code TreeGraphNode} having the same tree
    * structure and label values as an existing tree (but no shared
    * storage).
    * @param t     the tree to copy
@@ -120,7 +120,7 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Create a new <code>TreeGraphNode</code> having the same tree
+   * Create a new {@code TreeGraphNode} having the same tree
    * structure and label values as an existing tree (but no shared
    * storage).  Operates recursively to construct an entire
    * subtree.
@@ -143,8 +143,8 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Implements equality for <code>TreeGraphNode</code>s.  Unlike
-   * <code>Tree</code>s, <code>TreeGraphNode</code>s should be
+   * Implements equality for {@code TreeGraphNode}s.  Unlike
+   * {@code Tree}s, {@code TreeGraphNode}s should be
    * considered equal only if they are ==.  <i>Implementation note:</i>
    * TODO: This should be changed via introducing a Tree interface with the current Tree and this class implementing it, since what is done here breaks the equals() contract.
    *
@@ -177,7 +177,7 @@ public class TreeGraphNode extends Tree implements HasParent {
    *
    * @param label the new label to use.
    */
-  public void setLabel(final CoreLabel label) {
+  public void setLabel(CoreLabel label) {
     this.label = label;
   }
 
@@ -197,8 +197,8 @@ public class TreeGraphNode extends Tree implements HasParent {
 
   /**
    * Assign sequential integer indices to the leaves of the subtree
-   * rooted at this <code>TreeGraphNode</code>, beginning with
-   * <code>startIndex</code>, and traversing the leaves from left
+   * rooted at this {@code TreeGraphNode}, beginning with
+   * {@code startIndex}, and traversing the leaves from left
    * to right. If node is already indexed, then it uses the existing index.
    *
    * @param startIndex index for this node
@@ -217,17 +217,17 @@ public class TreeGraphNode extends Tree implements HasParent {
       }
       startIndex++;
     } else {
-      for (int i = 0; i < children.length; i++) {
-        startIndex = children[i].indexLeaves(startIndex);
-      }
+        for (TreeGraphNode aChildren : children) {
+            startIndex = aChildren.indexLeaves(startIndex);
+        }
     }
     return startIndex;
   }
 
   /**
    * Assign sequential integer indices to all nodes of the subtree
-   * rooted at this <code>TreeGraphNode</code>, beginning with
-   * <code>startIndex</code>, and doing a pre-order tree traversal.
+   * rooted at this {@code TreeGraphNode}, beginning with
+   * {@code startIndex}, and doing a pre-order tree traversal.
    * Any node which already has an index will not be re-indexed
    * &mdash; this is so that we can index the leaves first, and
    * then index the rest.
@@ -243,9 +243,9 @@ public class TreeGraphNode extends Tree implements HasParent {
       setIndex(startIndex++);
     }
     if (!isLeaf()) {
-      for (int i = 0; i < children.length; i++) {
-        startIndex = children[i].indexNodes(startIndex);
-      }
+        for (TreeGraphNode aChildren : children) {
+            startIndex = aChildren.indexNodes(startIndex);
+        }
     }
     return startIndex;
   }
@@ -253,7 +253,7 @@ public class TreeGraphNode extends Tree implements HasParent {
   /**
    * Assign sequential integer indices (starting with 0) to all
    * nodes of the subtree rooted at this
-   * <code>TreeGraphNode</code>.  The leaves are indexed first,
+   * {@code TreeGraphNode}.  The leaves are indexed first,
    * from left to right.  Then the internal nodes are indexed,
    * using a pre-order tree traversal.
    */
@@ -285,14 +285,14 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Sets the children of this <code>TreeGraphNode</code>.  If
-   * given <code>null</code>, this method sets
+   * Sets the children of this {@code TreeGraphNode}.  If
+   * given {@code null}, this method sets
    * the node's children to the canonical zero-length Tree[] array.
    *
    * @param children an array of child trees
    */
   @Override
-  public void setChildren(Tree[] children) {
+  public void setChildren(Tree... children) {
     if (children == null || children.length == 0) {
       this.children = ZERO_TGN_CHILDREN;
     } else {
@@ -320,7 +320,7 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Get the <code>TreeGraph</code> of which this node is a
+   * Get the {@code TreeGraph} of which this node is a
    * part.
    */
   protected TreeGraph treeGraph() {
@@ -328,7 +328,7 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Set pointer to the <code>TreeGraph</code> of which this node
+   * Set pointer to the {@code TreeGraph} of which this node
    * is a part.  Operates recursively to set pointer for all
    * descendants too.
    */
@@ -342,11 +342,11 @@ public class TreeGraphNode extends Tree implements HasParent {
   /**
    * Add a labeled arc from this node to the argument node.
    *
-   * @param arcLabel the <code>Class&lt;? extends GrammaticalRelationAnnotation&gt;</code> with which the new arc
+   * @param arcLabel the {@code Class&lt;? extends GrammaticalRelationAnnotation&gt;} with which the new arc
    *                 is to be labeled.
-   * @param node     the <code>TreeGraphNode</code> to which the new
+   * @param node     the {@code TreeGraphNode} to which the new
    *                 arc should point.
-   * @return <code>true</code> iff the arc did not already exist.
+   * @return {@code true} iff the arc did not already exist.
    */
   @SuppressWarnings("unchecked")
   public <GR extends GrammaticalRelationAnnotation> boolean addArc(Class<GR> arcLabel, TreeGraphNode node) {
@@ -363,14 +363,14 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Returns the <code>Set</code> of <code>TreeGraphNode</code>s to
+   * Returns the {@code Set} of {@code TreeGraphNode}s to
    * which there exist arcs bearing the specified label from this
-   * node, or <code>null</code> if no such nodes exist.
+   * node, or {@code null} if no such nodes exist.
    *
-   * @param arcLabel the <code>Object</code> which labels the
+   * @param arcLabel the {@code Object} which labels the
    *                 arc(s) to be followed.
-   * @return a <code>Set</code> containing only and all the
-   *         <code>TreeGraphNode</code>s to which there exist arcs bearing
+   * @return a {@code Set} containing only and all the
+   *         {@code TreeGraphNode}s to which there exist arcs bearing
    *         the specified label from this node.
    */
   public Set<TreeGraphNode> followArcToSet(Class<? extends GrammaticalRelationAnnotation> arcLabel) {
@@ -378,17 +378,17 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Returns a single <code>TreeGraphNode</code> to which there
+   * Returns a single {@code TreeGraphNode} to which there
    * exists an arc bearing the specified label from this node, or
-   * <code>null</code> if no such node exists.  If more than one
+   * {@code null} if no such node exists.  If more than one
    * such node exists, this method will return an arbitrary node
    * from among them; if this is a possibility, you might want to
    * use {@link TreeGraphNode#followArcToSet
-   * <code>followArcToSet</code>} instead.
+   * {@code followArcToSet}} instead.
    *
-   * @param arcLabel a <code>Object</code> containing the label of
+   * @param arcLabel a {@code Object} containing the label of
    *                 the arc(s) to be followed
-   * @return a <code>TreeGraphNode</code> to which there exists an
+   * @return a {@code TreeGraphNode} to which there exists an
    *         arc bearing the specified label from this node
    */
   public TreeGraphNode followArcToNode(Class<? extends GrammaticalRelationAnnotation> arcLabel) {
@@ -400,14 +400,14 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Finds all arcs between this node and <code>destNode</code>,
-   * and returns the <code>Set</code> of <code>Object</code>s which
+   * Finds all arcs between this node and {@code destNode},
+   * and returns the {@code Set} of {@code Object}s which
    * label those arcs.  If no such arcs exist, returns an empty
-   * <code>Set</code>.
+   * {@code Set}.
    *
    * @param destNode the destination node
-   * @return the <code>Set</code> of <code>Object</code>s which
-   *         label arcs between this node and <code>destNode</code>
+   * @return the {@code Set} of {@code Object}s which
+   *         label arcs between this node and {@code destNode}
    */
   public Set<Class<? extends GrammaticalRelationAnnotation>> arcLabelsToNode(TreeGraphNode destNode) {
     Set<Class<? extends GrammaticalRelationAnnotation>> arcLabels = Generics.newHashSet();
@@ -426,37 +426,36 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Returns the label of a single arc between this node and <code>destNode</code>,
-   * or <code>null</code> if no such arc exists.  If more than one
+   * Returns the label of a single arc between this node and {@code destNode},
+   * or {@code null} if no such arc exists.  If more than one
    * such arc exists, this method will return an arbitrary arc label
    * from among them; if this is a possibility, you might want to
    * use {@link TreeGraphNode#arcLabelsToNode
-   * <code>arcLabelsToNode</code>} instead.
+   * {@code arcLabelsToNode}} instead.
    *
    * @param destNode the destination node
-   * @return the <code>Object</code> which
-   *         labels one arc between this node and <code>destNode</code>
+   * @return the {@code Object} which
+   *         labels one arc between this node and {@code destNode}
    */
   public Class<? extends GrammaticalRelationAnnotation> arcLabelToNode(TreeGraphNode destNode) {
     Set<Class<? extends GrammaticalRelationAnnotation>> arcLabels = arcLabelsToNode(destNode);
     if (arcLabels == null) {
       return null;
     }
-    return (new ArrayList<Class<? extends GrammaticalRelationAnnotation>>(arcLabels)).get(0);
+    return new ArrayList<>(arcLabels).get(0);
   }
 
   /**
-   * Uses the specified {@link HeadFinder <code>HeadFinder</code>}
+   * Uses the specified {@link HeadFinder {@code HeadFinder}}
    * to determine the heads for this node and all its descendants,
    * and to store references to the head word node and head tag node
-   * in this node's {@link CoreLabel <code>CoreLabel</code>} and the
-   * <code>CoreLabel</code>s of all its descendants.<p>
+   * in this node's {@link CoreLabel {@code CoreLabel}} and the
+   * {@code CoreLabel}s of all its descendants.<p>
    * <p/>
-   * Note that, in contrast to {@link Tree#percolateHeads
-   * <code>Tree.percolateHeads()</code>}, which assumes {@link
+   * Note that, in contrast to , which assumes {@link
    * edu.stanford.nlp.ling.CategoryWordTag
-   * <code>CategoryWordTag</code>} labels and therefore stores head
-   * words and head tags merely as <code>String</code>s, this
+   * {@code CategoryWordTag}} labels and therefore stores head
+   * words and head tags merely as {@code String}s, this
    * method stores references to the actual nodes.  This mitigates
    * potential problems in sentences which contain the same word
    * more than once.
@@ -502,9 +501,9 @@ public class TreeGraphNode extends Tree implements HasParent {
    * objects, for the Tree.
    *
    * @param hf The HeadFinder to use to identify the head of constituents.
-   *           If this is <code>null</code>, then nodes are assumed to already
+   *           If this is {@code null}, then nodes are assumed to already
    *           be marked with their heads.
-   * @return Set of dependencies (each a <code>Dependency</code>)
+   * @return Set of dependencies (each a {@code Dependency})
    */
   public Set<Dependency<Label, Label, Object>> dependencies(Filter<Dependency<Label, Label, Object>> f, HeadFinder hf) {
     Set<Dependency<Label, Label, Object>> deps = Generics.newHashSet();
@@ -516,11 +515,7 @@ public class TreeGraphNode extends Tree implements HasParent {
       }
 
       TreeGraphNode headWordNode;
-      if (hf != null) {
-        headWordNode = safeCast(node.headTerminal(hf));
-      } else {
-        headWordNode = node.headWordNode();
-      }
+        headWordNode = hf != null ? safeCast(node.headTerminal(hf)) : node.headWordNode();
       
       for (Tree k : node.children()) {
         TreeGraphNode kid = safeCast(k);
@@ -528,19 +523,15 @@ public class TreeGraphNode extends Tree implements HasParent {
           continue;
         }
         TreeGraphNode kidHeadWordNode;
-        if (hf != null) {
-          kidHeadWordNode = safeCast(kid.headTerminal(hf));
-        } else {
-          kidHeadWordNode = kid.headWordNode();
-        }
+          kidHeadWordNode = hf != null ? safeCast(kid.headTerminal(hf)) : kid.headWordNode();
 
-        if (headWordNode != null && headWordNode != kidHeadWordNode && kidHeadWordNode != null) {
+        if (headWordNode != null && !headWordNode.equals(kidHeadWordNode) && kidHeadWordNode != null) {
           int headWordNodeIndex = headWordNode.index();
           int kidHeadWordNodeIndex = kidHeadWordNode.index();
           
           // If the two indices are equal, then the leaves haven't been indexed. Just return an ordinary
           // UnnamedDependency. This mirrors the implementation of super.dependencies().
-          Dependency<Label, Label, Object> d = (headWordNodeIndex == kidHeadWordNodeIndex) ?
+          Dependency<Label, Label, Object> d = headWordNodeIndex == kidHeadWordNodeIndex ?
               new UnnamedDependency(headWordNode, kidHeadWordNode) : 
               new UnnamedConcreteDependency(headWordNode, headWordNodeIndex, kidHeadWordNode, kidHeadWordNodeIndex);
               
@@ -555,18 +546,18 @@ public class TreeGraphNode extends Tree implements HasParent {
 
   /**
    * Return the node containing the head word for this node (or
-   * <code>null</code> if none), as recorded in this node's {@link
-   * CoreLabel <code>CoreLabel</code>}.  (In contrast to {@link
+   * {@code null} if none), as recorded in this node's {@link
+   * CoreLabel {@code CoreLabel}}.  (In contrast to {@link
    * edu.stanford.nlp.ling.CategoryWordTag
-   * <code>CategoryWordTag</code>}, we store head words and head
+   * {@code CategoryWordTag}}, we store head words and head
    * tags as references to nodes, not merely as
-   * <code>String</code>s.)
+   * {@code String}s.)
    *
    * @return the node containing the head word for this node
    */
   public TreeGraphNode headWordNode() {
     TreeGraphNode hwn = safeCast(label.get(TreeCoreAnnotations.HeadWordAnnotation.class));
-    if (hwn == null || (hwn.treeGraph() != null && !(hwn.treeGraph().equals(this.treeGraph())))) {
+    if (hwn == null || hwn.treeGraph() != null && !hwn.treeGraph().equals(this.treeGraph())) {
       return null;
     }
     return hwn;
@@ -575,32 +566,32 @@ public class TreeGraphNode extends Tree implements HasParent {
   /**
    * Store the node containing the head word for this node by
    * storing it in this node's {@link CoreLabel
-   * <code>CoreLabel</code>}.  (In contrast to {@link
+   * {@code CoreLabel}}.  (In contrast to {@link
    * edu.stanford.nlp.ling.CategoryWordTag
-   * <code>CategoryWordTag</code>}, we store head words and head
+   * {@code CategoryWordTag}}, we store head words and head
    * tags as references to nodes, not merely as
-   * <code>String</code>s.)
+   * {@code String}s.)
    *
    * @param hwn the node containing the head word for this node
    */
-  private void setHeadWordNode(final TreeGraphNode hwn) {
+  private void setHeadWordNode(TreeGraphNode hwn) {
     label.set(TreeCoreAnnotations.HeadWordAnnotation.class, hwn);
   }
 
   /**
    * Return the node containing the head tag for this node (or
-   * <code>null</code> if none), as recorded in this node's {@link
-   * CoreLabel <code>CoreLabel</code>}.  (In contrast to {@link
+   * {@code null} if none), as recorded in this node's {@link
+   * CoreLabel {@code CoreLabel}}.  (In contrast to {@link
    * edu.stanford.nlp.ling.CategoryWordTag
-   * <code>CategoryWordTag</code>}, we store head words and head
+   * {@code CategoryWordTag}}, we store head words and head
    * tags as references to nodes, not merely as
-   * <code>String</code>s.)
+   * {@code String}s.)
    *
    * @return the node containing the head tag for this node
    */
   public TreeGraphNode headTagNode() {
     TreeGraphNode htn = safeCast(label.get(TreeCoreAnnotations.HeadTagAnnotation.class));
-    if (htn == null || (htn.treeGraph() != null && !(htn.treeGraph().equals(this.treeGraph())))) {
+    if (htn == null || htn.treeGraph() != null && !htn.treeGraph().equals(this.treeGraph())) {
       return null;
     }
     return htn;
@@ -609,26 +600,26 @@ public class TreeGraphNode extends Tree implements HasParent {
   /**
    * Store the node containing the head tag for this node by
    * storing it in this node's {@link CoreLabel
-   * <code>CoreLabel</code>}.  (In contrast to {@link
+   * {@code CoreLabel}}.  (In contrast to {@link
    * edu.stanford.nlp.ling.CategoryWordTag
-   * <code>CategoryWordTag</code>}, we store head words and head
+   * {@code CategoryWordTag}}, we store head words and head
    * tags as references to nodes, not merely as
-   * <code>String</code>s.)
+   * {@code String}s.)
    *
    * @param htn the node containing the head tag for this node
    */
-  private void setHeadTagNode(final TreeGraphNode htn) {
+  private void setHeadTagNode(TreeGraphNode htn) {
     label.set(TreeCoreAnnotations.HeadTagAnnotation.class, htn);
   }
 
   /**
-   * Safely casts an <code>Object</code> to a
-   * <code>TreeGraphNode</code> if possible, else returns
-   * <code>null</code>.
+   * Safely casts an {@code Object} to a
+   * {@code TreeGraphNode} if possible, else returns
+   * {@code null}.
    *
-   * @param t any <code>Object</code>
-   * @return <code>t</code> if it is a <code>TreeGraphNode</code>;
-   *         <code>null</code> otherwise
+   * @param t any {@code Object}
+   * @return {@code t} if it is a {@code TreeGraphNode};
+   *         {@code null} otherwise
    */
   private static TreeGraphNode safeCast(Object t) {
     if (t == null || !(t instanceof TreeGraphNode)) {
@@ -639,13 +630,13 @@ public class TreeGraphNode extends Tree implements HasParent {
 
   /**
    * Checks the node's ancestors to find the highest ancestor with the
-   * same <code>headWordNode</code> as this node.
+   * same {@code headWordNode} as this node.
    */
   public TreeGraphNode highestNodeWithSameHead() {
     TreeGraphNode node = this;
     while (true) {
       TreeGraphNode parent = safeCast(node.parent());
-      if (parent == null || parent.headWordNode() != node.headWordNode()) {
+      if (parent == null || !parent.headWordNode().equals(node.headWordNode())) {
         return node;
       }
       node = parent;
@@ -657,20 +648,17 @@ public class TreeGraphNode extends Tree implements HasParent {
 
     static final TreeGraphNodeFactory tgnf = new TreeGraphNodeFactory();
 
-    private TreeFactoryHolder() {
-    }
-
   }
 
   /**
-   * Returns a <code>TreeFactory</code> that produces
-   * <code>TreeGraphNode</code>s.  The <code>Label</code> of
-   * <code>this</code> is examined, and providing it is not
-   * <code>null</code>, a <code>LabelFactory</code> which will
-   * produce that kind of <code>Label</code> is supplied to the
-   * <code>TreeFactory</code>.  If the <code>Label</code> is
-   * <code>null</code>, a
-   * <code>CoreLabel.factory()</code> will be used.  The factories
+   * Returns a {@code TreeFactory} that produces
+   * {@code TreeGraphNode}s.  The {@code Label} of
+   * {@code this} is examined, and providing it is not
+   * {@code null}, a {@code LabelFactory} which will
+   * produce that kind of {@code Label} is supplied to the
+   * {@code TreeFactory}.  If the {@code Label} is
+   * {@code null}, a
+   * {@code CoreLabel.factory()} will be used.  The factories
    * returned on different calls are different: a new one is
    * allocated each time.
    *
@@ -679,17 +667,13 @@ public class TreeGraphNode extends Tree implements HasParent {
   @Override
   public TreeFactory treeFactory() {
     LabelFactory lf;
-    if (label() != null) {
-      lf = label().labelFactory();
-    } else {
-      lf = CoreLabel.factory();
-    }
+      lf = label() != null ? label().labelFactory() : CoreLabel.factory();
     return new TreeGraphNodeFactory(lf);
   }
 
   /**
-   * Return a <code>TreeFactory</code> that produces trees of type
-   * <code>TreeGraphNode</code>.  The factory returned is always
+   * Return a {@code TreeFactory} that produces trees of type
+   * {@code TreeGraphNode}.  The factory returned is always
    * the same one (a singleton).
    *
    * @return a factory to produce treegraphs
@@ -699,12 +683,12 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Return a <code>TreeFactory</code> that produces trees of type
-   * <code>TreeGraphNode</code>, with the <code>Label</code> made
-   * by the supplied <code>LabelFactory</code>.  The factory
+   * Return a {@code TreeFactory} that produces trees of type
+   * {@code TreeGraphNode}, with the {@code Label} made
+   * by the supplied {@code LabelFactory}.  The factory
    * returned is a different one each time.
    *
-   * @param lf The <code>LabelFactory</code> to use
+   * @param lf The {@code LabelFactory} to use
    * @return a factory to produce treegraphs
    */
   public static TreeFactory factory(LabelFactory lf) {
@@ -712,12 +696,12 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Returns a <code>String</code> representation of this node and
+   * Returns a {@code String} representation of this node and
    * its subtree with one node per line, indented according to
-   * <code>indentLevel</code>.
+   * {@code indentLevel}.
    *
    * @param indentLevel how many levels to indent (0 for root node)
-   * @return <code>String</code> representation of this subtree
+   * @return {@code String} representation of this subtree
    */
   public String toPrettyString(int indentLevel) {
     StringBuilder buf = new StringBuilder("\n");
@@ -737,10 +721,10 @@ public class TreeGraphNode extends Tree implements HasParent {
   }
 
   /**
-   * Returns a <code>String</code> representation of this node and
+   * Returns a {@code String} representation of this node and
    * its subtree as a one-line parenthesized list.
    *
-   * @return <code>String</code> representation of this subtree
+   * @return {@code String} representation of this subtree
    */
   public String toOneLineString() {
     StringBuilder buf = new StringBuilder();
@@ -777,7 +761,7 @@ public class TreeGraphNode extends Tree implements HasParent {
   /**
    * Just for testing.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     try {
       TreeReader tr = new PennTreeReader(new StringReader("(S (NP (NNP Sam)) (VP (VBD died) (NP (NN today))))"), new LabeledScoredTreeFactory());
       Tree t = tr.readTree();

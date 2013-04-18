@@ -15,12 +15,12 @@ import edu.stanford.nlp.util.Generics;
 
 /**
  * This class assumes that there is either a
- * <code>List&lt;? extends CoreLabel&gt;</code> under the
- * <code>TokensAnnotation</code> field, and runs it
+ * {@code List&lt;? extends CoreLabel&gt;} under the
+ * {@code TokensAnnotation} field, and runs it
  * through {@link edu.stanford.nlp.process.WordToSentenceProcessor} and
- * puts the new <code>List&lt;List&lt;? extends CoreLabel&gt;&gt;</code>
+ * puts the new {@code List&lt;List&lt;? extends CoreLabel&gt;&gt;}
  * (it is now definitely a
- * <code>List&lt;List&lt;? extends CoreLabel&gt;&gt;</code>) back under
+ * {@code List&lt;List&lt;? extends CoreLabel&gt;&gt;}) back under
  * the Annotation.WORDS_KEY field.
  *
  * @author Jenny Finkel
@@ -51,16 +51,16 @@ public class WordsToSentencesAnnotator implements Annotator {
   public static WordsToSentencesAnnotator newlineSplitter(boolean verbose, String ... nlToken) {
     WordToSentenceProcessor<CoreLabel> wts;
     if (nlToken.length == 0) {
-      wts = new WordToSentenceProcessor<CoreLabel>("",
+      wts = new WordToSentenceProcessor<>("",
                                                    Collections.<String>emptySet(),
                                                    Collections.<String>emptySet());
     } else if (nlToken.length == 1) {
-      wts = new WordToSentenceProcessor<CoreLabel>("",
+      wts = new WordToSentenceProcessor<>("",
                                                    Collections.<String>emptySet(),
                                                    Collections.singleton(nlToken[0]));
     } else {
       Set<String> nlTokens = Generics.newHashSet(Arrays.asList(nlToken));
-      wts = new WordToSentenceProcessor<CoreLabel>("",
+      wts = new WordToSentenceProcessor<>("",
                                                    Collections.<String>emptySet(),
                                                    nlTokens);
     }
@@ -94,7 +94,7 @@ public class WordsToSentencesAnnotator implements Annotator {
 
       // assemble the sentence annotations
       int tokenOffset = 0;
-      List<CoreMap> sentences = new ArrayList<CoreMap>();
+      List<CoreMap> sentences = new ArrayList<>();
       for (List<CoreLabel> sentenceTokens: this.wts.process(tokens)) {
         if (sentenceTokens.isEmpty()) {
           throw new RuntimeException("unexpected empty sentence: " + sentenceTokens);

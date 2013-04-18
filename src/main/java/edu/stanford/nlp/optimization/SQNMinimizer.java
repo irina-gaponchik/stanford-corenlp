@@ -25,11 +25,11 @@ import edu.stanford.nlp.util.Pair;
  * THIS IS NOT UPDATE FOR THE STOCHASTIC VERSION YET.
  * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  * <p/>
- * <p><code>Minimizer qnm = new QNMinimizer();</code>
- * <br><code>DiffFunction df = new SomeDiffFunction();</code>
- * <br><code>double tol = 1e-4;</code>
- * <br><code>double[] initial = getInitialGuess();</code>
- * <br><code>double[] minimum = qnm.minimize(df,tol,initial);</code>
+ * <p>{@code Minimizer qnm = new QNMinimizer();}
+ * <br>{@code DiffFunction df = new SomeDiffFunction();}
+ * <br>{@code double tol = 1e-4;}
+ * <br>{@code double[] initial = getInitialGuess();}
+ * <br>{@code double[] minimum = qnm.minimize(df,tol,initial);}
  * <p/>
  * <p/>
  * If you do not choose a value of M, it will use the max amount of memory
@@ -48,15 +48,15 @@ import edu.stanford.nlp.util.Pair;
  */
 public class SQNMinimizer<T extends Function> extends StochasticMinimizer<T> {
 
-  private int M = 0;
+  private int M;
   private double lambda = 1.0;
 
   private double cPosDef = 1;
-  private double epsilon = 1e-10;
+  private double epsilon = 1.0e-10;
 
-  private List<double[]> sList = new ArrayList<double[]>();
-  private List<double[]> yList = new ArrayList<double[]>();
-  private List<Double> roList = new ArrayList<Double>();
+  private List<double[]> sList = new ArrayList<>();
+  private List<double[]> yList = new ArrayList<>();
+  private List<Double> roList = new ArrayList<>();
 
   double[] dir, s,y;
   double ro;
@@ -87,7 +87,7 @@ public class SQNMinimizer<T extends Function> extends StochasticMinimizer<T> {
   }
 
   // computes d = a + b * c
-  private static double[] plusAndConstMult(double[] a, double[] b, double c, double[] d) {
+  private static double[] plusAndConstMult(double[] a, double[] b, double c, double... d) {
     for (int i = 0; i < a.length; i++) {
       d[i] = a[i] + c * b[i];
     }
@@ -97,10 +97,10 @@ public class SQNMinimizer<T extends Function> extends StochasticMinimizer<T> {
   @Override
   public Pair<Integer,Double> tune( edu.stanford.nlp.optimization.Function function,double[] initial, long msPerTest){
     System.err.println("No tuning set yet");
-    return new Pair<Integer,Double>(bSize, gain);
+    return new Pair<>(bSize, gain);
   }
 
-  private void computeDir(double[] dir, double[] fg) throws SQNMinimizer.SurpriseConvergence {
+  private void computeDir(double[] dir, double... fg) throws SQNMinimizer.SurpriseConvergence {
     System.arraycopy(fg, 0, dir, 0, fg.length);
 
     int mmm = sList.size();
@@ -139,8 +139,8 @@ public class SQNMinimizer<T extends Function> extends StochasticMinimizer<T> {
   @Override
   protected void init(AbstractStochasticCachingDiffFunction func){
 
-    sList = new ArrayList<double[]>();
-    yList = new ArrayList<double[]>();
+    sList = new ArrayList<>();
+    yList = new ArrayList<>();
    dir = new double[func.domainDimension()];
   }
 

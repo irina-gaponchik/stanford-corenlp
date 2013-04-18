@@ -40,20 +40,19 @@ public class ErasureUtils {
    */
   @SuppressWarnings("unchecked")
   public static <T> T[] mkTArray(Class<?> klass, int size) {
-    return (T[])(Array.newInstance(klass, size));
+    return (T[]) Array.newInstance(klass, size);
 
   }
   
   @SuppressWarnings("unchecked")
-  public static <T> T[][] mkT2DArray(Class<?> klass, int[] dim ) {
+  public static <T> T[][] mkT2DArray(Class<?> klass, int... dim ) {
 	  if(dim.length != 2)
 		  throw new RuntimeException("dim should be an array of size 2.");
-	  return (T[][])(Array.newInstance(klass, dim));
+	  return (T[][]) Array.newInstance(klass, dim);
   }
 
-  @SuppressWarnings("unchecked")
   public static <T> List<T> sortedIfPossible(Collection<T> collection) {
-    List<T> result = new ArrayList<T>(collection);
+    List<T> result = new ArrayList<>(collection);
     try {
       Collections.sort((List)result);
     } catch (ClassCastException e) {

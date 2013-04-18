@@ -47,7 +47,10 @@ import edu.stanford.nlp.util.Generics;
  *
  */
 public class RegexNERSequenceClassifier extends AbstractSequenceClassifier<CoreLabel> {
-  private List<Entry> entries;
+    private static final Pattern COMPILE = Pattern.compile("\t");
+    private static final Pattern PATTERN = Pattern.compile("\\s+");
+    private static final Pattern COMPILE1 = Pattern.compile(",");
+    private List<Entry> entries;
 
   /**
    * If true, it overwrites NE labels generated through this regex NER
@@ -72,11 +75,7 @@ public class RegexNERSequenceClassifier extends AbstractSequenceClassifier<CoreL
    */
   public RegexNERSequenceClassifier(String mapping, boolean ignoreCase, boolean overwriteMyLabels, String validPosRegex) {
     super(new Properties());
-    if (validPosRegex != null && !validPosRegex.equals("")) {
-      validPosPattern = Pattern.compile(validPosRegex);
-    } else {
-      validPosPattern = null;
-    }
+      validPosPattern = validPosRegex != null && !validPosRegex.isEmpty() ? Pattern.compile(validPosRegex) : null;
     entries = readEntries(mapping, ignoreCase);
     this.ignoreCase = ignoreCase;
     this.overwriteMyLabels = overwriteMyLabels;
@@ -94,7 +93,7 @@ public class RegexNERSequenceClassifier extends AbstractSequenceClassifier<CoreL
     public Set<String> overwritableTypes;
     public double priority;
 
-    public Entry(List<Pattern> regex, String type, Set<String> overwritableTypes, double priority) {
+    private Entry(List<Pattern> regex, String type, Set<String> overwritableTypes, double priority) {
       this.regex = regex;
       this.type = type.intern();
       this.overwritableTypes = overwritableTypes;
@@ -177,7 +176,7 @@ public class RegexNERSequenceClassifier extends AbstractSequenceClassifier<CoreL
    *  @return a sorted list of Entries
    */
   private List<Entry> readEntries(String mapping, boolean ignoreCase) {
-    List<Entry> entries = new ArrayList<Entry>();
+    List<Entry> entries = new ArrayList<>();
 
     try {
       BufferedReader rd = IOUtils.readerFromString(mapping);
@@ -185,21 +184,21 @@ public class RegexNERSequenceClassifier extends AbstractSequenceClassifier<CoreL
       int lineCount = 0;
       for (String line; (line = rd.readLine()) != null; ) {
         lineCount ++;
-        String[] split = line.split("\t");
+        String[] split = COMPILE.split(line);
         if (split.length < 2 || split.length > 4)
           throw new RuntimeException("Provided mapping file is in wrong format");
 
-        String[] regexes = split[0].trim().split("\\s+");
+        String[] regexes = PATTERN.split(split[0].trim());
         String type = split[1].trim();
         Set<String> overwritableTypes = Generics.newHashSet();
         overwritableTypes.add(flags.backgroundSymbol);
         overwritableTypes.add(null);
         double priority = 0;
-        List<Pattern> tokens = new ArrayList<Pattern>();
+        List<Pattern> tokens = new ArrayList<>();
 
         try {
           if (split.length >= 3)
-            overwritableTypes.addAll(Arrays.asList(split[2].trim().split(",")));
+            overwritableTypes.addAll(Arrays.asList(COMPILE1.split(split[2].trim())));
           if (split.length == 4)
             priority = Double.parseDouble(split[3].trim());
 
@@ -261,7 +260,7 @@ public class RegexNERSequenceClassifier extends AbstractSequenceClassifier<CoreL
   }
 
   @Override
-  public List<CoreLabel> classifyWithGlobalInformation(List<CoreLabel> tokenSeq, final CoreMap doc, final CoreMap sent) {
+  public List<CoreLabel> classifyWithGlobalInformation(List<CoreLabel> tokenSeq, CoreMap doc, CoreMap sent) {
     return classify(tokenSeq);
   }
 }

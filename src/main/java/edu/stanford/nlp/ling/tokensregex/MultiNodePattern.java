@@ -51,14 +51,14 @@ public abstract class MultiNodePattern<T> {
       Collection<Interval<Integer>> matched = null;
       for (MultiNodePattern<T> p:nodePatterns) {
         Collection<Interval<Integer>> m = p.match(nodes, start);
-        if (m == null || m.size() == 0) {
+        if (m == null || m.isEmpty()) {
           return null;
         }
         if (matched == null) {
           matched = m;
         } else {
           matched.retainAll(m);
-          if (m.size() == 0) {
+          if (m.isEmpty()) {
             return null;
           }
         }
@@ -79,7 +79,7 @@ public abstract class MultiNodePattern<T> {
       Collection<Interval<Integer>> matched = null;
       for (MultiNodePattern<T> p:nodePatterns) {
         Collection<Interval<Integer>> m = p.match(nodes, start);
-        if (m != null && m.size() > 0) {
+        if (m != null && !m.isEmpty()) {
           if (matched == null) {
             matched = m;
           } else {

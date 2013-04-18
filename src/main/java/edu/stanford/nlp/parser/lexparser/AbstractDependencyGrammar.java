@@ -56,9 +56,9 @@ public abstract class AbstractDependencyGrammar implements DependencyGrammar {
   protected final Options op;
 
   transient protected Interner<IntTaggedWord> itwInterner =
-    new Interner<IntTaggedWord>();
+    new Interner<>();
 
-  public AbstractDependencyGrammar(TreebankLanguagePack tlp, TagProjection tagProjection, boolean directional, boolean useDistance, boolean useCoarseDistance, Options op, Index<String> wordIndex, Index<String> tagIndex) {
+  protected AbstractDependencyGrammar(TreebankLanguagePack tlp, TagProjection tagProjection, boolean directional, boolean useDistance, boolean useCoarseDistance, Options op, Index<String> wordIndex, Index<String> tagIndex) {
     this.tlp = tlp;
     this.tagProjection = tagProjection;
     this.directional = directional;
@@ -88,11 +88,7 @@ public abstract class AbstractDependencyGrammar implements DependencyGrammar {
   }
 
   public int tagBin(int tag) {
-    if (tag < 0) {
-      return tag;
-    } else {
-      return tagBin[tag];
-    }
+      return tag < 0 ? tag : tagBin[tag];
   }
 
   public boolean rootTW(IntTaggedWord rTW) {
@@ -123,11 +119,7 @@ public abstract class AbstractDependencyGrammar implements DependencyGrammar {
   public short distanceBin(int distance) {
     if (!useDistance) {
       return 0;
-    } else if (useCoarseDistance) {
-      return coarseDistanceBin(distance);
-    } else {
-      return regDistanceBin(distance);
-    }
+    } else return useCoarseDistance ? coarseDistanceBin(distance) : regDistanceBin(distance);
   }
 
   public short regDistanceBin(int distance) {
@@ -144,18 +136,18 @@ public abstract class AbstractDependencyGrammar implements DependencyGrammar {
     return (short) coarseDistanceBins.length;
   }
 
-  void setCoarseDistanceBins(int[] bins) {
-    assert(bins.length == 3);
+  void setCoarseDistanceBins(int... bins) {
+    assert bins.length == 3;
     coarseDistanceBins = bins;
   }
 
-  void setRegDistanceBins(int[] bins) {
-    assert(bins.length == 4);
+  void setRegDistanceBins(int... bins) {
+    assert bins.length == 4;
     regDistanceBins = bins;
   }
 
   protected void initTagBins() {
-    Index<String> tagBinIndex = new HashIndex<String>();
+    Index<String> tagBinIndex = new HashIndex<>();
     if (DEBUG) {
       System.err.println();
       System.err.println("There are " + tagIndex.size() + " tags.");
@@ -164,15 +156,11 @@ public abstract class AbstractDependencyGrammar implements DependencyGrammar {
     for (int t = 0; t < tagBin.length; t++) {
       String tagStr = tagIndex.get(t);
       String binStr;
-      if (tagProjection == null) {
-        binStr = tagStr;
-      } else {
-        binStr = tagProjection.project(tagStr);
-      }
+        binStr = tagProjection == null ? tagStr : tagProjection.project(tagStr);
       tagBin[t] = tagBinIndex.indexOf(binStr, true);
       if (DEBUG) {
         System.err.println("initTagBins: Mapped " + tagStr + " (" + t +
-                           ") to " + binStr + " (" + tagBin[t] + ")");
+                           ") to " + binStr + " (" + tagBin[t] + ')');
       }
     }
     numTagBins = tagBinIndex.size();
@@ -203,7 +191,7 @@ public abstract class AbstractDependencyGrammar implements DependencyGrammar {
   {
     ois.defaultReadObject();
     // reinitialize the transient objects
-    itwInterner = new Interner<IntTaggedWord>();
+    itwInterner = new Interner<>();
   }
 
   /**

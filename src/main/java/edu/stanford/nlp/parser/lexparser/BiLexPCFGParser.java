@@ -54,30 +54,26 @@ public class BiLexPCFGParser implements KBestViterbiParser {
   protected TreeFactory tf = new LabeledScoredTreeFactory();
 
   // temp
-  protected long relaxHook1 = 0;
-  protected long relaxHook2 = 0;
-  protected long relaxHook3 = 0;
-  protected long relaxHook4 = 0;
+  protected long relaxHook1;
+  protected long relaxHook2;
+  protected long relaxHook3;
+  protected long relaxHook4;
 
-  protected long builtHooks = 0;
-  protected long builtEdges = 0;
-  protected long extractedHooks = 0;
-  protected long extractedEdges = 0;
+  protected long builtHooks;
+  protected long builtEdges;
+  protected long extractedHooks;
+  protected long extractedEdges;
 
 
-  private static final double TOL = 1e-10;
+  private static final double TOL = 1.0e-10;
 
   protected static boolean better(double x, double y) {
-    return ((x - y) / (Math.abs(x) + Math.abs(y) + 1e-100) > TOL);
+    return (x - y) / (Math.abs(x) + Math.abs(y) + 1.0e-100) > TOL;
   }
 
 
   public double getBestScore() {
-    if (goal == null) {
-      return Double.NEGATIVE_INFINITY;
-    } else {
-      return goal.score();
-    }
+      return goal == null ? Double.NEGATIVE_INFINITY : goal.score();
   }
 
 
@@ -89,11 +85,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
     if (edge.backEdge == null && edge.backHook == null) {
       // leaf, but needs word terminal
       Tree leaf;
-      if (originalLabels[edge.head] != null) {
-        leaf = tf.newLeaf(originalLabels[edge.head]);
-      } else {
-        leaf = tf.newLeaf(head);
-      }
+        leaf = originalLabels[edge.head] != null ? tf.newLeaf(originalLabels[edge.head]) : tf.newLeaf(head);
       List<Tree> childList = Collections.singletonList(leaf);
       return tf.newTreeNode(label, childList);
     }
@@ -103,7 +95,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
       return tf.newTreeNode(label, childList);
     }
     // binary
-    List<Tree> children = new ArrayList<Tree>();
+    List<Tree> children = new ArrayList<>();
     if (edge.backHook.isPreHook()) {
       children.add(extractParse(edge.backEdge));
       children.add(extractParse(edge.backHook.backEdge));
@@ -130,7 +122,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
 
 
   // Added by Dan Zeman to store the list of N best trees.
-  protected List<Edge> nGoodTrees = new LinkedList<Edge>();
+  protected List<Edge> nGoodTrees = new LinkedList<>();
 
 
 
@@ -143,9 +135,9 @@ public class BiLexPCFGParser implements KBestViterbiParser {
    * @return The list of k best trees
    */
   public List<ScoredObject<Tree>> getKGoodParses(int k) {
-    List<ScoredObject<Tree>> nGoodTreesList = new ArrayList<ScoredObject<Tree>>(op.testOptions.printFactoredKGood);
+    List<ScoredObject<Tree>> nGoodTreesList = new ArrayList<>(op.testOptions.printFactoredKGood);
     for (Edge e : nGoodTrees) {
-      nGoodTreesList.add(new ScoredObject<Tree>(extractParse(e), e.iScore));
+      nGoodTreesList.add(new ScoredObject<>(extractParse(e), e.iScore));
     }
     return nGoodTreesList;
   }
@@ -212,10 +204,10 @@ public class BiLexPCFGParser implements KBestViterbiParser {
     // }
     Edge resultEdge = (Edge) interner.intern(tempEdge);
     if (VERBOSE) {
-      System.err.printf("Formed %s %s %.2f was %.2f better? %b\n", (resultEdge == tempEdge ? "new" : "pre-existing"), resultEdge, tempEdge.iScore, resultEdge.iScore, better(tempEdge.iScore, resultEdge.iScore));
+      System.err.printf("Formed %s %s %.2f was %.2f better? %b\n", resultEdge == tempEdge ? "new" : "pre-existing", resultEdge, tempEdge.iScore, resultEdge.iScore, better(tempEdge.iScore, resultEdge.iScore));
     }
     if (resultEdge == tempEdge) {
-      tempEdge = new Edge(op.testOptions.exhaustiveTest);
+      tempEdge = new Edge(TestOptions.exhaustiveTest);
       discoverEdge(resultEdge);
     } else {
       if (better(tempEdge.iScore, resultEdge.iScore) && resultEdge.oScore > Double.NEGATIVE_INFINITY) {
@@ -238,7 +230,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
             System.err.println("New backEdge: " + tempEdge.backEdge + " iE " + scorer.iScore(tempEdge.backEdge));
             System.err.println("New backHook: " + tempEdge.backHook + " i " + tempEdge.backHook.iScore + " o " + tempEdge.backHook.oScore + " s " + tempEdge.backHook.score());
             System.err.println("ERROR: Formed " + resultEdge + " i " + tempEdge.iScore + " o " + resultEdge.oScore + " s " + resultEdge.score());
-            System.err.println("ERROR: Formed " + resultEdge + " " + (resultEdge == tempEdge ? "new" : "old") + " " + tempEdge.iScore + " was " + back + " better? " + better(tempEdge.iScore, back));
+            System.err.println("ERROR: Formed " + resultEdge + ' ' + (resultEdge == tempEdge ? "new" : "old") + ' ' + tempEdge.iScore + " was " + back + " better? " + better(tempEdge.iScore, back));
           }
         }
       }
@@ -263,8 +255,8 @@ public class BiLexPCFGParser implements KBestViterbiParser {
 
   protected double buildOScore(Hook hook) {
     double bestOScore = Double.NEGATIVE_INFINITY;
-    Edge iTemp = new Edge(op.testOptions.exhaustiveTest);
-    Edge oTemp = new Edge(op.testOptions.exhaustiveTest);
+    Edge iTemp = new Edge(TestOptions.exhaustiveTest);
+    Edge oTemp = new Edge(TestOptions.exhaustiveTest);
     iTemp.head = hook.head;
     iTemp.tag = hook.tag;
     iTemp.state = hook.subState;
@@ -302,90 +294,88 @@ public class BiLexPCFGParser implements KBestViterbiParser {
     //for (Iterator rI = bg.ruleIteratorByLeftChild(edge.state);
     //      rI.hasNext(); ) {
     List<BinaryRule> ruleList = bg.ruleListByLeftChild(edge.state);
-    for (int r = 0, rsz = ruleList.size(); r < rsz; r++) {
-      //BinaryRule br = rI.next();
-      BinaryRule br = ruleList.get(r);
-      if(scorer instanceof LatticeScorer) {
-      	LatticeScorer lscorer = (LatticeScorer) scorer;
-      	Edge latEdge = (Edge) lscorer.convertItemSpan(new Edge(edge));
-      	if (!fscorer.oPossibleL(project(br.parent), latEdge.start) || !fscorer.iPossibleL(project(br.rightChild), latEdge.end)) {
-      		if (!op.testOptions.exhaustiveTest) {
-      			continue;
-      		}
-      	}
-      } else {
-      	if (!fscorer.oPossibleL(project(br.parent), edge.start) || !fscorer.iPossibleL(project(br.rightChild), edge.end)) {
-      		if (!op.testOptions.exhaustiveTest) {
-      			continue;
-      		}
-      	}
-      }
-      for (int head = edge.end; head < length; head++) {
-        // cdm Apr 2006: avoid Iterator allocation
-        // for (Iterator iTWI = taggedWordList[head].iterator(); iTWI.hasNext();) {
-        // IntTaggedWord iTW = (IntTaggedWord) iTWI.next();
-        for (int hdi = 0, sz = taggedWordList[head].size(); hdi < sz; hdi++) {
-          IntTaggedWord iTW = taggedWordList[head].get(hdi);
-          int tag = iTW.tag;
-          tempHook.start = edge.start;
-          tempHook.end = edge.end;
-          tempHook.head = head;
-          tempHook.tag = tag;
-          tempHook.state = br.parent;
-          tempHook.subState = br.rightChild;
-          if (!chart.isBuiltL(tempHook.subState, tempHook.end, tempHook.head, tempHook.tag)) {
-            continue;
+      for (BinaryRule br : ruleList) {
+          //BinaryRule br = rI.next();
+          if (scorer instanceof LatticeScorer) {
+              LatticeScorer lscorer = (LatticeScorer) scorer;
+              Edge latEdge = (Edge) lscorer.convertItemSpan(new Edge(edge));
+              if (!fscorer.oPossibleL(project(br.parent), latEdge.start) || !fscorer.iPossibleL(project(br.rightChild), latEdge.end)) {
+                  if (!TestOptions.exhaustiveTest) {
+                      continue;
+                  }
+              }
+          } else {
+              if (!fscorer.oPossibleL(project(br.parent), edge.start) || !fscorer.iPossibleL(project(br.rightChild), edge.end)) {
+                  if (!TestOptions.exhaustiveTest) {
+                      continue;
+                  }
+              }
           }
-          tempHook.iScore = edge.iScore + br.score + dparser.headScore[dparser.binDistance[head][edge.end]][head][dg.tagBin(tag)][edge.head][dg.tagBin(edge.tag)] + dparser.headStop[edge.head][dg.tagBin(edge.tag)][edge.start] + dparser.headStop[edge.head][dg.tagBin(edge.tag)][edge.end];
-          tempHook.backEdge = edge;
-          relaxTempHook();
-        }
+          for (int head = edge.end; head < length; head++) {
+              // cdm Apr 2006: avoid Iterator allocation
+              // for (Iterator iTWI = taggedWordList[head].iterator(); iTWI.hasNext();) {
+              // IntTaggedWord iTW = (IntTaggedWord) iTWI.next();
+              for (int hdi = 0, sz = taggedWordList[head].size(); hdi < sz; hdi++) {
+                  IntTaggedWord iTW = taggedWordList[head].get(hdi);
+                  int tag = iTW.tag;
+                  tempHook.start = edge.start;
+                  tempHook.end = edge.end;
+                  tempHook.head = head;
+                  tempHook.tag = tag;
+                  tempHook.state = br.parent;
+                  tempHook.subState = br.rightChild;
+                  if (!chart.isBuiltL(tempHook.subState, tempHook.end, tempHook.head, tempHook.tag)) {
+                      continue;
+                  }
+                  tempHook.iScore = edge.iScore + br.score + dparser.headScore[dparser.binDistance[head][edge.end]][head][dg.tagBin(tag)][edge.head][dg.tagBin(edge.tag)] + dparser.headStop[edge.head][dg.tagBin(edge.tag)][edge.start] + dparser.headStop[edge.head][dg.tagBin(edge.tag)][edge.end];
+                  tempHook.backEdge = edge;
+                  relaxTempHook();
+              }
+          }
       }
-    }
     // PRE HOOKS
     //for (Iterator<BinaryRule> rI = bg.ruleIteratorByRightChild(edge.state);
     //     rI.hasNext(); ) {
     ruleList = bg.ruleListByRightChild(edge.state);
-    for (int r = 0, rlSize = ruleList.size(); r < rlSize; r++) {
-      //BinaryRule br = rI.next();
-      BinaryRule br = ruleList.get(r);
-      if(scorer instanceof LatticeScorer) {
-      	LatticeScorer lscorer = (LatticeScorer) scorer;
-      	Edge latEdge = (Edge) lscorer.convertItemSpan(new Edge(edge));
-      	if (!fscorer.oPossibleR(project(br.parent), latEdge.end) || !fscorer.iPossibleR(project(br.leftChild), latEdge.start)) {
-      		if (!op.testOptions.exhaustiveTest) {
-      			continue;
-      		}
-      	}
-      } else {
-      	if (!fscorer.oPossibleR(project(br.parent), edge.end) || !fscorer.iPossibleR(project(br.leftChild), edge.start)) {
-      		if (!op.testOptions.exhaustiveTest) {
-      			continue;
-      		}
-      	}
-      }
-      for (int head = 0; head < edge.start; head++) {
-        // cdm Apr 2006: avoid Iterator allocation
-        // for (Iterator iTWI = taggedWordList[head].iterator(); iTWI.hasNext();) {
-        //IntTaggedWord iTW = (IntTaggedWord) iTWI.next();
-        for (int hdi = 0, sz = taggedWordList[head].size(); hdi < sz; hdi++) {
-          IntTaggedWord iTW = taggedWordList[head].get(hdi);
-          int tag = iTW.tag;
-          tempHook.start = edge.start;
-          tempHook.end = edge.end;
-          tempHook.head = head;
-          tempHook.tag = tag;
-          tempHook.state = br.parent;
-          tempHook.subState = br.leftChild;
-          if (!chart.isBuiltR(tempHook.subState, tempHook.start, tempHook.head, tempHook.tag)) {
-            continue;
+      for (BinaryRule br : ruleList) {
+          //BinaryRule br = rI.next();
+          if (scorer instanceof LatticeScorer) {
+              LatticeScorer lscorer = (LatticeScorer) scorer;
+              Edge latEdge = (Edge) lscorer.convertItemSpan(new Edge(edge));
+              if (!fscorer.oPossibleR(project(br.parent), latEdge.end) || !fscorer.iPossibleR(project(br.leftChild), latEdge.start)) {
+                  if (!TestOptions.exhaustiveTest) {
+                      continue;
+                  }
+              }
+          } else {
+              if (!fscorer.oPossibleR(project(br.parent), edge.end) || !fscorer.iPossibleR(project(br.leftChild), edge.start)) {
+                  if (!TestOptions.exhaustiveTest) {
+                      continue;
+                  }
+              }
           }
-          tempHook.iScore = edge.iScore + br.score + dparser.headScore[dparser.binDistance[head][edge.start]][head][dg.tagBin(tag)][edge.head][dg.tagBin(edge.tag)] + dparser.headStop[edge.head][dg.tagBin(edge.tag)][edge.start] + dparser.headStop[edge.head][dg.tagBin(edge.tag)][edge.end];
-          tempHook.backEdge = edge;
-          relaxTempHook();
-        }
+          for (int head = 0; head < edge.start; head++) {
+              // cdm Apr 2006: avoid Iterator allocation
+              // for (Iterator iTWI = taggedWordList[head].iterator(); iTWI.hasNext();) {
+              //IntTaggedWord iTW = (IntTaggedWord) iTWI.next();
+              for (int hdi = 0, sz = taggedWordList[head].size(); hdi < sz; hdi++) {
+                  IntTaggedWord iTW = taggedWordList[head].get(hdi);
+                  int tag = iTW.tag;
+                  tempHook.start = edge.start;
+                  tempHook.end = edge.end;
+                  tempHook.head = head;
+                  tempHook.tag = tag;
+                  tempHook.state = br.parent;
+                  tempHook.subState = br.leftChild;
+                  if (!chart.isBuiltR(tempHook.subState, tempHook.start, tempHook.head, tempHook.tag)) {
+                      continue;
+                  }
+                  tempHook.iScore = edge.iScore + br.score + dparser.headScore[dparser.binDistance[head][edge.start]][head][dg.tagBin(tag)][edge.head][dg.tagBin(edge.tag)] + dparser.headStop[edge.head][dg.tagBin(edge.tag)][edge.start] + dparser.headStop[edge.head][dg.tagBin(edge.tag)][edge.end];
+                  tempHook.backEdge = edge;
+                  relaxTempHook();
+              }
+          }
       }
-    }
   }
 
   protected void registerReal(Edge real) {
@@ -504,7 +494,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
     if (VERBOSE) {
       System.err.println("Considering: " + tempHook + " iP: " + scorer.iPossible(tempHook) + " oP: " + scorer.oPossible(tempHook));
     }
-    if (!op.testOptions.exhaustiveTest) {
+    if (!TestOptions.exhaustiveTest) {
       if (!scorer.oPossible(tempHook) || !scorer.iPossible(tempHook)) {
         return;
       }
@@ -512,14 +502,14 @@ public class BiLexPCFGParser implements KBestViterbiParser {
     relaxHook2++;
     Hook resultHook = (Hook) interner.intern(tempHook);
     if (VERBOSE) {
-      System.err.printf("Formed %s %s %f was %f\n", resultHook, (resultHook == tempHook ? "new" : "old"), tempHook.iScore, resultHook.iScore);
+      System.err.printf("Formed %s %s %f was %f\n", resultHook, resultHook == tempHook ? "new" : "old", tempHook.iScore, resultHook.iScore);
       if (resultHook.backEdge != null) {
         System.err.println("  Backtrace: " + resultHook.backEdge);
       }
     }
     if (resultHook == tempHook) {
       relaxHook3++;
-      tempHook = new Hook(op.testOptions.exhaustiveTest);
+      tempHook = new Hook(TestOptions.exhaustiveTest);
       discoverHook(resultHook);
     }
     if (better(tempHook.iScore, resultHook.iScore)) {
@@ -606,7 +596,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
   }
 
   protected Item makeInitialItem(int pos, int tag, int state, double iScore) {
-    Edge edge = new Edge(op.testOptions.exhaustiveTest);
+    Edge edge = new Edge(TestOptions.exhaustiveTest);
     edge.start = pos;
     edge.end = pos + 1;
     edge.state = state;
@@ -617,7 +607,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
   }
 
   protected List<Item> makeInitialItems(List<? extends HasWord> wordList) {
-    List<Item> itemList = new ArrayList<Item>();
+    List<Item> itemList = new ArrayList<>();
     int length = wordList.size();
     int numTags = tagIndex.size();
     words = new int[length];
@@ -625,7 +615,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
     int terminalCount = 0;
     originalLabels = new CoreLabel[wordList.size()];
     for (int i = 0; i < length; i++) {
-      taggedWordList[i] = new ArrayList<IntTaggedWord>(numTags);
+      taggedWordList[i] = new ArrayList<>(numTags);
       HasWord wordObject = wordList.get(i);
       if (wordObject instanceof CoreLabel) {
         originalLabels[i] = (CoreLabel) wordObject;
@@ -636,7 +626,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
       String wordContextStr = null;
       if(wordObject instanceof HasContext) {
         wordContextStr = ((HasContext) wordObject).originalText();
-        if("".equals(wordContextStr))
+        if(wordContextStr != null && wordContextStr.isEmpty())
           wordContextStr = null;
       }
 
@@ -708,7 +698,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
   }
 
   protected void setGoal(int length) {
-    goal = new Edge(op.testOptions.exhaustiveTest);
+    goal = new Edge(TestOptions.exhaustiveTest);
     goal.start = 0;
     goal.end = length;
     goal.state = stateIndex.indexOf(op.langpack().startSymbol());
@@ -720,17 +710,16 @@ public class BiLexPCFGParser implements KBestViterbiParser {
   protected void initialize(List<? extends HasWord> words) {
     length = words.size();
     interner = new Interner();
-    agenda = new ArrayHeap<Item>(ScoredComparator.DESCENDING_COMPARATOR);
+    agenda = new ArrayHeap<>(ScoredComparator.DESCENDING_COMPARATOR);
     chart = new HookChart();
     setGoal(length);
     List<Item> initialItems = makeInitialItems(words);
 //    scoreDependencies();
-    for (int i = 0, iiSize = initialItems.size(); i < iiSize; i++) {
-      Item item = initialItems.get(i);
-      item = (Item) interner.intern(item);
-      //if (VERBOSE) System.err.println("Initial: "+item);
-      discoverItem(item);
-    }
+      for (Item item : initialItems) {
+          item = (Item) interner.intern(item);
+          //if (VERBOSE) System.err.println("Initial: "+item);
+          discoverItem(item);
+      }
   }
 
   /**
@@ -826,7 +815,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
       // Is the currently best item acceptable at all?
       if (item.score() == Double.NEGATIVE_INFINITY) {
         // Do not report failure in nGood mode if we found something earlier.
-        if (nGoodTrees.size() > 0) {
+        if (!nGoodTrees.isEmpty()) {
           if (VERBOSE) {
             System.err.println("Aborting kGood search because of an unacceptable (-Inf) item: " + item);
           }
@@ -842,9 +831,9 @@ public class BiLexPCFGParser implements KBestViterbiParser {
         return false;
       }
       // Keep the number of items from getting too large
-      if (op.testOptions.MAX_ITEMS > 0 && (builtEdges + builtHooks) >= op.testOptions.MAX_ITEMS) {
+      if (op.testOptions.MAX_ITEMS > 0 && builtEdges + builtHooks >= op.testOptions.MAX_ITEMS) {
         // Do not report failure in kGood mode if we found something earlier.
-        if (nGoodTrees.size() > 0) {
+        if (!nGoodTrees.isEmpty()) {
           System.err.println("DEBUG: aborting search because of reaching the MAX_ITEMS work limit [" +
                              op.testOptions.MAX_ITEMS + " items]");
           goal = nGoodTrees.get(0);
@@ -860,17 +849,17 @@ public class BiLexPCFGParser implements KBestViterbiParser {
         }
         return false;
       }
-      if (VERBOSE && item.score() != Double.NEGATIVE_INFINITY) {
+      if (false) {
         System.err.printf("Removing from agenda: %s score i %.2f + o %.2f = %.2f\n", item, item.iScore, item.oScore, item.score());
         if (item.backEdge != null) {
-          System.err.println("  Backtrace: " + item.backEdge.toString() + " " + (item.isEdge() ? (((Edge) item).backHook != null ? ((Edge) item).backHook.toString() : "") : ""));
+          System.err.println("  Backtrace: " + item.backEdge.toString() + ' ' + (item.isEdge() ? ((Edge) item).backHook != null ? ((Edge) item).backHook.toString() : "" : ""));
         }
       }
       processItem(item);
     } // end while agenda is not empty
     // If we are here, the agenda is empty.
     // Do not report failure if we found something earlier.
-    if (nGoodTrees.size() > 0) {
+    if (!nGoodTrees.isEmpty()) {
       System.err.println("DEBUG: aborting search because of empty agenda");
       goal = nGoodTrees.get(0);
       interner = null;
@@ -901,7 +890,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
       } else {
         numHooks++;
         Collection edges = chart.getEdges((Hook) item);
-        if (edges.size() == 0) {
+        if (edges.isEmpty()) {
           numUnmatchedHooks++;
         }
       }
@@ -934,8 +923,8 @@ public class BiLexPCFGParser implements KBestViterbiParser {
     this.wordIndex = wordIndex;
     this.tagIndex = tagIndex;
 
-    tempEdge = new Edge(op.testOptions.exhaustiveTest);
-    tempHook = new Hook(op.testOptions.exhaustiveTest);
+    tempEdge = new Edge(TestOptions.exhaustiveTest);
+    tempHook = new Hook(TestOptions.exhaustiveTest);
   }
 
   public static class N5BiLexPCFGParser extends BiLexPCFGParser {
@@ -946,7 +935,7 @@ public class BiLexPCFGParser implements KBestViterbiParser {
       if (VERBOSE) {
         System.err.println("Considering: " + tempHook + " iP: " + scorer.iPossible(tempHook) + " oP: " + scorer.oPossible(tempHook));
       }
-      if (!op.testOptions.exhaustiveTest) {
+      if (!TestOptions.exhaustiveTest) {
         if (!scorer.oPossible(tempHook) || !scorer.iPossible(tempHook)) {
           return;
         }
@@ -955,11 +944,11 @@ public class BiLexPCFGParser implements KBestViterbiParser {
       Hook resultHook = tempHook;
       //Hook resultHook = (Hook)interner.intern(tempHook);
       if (VERBOSE) {
-        System.err.println("Formed " + resultHook + " " + (resultHook == tempHook ? "new" : "old") + " " + tempHook.iScore + " was " + resultHook.iScore);
+        System.err.println("Formed " + resultHook + ' ' + (resultHook == tempHook ? "new" : "old") + ' ' + tempHook.iScore + " was " + resultHook.iScore);
       }
       if (resultHook == tempHook) {
         relaxHook3++;
-        tempHook = new Hook(op.testOptions.exhaustiveTest);
+        tempHook = new Hook(TestOptions.exhaustiveTest);
         processHook(resultHook);
         builtHooks++;
       }

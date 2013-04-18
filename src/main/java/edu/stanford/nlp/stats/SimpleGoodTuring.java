@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Simple Good-Turing smoothing, based on code from Sampson, available at:
@@ -17,13 +18,14 @@ public class SimpleGoodTuring {
 
   private static final int MIN_INPUT = 5;
   private static final double CONFID_FACTOR = 1.96;
-  private static final double TOLERANCE = 1e-12;
+  private static final double TOLERANCE = 1.0e-12;
+    private static final Pattern COMPILE = Pattern.compile("\\s+");
 
-  private int[] r;               // for each bucket, a frequency
+    private int[] r;               // for each bucket, a frequency
   private int[] n;               // for each bucket, number of items w that frequency
   private int rows;              // number of frequency buckets
 
-  private int bigN = 0;          // total count of all items
+  private int bigN;          // total count of all items
   private double pZero;          // probability of unseen items
   private double bigNPrime;
   private double slope;
@@ -43,11 +45,11 @@ public class SimpleGoodTuring {
    * number of types which occurred with count r[i] in the underlying
    * collection.  See the documentation for main() for a concrete example.
    */
-  public SimpleGoodTuring(int[] r, int[] n) {
+  public SimpleGoodTuring(int[] r, int... n) {
     if (r == null) throw new IllegalArgumentException("r must not be null!");
     if (n == null) throw new IllegalArgumentException("n must not be null!");
     if (r.length != n.length) throw new IllegalArgumentException("r and n must have same size!");
-    if (r.length < MIN_INPUT) throw new IllegalArgumentException("r must have size >= " + MIN_INPUT + "!");
+    if (r.length < MIN_INPUT) throw new IllegalArgumentException("r must have size >= " + MIN_INPUT + '!');
     this.r = new int[r.length];
     this.n = new int[n.length];
     System.arraycopy(r, 0, this.r, 0, r.length); // defensive copy
@@ -90,13 +92,10 @@ public class SimpleGoodTuring {
         
     for (j = 0; j < rows; ++j) bigN += r[j] * n[j]; // count all items
     next_n = row(1);
-    pZero = (next_n < 0) ? 0 : n[next_n] / (double) bigN;
+    pZero = next_n < 0 ? 0 : n[next_n] / (double) bigN;
     for (j = 0; j < rows; ++j) {
-      i = (j == 0 ? 0 : r[j - 1]);
-      if (j == rows - 1)
-        k = (double) (2 * r[j] - i);
-      else
-        k = (double) r[j + 1];
+      i = j == 0 ? 0 : r[j - 1];
+        k = j == rows - 1 ? (double) (2 * r[j] - i) : (double) r[j + 1];
       z[j] = 2 * n[j] / (k - i);
       logR[j] = Math.log(r[j]);
       logZ[j] = Math.log(z[j]);
@@ -109,7 +108,7 @@ public class SimpleGoodTuring {
       if (!indiffValsSeen) {
         x = (r[j] + 1) * (next_n = n[row(r[j] + 1)]) / (double) n[j];
         if (Math.abs(x - y) <= CONFID_FACTOR * Math.sqrt(sq(r[j] + 1.0)
-                                                         * next_n / (sq((double) n[j]))
+                                                         * next_n / sq((double) n[j])
                                                          * (1 + next_n / (double) n[j])))
           indiffValsSeen = true;
         else
@@ -132,7 +131,7 @@ public class SimpleGoodTuring {
   private int row(int freq) {
     int i = 0;
     while (i < rows && r[i] < freq) i++;
-    return ((i < rows && r[i] == freq) ? i : -1);
+    return i < rows && r[i] == freq ? i : -1;
   }
 
   private void findBestFit() {
@@ -154,11 +153,11 @@ public class SimpleGoodTuring {
   }
 
   private double smoothed(int i) {
-    return (Math.exp(intercept + slope * Math.log(i)));
+    return Math.exp(intercept + slope * Math.log(i));
   }
 
   private static double sq(double x) {
-    return (x * x);
+    return x * x;
   }
 
   private void print() {
@@ -176,7 +175,7 @@ public class SimpleGoodTuring {
   private void validate(double tolerance) {
     double sum = pZero;
     for (int i = 0; i < n.length; i++) {
-      sum += (n[i] * p[i]);
+      sum += n[i] * p[i];
     }
     double err = 1.0 - sum;
     if (Math.abs(err) > tolerance) {
@@ -193,12 +192,12 @@ public class SimpleGoodTuring {
    * values read.
    */
   private static int[][] readInput() throws Exception {
-    List<Integer> rVals = new ArrayList<Integer>();
-    List<Integer> nVals = new ArrayList<Integer>();
+    List<Integer> rVals = new ArrayList<>();
+    List<Integer> nVals = new ArrayList<>();
     BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
     String line;
     while ((line = in.readLine()) != null) {
-      String[] tokens = line.trim().split("\\s+");
+      String[] tokens = COMPILE.split(line.trim());
       if (tokens.length != 2)
         throw new Exception("Line doesn't contain two tokens: " + line);
       Integer r = Integer.valueOf(tokens[0]);
@@ -262,7 +261,7 @@ public class SimpleGoodTuring {
    * The last column represents the smoothed probabilities, and the first item
    * in this column represents the probability assigned to unseen items.
    */
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     int[][] input = readInput();
     SimpleGoodTuring sgt = new SimpleGoodTuring(input[0], input[1]);
     sgt.print();

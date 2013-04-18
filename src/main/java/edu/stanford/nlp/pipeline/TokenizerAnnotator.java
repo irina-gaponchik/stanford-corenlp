@@ -31,7 +31,7 @@ abstract public class TokenizerAnnotator implements Annotator {
 
   private final boolean VERBOSE;
 
-  public TokenizerAnnotator(boolean verbose) {
+  protected TokenizerAnnotator(boolean verbose) {
     VERBOSE = verbose;
   }
 
@@ -64,7 +64,7 @@ abstract public class TokenizerAnnotator implements Annotator {
       annotation.set(CoreAnnotations.TokensAnnotation.class, tokens);
       if (VERBOSE) {
         timer.stop("done.");
-        System.err.println("output: "+annotation.get(CoreAnnotations.TokensAnnotation.class)+"\n");
+        System.err.println("output: "+annotation.get(CoreAnnotations.TokensAnnotation.class)+ '\n');
       }
     } else {
       throw new RuntimeException("unable to find text in annotation: " + annotation);

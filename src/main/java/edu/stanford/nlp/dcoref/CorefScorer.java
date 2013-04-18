@@ -50,7 +50,7 @@ public abstract class CorefScorer {
   public double getF1() {
     double p = getPrecision();
     double r = getRecall();
-    return (p + r == 0.0) ? 0.0: 2.0 * p * r / (p + r);
+    return p + r == 0.0 ? 0.0: 2.0 * p * r / (p + r);
   }
 
   public void calculateScore(Document doc) {
@@ -79,7 +79,7 @@ public abstract class CorefScorer {
     String F1F1 = nf2.format(f1*100);
 
     if (printF1First) {
-      String str = "F1 = "+F1+", P = "+P+" ("+(int) precisionNumSum+"/"+(int) precisionDenSum+"), R = "+R+" ("+(int) recallNumSum+"/"+(int) recallDenSum+")";
+      String str = "F1 = "+F1+", P = "+P+" ("+(int) precisionNumSum+ '/' +(int) precisionDenSum+"), R = "+R+" ("+(int) recallNumSum+ '/' +(int) recallDenSum+ ')';
       if(scoreType == ScoreType.Pairwise){
         logger.fine("Pairwise "+str);
       } else if(scoreType == ScoreType.BCubed){

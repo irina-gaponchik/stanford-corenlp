@@ -60,7 +60,7 @@ public class NumberRangeFileFilter implements FileFilter {
       }
       int j = k;
       c = filename.charAt(j);
-      while (j >= 0 && (c >= '0' && c <= '9')) {
+      while (j >= 0 && c >= '0' && c <= '9') {
         j--;
         if (j >= 0) {
           c = filename.charAt(j);
@@ -70,7 +70,7 @@ public class NumberRangeFileFilter implements FileFilter {
       k++;
       String theNumber = filename.substring(j, k);
       int number = Integer.parseInt(theNumber);
-      return (number >= minimum) && (number <= maximum);
+      return number >= minimum && number <= maximum;
     }
   }
 

@@ -21,17 +21,17 @@ import edu.stanford.nlp.util.Pair;
  * The basic way to use the minimizer is with a null constructor, then
  * the simple minimize method:
  * <p/>
- * <p><code>Minimizer smd = new SGDMinimizer();</code>
- * <br><code>DiffFunction df = new SomeDiffFunction(); //Note that it must be a incidence of AbstractStochasticCachingDiffFunction</code>
- * <br><code>double tol = 1e-4;</code>
- * <br><code>double[] initial = getInitialGuess();</code>
- * <br><code>int maxIterations = someSafeNumber;</code>
- * <br><code>double[] minimum = qnm.minimize(df,tol,initial,maxIterations);</code>
+ * <p>{@code Minimizer smd = new SGDMinimizer();}
+ * <br>{@code DiffFunction df = new SomeDiffFunction(); //Note that it must be a incidence of AbstractStochasticCachingDiffFunction}
+ * <br>{@code double tol = 1e-4;}
+ * <br>{@code double[] initial = getInitialGuess();}
+ * <br>{@code int maxIterations = someSafeNumber;}
+ * <br>{@code double[] minimum = qnm.minimize(df,tol,initial,maxIterations);}
  * <p/>
  * Constructing with a null constructor will use the default values of
  * <p>
- * <br><code>batchSize = 15;</code>
- * <br><code>initialGain = 0.1;</code>
+ * <br>{@code batchSize = 15;}
+ * <br>{@code initialGain = 0.1;}
  * <p/>
  *
  * @author <a href="mailto:akleeman@stanford.edu">Alex Kleeman</a>
@@ -40,7 +40,7 @@ import edu.stanford.nlp.util.Pair;
  */
 public abstract class StochasticMinimizer<T extends Function> implements Minimizer<T>, HasEvaluators {
 
-  public boolean outputIterationsToFile = false;
+  public boolean outputIterationsToFile;
   public int outputFrequency = 1000;
   public double gain = 0.1;
 
@@ -48,16 +48,16 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
   protected int numBatches;
   protected int k;
   protected int bSize = 15;
-  protected boolean quiet = false;
-  protected List<double[]> gradList = null;
+  protected boolean quiet;
+  protected List<double[]> gradList;
   protected int memory = 10;
   protected int numPasses = -1;
   protected Random gen = new Random(1);
-  protected PrintWriter file = null;
-  protected PrintWriter infoFile = null;
+  protected PrintWriter file;
+  protected PrintWriter infoFile;
   protected long maxTime = Long.MAX_VALUE;
 
-  private int evaluateIters = 0;    // Evaluate every x iterations (0 = no evaluation)
+  private int evaluateIters;    // Evaluate every x iterations (0 = no evaluation)
   private Evaluator[] evaluators;  // separate set of evaluators to check how optimization is going
 
   public void shutUp() {
@@ -71,7 +71,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
 
   protected abstract void takeStep(AbstractStochasticCachingDiffFunction dfunction);
 
-  public void setEvaluators(int iters, Evaluator[] evaluators)
+  public void setEvaluators(int iters, Evaluator... evaluators)
   {
     this.evaluateIters = iters;
     this.evaluators = evaluators;
@@ -81,7 +81,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
     This is the scaling factor for the gains to ensure convergence
   */
   protected static double gainSchedule(int it, double tau){
-    return (tau / (tau + it));
+    return tau / (tau + it);
   }
 
   /*
@@ -96,7 +96,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
       ArrayMath.pairwiseAddInPlace(smoothed,thisArray);
     }
 
-    ArrayMath.multiplyInPlace(smoothed,1/((double) toSmooth.size() ));
+    ArrayMath.multiplyInPlace(smoothed,1/ (double) toSmooth.size());
     return smoothed;
   }
 
@@ -122,7 +122,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
   public abstract Pair<Integer,Double> tune(Function function,double[] initial, long msPerTest);
 
   public double tuneDouble(edu.stanford.nlp.optimization.Function function, double[] initial, long msPerTest,PropertySetter<Double> ps,double lower,double upper){
-    return this.tuneDouble(function, initial, msPerTest, ps, lower, upper, 1e-3*Math.abs(upper-lower));
+    return this.tuneDouble(function, initial, msPerTest, ps, lower, upper, 1.0e-3 *Math.abs(upper-lower));
   }
 
   public double tuneDouble(edu.stanford.nlp.optimization.Function function, double[] initial, long msPerTest,PropertySetter<Double> ps,double lower,double upper,double TOL){
@@ -135,14 +135,14 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
     }
     AbstractStochasticCachingDiffFunction dfunction = (AbstractStochasticCachingDiffFunction) function;
 
-    List<Pair<Double,Double>> res = new ArrayList<Pair<Double,Double>>();
-    Pair<Double,Double> best = new Pair<Double,Double>(lower,Double.POSITIVE_INFINITY); //this is set to lower because the first it will always use the lower first, so it has to be best
-    Pair<Double,Double> low = new Pair<Double,Double>(lower,Double.POSITIVE_INFINITY);
-    Pair<Double,Double> high = new Pair<Double,Double>(upper,Double.POSITIVE_INFINITY);
-    Pair<Double,Double> cur = new Pair<Double,Double>();
-    Pair<Double,Double> tmp = new Pair<Double,Double>();
+    List<Pair<Double,Double>> res = new ArrayList<>();
+    Pair<Double,Double> best = new Pair<>(lower,Double.POSITIVE_INFINITY); //this is set to lower because the first it will always use the lower first, so it has to be best
+    Pair<Double,Double> low = new Pair<>(lower,Double.POSITIVE_INFINITY);
+    Pair<Double,Double> high = new Pair<>(upper,Double.POSITIVE_INFINITY);
+    Pair<Double,Double> cur = new Pair<>();
+    Pair<Double,Double> tmp = new Pair<>();
 
-    List<Double> queue = new ArrayList<Double>();
+    List<Double> queue = new ArrayList<>();
     queue.add(lower);
     queue.add(upper);
     //queue.add(0.5* (lower + upper));
@@ -152,11 +152,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
 
     do{
       System.arraycopy(initial, 0, xtest, 0, initial.length);
-      if(queue.size() != 0){
-        cur.first = queue.remove(0);
-      }else{
-        cur.first = 0.5*( low.first() + high.first() );
-      }
+        cur.first = !queue.isEmpty() ? queue.remove(0) : 0.5 * (low.first() + high.first());
 
       ps.set(cur.first() );
 
@@ -165,13 +161,9 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
               "  gain: "  + gain + " and  " +
               ps.toString() + " set to  " + cur.first());
 
-      xtest = this.minimize(function, 1e-100, xtest);
+      xtest = this.minimize(function, 1.0e-100, xtest);
 
-      if(Double.isNaN( xtest[0] ) ){
-        cur.second = Double.POSITIVE_INFINITY;
-      } else {
-        cur.second = dfunction.valueAt(xtest);
-      }
+        cur.second = Double.isNaN(xtest[0]) ? Double.POSITIVE_INFINITY : dfunction.valueAt(xtest);
 
       if( cur.second() < best.second() ){
 
@@ -194,7 +186,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
         toContinue = false;
       }
 
-      res.add(new Pair<Double,Double>(cur.first(),cur.second()));
+      res.add(new Pair<>(cur.first(),cur.second()));
 
       System.err.println("");
       System.err.println("Final value is: " + nf.format(cur.second()));
@@ -208,9 +200,9 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
     System.err.println(ps.getClass().toString());
     System.err.println("-------------");
     System.err.println("  val    ,    function after " + msPerTest + " ms");
-    for(int i=0;i<res.size();i++ ){
-      System.err.println(res.get(i).first() + "    ,    " + res.get(i).second() );
-     }
+      for (Pair<Double, Double> re : res) {
+          System.err.println(re.first() + "    ,    " + re.second());
+      }
     System.err.println("");
     System.err.println("");
 
@@ -225,7 +217,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
 
 
   private class setGain implements PropertySetter<Double>{
-    StochasticMinimizer<T> parent = null;
+    StochasticMinimizer<T> parent;
 
     public setGain(StochasticMinimizer<T> min) {
       parent = min;
@@ -272,16 +264,16 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
       System.err.println("Testing with batch size:  " + b );
       bSize = b;
       shutUp();
-      this.minimize(function, 1e-5, xTest);
+      this.minimize(function, 1.0e-5, xTest);
       double result = dFunction.valueAt(xTest);
 
       if (result < min) {
         min = result;
         bOpt = bSize;
-        b *= 2;
+          b <<= 1;
         prev = result;
       } else if(result < prev) {
-        b *= 2;
+          b <<= 1;
         prev = result;
       } else if (result > prev) {
         toContinue = false;
@@ -314,7 +306,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
         System.err.println("");
         System.err.println("Testing with batch size: " + bSize + "    gain:  " + nf.format(gain) );
         this.quiet = true;
-        this.minimize(function, 1e-100, xtest);
+        this.minimize(function, 1.0e-100, xtest);
         results[b][g] = function.valueAt(xtest);
 
         if( results[b][g] < min ){
@@ -330,7 +322,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
       }
     }
 
-    return new Pair<Integer,Double>(bOpt,gOpt);
+    return new Pair<>(bOpt,gOpt);
   }
 
 
@@ -339,7 +331,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
   }
 
 
-  private void doEvaluation(double[] x) {
+  private void doEvaluation(double... x) {
     // Evaluate solution
     if (evaluators == null) return;
     for (Evaluator eval:evaluators) {
@@ -348,7 +340,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
     }
   }
 
-  public double[] minimize(Function function, double functionTolerance, double[] initial) {
+  public double[] minimize(Function function, double functionTolerance, double... initial) {
     return minimize(function, functionTolerance, initial, -1);
   }
 
@@ -373,14 +365,14 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
     x = initial;
     grad = new double[x.length];
     newX = new double[x.length];
-    gradList = new ArrayList<double[]>();
+    gradList = new ArrayList<>();
     numBatches =  dfunction.dataDimension()/ bSize;
-    outputFrequency = (int) Math.ceil( ((double) numBatches) /( (double) outputFrequency) )  ;
+    outputFrequency = (int) Math.ceil( (double) numBatches / (double) outputFrequency)  ;
 
     init(dfunction);
     initFiles();
 
-    boolean have_max = (maxIterations > 0 || numPasses > 0);
+    boolean have_max = maxIterations > 0 || numPasses > 0;
 
     if (!have_max){
       throw new UnsupportedOperationException("No maximum number of iterations has been specified.");
@@ -412,7 +404,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
     current.start();
     for (k = 0; k<maxIterations ; k++)  {
       try{
-        boolean doEval = (k > 0 && evaluateIters > 0 && k % evaluateIters == 0);
+        boolean doEval = k > 0 && evaluateIters > 0 && k % evaluateIters == 0;
         if (doEval) {
           doEvaluation(x);
         }
@@ -422,11 +414,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
 
         // restrict number of saved gradients
         //  (recycle memory of first gradient in list for new gradient)
-        if(k > 0 && gradList.size() >= memory){
-          newGrad = gradList.remove(0);
-        }else{
-          newGrad = new double[grad.length];
-        }
+          newGrad = k > 0 && gradList.size() >= memory ? gradList.remove(0) : new double[grad.length];
 
         dfunction.hasNewVals = true;
         System.arraycopy(dfunction.derivativeAt(x,v,bSize),0,newGrad,0,newGrad.length);
@@ -442,7 +430,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         // THIS IS FOR DEBUG ONLY
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if(outputIterationsToFile && (k%outputFrequency == 0) && k!=0 ) {
+        if(outputIterationsToFile && k%outputFrequency == 0 && k!=0 ) {
           double curVal = dfunction.valueAt(x);
           say(" TrueValue{ " + curVal + " } ");
           file.println(k + " , " + curVal + " , " + total.report() );
@@ -465,8 +453,8 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
 
         System.arraycopy(newX, 0, x, 0, x.length);
 
-        say("[" + ( total.report() )/1000.0 + " s " );
-        say("{" + (current.restart()/1000.0) + " s}] ");
+        say("[" + total.report() /1000.0 + " s " );
+        say("{" + current.restart()/1000.0 + " s}] ");
         say(" "+dfunction.lastValue());
 
         if (quiet) {
@@ -489,7 +477,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
 
     if(outputIterationsToFile){
       infoFile.println(k + "; Iterations");
-      infoFile.println(( total.report() )/1000.0 + "; Completion Time");
+      infoFile.println(total.report() /1000.0 + "; Completion Time");
       infoFile.println(dfunction.valueAt(x) + "; Finalvalue");
 
       infoFile.close();
@@ -498,7 +486,7 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
       //System.exit(1);
     }
 
-    say("Completed in: " + ( total.report() )/1000.0 + " s");
+    say("Completed in: " + total.report() /1000.0 + " s");
 
     return x;
   }

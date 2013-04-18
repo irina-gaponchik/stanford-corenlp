@@ -32,10 +32,7 @@ public class FrenchTreeNormalizer extends BobChrisTreeNormalizer {
     emptyFilter = new Filter<Tree>() {
       private static final long serialVersionUID = -22673346831392110L;
       public boolean accept(Tree tree) {
-        if(tree.isPreTerminal() && (tree.firstChild().value().equals("") || tree.firstChild().value().equals("-NONE-"))) {
-          return false;
-        }
-        return true;
+          return !(tree.isPreTerminal() && (tree.firstChild().value().isEmpty() || tree.firstChild().value().equals("-NONE-")));
       }
     };
   }
@@ -104,7 +101,7 @@ public class FrenchTreeNormalizer extends BobChrisTreeNormalizer {
     //Add start symbol so that the root has only one sub-state. Escape any enclosing brackets.
     //If the "tree" consists entirely of enclosing brackets e.g. ((())) then this method
     //will return null. In this case, readers e.g. PennTreeReader will try to read the next tree.
-    while(tree != null && (tree.value() == null || tree.value().equals("")) && tree.numChildren() <= 1)
+    while(tree != null && (tree.value() == null || tree.value().isEmpty()) && tree.numChildren() <= 1)
       tree = tree.firstChild();
 
     //Ensure that the tree has a top-level unary rewrite
@@ -124,13 +121,8 @@ public class FrenchTreeNormalizer extends BobChrisTreeNormalizer {
      *  Also removes all w nodes.
      */
     public boolean accept(Tree t) {
-      if(t.value() != null && t.value().equals("w"))
-        return false;
+        return !(t.value() != null && t.value().equals("w")) && (t.isLeaf() || t.isPreTerminal() || !(t.label() != null && t.label().value() != null && t.label().value().equals(t.getChild(0).label().value())));
 
-      if (t.isLeaf() || t.isPreTerminal())
-        return true;
-
-      return ! (t.label() != null && t.label().value() != null && t.label().value().equals(t.getChild(0).label().value()));
     }
   }
 

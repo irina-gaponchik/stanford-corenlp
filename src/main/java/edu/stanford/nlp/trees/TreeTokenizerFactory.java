@@ -41,7 +41,7 @@ public class TreeTokenizerFactory implements TokenizerFactory<Tree> {
     };
   }
 
-  public Tokenizer<Tree> getTokenizer(final Reader r, String extraOptions) {
+  public Tokenizer<Tree> getTokenizer(Reader r, String extraOptions) {
     // Silently ignore extra options
     return getTokenizer(r);
   }

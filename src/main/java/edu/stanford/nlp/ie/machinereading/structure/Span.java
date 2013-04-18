@@ -39,11 +39,7 @@ public class Span implements Serializable {
    * Safe way to construct Spans if you're not sure which value is higher.
    */
   public static Span fromValues(int val1, int val2) {
-    if (val1 <= val2) {
-      return new Span(val1, val2);
-    } else {
-      return new Span(val2, val1);
-    }
+      return val1 <= val2 ? new Span(val1, val2) : new Span(val2, val1);
   }
   
   public int start() { return start; }
@@ -56,28 +52,25 @@ public class Span implements Serializable {
   public boolean equals(Object other) {
     if(! (other instanceof Span)) return false;
     Span otherSpan = (Span) other;
-    if(start == otherSpan.start && end == otherSpan.end){
-      return true;
-    }
-    return false;
+      return start == otherSpan.start && end == otherSpan.end;
   }
   
   @Override
   public int hashCode() {
-    return (new Pair<Integer,Integer>(start,end)).hashCode();
+    return new Pair<>(start,end).hashCode();
   }
   
   @Override
   public String toString() {
-    return "[" + start + "," + end + ")";
+    return "[" + start + ',' + end + ')';
   }
   
   public void expandToInclude(Span otherSpan) {
     if (otherSpan.start() < start) {
-      setStart(otherSpan.start());
+        start = otherSpan.start();
     }
     if (otherSpan.end() > end) {
-      setEnd(otherSpan.end());
+        end = otherSpan.end();
     }
   }
 

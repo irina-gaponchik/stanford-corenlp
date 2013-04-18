@@ -7,8 +7,8 @@ import java.io.Serializable;
 /**
  * A PaddedList wraps another list, presenting an apparently infinite
  * list by padding outside the real confines of the list with a default
- * value.  Note that <code>size()</code> returns the true size, but
- * <code>get()</code> works for any number.
+ * value.  Note that {@code size()} returns the true size, but
+ * {@code get()} works for any number.
  *
  * @author Christopher Manning
  */
@@ -39,7 +39,7 @@ public class PaddedList<E> extends AbstractList<E> implements Serializable {
     return l.toString();
   }
 
-  /** With this constructor, get() will return <code>null</code> for
+  /** With this constructor, get() will return {@code null} for
    *  elements outside the real list.
    */
   public PaddedList(List<E> l) {
@@ -71,7 +71,7 @@ public class PaddedList<E> extends AbstractList<E> implements Serializable {
    *  @return The padded list
    */
   public static <IN> PaddedList<IN> valueOf(List<IN> list, IN padding) {
-    return new PaddedList<IN>(list, padding);
+    return new PaddedList<>(list, padding);
   }
 
   /** Returns true if this PaddedList and another are wrapping the
@@ -79,7 +79,7 @@ public class PaddedList<E> extends AbstractList<E> implements Serializable {
    *  want to know.
    */
   public boolean sameInnerList(PaddedList<E> p) {
-    return p != null && l == p.l;
+    return p != null && l.equals(p.l);
   }
 
   private static final long serialVersionUID = 2064775966439971729L;

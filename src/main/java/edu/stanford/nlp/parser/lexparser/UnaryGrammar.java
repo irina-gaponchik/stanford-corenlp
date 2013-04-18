@@ -57,7 +57,7 @@ public class UnaryGrammar implements Serializable, Iterable<UnaryRule> {
   }
 
   public List<UnaryRule> rules() {
-    return new ArrayList<UnaryRule>(coreRules.keySet());
+    return new ArrayList<>(coreRules.keySet());
   }
 
   /** Remove A -&gt; A UnaryRules from bestRulesUnderMax. */
@@ -149,7 +149,7 @@ public class UnaryGrammar implements Serializable, Iterable<UnaryRule> {
 
   public double scoreRule(UnaryRule ur) {
     UnaryRule bestR = bestRulesUnderMax.get(ur);
-    return (bestR != null ? bestR.score : Double.NEGATIVE_INFINITY);
+    return bestR != null ? bestR.score : Double.NEGATIVE_INFINITY;
   }
 
   public final void addRule(UnaryRule ur) {
@@ -265,10 +265,10 @@ public class UnaryGrammar implements Serializable, Iterable<UnaryRule> {
     bestRulesUnderMax = Generics.newHashMap();
     // backTrace = Generics.newHashMap();
     for (int s = 0; s < numStates; s++) {
-      rulesWithParent[s] = new ArrayList<UnaryRule>();
-      rulesWithChild[s] = new ArrayList<UnaryRule>();
-      closedRulesWithParent[s] = new ArrayList<UnaryRule>();
-      closedRulesWithChild[s] = new ArrayList<UnaryRule>();
+      rulesWithParent[s] = new ArrayList<>();
+      rulesWithChild[s] = new ArrayList<>();
+      closedRulesWithParent[s] = new ArrayList<>();
+      closedRulesWithChild[s] = new ArrayList<>();
       UnaryRule selfR = new UnaryRule(s, s, 0.0);
       relaxRule(selfR);
     }
@@ -290,7 +290,7 @@ public class UnaryGrammar implements Serializable, Iterable<UnaryRule> {
     int lineNum = 1;
     // all lines have one rule per line
     line = in.readLine();
-    while (line != null && line.length() > 0) {
+    while (line != null && !line.isEmpty()) {
       try {
         addRule(new UnaryRule(line, index));
       } catch (Exception e) {

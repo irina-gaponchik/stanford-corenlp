@@ -20,7 +20,7 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
   boolean[] isCorrect; // is the i-th example correct
   double logLikelihood;
   double accuracy;
-  static String saveFile = null;
+  static String saveFile;
   static int saveIndex = 1;
 
   public static final int USE_ACCURACY = 1;
@@ -55,8 +55,8 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
     initMC(classifier, data);
   }
 
-  int correct = 0;
-  int total = 0;
+  int correct;
+  int total;
 
   public <F> double score(ProbabilisticClassifier<L,F> classifier, GeneralDataset<L,F> data) {
       initMC(classifier,data);
@@ -92,7 +92,7 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
     //
     //Dataset data = (Dataset)gData;
 
-    PriorityQueue<Pair<Integer, Pair<Double, Boolean>>> q = new BinaryHeapPriorityQueue<Pair<Integer, Pair<Double, Boolean>>>();
+    PriorityQueue<Pair<Integer, Pair<Double, Boolean>>> q = new BinaryHeapPriorityQueue<>();
     total = 0;
     correct = 0;
     logLikelihood = 0.0;
@@ -111,7 +111,7 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
         correct++;
       }
       logLikelihood += correctScore;
-      q.add(new Pair<Integer, Pair<Double, Boolean>>(Integer.valueOf(i), new Pair<Double, Boolean>(new Double(guessScore), Boolean.valueOf(guessInd == correctInd))), -guessScore);
+      q.add(new Pair<>(i, new Pair<>(guessScore, guessInd == correctInd)), -guessScore);
     }
     accuracy = (double) correct / (double) total;
     List<Pair<Integer, Pair<Double, Boolean>>> sorted = q.toSortedList();
@@ -120,8 +120,8 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
 
     for (int i = 0; i < sorted.size(); i++) {
       Pair<Double, Boolean> next = sorted.get(i).second();
-      scores[i] = next.first().doubleValue();
-      isCorrect[i] = next.second().booleanValue();
+      scores[i] = next.first();
+      isCorrect[i] = next.second();
     }
 
   }
@@ -155,12 +155,12 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
 
     StringBuilder sb = new StringBuilder();
     double confWeightedAccuracy = confidenceWeightedAccuracy();
-    sb.append("--- Accuracy Stats ---").append("\n");
-    sb.append("accuracy: ").append(nf.format(accuracy)).append(" (").append(correct).append("/").append(total).append(")\n");
-    sb.append("confidence weighted accuracy :").append(nf.format(confWeightedAccuracy)).append("\n");
-    sb.append("log-likelihood: ").append(logLikelihood).append("\n");
+    sb.append("--- Accuracy Stats ---").append('\n');
+    sb.append("accuracy: ").append(nf.format(accuracy)).append(" (").append(correct).append('/').append(total).append(")\n");
+    sb.append("confidence weighted accuracy :").append(nf.format(confWeightedAccuracy)).append('\n');
+    sb.append("log-likelihood: ").append(logLikelihood).append('\n');
     if (saveFile != null) {
-      String f = saveFile + "-" + saveIndex;
+      String f = saveFile + '-' + saveIndex;
       sb.append("saving accuracy info to ").append(f).append(".accuracy\n");
       StringUtils.printToFile(f + ".accuracy", AccuracyStats.toStringArr(getAccCoverage()));
       saveIndex++;
@@ -175,11 +175,8 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
     String accuracyType = null;
     if(scoreType == USE_ACCURACY)
       accuracyType = "classification_accuracy";
-    else if(scoreType == USE_LOGLIKELIHOOD)
-      accuracyType = "log_likelihood";
-    else
-      accuracyType = "unknown";
-    return "MultiClassAccuracyStats(" + accuracyType  + ")" + scoreType + USE_ACCURACY + USE_LOGLIKELIHOOD;
+    else accuracyType = scoreType == USE_LOGLIKELIHOOD ? "log_likelihood" : "unknown";
+    return "MultiClassAccuracyStats(" + accuracyType  + ')' + scoreType + USE_ACCURACY + USE_LOGLIKELIHOOD;
   }
 
 }

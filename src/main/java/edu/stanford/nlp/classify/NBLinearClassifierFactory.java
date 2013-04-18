@@ -30,8 +30,8 @@ public class NBLinearClassifierFactory<L, F> extends AbstractLinearClassifierFac
 
   private double sigma;     // amount of add-k smoothing of evidence
   private final boolean interpretAlwaysOnFeatureAsPrior;
-  private static final double epsilon = 1e-30;   // fudge to keep nonzero
-  private boolean tuneSigma = false;
+  private static final double epsilon = 1.0e-30;   // fudge to keep nonzero
+  private boolean tuneSigma;
   private int folds;
 
 
@@ -43,18 +43,18 @@ public class NBLinearClassifierFactory<L, F> extends AbstractLinearClassifierFac
   /**
    * Train weights.
    * If tuneSigma is true, the optimal sigma value is found using cross-validation:
-   * the number of folds is determined by the <code>folds</code> variable,
+   * the number of folds is determined by the {@code folds} variable,
    * if there are less training examples than folds,
    * leave-one-out is used.
    */
-  double[][] trainWeights(int[][] data, int[] labels) {
+  double[][] trainWeights(int[][] data, int... labels) {
     if (tuneSigma) {
       tuneSigma(data, labels);
     }
     if (VERBOSE) {
       System.err.println("NB CF: " + data.length + " data items ");
       for (int i = 0; i < data.length; i++) {
-        System.err.print("Datum " + i + ": " + labels[i] + ":");
+        System.err.print("Datum " + i + ": " + labels[i] + ':');
         for (int j = 0; j < data[i].length; j++) {
           System.err.print(" " + data[i][j]);
         }
@@ -92,7 +92,7 @@ public class NBLinearClassifierFactory<L, F> extends AbstractLinearClassifierFac
           double p_c = (n_c[c] + epsilon) / (n + numClasses * epsilon);
           double p_c_f = (n_fc[f][c] + sigma) / (n_f[f] + sigma * numClasses);
           if (VERBOSE) {
-            System.err.println("Prob ratio(f=" + f + ",c=" + c + ") = " + p_c_f / p_c + " (nc=" + n_c[c] + ", nf=" + n_f[f] + ", nfc=" + n_fc[f][c] + ")");
+            System.err.println("Prob ratio(f=" + f + ",c=" + c + ") = " + p_c_f / p_c + " (nc=" + n_c[c] + ", nf=" + n_f[f] + ", nfc=" + n_fc[f][c] + ')');
           }
           weights[f][c] = Math.log(p_c_f / p_c);
         }
@@ -148,7 +148,7 @@ public class NBLinearClassifierFactory<L, F> extends AbstractLinearClassifierFac
   }
 
 
-  private void tuneSigma(final int[][] data, final int[] labels) {
+  private void tuneSigma(final int[][] data, final int... labels) {
 
     Function<Double, Double> CVSigmaToPerplexity = new Function<Double, Double>() {
       @Override
@@ -171,7 +171,7 @@ public class NBLinearClassifierFactory<L, F> extends AbstractLinearClassifierFac
           int testMin = j * foldSize;
           int testMax = testMin + foldSize;
 
-          LinearClassifier<L, F> c = new LinearClassifier<L, F>(weights(data, labels, testMin, testMax, trialSigma, foldSize), featureIndex, labelIndex);
+          LinearClassifier<L, F> c = new LinearClassifier<>(weights(data, labels, testMin, testMax, trialSigma, foldSize), featureIndex, labelIndex);
           for (int i = testMin; i < testMax; i++) {
             //System.out.println("test i: "+ i + " "+ new BasicDatum(featureIndex.objects(data[i])));
             score -= c.logProbabilityOf(new BasicDatum<L, F>(featureIndex.objects(data[i]))).getCount(labelIndex.get(labels[i]));
@@ -223,7 +223,7 @@ public class NBLinearClassifierFactory<L, F> extends AbstractLinearClassifierFac
   }
 
   /**
-   * setTuneSigmaCV sets the <code>tuneSigma</code> flag: when turned on,
+   * setTuneSigmaCV sets the {@code tuneSigma} flag: when turned on,
    * the sigma is tuned by cross-validation.
    * If there is less data than the number of folds, leave-one-out is used.
    * The default for tuneSigma is false.

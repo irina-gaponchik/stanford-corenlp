@@ -16,10 +16,7 @@ import edu.stanford.nlp.trees.TreeTransformer;
  */
 public class BoundaryRemover implements TreeTransformer {
 
-  public BoundaryRemover() {
-  }
-
-  @Override
+    @Override
   public Tree transformTree(Tree tree) {
     Tree last = tree.lastChild();
     if (last.label().value().equals(Lexicon.BOUNDARY_TAG) ||

@@ -16,7 +16,7 @@ class VariableStrings {
 
   public VariableStrings() {
     varsToStrings = Generics.newHashMap();
-    numVarsSet = new IntCounter<String>();
+    numVarsSet = new IntCounter<>();
   }
 
   public boolean isSet(String o) {
@@ -44,22 +44,22 @@ class VariableStrings {
   @Override
   public String toString() {
     StringBuilder s = new StringBuilder();
-    s.append("{");
+    s.append('{');
     boolean appended = false;
-    for (String key : varsToStrings.keySet()) {
+    for (Map.Entry<String, String> stringStringEntry : varsToStrings.entrySet()) {
       if (appended) {
-        s.append(",");
+        s.append(',');
       } else {
         appended = true;
       }
-      s.append(key);
+      s.append(stringStringEntry.getKey());
       s.append("=(");
-      s.append(varsToStrings.get(key));
-      s.append(":");
-      s.append(numVarsSet.getCount(key));
-      s.append(")");
+      s.append(stringStringEntry.getValue());
+      s.append(':');
+      s.append(numVarsSet.getCount(stringStringEntry.getKey()));
+      s.append(')');
     }
-    s.append("}");
+    s.append('}');
     return s.toString();
   }
 

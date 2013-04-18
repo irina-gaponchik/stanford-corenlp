@@ -52,9 +52,9 @@ public class ATBTreeUtils {
     if(s == null) return null;
 
     //LDC escape sequences (as of ATB3p3)
-    s = s.replaceAll("\\(", "-LRB-");
-    s = s.replaceAll("\\)", "-RRB-");
-    s = s.replaceAll("\\+", "-PLUS-");
+    s = s.replace ("(", "-LRB-");
+    s = s.replace (")", "-RRB-");
+    s = s.replace ("+", "-PLUS-");
 
     return s;
   }
@@ -69,9 +69,9 @@ public class ATBTreeUtils {
     if(s == null) return null;
 
     //LDC escape sequences (as of ATB3p3)
-    s = s.replaceAll("-LRB-", "(");
-    s = s.replaceAll("-RRB-", ")");
-    s = s.replaceAll("-PLUS-", "+");
+    s = s.replace("-LRB-", "(");
+    s = s.replace("-RRB-", ")");
+    s = s.replace("-PLUS-", "+");
 
     return s;
   }
@@ -93,8 +93,8 @@ public class ATBTreeUtils {
   
   /**
    * Converts a parse tree into a string of tokens. Each token is a word and
-   * its POS tag separated by the delimiter specified by <code>separator</code>
-   * 
+   * its POS tag separated by the delimiter specified by {@code separator}
+   *
    * @param t - A parse tree
    * @param removeEscaping - If true, remove LDC escape characters. Otherwise, leave them.
    * @param separator Word/tag separator
@@ -104,14 +104,14 @@ public class ATBTreeUtils {
     t = t.prune(emptyFilter, tf);
     List<CoreLabel> taggedSentence = t.taggedLabeledYield();
     for (CoreLabel token : taggedSentence) {
-      String word = (removeEscaping) ? unEscape(token.word()) : token.word();
+      String word = removeEscaping ? unEscape(token.word()) : token.word();
       token.setWord(word);
       token.setValue(word);
     }
     return Sentence.listToString(taggedSentence, false, separator);
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     String debug = "( the big lion ) + (the small rabbit)";
     String escaped = ATBTreeUtils.escape(debug);
     System.out.println(escaped);

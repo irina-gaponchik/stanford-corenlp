@@ -50,7 +50,7 @@ public class Buckwalter implements SerializableFunction<String,String> {
 	 * unicode values (e.g., "\u0621" rather than the character version of those values.
 	 * Only applicable for Buckwalter to Arabic conversion.
 	 */
-	boolean outputUnicodeValues = false;
+	boolean outputUnicodeValues;
 
 	private final char[] arabicChars = {
 			'\u0621', '\u0622', '\u0623', '\u0624', '\u0625', '\u0626', '\u0627',
@@ -110,12 +110,12 @@ public class Buckwalter implements SerializableFunction<String,String> {
 	 */
 	/* IBM also deletes: 654 655 670 */
 
-	private boolean unicode2Buckwalter = false;
+	private boolean unicode2Buckwalter;
 	private final Map<Character,Character> u2bMap;
 	private final Map<Character,Character> b2uMap;
 	private ClassicCounter<String> unmappable;
 
-	private static boolean DEBUG = false;
+	private static boolean DEBUG;
 	private static final boolean PASS_ASCII_IN_UNICODE = true;
 	private static boolean SUPPRESS_DIGIT_MAPPING_IN_B2A = true;
 	private static boolean SUPPRESS_PUNC_MAPPING_IN_B2A = true;
@@ -133,13 +133,13 @@ public class Buckwalter implements SerializableFunction<String,String> {
 		u2bMap = Generics.newHashMap(arabicChars.length);
 		b2uMap = Generics.newHashMap(buckChars.length);
 		for (int i = 0; i < arabicChars.length; i++) {
-			Character charU = Character.valueOf(arabicChars[i]);
-			Character charB = Character.valueOf(buckChars[i]);
+			Character charU = arabicChars[i];
+			Character charB = buckChars[i];
 			u2bMap.put(charU, charB);
 			b2uMap.put(charB, charU);
 		}
 
-		if (DEBUG) unmappable = new ClassicCounter<String>();
+		if (DEBUG) unmappable = new ClassicCounter<>();
 	}
 
 	public Buckwalter(boolean unicodeToBuckwalter) {
@@ -147,9 +147,9 @@ public class Buckwalter implements SerializableFunction<String,String> {
 		unicode2Buckwalter = unicodeToBuckwalter;
 	}
 
-	public void suppressBuckDigitConversion(boolean b) { SUPPRESS_DIGIT_MAPPING_IN_B2A = b; }
+	public static void suppressBuckDigitConversion(boolean b) { SUPPRESS_DIGIT_MAPPING_IN_B2A = b; }
 
-	public void suppressBuckPunctConversion(boolean b) { SUPPRESS_PUNC_MAPPING_IN_B2A = b; }
+	public static void suppressBuckPunctConversion(boolean b) { SUPPRESS_PUNC_MAPPING_IN_B2A = b; }
 
 	public String apply(String in) { return convert(in, unicode2Buckwalter); }
 
@@ -158,30 +158,25 @@ public class Buckwalter implements SerializableFunction<String,String> {
 	public String unicodeToBuckwalter(String in) { return convert(in, true); }
 
 	private String convert(String in, boolean unicodeToBuckwalter) {
-		final StringTokenizer st = new StringTokenizer(in);
-		final StringBuilder result = new StringBuilder(in.length());
+		StringTokenizer st = new StringTokenizer(in);
+		StringBuilder result = new StringBuilder(in.length());
 
 		while(st.hasMoreTokens()) {
-			final String token = st.nextToken();
+			String token = st.nextToken();
 			for (int i = 0; i < token.length(); i++) {
 				if(ATBTreeUtils.reservedWords.contains(token)) {
 					result.append(token);
 					break;
 				}
 
-				final Character inCh = Character.valueOf(token.charAt(i));
+				Character inCh = token.charAt(i);
 				Character outCh = null;
 
 				if (unicodeToBuckwalter) {
-					outCh = (PASS_ASCII_IN_UNICODE && inCh.charValue() < 127) ? inCh : u2bMap.get(inCh);
+					outCh = inCh < 127 ? inCh : u2bMap.get(inCh);
 
-				} else if((SUPPRESS_DIGIT_MAPPING_IN_B2A && Character.isDigit(inCh)) ||
-						(SUPPRESS_PUNC_MAPPING_IN_B2A && latinPunc.matcher(inCh.toString()).matches())) {
-					outCh = inCh;
-
-				} else {
-					outCh = b2uMap.get(inCh);
-				}
+				} else outCh = SUPPRESS_DIGIT_MAPPING_IN_B2A && Character.isDigit(inCh) ||
+                        SUPPRESS_PUNC_MAPPING_IN_B2A && latinPunc.matcher(inCh.toString()).matches() ? inCh : b2uMap.get(inCh);
 
 				if (outCh == null) {
 					if (DEBUG) {
@@ -198,7 +193,7 @@ public class Buckwalter implements SerializableFunction<String,String> {
 					result.append(outCh);
 				}
 			}
-			result.append(" ");
+			result.append(' ');
 		}
 
 		return result.toString().trim();
@@ -218,23 +213,27 @@ public class Buckwalter implements SerializableFunction<String,String> {
 	 * 
 	 * @param args
 	 */
-	public static void main(String[] args) {
+	public static void main(String... args) {
 
 		boolean unicodeToBuck = false;
 		boolean outputUnicodeValues = false;
 		File inputFile = null;
 		for(int i = 0; i < args.length; i++) {
-			if(args[i].startsWith("-")) {
-				if(args[i].equals("-u2b"))
-					unicodeToBuck = true;
-				else if(args[i].equals("-o"))
-					outputUnicodeValues = false;
-				else if(args[i].equals("-d"))
-					DEBUG = true;
-				else {
-					System.out.println(usage.toString());
-					return;					
-				}
+			if(!args[i].isEmpty() && args[i].charAt(0) == '-') {
+                switch (args[i]) {
+                    case "-u2b":
+                        unicodeToBuck = true;
+                        break;
+                    case "-o":
+                        outputUnicodeValues = false;
+                        break;
+                    case "-d":
+                        DEBUG = true;
+                        break;
+                    default:
+                        System.out.println(usage.toString());
+                        return;
+                }
 
 			} else if(i != args.length) {
 				inputFile = new File(args[i]);
@@ -242,10 +241,10 @@ public class Buckwalter implements SerializableFunction<String,String> {
 			}
 		}
 
-		final Buckwalter b = new Buckwalter(unicodeToBuck);
+		Buckwalter b = new Buckwalter(unicodeToBuck);
 		b.outputUnicodeValues = outputUnicodeValues;
 
-		int j = (b.outputUnicodeValues ? 2 : Integer.MAX_VALUE);
+		int j = b.outputUnicodeValues ? 2 : Integer.MAX_VALUE;
 		if (j < args.length) {
 			for (; j < args.length; j++)
 				EncodingPrintWriter.out.println(args[j] + " -> " + b.apply(args[j]), "utf-8");
@@ -253,7 +252,7 @@ public class Buckwalter implements SerializableFunction<String,String> {
 		} else {
 			int numLines = 0;			
 			try {
-				final BufferedReader br = (inputFile == null) ? new BufferedReader(new InputStreamReader(System.in, "utf-8")) :
+				BufferedReader br = inputFile == null ? new BufferedReader(new InputStreamReader(System.in, "utf-8")) :
 					new BufferedReader(new InputStreamReader(new FileInputStream(inputFile), "utf-8"));
 
 				System.err.printf("Reading input...");
@@ -264,8 +263,8 @@ public class Buckwalter implements SerializableFunction<String,String> {
 				}
 				br.close();
 
-				System.err.printf("done.\nConverted %d lines from %s.\n",numLines, 
-						(unicodeToBuck ? "UTF-8 to Buckwalter" : "Buckwalter to UTF-8"));
+				System.err.printf("done.\nConverted %d lines from %s.\n",numLines,
+                        unicodeToBuck ? "UTF-8 to Buckwalter" : "Buckwalter to UTF-8");
 
 			} catch (UnsupportedEncodingException e) {
 				System.err.println("ERROR: File system does not support UTF-8 encoding.");

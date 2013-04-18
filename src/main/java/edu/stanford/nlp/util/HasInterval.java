@@ -22,7 +22,7 @@ public interface HasInterval<E extends Comparable<E>> {
               if (len1 == len2) {
                 return 0;
               } else {
-                return (len1 > len2)? -1:1;
+                return len1 > len2 ? -1:1;
               }
             }
           };
@@ -30,7 +30,7 @@ public interface HasInterval<E extends Comparable<E>> {
   public final static Comparator<HasInterval> ENDPOINTS_COMPARATOR =
           new Comparator<HasInterval>() {
             public int compare(HasInterval e1, HasInterval e2) {
-              return (e1.getInterval().compareTo(e2.getInterval()));
+              return e1.getInterval().compareTo(e2.getInterval());
             }
           };
 
@@ -40,11 +40,7 @@ public interface HasInterval<E extends Comparable<E>> {
               Interval.RelType rel = e1.getInterval().getRelation(e2.getInterval());
               if (rel.equals(Interval.RelType.CONTAIN)) {
                 return 1;
-              } else if (rel.equals(Interval.RelType.INSIDE)) {
-                return -1;
-              } else {
-                return (e1.getInterval().compareTo(e2.getInterval()));
-              }
+              } else return rel.equals(Interval.RelType.INSIDE) ? -1 : e1.getInterval().compareTo(e2.getInterval());
             }
           };
 
@@ -54,11 +50,7 @@ public interface HasInterval<E extends Comparable<E>> {
               Interval.RelType rel = e1.getInterval().getRelation(e2.getInterval());
               if (rel.equals(Interval.RelType.CONTAIN)) {
                 return -1;
-              } else if (rel.equals(Interval.RelType.INSIDE)) {
-                return 1;
-              } else {
-                return (e1.getInterval().compareTo(e2.getInterval()));
-              }
+              } else return rel.equals(Interval.RelType.INSIDE) ? 1 : e1.getInterval().compareTo(e2.getInterval());
             }
           };
 }

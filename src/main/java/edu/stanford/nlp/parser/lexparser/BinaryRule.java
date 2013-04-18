@@ -70,7 +70,7 @@ public class BinaryRule implements Rule, Comparable<BinaryRule>, Serializable {
   @Override
   public int hashCode() {
     if (hashCode < 0) {
-      hashCode = (parent << 16) ^ (leftChild << 8) ^ rightChild;
+      hashCode = parent << 16 ^ leftChild << 8 ^ rightChild;
     }
     return hashCode;
   }

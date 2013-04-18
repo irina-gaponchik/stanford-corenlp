@@ -38,7 +38,7 @@ class ArabicLexer {
    *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
-  private static final int ZZ_LEXSTATE[] = { 
+  private static final int[] ZZ_LEXSTATE = {
      0, 0
   };
 
@@ -150,7 +150,7 @@ class ArabicLexer {
     return result;
   }
 
-  private static int zzUnpackAction(String packed, int offset, int [] result) {
+  private static int zzUnpackAction(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -194,13 +194,13 @@ class ArabicLexer {
     return result;
   }
 
-  private static int zzUnpackRowMap(String packed, int offset, int [] result) {
+  private static int zzUnpackRowMap(String packed, int offset, int... result) {
     int i = 0;  /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
     while (i < l) {
-      int high = packed.charAt(i++) << 16;
-      result[j++] = high | packed.charAt(i++);
+      int high = (int) packed.charAt(i++) << 16;
+      result[j++] = high | (int) packed.charAt(i++);
     }
     return j;
   }
@@ -470,7 +470,7 @@ class ArabicLexer {
     return result;
   }
 
-  private static int zzUnpackTrans(String packed, int offset, int [] result) {
+  private static int zzUnpackTrans(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -490,14 +490,14 @@ class ArabicLexer {
   private static final int ZZ_PUSHBACK_2BIG = 2;
 
   /* error messages for the codes above */
-  private static final String ZZ_ERROR_MSG[] = {
+  private static final String[] ZZ_ERROR_MSG = {
     "Unkown internal scanner error",
     "Error: could not match input",
     "Error: pushback value was too large"
   };
 
   /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
    */
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
@@ -515,7 +515,7 @@ class ArabicLexer {
     return result;
   }
 
-  private static int zzUnpackAttribute(String packed, int offset, int [] result) {
+  private static int zzUnpackAttribute(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -534,11 +534,11 @@ class ArabicLexer {
   private int zzState;
 
   /** the current lexical state */
-  private int zzLexicalState = YYINITIAL;
+  private int zzLexicalState;
 
   /** this buffer contains the current text to be matched and is
       the source of the yytext() string */
-  private char zzBuffer[] = new char[ZZ_BUFFERSIZE];
+  private char[] zzBuffer = new char[ZZ_BUFFERSIZE];
 
   /** the textposition at the last accepting state */
   private int zzMarkedPos;
@@ -792,7 +792,7 @@ class ArabicLexer {
      if (normMap.containsKey(thisChar)) {
        thisChar = normMap.get(thisChar);
      }
-     if (thisChar.length() > 0) {
+     if (!thisChar.isEmpty()) {
        sb.append(thisChar);
      }
    }
@@ -883,9 +883,9 @@ class ArabicLexer {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
-   * 
-   * @exception   java.io.IOException  if any I/O-Error occurs
+   * @return      {@code false}, iff there was new input.
+   *
+   * @exception java.io.IOException  if any I/O-Error occurs
    */
   private boolean zzRefill() throws java.io.IOException {
 
@@ -905,7 +905,7 @@ class ArabicLexer {
     /* is the buffer big enough? */
     if (zzCurrentPos >= zzBuffer.length) {
       /* if not: blow it up */
-      char newBuffer[] = new char[zzCurrentPos*2];
+      char[] newBuffer = new char[(zzCurrentPos << 1)];
       System.arraycopy(zzBuffer, 0, newBuffer, 0, zzBuffer.length);
       zzBuffer = newBuffer;
     }
@@ -1032,7 +1032,7 @@ class ArabicLexer {
    *
    * @param   errorCode  the code of the errormessage to display
    */
-  private void zzScanError(int errorCode) {
+  private static void zzScanError(int errorCode) {
     String message;
     try {
       message = ZZ_ERROR_MSG[errorCode];
@@ -1120,7 +1120,7 @@ class ArabicLexer {
               zzInput = zzBufferL[zzCurrentPosL++];
             }
           }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+          int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 
@@ -1138,44 +1138,34 @@ class ArabicLexer {
       zzMarkedPos = zzMarkedPosL;
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
-        case 6: 
-          { return getEllipsis();
-          }
-        case 8: break;
-        case 4: 
-          { return getNext(false);
-          }
-        case 9: break;
-        case 7: 
-          { if ( ! removeProMarker) {
-                return getNext(false);
-              }
-          }
-        case 10: break;
-        case 2: 
-          { return getNewline();
-          }
-        case 11: break;
-        case 5: 
-          { return getNext(true);
-          }
-        case 12: break;
-        case 3: 
-          { 
-          }
-        case 13: break;
-        case 1: 
-          { System.err.printf("Untokenizable: %s%n", yytext());
-	      return getNext(true);
-          }
-        case 14: break;
+        case 6:
+            return getEllipsis();
+          case 8: break;
+        case 4:
+            return getNext(false);
+          case 9: break;
+        case 7:
+            if ( ! removeProMarker) {
+                  return getNext(false);
+                }
+          case 10: break;
+        case 2:
+            return getNewline();
+          case 11: break;
+        case 5:
+            return getNext(true);
+          case 12: break;
+        case 3:
+          case 13: break;
+        case 1:
+            System.err.printf("Untokenizable: %s%n", yytext());
+            return getNext(true);
+          case 14: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;
-              {
-                return null;
-              }
-          } 
+              return null;
+          }
           else {
             zzScanError(ZZ_NO_MATCH);
           }

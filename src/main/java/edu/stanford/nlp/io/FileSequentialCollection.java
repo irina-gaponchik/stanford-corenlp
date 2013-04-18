@@ -5,11 +5,11 @@ import java.io.FileFilter;
 import java.util.*;
 
 /**
- * A <code>FileSequentialCollection</code> maintains a read-only
- * collection of <code>Files</code>.  (It's a list, but we don't
+ * A {@code FileSequentialCollection} maintains a read-only
+ * collection of {@code Files}.  (It's a list, but we don't
  * make it a List or else one needs an iterator that can go backwards.)
  * It is built from a Collection of paths, or just from a single path.
- * Optionally one can also provide a <code>FileFilter</code> which is
+ * Optionally one can also provide a {@code FileFilter} which is
  * applied over the files in a recursive traversal, or else
  * an extension and whether to do recursive traversal, which are used to
  * construct a filter.
@@ -18,32 +18,32 @@ import java.util.*;
  * directories they will be recursed and files in them added.  To get the
  * behavior of putting just directories in the collection one needs to
  * use the constructor
- * <code>FileSequentialCollection(c, failFilt, true)</code>,
- * where <code>failFilt</code>
- * is a user-supplied <code>FileFilter</code> that accepts no files.
- * The <code>FileSequentialCollection</code> builds from these
- * constructor arguments a collection of <code>Files</code>, which can be
+ * {@code FileSequentialCollection(c, failFilt, true)},
+ * where {@code failFilt}
+ * is a user-supplied {@code FileFilter} that accepts no files.
+ * The {@code FileSequentialCollection} builds from these
+ * constructor arguments a collection of {@code Files}, which can be
  * iterated over, etc.  This class does runtime expansion of paths.
  * That is, it is optimized for iteration and not for random access.
  * It is also an unmodifiable Collection.
  * <p/>
  * The class provides some additional constructors beyond the two recommended
- * by the Collections package, to allow specifying a <code>FileFilter</code>
+ * by the Collections package, to allow specifying a {@code FileFilter}
  * and similar options.  Nevertheless, so as to avoid overburdening the
  * the API, not every possibly useful constructor has been provided where
  * these can be easily synthesized using standard Collections package
  * facilities.  Useful idioms to know are:
  * <ul>
- * <li>To make a <code>FileSequentialCollection</code> from an array of
- * <code>Files</code> or <code>Strings</code> <code>arr</code>:<br>
- * <code>FileSequentialCollection fcollect = new FileSequentialCollection(Arrays.asList(arr));
- * </code></li>
- * <li>To make a <code>FileSequentialCollection</code> from a single
- * <code>File</code> or <code>String</code> fi:<br>
- * <code>FileSequentialCollection fcollect =
- * new FileSequentialCollection(Collections.singletonList(fi));</code></li>
+ * <li>To make a {@code FileSequentialCollection} from an array of
+ * {@code Files} or {@code Strings} {@code arr}:<br>
+ * {@code FileSequentialCollection fcollect = new FileSequentialCollection(Arrays.asList(arr));
+ * }</li>
+ * <li>To make a {@code FileSequentialCollection} from a single
+ * {@code File} or {@code String} fi:<br>
+ * {@code FileSequentialCollection fcollect =
+ * new FileSequentialCollection(Collections.singletonList(fi));}</li>
  * </ul>
- * This class will throw an <code>IllegalArgumentException</code> if there
+ * This class will throw an {@code IllegalArgumentException} if there
  * are things that are not existing Files or String paths to existing files
  * in the input collection (from the Iterator).
  *
@@ -68,8 +68,8 @@ public class FileSequentialCollection extends AbstractCollection<File> {
 
 
   /**
-   * Creates an empty <code>FileSequentialCollection</code>, with no Files
-   * in it.  Since a <code>FileSequentialCollection</code> is not
+   * Creates an empty {@code FileSequentialCollection}, with no Files
+   * in it.  Since a {@code FileSequentialCollection} is not
    * modifiable, this is
    * largely useless (except if you want an empty one).
    */
@@ -79,19 +79,19 @@ public class FileSequentialCollection extends AbstractCollection<File> {
 
 
   /**
-   * Creates a <code>FileSequentialCollection</code> from the passed in
-   * <code>Collection</code>.  The constructor iterates through the
-   * collection.  For each element, if it is a <code>File</code> or
-   * <code>String</code>, then this file path is traversed for addition
+   * Creates a {@code FileSequentialCollection} from the passed in
+   * {@code Collection}.  The constructor iterates through the
+   * collection.  For each element, if it is a {@code File} or
+   * {@code String}, then this file path is traversed for addition
    * to the collection.  If the argument is of some other type, an
-   * <code>IllegalArgumentException</code> is thrown.
-   * For each <code>File</code> or <code>String</code>, if they
+   * {@code IllegalArgumentException} is thrown.
+   * For each {@code File} or {@code String}, if they
    * do not correspond to directories, then they are added to the
    * collection; if they do, they are recursively explored and all
    * non-directories within them are added to the collection.
    *
    * @param c The collection to build the
-   *          <code>FileSequentialCollection</code> from
+   *          {@code FileSequentialCollection} from
    */
   public FileSequentialCollection(Collection<?> c) {
     this(c, null);
@@ -99,8 +99,8 @@ public class FileSequentialCollection extends AbstractCollection<File> {
 
 
   /**
-   * Creates a <code>FileSequentialCollection</code> from the passed in
-   * <code>File</code> path.  If the <code>File</code>
+   * Creates a {@code FileSequentialCollection} from the passed in
+   * {@code File} path.  If the {@code File}
    * does not correspond to a directory, then it is added to the
    * collection; if it does, it is explored.  Files
    * that match the extension, and files in subfolders that match, if
@@ -117,14 +117,14 @@ public class FileSequentialCollection extends AbstractCollection<File> {
 
 
   /**
-   * Creates a <code>FileSequentialCollection</code> from the passed in
-   * <code>Collection</code>.  The constructor iterates through the
-   * collection.  For each element, if it is a <code>File</code>, then the
-   * <code>File</code> is added to the collection, if it is a
-   * <code>String</code>, then a <code>File</code> corresponding to this
-   * <code>String</code> as a file path is added to the collection, and
+   * Creates a {@code FileSequentialCollection} from the passed in
+   * {@code Collection}.  The constructor iterates through the
+   * collection.  For each element, if it is a {@code File}, then the
+   * {@code File} is added to the collection, if it is a
+   * {@code String}, then a {@code File} corresponding to this
+   * {@code String} as a file path is added to the collection, and
    * if the argument is of some other type, an
-   * <code>IllegalArgumentException</code> is thrown.  For the files
+   * {@code IllegalArgumentException} is thrown.  For the files
    * thus specified, they are included in the collection only if they
    * match an extension filter as specified by the other arguments.
    *
@@ -138,30 +138,30 @@ public class FileSequentialCollection extends AbstractCollection<File> {
 
 
   /**
-   * Creates a <code>FileSequentialCollection</code> from the passed in
-   * <code>Collection</code>.  The constructor iterates through the
-   * collection.  For each element, if it is a <code>File</code> or
-   * <code>String</code> then these file paths are processed as
+   * Creates a {@code FileSequentialCollection} from the passed in
+   * {@code Collection}.  The constructor iterates through the
+   * collection.  For each element, if it is a {@code File} or
+   * {@code String} then these file paths are processed as
    * explained below.
    * If the argument is of some other type, an
-   * <code>IllegalArgumentException</code> is thrown.  For the files
+   * {@code IllegalArgumentException} is thrown.  For the files
    * specified, if they are not directories, they are included in the
    * collection.  If they are directories, files inside them are
-   * included iff they match the <code>FileFilter</code>.  This will
-   * include recursive directory descent iff the <code>FileFilter</code>
+   * included iff they match the {@code FileFilter}.  This will
+   * include recursive directory descent iff the {@code FileFilter}
    * accepts directories.
    * If the path is a directory then only
    * files within the directory (perhaps recursively) that satisfy the
-   * filter are processed.  If the <code>path</code>is a file, then
+   * filter are processed.  If the {@code path}is a file, then
    * that file is processed regardless of whether it satisfies the
    * filter.  (This semantics was adopted, since otherwise there was no
    * easy way to go through all the files in a directory without
    * descending recursively via the specification of a
-   * <code>FileFilter</code>.)
+   * {@code FileFilter}.)
    *
    * @param c    The collection of file or directory to load from
    * @param filt A FileFilter of files to load.  This may be
-   *             <code>null</code>, in which case all files are accepted.
+   *             {@code null}, in which case all files are accepted.
    */
   public FileSequentialCollection(Collection<?> c, FileFilter filt) {
     this(c, filt, false);
@@ -173,42 +173,37 @@ public class FileSequentialCollection extends AbstractCollection<File> {
 
 
   /**
-   * Creates a <code>FileSequentialCollection</code> from the passed in
-   * <code>Collection</code>.  The constructor iterates through the
-   * collection.  For each element, if it is a <code>File</code> or
-   * <code>String</code> then these file paths are processed as
+   * Creates a {@code FileSequentialCollection} from the passed in
+   * {@code Collection}.  The constructor iterates through the
+   * collection.  For each element, if it is a {@code File} or
+   * {@code String} then these file paths are processed as
    * explained below.
    * If the argument is of some other type, an
-   * <code>IllegalArgumentException</code> is thrown.  For the files
+   * {@code IllegalArgumentException} is thrown.  For the files
    * specified, if they are not directories, they are included in the
    * collection.  If they are directories, files inside them are
-   * included iff they match the <code>FileFilter</code>.  This will
-   * include recursive directory descent iff the <code>FileFilter</code>
+   * included iff they match the {@code FileFilter}.  This will
+   * include recursive directory descent iff the {@code FileFilter}
    * accepts directories.
    * If the path is a directory then only
    * files within the directory (perhaps recursively) that satisfy the
-   * filter are processed.  If the <code>path</code>is a file, then
+   * filter are processed.  If the {@code path}is a file, then
    * that file is processed regardless of whether it satisfies the
    * filter.  (This semantics was adopted, since otherwise there was no
    * easy way to go through all the files in a directory without
    * descending recursively via the specification of a
-   * <code>FileFilter</code>.)
+   * {@code FileFilter}.)
    *
    * @param c           The collection of file or directory to load from.  An
-   *                    argument of <code>null</code> is interpreted like an
+   *                    argument of {@code null} is interpreted like an
    *                    empty collection.
    * @param filt        A FileFilter of files to load.  This may be
-   *                    <code>null</code>, in which case all files are accepted
+   *                    {@code null}, in which case all files are accepted
    * @param includeDirs Whether to include directory names in the file list
    */
   public FileSequentialCollection(Collection<?> c, FileFilter filt, boolean includeDirs) {
-    super();
-    // store the arguments.  They are expanded by the iterator
-    if (c == null) {
-      coll = new ArrayList<Object>();
-    } else {
-      coll = c;
-    }
+      // store the arguments.  They are expanded by the iterator
+      coll = c == null ? new ArrayList<>() : c;
     this.filt = filt;
     this.includeDirs = includeDirs;
   }
@@ -219,7 +214,7 @@ public class FileSequentialCollection extends AbstractCollection<File> {
    *
    * @return size How many files are in the collection
    */
-  @SuppressWarnings({"UnusedDeclaration","unused"})
+  @SuppressWarnings({"UnusedDeclaration"})
   @Override
   public int size() {
     int counter = 0;
@@ -261,11 +256,11 @@ public class FileSequentialCollection extends AbstractCollection<File> {
       // System.err.println("Coll is " + coll);
       roots = coll.toArray();
       rootsIndex = 0;
-      fileArrayStack = new Stack<Object>();
-      fileArrayStackIndices = new Stack<Integer>();
+      fileArrayStack = new Stack<>();
+      fileArrayStackIndices = new Stack<>();
       if (roots.length > 0) {
         fileArrayStack.add(roots[rootsIndex]);
-        fileArrayStackIndices.push(Integer.valueOf(0));
+        fileArrayStackIndices.push(0);
       }
       next = primeNextFile();
     }
@@ -294,7 +289,7 @@ public class FileSequentialCollection extends AbstractCollection<File> {
     }
 
     /**
-     * Returns the next file to be accessed, or <code>null</code> if
+     * Returns the next file to be accessed, or {@code null} if
      * there are none left.  This is all quite hairy to write as an
      * iterator....
      *
@@ -309,9 +304,9 @@ public class FileSequentialCollection extends AbstractCollection<File> {
             // System.err.println("Got a File[]");
             File[] files = (File[]) obj;
             Integer index = fileArrayStackIndices.pop();
-            int ind = index.intValue();
+            int ind = index;
             if (ind < files.length) {
-              index = Integer.valueOf(ind + 1);
+              index = ind + 1;
               fileArrayStackIndices.push(index);
               fileArrayStack.push(files[ind]);
               // loop around to process this new file
@@ -342,7 +337,7 @@ public class FileSequentialCollection extends AbstractCollection<File> {
                 // System.err.println("Include dir as answer");
                 if (directoryListing.length > 0) {
                   fileArrayStack.push(directoryListing);
-                  fileArrayStackIndices.push(Integer.valueOf(0));
+                  fileArrayStackIndices.push(0);
                 }
                 return path;
               } else {
@@ -350,7 +345,7 @@ public class FileSequentialCollection extends AbstractCollection<File> {
                 // the directory and loop around again ...
                 if (directoryListing.length > 0) {
                   fileArrayStack.push(directoryListing);
-                  fileArrayStackIndices.push(Integer.valueOf(0));
+                  fileArrayStackIndices.push(0);
                 }
                 // otherwise there was nothing in the
                 // directory; we will pop back up
@@ -370,7 +365,7 @@ public class FileSequentialCollection extends AbstractCollection<File> {
         rootsIndex++;
         if (rootsIndex < roots.length) {
           fileArrayStack.add(roots[rootsIndex]);
-          fileArrayStackIndices.push(Integer.valueOf(0));
+          fileArrayStackIndices.push(0);
         }
       }
       // finished everything
@@ -383,14 +378,14 @@ public class FileSequentialCollection extends AbstractCollection<File> {
   /**
    * This is simply a debugging aid that tests the functionality of
    * the class.  The supplied arguments are put in a
-   * <code>Collection</code>, and passed to the
-   * <code>FileSequentialCollection</code> constructor.
+   * {@code Collection}, and passed to the
+   * {@code FileSequentialCollection} constructor.
    * An iterator is then used to print the names of all the files
    * (but not directories) in the collection.
    *
    * @param args A list of file paths
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     FileSequentialCollection fcollect = new FileSequentialCollection(Arrays.asList(args));
     for (File fi: fcollect) {
       System.out.println(fi);

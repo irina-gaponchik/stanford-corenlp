@@ -10,15 +10,13 @@ import edu.stanford.nlp.process.Morphology;
  */
 public class WordStemmer implements TreeVisitor {
 
-  public WordStemmer() { }
-
-  public void visitTree(Tree t) {
+    public void visitTree(Tree t) {
     // A single Morphology is not threadsafe, so to make this class
     // threadsafe, we have to create a new Morphology for each visit
     processTree(t, null, new Morphology());
   }
 
-  private void processTree(Tree t, String tag, Morphology morpha) {
+  private static void processTree(Tree t, String tag, Morphology morpha) {
     if (t.isPreTerminal()) {
       tag = t.label().value();
     }
@@ -36,7 +34,7 @@ public class WordStemmer implements TreeVisitor {
    *
    * @param args Usage: WordStemmer file
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Treebank treebank = new DiskTreebank();
     treebank.loadPath(args[0]);
     WordStemmer ls = new WordStemmer();

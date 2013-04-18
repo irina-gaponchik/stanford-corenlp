@@ -46,11 +46,8 @@ public enum StochasticCalculateMethods {
       return StochasticCalculateMethods.AlgorithmicDifferentiation;
     } else if(method.equalsIgnoreCase("IncorporatedFiniteDifference")){
       return StochasticCalculateMethods.IncorporatedFiniteDifference ;
-    } else if(method.equalsIgnoreCase("ExternalFinitedifference")){
-      return StochasticCalculateMethods.ExternalFiniteDifference ;
-    } else {
-      return null;
-    }
+    } else
+        return method.equalsIgnoreCase("ExternalFinitedifference") ? StochasticCalculateMethods.ExternalFiniteDifference : null;
   }
 
 }

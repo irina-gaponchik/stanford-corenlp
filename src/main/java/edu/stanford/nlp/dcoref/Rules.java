@@ -47,7 +47,7 @@ public class Rules {
         potentialAntecedentHaveProper = true;
       }
     }
-    return (mentionClusterHaveProper && potentialAntecedentHaveProper);
+    return mentionClusterHaveProper && potentialAntecedentHaveProper;
   }
   public static boolean entitySameProperHeadLastWord(CorefCluster mentionCluster,
       CorefCluster potentialAntecedent, Mention mention, Mention ant) {
@@ -68,10 +68,7 @@ public class Rules {
         || antecedent.mentionType!=MentionType.PROPER) return false;
     
     Method meth = semantics.wordnet.getClass().getMethod("alias", new Class[]{Mention.class, Mention.class});
-    if((Boolean) meth.invoke(semantics.wordnet, new Object[]{mention, antecedent})) {
-      return true;
-    }
-    return false;
+      return (Boolean) meth.invoke(semantics.wordnet, mention, antecedent);
   }
   public static boolean entityIWithinI(CorefCluster mentionCluster,
       CorefCluster potentialAntecedent, Dictionaries dict) {
@@ -91,16 +88,14 @@ public class Rules {
         }
       }
     }
-    if(disagree) return true;
-    else return false;
+      return disagree ? true : false;
   }
   /** Word inclusion except stop words  */
   public static boolean entityWordsIncluded(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention mention, Mention ant) {
     Set<String> wordsExceptStopWords = Generics.newHashSet(mentionCluster.words);
-    wordsExceptStopWords.removeAll(Arrays.asList(new String[]{ "the","this", "mr.", "miss", "mrs.", "dr.", "ms.", "inc.", "ltd.", "corp.", "'s"}));
+    wordsExceptStopWords.removeAll(Arrays.asList("the","this", "mr.", "miss", "mrs.", "dr.", "ms.", "inc.", "ltd.", "corp.", "'s"));
     wordsExceptStopWords.remove(mention.headString.toLowerCase());
-    if(potentialAntecedent.words.containsAll(wordsExceptStopWords)) return true;
-    else return false;
+      return potentialAntecedent.words.containsAll(wordsExceptStopWords) ? true : false;
   }
 
   /** Compatible modifier only  */
@@ -113,8 +108,7 @@ public class Rules {
     return false;
   }
   public static boolean entityIsRoleAppositive(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention m1, Mention m2, Dictionaries dict) {
-    if(!entityAttributesAgree(mentionCluster, potentialAntecedent)) return false;
-    return m1.isRoleAppositive(m2, dict) || m2.isRoleAppositive(m1, dict);
+      return entityAttributesAgree(mentionCluster, potentialAntecedent) && (m1.isRoleAppositive(m2, dict) || m2.isRoleAppositive(m1, dict));
   }
   public static boolean entityIsRelativePronoun(Mention m1, Mention m2) {
       return m1.isRelativePronoun(m2) || m2.isRelativePronoun(m1);
@@ -142,11 +136,11 @@ public class Rules {
     if (first.size() == second.size()) {
       String firstWord = first.get(0).get(CoreAnnotations.TextAnnotation.class);
       String secondWord = second.get(0).get(CoreAnnotations.TextAnnotation.class);
-      longer = (firstWord.length() > secondWord.length()) ? first : second;
-      shorter = (firstWord.length() > secondWord.length()) ? second : first;;
+      longer = firstWord.length() > secondWord.length() ? first : second;
+      shorter = firstWord.length() > secondWord.length() ? second : first;
     } else {
-      longer = (first.size() > second.size()) ? first : second;
-      shorter = (first.size() > second.size()) ? second : first;
+      longer = first.size() > second.size() ? first : second;
+      shorter = first.size() > second.size() ? second : first;
     }
 
     String acronym = shorter.get(0).get(CoreAnnotations.TextAnnotation.class);
@@ -158,48 +152,40 @@ public class Rules {
       }
     }
     int acronymPos = 0;
-    for (int wordNum = 0; wordNum < longer.size(); ++wordNum) {
-      String word = longer.get(wordNum).get(CoreAnnotations.TextAnnotation.class);
-      for (int charNum = 0; charNum < word.length(); ++charNum) {
-        if (word.charAt(charNum) >= 'A' && word.charAt(charNum) <= 'Z') {
-          // This triggers if there were more "acronym" characters in
-          // the longer mention than in the shorter mention
-          if (acronymPos >= acronym.length()) {
-            return false;
+      for (CoreLabel aLonger1 : longer) {
+          String word = aLonger1.get(CoreAnnotations.TextAnnotation.class);
+          for (int charNum = 0; charNum < word.length(); ++charNum) {
+              if (word.charAt(charNum) >= 'A' && word.charAt(charNum) <= 'Z') {
+                  // This triggers if there were more "acronym" characters in
+                  // the longer mention than in the shorter mention
+                  if (acronymPos >= acronym.length()) {
+                      return false;
+                  }
+                  if (acronym.charAt(acronymPos) != word.charAt(charNum)) {
+                      return false;
+                  }
+                  ++acronymPos;
+              }
           }
-          if (acronym.charAt(acronymPos) != word.charAt(charNum)) {
-            return false;
-          }
-          ++acronymPos;
-        }
       }
-    }
     if (acronymPos != acronym.length()) {
       return false;
     }
-    for (int i = 0; i < longer.size(); ++i) {
-      if (longer.get(i).get(CoreAnnotations.TextAnnotation.class).contains(acronym)) {
-        return false;
+      for (CoreLabel aLonger : longer) {
+          if (aLonger.get(CoreAnnotations.TextAnnotation.class).contains(acronym)) {
+              return false;
+          }
       }
-    }
     
     return true;
   }
 
   public static boolean entityIsPredicateNominatives(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention m1, Mention m2) {
-    if(!entityAttributesAgree(mentionCluster, potentialAntecedent)) return false;
-    if ((m1.startIndex <= m2.startIndex && m1.endIndex >= m2.endIndex)
-            || (m1.startIndex >= m2.startIndex && m1.endIndex <= m2.endIndex)) {
-      return false;
-    }
-    return m1.isPredicateNominatives(m2) || m2.isPredicateNominatives(m1);
+      return entityAttributesAgree(mentionCluster, potentialAntecedent) && !(m1.startIndex <= m2.startIndex && m1.endIndex >= m2.endIndex || m1.startIndex >= m2.startIndex && m1.endIndex <= m2.endIndex) && (m1.isPredicateNominatives(m2) || m2.isPredicateNominatives(m1));
   }
 
   public static boolean entityIsApposition(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention m1, Mention m2) {
-    if(!entityAttributesAgree(mentionCluster, potentialAntecedent)) return false;
-    if(m1.mentionType==MentionType.PROPER && m2.mentionType==MentionType.PROPER) return false;
-    if(m1.nerString.equals("LOCATION")) return false;
-    return m1.isApposition(m2) || m2.isApposition(m1);
+      return entityAttributesAgree(mentionCluster, potentialAntecedent) && !(m1.mentionType == MentionType.PROPER && m2.mentionType == MentionType.PROPER) && !m1.nerString.equals("LOCATION") && (m1.isApposition(m2) || m2.isApposition(m1));
   }
 
   public static boolean entityAttributesAgree(CorefCluster mentionCluster, CorefCluster potentialAntecedent){
@@ -272,8 +258,7 @@ public class Rules {
 
   public static boolean entityRelaxedHeadsAgreeBetweenMentions(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention m, Mention ant) {
     if(m.isPronominal() || ant.isPronominal()) return false;
-    if(m.headsAgree(ant)) return true;
-    return false;
+      return m.headsAgree(ant);
   }
 
   public static boolean entityHeadsAgree(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention m, Mention ant, Dictionaries dict) {
@@ -328,12 +313,9 @@ public class Rules {
         || dict.allPronouns.contains(ant.spanToString().toLowerCase())) return false;
     String mentionSpan = mention.removePhraseAfterHead();
     String antSpan = ant.removePhraseAfterHead();
-    if(mentionSpan.equals("") || antSpan.equals("")) return false;
+    if(mentionSpan.isEmpty() || antSpan.isEmpty()) return false;
 
-    if(mentionSpan.equals(antSpan) || mentionSpan.equals(antSpan+" 's") || antSpan.equals(mentionSpan+" 's")){
-      return true;
-    }
-    return false;
+      return mentionSpan.equals(antSpan) || mentionSpan.equals(antSpan + " 's") || antSpan.equals(mentionSpan + " 's");
   }
 
   /** Check whether two mentions are in i-within-i relation (Chomsky, 1981) */
@@ -365,8 +347,8 @@ public class Rules {
     for (int i=0; i< lengthThis ; i++){
       String w1 = m.originalSpan.get(i).get(CoreAnnotations.TextAnnotation.class).toLowerCase();
       String pos1 = m.originalSpan.get(i).get(CoreAnnotations.PartOfSpeechAnnotation.class);
-      if (!(pos1.startsWith("N") || pos1.startsWith("JJ") || pos1.equals("CD")
-            || pos1.startsWith("V")) || w1.equalsIgnoreCase(m.headString)) {
+      if (!(!pos1.isEmpty() && pos1.charAt(0) == 'N' || pos1.startsWith("JJ") || pos1.equals("CD")
+            || !pos1.isEmpty() && pos1.charAt(0) == 'V') || w1.equalsIgnoreCase(m.headString)) {
         continue;
       }
       thisWordSet.add(w1);
@@ -384,7 +366,7 @@ public class Rules {
         hasLocationModifier = true;
       }
     }
-    return (thisHasExtra || hasLocationModifier);
+    return thisHasExtra || hasLocationModifier;
   }
   /** Check whether two mentions have different locations */
   public static boolean entityHaveDifferentLocation(Mention m, Mention a, Dictionaries dict) {
@@ -427,10 +409,7 @@ public class Rules {
     for (String s : locationA) {
       if (!mString.contains(s.toLowerCase())) aHasExtra = true;
     }
-    if(mHasExtra && aHasExtra) {
-      return true;
-    }
-    return false;
+      return mHasExtra && aHasExtra;
   }
 
   /** Check whether two mentions have the same proper head words */
@@ -464,8 +443,7 @@ public class Rules {
     for (String s : aProperNouns) {
       if (!mProperNouns.contains(s)) aHasExtra = true;
     }
-    if(mHasExtra && aHasExtra) return false;
-    return true;
+      return !(mHasExtra && aHasExtra);
   }
 
   static final Set<String> NUMBERS = Generics.newHashSet(Arrays.asList(new String[]{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "hundred", "thousand", "million", "billion"}));
@@ -516,27 +494,21 @@ public class Rules {
       if (!mString.contains(s) && !exceptWords.contains(s.toLowerCase())) aHasExtra = true;
     }
 
-    if(mHasExtra && aHasExtra) {
-      return true;
-    }
-    return false;
+      return mHasExtra && aHasExtra;
   }
 
   public static final Pattern WHITESPACE_PATTERN = Pattern.compile(" +");
 
   public static boolean entityIsSpeaker(Document document,
       Mention mention, Mention ant, Dictionaries dict) {
-    if(document.speakerPairs.contains(new Pair<Integer, Integer>(mention.mentionID, ant.mentionID))) {
+    if(document.speakerPairs.contains(new Pair<>(mention.mentionID, ant.mentionID))) {
       return true;
     }
 
     if(mentionMatchesSpeakerAnnotation(mention, ant)) {
       return true;
     }
-    if(mentionMatchesSpeakerAnnotation(ant, mention)) {
-      return true;
-    }
-    return false;
+      return mentionMatchesSpeakerAnnotation(ant, mention);
   }
 
   public static boolean mentionMatchesSpeakerAnnotation(Mention mention, Mention ant) {
@@ -551,7 +523,7 @@ public class Rules {
     // We optimize a little here: if the name has no spaces, which is
     // the common case, then it is unnecessarily expensive to call
     // regex split
-    if (speaker.indexOf(" ") >= 0) {
+    if (speaker.indexOf(' ') >= 0) {
       // Perhaps we could optimize this, too, but that would be trickier
       for (String s : WHITESPACE_PATTERN.split(speaker)) {
         if (ant.headString.equalsIgnoreCase(s)) return true;
@@ -566,8 +538,8 @@ public class Rules {
     boolean sameSpeaker = entitySameSpeaker(document, m, ant);
 
     if(sameSpeaker && m.person!=ant.person) {
-      if ((m.person == Person.IT && ant.person == Person.THEY)
-           || (m.person == Person.THEY && ant.person == Person.IT) || (m.person == Person.THEY && ant.person == Person.THEY)) {
+      if (m.person == Person.IT && ant.person == Person.THEY
+           || m.person == Person.THEY && ant.person == Person.IT || m.person == Person.THEY && ant.person == Person.THEY) {
         return false;
       } else if (m.person != Person.UNKNOWN && ant.person != Person.UNKNOWN)
         return true;
@@ -632,31 +604,27 @@ public class Rules {
         mSpeakerID = Integer.parseInt(mSpeakerStr);
         antSpeakerID = Integer.parseInt(ant.headWord.get(CoreAnnotations.SpeakerAnnotation.class));
       } catch (Exception e) {
-        return (m.headWord.get(CoreAnnotations.SpeakerAnnotation.class).equals(ant.headWord.get(CoreAnnotations.SpeakerAnnotation.class)));
+        return m.headWord.get(CoreAnnotations.SpeakerAnnotation.class).equals(ant.headWord.get(CoreAnnotations.SpeakerAnnotation.class));
       }
     } else {
-      return (m.headWord.get(CoreAnnotations.SpeakerAnnotation.class).equals(ant.headWord.get(CoreAnnotations.SpeakerAnnotation.class)));
+      return m.headWord.get(CoreAnnotations.SpeakerAnnotation.class).equals(ant.headWord.get(CoreAnnotations.SpeakerAnnotation.class));
     }
     int mSpeakerClusterID = document.allPredictedMentions.get(mSpeakerID).corefClusterID;
     int antSpeakerClusterID = document.allPredictedMentions.get(antSpeakerID).corefClusterID;
-    return (mSpeakerClusterID == antSpeakerClusterID);
+    return mSpeakerClusterID == antSpeakerClusterID;
   }
 
   public static boolean entitySubjectObject(Mention m1, Mention m2) {
     if(m1.sentNum != m2.sentNum) return false;
     if(m1.dependingVerb==null || m2.dependingVerb ==null) return false;
-    if (m1.dependingVerb == m2.dependingVerb
-         && ((m1.isSubject && (m2.isDirectObject || m2.isIndirectObject || m2.isPrepositionObject))
-              || (m2.isSubject && (m1.isDirectObject || m1.isIndirectObject || m1.isPrepositionObject)))) {
-      return true;
-    }
-    return false;
+      return m1.dependingVerb.equals(m2.dependingVerb)
+              && (m1.isSubject && (m2.isDirectObject || m2.isIndirectObject || m2.isPrepositionObject)
+              || m2.isSubject && (m1.isDirectObject || m1.isIndirectObject || m1.isPrepositionObject));
   }
 
   // Return true if the two mentions are less than n mentions apart in the same sent
   public static boolean entityTokenDistance(Mention m1, Mention m2) {
-    if( (m2.sentNum == m1.sentNum) && (m1.startIndex - m2.startIndex < 6) ) return true;
-    return false;
+      return m2.sentNum == m1.sentNum && m1.startIndex - m2.startIndex < 6;
   }
 
   // COREF_DICT strict: all the mention pairs between the two clusters must match in the dict
@@ -680,7 +648,7 @@ public class Rules {
    // COREF_DICT pairwise: the two mentions match in the dict
    public static boolean entityCorefDictionary(Mention men, Mention ant, Dictionaries dict, int dictVersion, int freq){  
           
-     Pair<String, String> mention_pair = new Pair<String, String>(
+     Pair<String, String> mention_pair = new Pair<>(
          men.getSplitPattern()[dictVersion-1].toLowerCase(), 
          ant.getSplitPattern()[dictVersion-1].toLowerCase());     
      
@@ -706,17 +674,13 @@ public class Rules {
    
    public static boolean contextIncompatible(Mention men, Mention ant, Dictionaries dict) {
      String antHead = ant.headWord.word();
-     if ( (ant.mentionType == MentionType.PROPER) 
+     if ( ant.mentionType == MentionType.PROPER
            && ant.sentNum != men.sentNum 
            && !isContextOverlapping(ant,men) 
            && dict.NE_signatures.containsKey(antHead)) {
        IntCounter<String> ranks = Counters.toRankCounter(dict.NE_signatures.get(antHead));
        List<String> context;
-       if (!men.getPremodifierContext().isEmpty()) {
-         context = men.getPremodifierContext();
-       } else {
-         context = men.getContext();
-       }
+         context = !men.getPremodifierContext().isEmpty() ? men.getPremodifierContext() : men.getContext();
        if (!context.isEmpty()) {
          int highestRank = 100000;
          for (String w: context) {
@@ -738,9 +702,9 @@ public class Rules {
    }
 
    public static boolean sentenceContextIncompatible(Mention men, Mention ant, Dictionaries dict) {
-     if ( (ant.mentionType != MentionType.PROPER)
-          && (ant.sentNum != men.sentNum)
-          && (men.mentionType != MentionType.PROPER) 
+     if ( ant.mentionType != MentionType.PROPER
+          && ant.sentNum != men.sentNum
+          && men.mentionType != MentionType.PROPER
           && !isContextOverlapping(ant,men)) {
        List<String> context1 = !ant.getPremodifierContext().isEmpty() ? ant.getPremodifierContext() : ant.getContext();
        List<String> context2 = !men.getPremodifierContext().isEmpty() ? men.getPremodifierContext() : men.getContext();

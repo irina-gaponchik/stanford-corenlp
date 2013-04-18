@@ -93,7 +93,7 @@ public class TaggerFeature extends Feature {
   @Override
   public double getVal(int x, int y) {
     int num = x * domain.ySize + y;
-    if (!(getYTag() == y)) {
+    if (!(yTag == y)) {
       return 0;
     }
     for (int i = 0; i < len(); i++) {
@@ -134,7 +134,7 @@ public class TaggerFeature extends Feature {
   @Override
   public double ftilde() {
     double s = 0.0;
-    int y = getYTag();
+    int y = yTag;
     for (int example = start; example < end + 1; example++) {
       int x = domain.getTaggerFeatures().xIndexed[example];
       s = s + domain.ptildeXY(x, y);

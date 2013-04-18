@@ -19,7 +19,7 @@ public class NegraPennLanguagePack extends AbstractTreebankLanguagePack {
   private static final long serialVersionUID = 9081305982861675328L;
 
   //Grammatical function parameters
-  private boolean leaveGF = false;
+  private boolean leaveGF;
 
   private static String[] gfToKeepArray = {"SB", "OA", "DA"};
 
@@ -141,7 +141,7 @@ public class NegraPennLanguagePack extends AbstractTreebankLanguagePack {
   private static boolean containsKeptGF(String category, int index) {
     for(String gf : gfToKeepArray) {
       int gfLength = gf.length();
-      if(gfLength < (category.length() - index)) {
+      if(gfLength < category.length() - index) {
         if(category.substring(index+1, index+1+gfLength).equals(gf))
           return true;
       }
@@ -193,7 +193,7 @@ public class NegraPennLanguagePack extends AbstractTreebankLanguagePack {
 
   /**
    * Return the input Charset encoding for the Treebank.
-   * See documentation for the <code>Charset</code> class.
+   * See documentation for the {@code Charset} class.
    *
    * @return Name of Charset
    */

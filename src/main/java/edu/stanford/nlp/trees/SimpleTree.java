@@ -5,8 +5,8 @@ import edu.stanford.nlp.ling.Label;
 import java.util.List;
 
 /**
- * A <code>SimpleTree</code> is a minimal concrete implementation of an
- * unlabeled, unscored <code>Tree</code>.  It has a tree structure, but no
+ * A {@code SimpleTree} is a minimal concrete implementation of an
+ * unlabeled, unscored {@code Tree}.  It has a tree structure, but no
  * annotation at nodes.
  *
  * @author Christopher Manning
@@ -61,14 +61,14 @@ public class SimpleTree extends Tree {
   }
 
   /**
-   * Sets the children of this <code>Tree</code>.  If given
-   * <code>null</code>, this method sets the Tree's children to a
+   * Sets the children of this {@code Tree}.  If given
+   * {@code null}, this method sets the Tree's children to a
    * unique zero-length Tree[] array.
    *
    * @param children An array of child trees
    */
   @Override
-  public void setChildren(Tree[] children) {
+  public void setChildren(Tree... children) {
     if (children == null) {
       System.err.println("Warning -- you tried to set the children of a SimpleTree to null.\nYou should be really using a zero-length array instead.");
       daughterTrees = EMPTY_TREE_ARRAY;
@@ -85,8 +85,8 @@ public class SimpleTree extends Tree {
 
 
   /**
-   * Return a <code>TreeFactory</code> that produces trees of the
-   * <code>SimpleTree</code> type.
+   * Return a {@code TreeFactory} that produces trees of the
+   * {@code SimpleTree} type.
    * The factory returned is always the same one (a singleton).
    *
    * @return a factory to produce simple (unlabelled) trees
@@ -98,8 +98,8 @@ public class SimpleTree extends Tree {
 
 
   /**
-   * Return a <code>TreeFactory</code> that produces trees of the
-   * <code>SimpleTree</code> type.
+   * Return a {@code TreeFactory} that produces trees of the
+   * {@code SimpleTree} type.
    * The factory returned is always the same one (a singleton).
    *
    * @return a factory to produce simple (unlabelled) trees

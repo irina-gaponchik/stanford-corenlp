@@ -41,8 +41,9 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
   private static final Pattern pMood = Pattern.compile("_MOOD:([ISJ])");
   private static final Pattern pVerbTenseMarker = Pattern.compile("IV|PV|CV");
   private static final Pattern pNounNoMorph = Pattern.compile("PROP|QUANT");
+    private static final Pattern COMPILE = Pattern.compile(",");
 
-  @Override
+    @Override
   public List<String> getValues(MorphoFeatureType feat) {
     if(feat == MorphoFeatureType.DEF)
       return Arrays.asList(defVals);
@@ -75,7 +76,7 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
     MorphoFeatures features = new ArabicMorphoFeatures();
 
     // Check for the boundary symbol
-    if(spec == null || spec.equals("")) {
+    if(spec == null || spec.isEmpty()) {
       return features;
     }
     //Possessiveness
@@ -125,7 +126,7 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
         }
       }
 
-    } else if(spec.contains("PRON") || (spec.contains("VSUFF_DO") && !pVerbMood.matcher(spec).find())) {
+    } else if(spec.contains("PRON") || spec.contains("VSUFF_DO") && !pVerbMood.matcher(spec).find()) {
       if(spec.contains("DEM_PRON")) {
         features.addFeature(MorphoFeatureType.DEF, defVals[0]);
         Matcher m = pDemPronounFeatures.matcher(spec);
@@ -158,12 +159,17 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
         Matcher moodMatcher = pMood.matcher(spec);
         if(moodMatcher.find()) {
           String moodStr = moodMatcher.group(1);
-          if(moodStr.equals("I"))
-            features.addFeature(MorphoFeatureType.MOOD, moodVals[0]);
-          else if(moodStr.equals("S"))
-            features.addFeature(MorphoFeatureType.MOOD, moodVals[1]);
-          else if(moodStr.equals("J"))
-            features.addFeature(MorphoFeatureType.MOOD, moodVals[2]);
+            switch (moodStr) {
+                case "I":
+                    features.addFeature(MorphoFeatureType.MOOD, moodVals[0]);
+                    break;
+                case "S":
+                    features.addFeature(MorphoFeatureType.MOOD, moodVals[1]);
+                    break;
+                case "J":
+                    features.addFeature(MorphoFeatureType.MOOD, moodVals[2]);
+                    break;
+            }
         }
       }
 
@@ -202,11 +208,11 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
     }
 
     if(isActive(MorphoFeatureType.NUM)) {
-      if(spec.endsWith("S"))
+      if(!spec.isEmpty() && spec.charAt(spec.length() - 1) == 'S')
         feats.addFeature(MorphoFeatureType.NUM, numVals[0]);
-      else if(spec.endsWith("D"))
+      else if(!spec.isEmpty() && spec.charAt(spec.length() - 1) == 'D')
         feats.addFeature(MorphoFeatureType.NUM, numVals[1]);
-      else if(spec.endsWith("P"))
+      else if(!spec.isEmpty() && spec.charAt(spec.length() - 1) == 'P')
         feats.addFeature(MorphoFeatureType.NUM, numVals[2]);
     }
 
@@ -229,15 +235,17 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
   public static class ArabicMorphoFeatures extends MorphoFeatures {
 
     private static final long serialVersionUID = -4611776415583633186L;
+      private static final Pattern COMPILE = Pattern.compile("\\-");
+      private static final Pattern PATTERN = Pattern.compile(KEY_VAL_DELIM);
 
-    @Override
+      @Override
     public MorphoFeatures fromTagString(String str) {
-      String[] feats = str.split("\\-");
+      String[] feats = COMPILE.split(str);
       MorphoFeatures mFeats = new ArabicMorphoFeatures();
       // First element is the base POS
 //      String baseTag = feats[0];
       for(int i = 1; i < feats.length; i++) {
-        String[] keyValue = feats[i].split(KEY_VAL_DELIM);
+        String[] keyValue = PATTERN.split(feats[i]);
         if(keyValue.length != 2) continue;
         MorphoFeatureType fName = MorphoFeatureType.valueOf(keyValue[0].trim());
         mFeats.addFeature(fName, keyValue[1].trim());
@@ -265,14 +273,14 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
    *
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if(args.length != 2) {
       System.err.printf("Usage: java %s filename feats%n", ArabicMorphoFeatureSpecification.class.getName());
       System.exit(-1);
     }
 
     MorphoFeatureSpecification fSpec = new ArabicMorphoFeatureSpecification();
-    String[] feats = args[1].split(",");
+    String[] feats = COMPILE.split(args[1]);
     for(String feat : feats) {
       MorphoFeatureType fType = MorphoFeatureType.valueOf(feat);
       fSpec.activate(fType);
@@ -290,8 +298,6 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
       br.close();
       System.out.printf("%nRead %d lines%n",nLine);
 
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }

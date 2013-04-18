@@ -41,7 +41,7 @@ public class AceDomReader extends DomReader {
     String ldctype = getAttributeValue(node, "LDCTYPE");
     AceCharSeq extent = parseCharSeq(getChildByName(node, "extent"));
     AceCharSeq head = parseCharSeq(getChildByName(node, "head"));
-    return (new AceEntityMention(id, type, ldctype, extent, head));
+    return new AceEntityMention(id, type, ldctype, extent, head);
   }
 
   /**
@@ -228,7 +228,7 @@ public class AceDomReader extends DomReader {
     return aceDoc;
   }
 
-  public static void main(String [] argv) throws Exception {
+  public static void main(String... argv) throws Exception {
     if (argv.length != 1) {
       System.err.println("Usage: java AceDomReader <APF file>");
       System.exit(1);

@@ -61,7 +61,7 @@ public class CorefChain implements Serializable {
   private final Map<IntPair, Set<CorefMention>> mentionMap;
 
   /** The most representative mention in this cluster */
-  private CorefMention representative = null;
+  private CorefMention representative;
 
   @Override
   public boolean equals(Object aThat) {
@@ -74,9 +74,9 @@ public class CorefChain implements Serializable {
       return false;
     if (!mentions.equals(that.mentions))
       return false;
-    if ((representative == null && that.representative != null) ||
-        (representative != null && that.representative == null) ||
-        (!representative.equals(that.representative))) {
+    if (representative == null && that.representative != null ||
+            representative != null && that.representative == null ||
+            !representative.equals(that.representative)) {
       return false;
     }
     // mentionMap is another view of mentions, so no need to compare
@@ -232,16 +232,15 @@ public class CorefChain implements Serializable {
     @Override
     public String toString(){
       StringBuilder s = new StringBuilder();
-      s.append("\"").append(mentionSpan).append("\"").append(" in sentence ").append(sentNum);
+      s.append('"').append(mentionSpan).append('"').append(" in sentence ").append(sentNum);
       return s.toString();
       //      return "(sentence:" + sentNum + ", startIndex:" + startIndex + "-endIndex:" + endIndex + ")";
     }
     private boolean moreRepresentativeThan(CorefMention m){
       if(m==null) return true;
       if(mentionType!=m.mentionType) {
-        if((mentionType==MentionType.PROPER && m.mentionType!=MentionType.PROPER)
-            || (mentionType==MentionType.NOMINAL && m.mentionType==MentionType.PRONOMINAL)) return true;
-        else return false;
+          return mentionType == MentionType.PROPER && m.mentionType != MentionType.PROPER
+                  || mentionType == MentionType.NOMINAL && m.mentionType == MentionType.PRONOMINAL ? true : false;
       } else {
         // First, check length
         if (headIndex - startIndex > m.headIndex - m.startIndex) return true;
@@ -254,8 +253,7 @@ public class CorefChain implements Serializable {
         if (headIndex < m.headIndex) return true;
         if (headIndex > m.headIndex) return false;
         if (startIndex < m.startIndex) return true;
-        if (startIndex > m.startIndex) return false;
-        // At this point they're equal...
+          // At this point they're equal...
         return false;
       }
     }
@@ -272,15 +270,14 @@ public class CorefChain implements Serializable {
         else if(m1.startIndex > m2.startIndex) return 1;
         else {
           if(m1.endIndex > m2.endIndex) return -1;
-          else if(m1.endIndex < m2.endIndex) return 1;
-          else return 0;
+          else return m1.endIndex < m2.endIndex ? 1 : 0;
         }
       }
     }
   }
   public CorefChain(CorefCluster c, Map<Mention, IntTuple> positions){
     chainID = c.clusterID;
-    mentions = new ArrayList<CorefMention>();
+    mentions = new ArrayList<>();
     mentionMap = Generics.newHashMap();
     for (Mention m : c.getCorefMentions()) {
       CorefMention men = new CorefMention(m, positions.get(m));
@@ -300,7 +297,7 @@ public class CorefChain implements Serializable {
     this.chainID = cid;
     this.representative = representative;
     this.mentionMap = mentionMap;
-    this.mentions = new ArrayList<CorefMention>();
+    this.mentions = new ArrayList<>();
     for(Set<CorefMention> ms: mentionMap.values()){
       for(CorefMention m: ms) {
         this.mentions.add(m);
@@ -310,7 +307,7 @@ public class CorefChain implements Serializable {
   }
 
   public String toString(){
-    return "CHAIN"+this.chainID+ "-" +mentions.toString();
+    return "CHAIN"+this.chainID+ '-' +mentions.toString();
   }
 
   private static final long serialVersionUID = 3657691243506528L;

@@ -34,15 +34,15 @@ public class DateTemplate{
     if(! (obj instanceof DateTemplate)) return false;
 
     DateTemplate d = (DateTemplate)obj;
-    return (subdate.equals(d.subdate) &&
+    return subdate.equals(d.subdate) &&
             noadate.equals(d.noadate) &&
             crcdate.equals(d.crcdate) &&
-            workdate.equals(d.workdate));
+            workdate.equals(d.workdate);
   }
 
   @Override
   public String toString() {
-    return (" Sub:" + subdate + " Noa:" + noadate + " Crc:" + crcdate + " Wrk:" + workdate);
+    return " Sub:" + subdate + " Noa:" + noadate + " Crc:" + crcdate + " Wrk:" + workdate;
   }
 
 

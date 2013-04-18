@@ -28,7 +28,7 @@ public class LabeledChunkIdentifier {
   /**
    * Whether to use or ignore provided tag (the label prefix)
    */
-  private boolean ignoreProvidedTag = false;
+  private boolean ignoreProvidedTag;
 
   /**
    * Label/Type indicating the token is not a part of a chunk
@@ -57,7 +57,6 @@ public class LabeledChunkIdentifier {
    * @param labelKey - Key to use to find the token label (to determine if inside chunk or not)
    * @return List of annotations (each as a CoreMap) representing the chunks of tokens
    */
-  @SuppressWarnings("unchecked")
   public List<CoreMap> getAnnotatedChunks(List<CoreLabel> tokens, int totalTokensOffset, Class textKey, Class labelKey)
   {
     return getAnnotatedChunks(tokens, totalTokensOffset, textKey, labelKey, null, null);
@@ -154,8 +153,7 @@ public class LabeledChunkIdentifier {
    */
   public static boolean isEndOfChunk(LabelTagType prev, LabelTagType cur)
   {
-    if (prev == null) return false;
-    return isEndOfChunk(prev.tag, prev.type, cur.tag, cur.type);
+      return prev != null && isEndOfChunk(prev.tag, prev.type, cur.tag, cur.type);
   }
 
   /**
@@ -195,11 +193,7 @@ public class LabeledChunkIdentifier {
    */
   public static boolean isStartOfChunk(LabelTagType prev, LabelTagType cur)
   {
-    if (prev == null) {
-      return isStartOfChunk("O", "O", cur.tag, cur.type);
-    } else {
-      return isStartOfChunk(prev.tag, prev.type, cur.tag, cur.type);
-    }
+      return prev == null ? isStartOfChunk("O", "O", cur.tag, cur.type) : isStartOfChunk(prev.tag, prev.type, cur.tag, cur.type);
   }
 
   private static Pattern labelPattern = Pattern.compile("^([^-]*)-(.*)$");
@@ -228,10 +222,10 @@ public class LabeledChunkIdentifier {
     public String toString()
     {
       StringBuilder sb = new StringBuilder();
-      sb.append("(");
-      sb.append(label).append(",");
-      sb.append(tag).append(",");
-      sb.append(type).append(")");
+      sb.append('(');
+      sb.append(label).append(',');
+      sb.append(tag).append(',');
+      sb.append(type).append(')');
       return sb.toString();
     }
   }
@@ -247,22 +241,14 @@ public class LabeledChunkIdentifier {
     if (matcher.matches()) {
       if (ignoreProvidedTag) {
         type = matcher.group(2);
-        if (negLabel.equals(type)) {
-          tag = defaultNegTag;
-        } else {
-          tag = defaultPosTag;
-        }
+          tag = negLabel.equals(type) ? defaultNegTag : defaultPosTag;
       } else {
         tag = matcher.group(1);
         type = matcher.group(2);
       }
     } else {
       type = label;
-      if (negLabel.equals(label)) {
-        tag = defaultNegTag;
-      } else {
-        tag = defaultPosTag;
-      }
+        tag = negLabel.equals(label) ? defaultNegTag : defaultPosTag;
     }
     return new LabelTagType(label, tag, type);
   }

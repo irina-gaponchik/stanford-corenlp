@@ -7,14 +7,14 @@ import java.util.Collection;
 import edu.stanford.nlp.util.Generics;
 
 /**
- * A <code>TreeGraph</code> is a tree with additional directed,
+ * A {@code TreeGraph} is a tree with additional directed,
  * labeled arcs between arbitrary pairs of nodes.  (So, it's a graph
  * with a tree skeleton.)  This class is a container for the complete
  * TreeGraph structure, and does not inherit from {@link Tree
- * <code>Tree</code>}.  Individual nodes in the TreeGraph are
- * represented by {@link TreeGraphNode <code>TreeGraphNode</code>s},
- * which do inherit from <code>Tree</code>, and the additional
- * labeled arcs are represented in the <code>TreeGraphNode</code>s.
+ * {@code Tree}}.  Individual nodes in the TreeGraph are
+ * represented by {@link TreeGraphNode {@code TreeGraphNode}s},
+ * which do inherit from {@code Tree}, and the additional
+ * labeled arcs are represented in the {@code TreeGraphNode}s.
  *
  * @author Bill MacCartney
  * @see TreeGraphNode
@@ -32,7 +32,7 @@ public class TreeGraph implements Serializable {
   private Map<Integer, TreeGraphNode> indexMap = Generics.newHashMap();
 
   /**
-   * Construct a new <code>TreeGraph</code> having the same tree
+   * Construct a new {@code TreeGraph} having the same tree
    * structure and label values as an existing tree (but no shared
    * storage).  This constructor also assigns integer indices to
    * all the nodes, beginning with 0 and using a preorder tree
@@ -63,13 +63,13 @@ public class TreeGraph implements Serializable {
    * Store a mapping from an arbitrary integer index to a node in
    * this treegraph.  Normally a client shouldn't need to use this,
    * as the nodes are automatically indexed by the
-   * <code>TreeGraph</code> constructor.
+   * {@code TreeGraph} constructor.
    *
    * @param index the arbitrary integer index
-   * @param node  the <code>TreeGraphNode</code> to be indexed
+   * @param node  the {@code TreeGraphNode} to be indexed
    */
   public void addNodeToIndexMap(int index, TreeGraphNode node) {
-    indexMap.put(Integer.valueOf(index), node);
+    indexMap.put(index, node);
   }
 
   /**
@@ -77,11 +77,11 @@ public class TreeGraph implements Serializable {
    * specified integer index.
    *
    * @param index the integer index of the node you want
-   * @return the <code>TreeGraphNode</code> having the specified
-   *         index (or <code>null</code> if such does not exist)
+   * @return the {@code TreeGraphNode} having the specified
+   *         index (or {@code null} if such does not exist)
    */
   public TreeGraphNode getNodeByIndex(int index) {
-    return indexMap.get(Integer.valueOf(index));
+    return indexMap.get(index);
   }
 
   public Collection<TreeGraphNode> getNodes() {
@@ -89,12 +89,12 @@ public class TreeGraph implements Serializable {
   }
 
   /**
-   * Return a <code>String</code> representing this treegraph.  By
+   * Return a {@code String} representing this treegraph.  By
    * default, the nodes of the treegraph are printed in Lispy
    * (parenthesized) format, with one node per line, indented
    * according to depth.
    *
-   * @return a <code>String</code> representation of this treegraph
+   * @return a {@code String} representation of this treegraph
    */
   @Override
   public String toString() {
@@ -106,7 +106,7 @@ public class TreeGraph implements Serializable {
   /**
    * Just for testing.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Tree t;
     try {
       t = Tree.valueOf("(S (NP (NNP Sam)) (VP (VBD died) (NP-TMP (NN today))))");

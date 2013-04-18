@@ -9,7 +9,7 @@ import edu.stanford.nlp.ling.HasIndex;
 import edu.stanford.nlp.ling.HasWord;
 
 /**
- * This class implements the <code>TreeReader</code> interface to read Penn Treebank-style
+ * This class implements the {@code TreeReader} interface to read Penn Treebank-style
  * files. The reader is implemented as a push-down automaton (PDA) that parses the Lisp-style
  * format in which the trees are stored. This reader is compatible with both PTB
  * and PATB trees.
@@ -34,12 +34,12 @@ public class PennTreeReader implements TreeReader {
   private static final String rightParen = ")";
 
   /**
-   * Read parse trees from a <code>Reader</code>.
+   * Read parse trees from a {@code Reader}.
    * For the defaulted arguments, you get a
-   * <code>SimpleTreeFactory</code>, no <code>TreeNormalizer</code>, and
-   * a <code>PennTreebankTokenizer</code>.
+   * {@code SimpleTreeFactory}, no {@code TreeNormalizer}, and
+   * a {@code PennTreebankTokenizer}.
    *
-   * @param in The <code>Reader</code>
+   * @param in The {@code Reader}
    */
   public PennTreeReader(Reader in) {
     this(in, new LabeledScoredTreeFactory());
@@ -47,7 +47,7 @@ public class PennTreeReader implements TreeReader {
 
 
   /**
-   * Read parse trees from a <code>Reader</code>.
+   * Read parse trees from a {@code Reader}.
    *
    * @param in the Reader
    * @param tf TreeFactory -- factory to create some kind of Tree
@@ -84,7 +84,7 @@ public class PennTreeReader implements TreeReader {
     tokenizer = st;
 
     // check for whacked out headers still present in Brown corpus in Treebank 3
-    String first = (st.hasNext() ? st.peek() : null);
+    String first = st.hasNext() ? st.peek() : null;
     if (first != null && first.startsWith("*x*x*x")) {
       if (DEBUG) {
         System.err.printf("%s: Skipping past whacked out header (%s)\n",this.getClass().getName(),first);
@@ -100,9 +100,9 @@ public class PennTreeReader implements TreeReader {
 
     if (DEBUG) {
       System.err.printf("%s: Built from\n %s ", this.getClass().getName(), in.getClass().getName());
-      System.err.println(' ' + ((tf == null) ? "no tf" : tf.getClass().getName()));
-      System.err.println(' ' + ((tn == null) ? "no tn" : tn.getClass().getName()));
-      System.err.println(' ' + ((st == null) ? "no st" : st.getClass().getName()));
+      System.err.println(' ' + (tf == null ? "no tf" : tf.getClass().getName()));
+      System.err.println(' ' + (tn == null ? "no tn" : tn.getClass().getName()));
+      System.err.println(' ' + (st == null ? "no st" : st.getClass().getName()));
     }
   }
 
@@ -111,14 +111,14 @@ public class PennTreeReader implements TreeReader {
    * input stream. The method supports additional parentheses around the
    * tree (an unnamed ROOT node) so long as they are balanced. If the token stream
    * ends before the current tree is complete, then the method will throw an
-   * <code>IOException</code>.
+   * {@code IOException}.
    * <p>
    * Note that the method will skip malformed trees and attempt to
    * read additional trees from the input stream. It is possible, however,
    * that a malformed tree will corrupt the token stream. In this case,
-   * an <code>IOException</code> will eventually be thrown.
+   * an {@code IOException} will eventually be thrown.
    *
-   * @return A single tree, or <code>null</code> at end of token stream.
+   * @return A single tree, or {@code null} at end of token stream.
    */
   @Override
   public Tree readTree() throws IOException {
@@ -128,7 +128,7 @@ public class PennTreeReader implements TreeReader {
 
       //Setup PDA
       this.currentTree = null;
-      this.stack = new ArrayList<Tree>();
+      this.stack = new ArrayList<>();
 
       try {
         t = getTreeFromInputStream();
@@ -156,66 +156,73 @@ public class PennTreeReader implements TreeReader {
     int wordIndex = 1;
 
     // FSA
-    while (tokenizer.hasNext()) {
-      String token = tokenizer.next();
+      label:
+      while (tokenizer.hasNext()) {
+          String token = tokenizer.next();
 
-      if (token.equals(leftParen)) {
+          switch (token) {
+              case leftParen:
 
-        // cdm 20100225: This next line used to have "" instead of null, but the traditional and current tree normalizers depend on the label being null not "" when there is no label on a tree (like the outermost English PTB level)
-        String label = (tokenizer.peek().equals(leftParen)) ? null : tokenizer.next();
-        if (rightParen.equals(label)) {//Skip past empty trees
-          continue;
-        } else if (treeNormalizer != null) {
-          label = treeNormalizer.normalizeNonterminal(label);
-        }
+                  // cdm 20100225: This next line used to have "" instead of null, but the traditional and current tree normalizers depend on the label being null not "" when there is no label on a tree (like the outermost English PTB level)
+                  String label = tokenizer.peek().equals(leftParen) ? null : tokenizer.next();
+                  if (rightParen.equals(label)) {//Skip past empty trees
+                      continue;
+                  } else if (treeNormalizer != null) {
+                      label = treeNormalizer.normalizeNonterminal(label);
+                  }
 
-        Tree newTree = treeFactory.newTreeNode(label, null); // dtrs are added below
-        if(currentTree == null)
-          stack.add(newTree);
-        else {
-          currentTree.addChild(newTree);
-          stack.add(currentTree);
-        }
+                  Tree newTree = treeFactory.newTreeNode(label, null); // dtrs are added below
 
-        currentTree = newTree;
+                  if (currentTree == null)
+                      stack.add(newTree);
+                  else {
+                      currentTree.addChild(newTree);
+                      stack.add(currentTree);
+                  }
 
-      } else if(token.equals(rightParen)) {
-        if (stack.isEmpty()) {
-          // Warn that file has too many right parens
-          System.err.println("PennTreeReader: warning: file has extra non-matching right parenthesis [ignored]");
-          break;
-        }
+                  currentTree = newTree;
 
-        //Accept
-        currentTree = stack.remove(stack.size() - 1);  // i.e., stack.pop()
-        if (stack.isEmpty()) return currentTree;
+                  break;
+              case rightParen:
+                  if (stack.isEmpty()) {
+                      // Warn that file has too many right parens
+                      System.err.println("PennTreeReader: warning: file has extra non-matching right parenthesis [ignored]");
+                      break label;
+                  }
 
-      } else {
+                  //Accept
+                  currentTree = stack.remove(stack.size() - 1);  // i.e., stack.pop()
 
-        if (currentTree == null) {
-          // A careful Reader should warn here, but it's kind of useful to
-          // suppress this because then the TreeReader doesn't print a ton of
-          // messages if there is a README file in a directory of Trees.
-          // System.err.println("PennTreeReader: warning: file has extra token not in a s-expression tree: " + token + " [ignored]");
-          break;
-        }
+                  if (stack.isEmpty()) return currentTree;
 
-        String terminal = (treeNormalizer == null) ? token : treeNormalizer.normalizeTerminal(token);
-        Tree leaf = treeFactory.newLeaf(terminal);
-        if(leaf.label() instanceof HasIndex) {
-          HasIndex hi = (HasIndex) leaf.label();
-          hi.setIndex(wordIndex);
-        }
-        if(leaf.label() instanceof HasWord) {
-          HasWord hw = (HasWord) leaf.label();
-          hw.setWord(leaf.label().value());
-        }
-        wordIndex++;
+                  break;
+              default:
 
-        currentTree.addChild(leaf);
-        // cdm: Note: this implementation just isn't as efficient as the old recursive descent parser (see 2008 code), where all the daughters are gathered before the tree is made....
+                  if (currentTree == null) {
+                      // A careful Reader should warn here, but it's kind of useful to
+                      // suppress this because then the TreeReader doesn't print a ton of
+                      // messages if there is a README file in a directory of Trees.
+                      // System.err.println("PennTreeReader: warning: file has extra token not in a s-expression tree: " + token + " [ignored]");
+                      break label;
+                  }
+
+                  String terminal = treeNormalizer == null ? token : treeNormalizer.normalizeTerminal(token);
+                  Tree leaf = treeFactory.newLeaf(terminal);
+                  if (leaf.label() instanceof HasIndex) {
+                      HasIndex hi = (HasIndex) leaf.label();
+                      hi.setIndex(wordIndex);
+                  }
+                  if (leaf.label() instanceof HasWord) {
+                      HasWord hw = (HasWord) leaf.label();
+                      hw.setWord(leaf.label().value());
+                  }
+                  wordIndex++;
+
+                  currentTree.addChild(leaf);
+                  // cdm: Note: this implementation just isn't as efficient as the old recursive descent parser (see 2008 code), where all the daughters are gathered before the tree is made....
+                  break;
+          }
       }
-    }
 
     //Reject
     if (currentTree != null) {
@@ -226,7 +233,7 @@ public class PennTreeReader implements TreeReader {
 
 
   /**
-   * Closes the underlying <code>Reader</code> used to create this
+   * Closes the underlying {@code Reader} used to create this
    * class.
    */
   @Override
@@ -240,7 +247,7 @@ public class PennTreeReader implements TreeReader {
    *
    * @param args Array of command-line arguments: specifies a filename
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     try {
       TreeFactory tf = new LabeledScoredTreeFactory();
       Reader r = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), "UTF-8"));

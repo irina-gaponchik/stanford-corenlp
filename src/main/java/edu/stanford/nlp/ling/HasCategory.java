@@ -1,7 +1,7 @@
 package edu.stanford.nlp.ling;
 
 /**
- * Something that implements the <code>HasCategory</code> interface
+ * Something that implements the {@code HasCategory} interface
  * knows about categories.
  *
  * @author Christopher Manning

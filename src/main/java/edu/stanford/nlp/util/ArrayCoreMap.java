@@ -118,7 +118,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
   @SuppressWarnings("unchecked")
   public <VALUE> VALUE get(Class<? extends Key<VALUE>> key) {
     for (int i = 0; i < size; i++) {
-      if (key == keys[i]) {
+      if (key.equals(keys[i])) {
         return (VALUE)values[i];
       }
     }
@@ -133,7 +133,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
   @Override
   public <VALUE> boolean has(Class<? extends Key<VALUE>> key) {
     for (int i = 0; i < size; i++) {
-      if (keys[i] == key) {
+      if (keys[i].equals(key)) {
         return true;
       }
     }
@@ -150,7 +150,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
 
     // search array for existing value to replace
     for (int i = 0; i < size; i++) {
-      if (keys[i] == key) {
+      if (keys[i].equals(key)) {
         VALUE rv = (VALUE)values[i];
         values[i] = value;
         return rv;
@@ -227,7 +227,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
 
     Object rv = null;
     for (int i = 0; i < size; i++) {
-      if (keys[i] == key) {
+      if (keys[i].equals(key)) {
         rv = values[i];
         if (i < size - 1) {
           System.arraycopy(keys,   i+1, keys,   i, size-(i+1));
@@ -246,7 +246,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
   @Override
   public <VALUE> boolean containsKey(Class<? extends Key<VALUE>> key) {
     for (int i = 0; i < size; i++) {
-      if (keys[i] == key) {
+      if (keys[i].equals(key)) {
         return true;
       }
     }
@@ -296,14 +296,14 @@ public class ArrayCoreMap implements CoreMap, Serializable {
    * state.  When a call to toString is about to return, this is reset
    * to null for that particular thread.
    */
-  private static ThreadLocal<IdentityHashSet<CoreMap>> toStringCalled = new ThreadLocal<IdentityHashSet<CoreMap>>();
+  private static ThreadLocal<IdentityHashSet<CoreMap>> toStringCalled = new ThreadLocal<>();
 
   @Override
   public String toString() {
     IdentityHashSet<CoreMap> calledSet = toStringCalled.get();
-    boolean createdCalledSet = (calledSet == null);
+    boolean createdCalledSet = calledSet == null;
     if (createdCalledSet) {
-      calledSet = new IdentityHashSet<CoreMap>();
+      calledSet = new IdentityHashSet<>();
       toStringCalled.set(calledSet);
     }
 
@@ -426,11 +426,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
       }
     }
     String answer = s.toString();
-    if (answer.indexOf(' ') < 0) {
-      return answer;
-    } else {
-      return '{' + answer + '}';
-    }
+      return answer.indexOf(' ') < 0 ? answer : '{' + answer + '}';
   }
 
   /**
@@ -441,7 +437,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
    * track of its own state.  When a call to toString is about to
    * return, this is reset to null for that particular thread.
    */
-  private static ThreadLocal<TwoDimensionalMap<CoreMap, CoreMap, Boolean>> equalsCalled = new ThreadLocal<TwoDimensionalMap<CoreMap, CoreMap, Boolean>>();
+  private static ThreadLocal<TwoDimensionalMap<CoreMap, CoreMap, Boolean>> equalsCalled = new ThreadLocal<>();
 
 
   /**
@@ -497,7 +493,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
 
   private boolean equals(ArrayCoreMap other) {
     TwoDimensionalMap<CoreMap, CoreMap, Boolean> calledMap = equalsCalled.get();
-    boolean createdCalledMap = (calledMap == null);
+    boolean createdCalledMap = calledMap == null;
     if (createdCalledMap) {
       calledMap = TwoDimensionalMap.identityHashMap();
       equalsCalled.set(calledMap);
@@ -525,15 +521,15 @@ public class ArrayCoreMap implements CoreMap, Serializable {
       // test if other contains this key,value pair
       boolean matched = false;
       for (int j = 0; j < other.size; j++) {
-        if (this.keys[i] == other.keys[j]) {
-          if ((this.values[i] == null && other.values[j] != null) ||
-              (this.values[i] != null && other.values[j] == null)) {
+        if (this.keys[i].equals(other.keys[j])) {
+          if (this.values[i] == null && other.values[j] != null ||
+                  this.values[i] != null && other.values[j] == null) {
             matched = false;
             break;
           }
 
-          if ((this.values[i] == null && other.values[j] == null) ||
-              (this.values[i].equals(other.values[j]))) {
+          if (this.values[i] == null && other.values[j] == null ||
+                  this.values[i].equals(other.values[j])) {
             matched = true;
             break;
           }
@@ -561,7 +557,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
    * state.  When a call to toString is about to return, this is reset
    * to null for that particular thread.
    */
-  private static ThreadLocal<IdentityHashSet<CoreMap>> hashCodeCalled = new ThreadLocal<IdentityHashSet<CoreMap>>();
+  private static ThreadLocal<IdentityHashSet<CoreMap>> hashCodeCalled = new ThreadLocal<>();
 
 
   /**
@@ -572,9 +568,9 @@ public class ArrayCoreMap implements CoreMap, Serializable {
   @Override
   public int hashCode() {
     IdentityHashSet<CoreMap> calledSet = hashCodeCalled.get();
-    boolean createdCalledSet = (calledSet == null);
+    boolean createdCalledSet = calledSet == null;
     if (createdCalledSet) {
-      calledSet = new IdentityHashSet<CoreMap>();
+      calledSet = new IdentityHashSet<>();
       hashCodeCalled.set(calledSet);
     }
 
@@ -588,7 +584,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
     int valuesCode = 0;
     for (int i = 0; i < size; i++) {
       keysCode += keys[i].hashCode();
-      valuesCode += (values[i] != null ? values[i].hashCode() : 0);
+      valuesCode += values[i] != null ? values[i].hashCode() : 0;
     }
 
     if (createdCalledSet) {

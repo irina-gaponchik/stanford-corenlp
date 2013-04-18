@@ -100,7 +100,7 @@ public class Extractor implements Serializable {
    *  @param tag The possible tag that the feature will be generated for
    *  @return Whether the feature extractor is applicable (true) or not (false)
    */
-  @SuppressWarnings({"MethodMayBeStatic", "UnusedDeclaration"})
+  @SuppressWarnings({"UnusedDeclaration"})
   public boolean precondition(String tag) {
     return true;
   }
@@ -173,7 +173,6 @@ public class Extractor implements Serializable {
     return isTag ? pH.getTag(h, position) : pH.getWord(h, position);
   }
 
-  @SuppressWarnings({"MethodMayBeStatic"})
   String extractLV(History h, PairsHolder pH) {
     // should extract last verbal word and also the current word
     int start = h.start;
@@ -186,7 +185,7 @@ public class Extractor implements Serializable {
         lastverb = pH.getWord(index);
         break;
       }
-      if (tag.startsWith(",")) {
+      if (!tag.isEmpty() && tag.charAt(0) == ',') {
         break;
       }
       index--;
@@ -200,13 +199,13 @@ public class Extractor implements Serializable {
     String lastverb = "NA";
     int current = h.current;
     int index = current - 1;
-    while ((index >= start) && (index >= current - bound)) {
+    while (index >= start && index >= current - bound) {
       String tag = pH.getTag(index);
       if (tag.startsWith("VB")) {
         lastverb = pH.getWord(index);
         break;
       }
-      if (tag.startsWith(",")) {
+      if (!tag.isEmpty() && tag.charAt(0) == ',') {
         break;
       }
       index--;
@@ -216,7 +215,7 @@ public class Extractor implements Serializable {
 
 
   // By default the bound is ignored, but a few subclasses make use of it.
-  @SuppressWarnings({"UnusedDeclaration"})
+  @SuppressWarnings("UnusedDeclaration")
   String extract(History h, PairsHolder pH, int bound) {
     return extract(h, pH);
   }
@@ -227,7 +226,7 @@ public class Extractor implements Serializable {
     String cl = getClass().getName();
     int ind = cl.lastIndexOf('.');
     // MAX_VALUE is the default value and means we aren't using these two arguments
-    String args = (position == Integer.MAX_VALUE) ? "": (position + "," + (isTag ? "tag" : "word"));
+    String args = position == Integer.MAX_VALUE ? "": position + "," + (isTag ? "tag" : "word");
     return cl.substring(ind + 1) + '(' + args + ')';
   }
 
@@ -265,12 +264,10 @@ public class Extractor implements Serializable {
     int ans = 0;
     try {
       ans = Integer.parseInt(args[num]);
-    } catch (NumberFormatException nfe) {
-      // just leave ans as 0
-    } catch (ArrayIndexOutOfBoundsException aioobe) {
+    } catch (NumberFormatException | ArrayIndexOutOfBoundsException nfe) {
       // just leave ans as 0
     }
-    return ans;
+      return ans;
   }
 
 }

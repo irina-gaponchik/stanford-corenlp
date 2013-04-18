@@ -40,7 +40,7 @@ public class TestOptions implements Serializable {
    * It is false by default. Use option -noRecoveryTagging to set
    * to true.
    */
-  public boolean noRecoveryTagging = false;
+  public boolean noRecoveryTagging;
 
   /** If true, then  failure of the PCFG factor to parse a sentence
    *  will trigger parse recovery mode.
@@ -50,7 +50,7 @@ public class TestOptions implements Serializable {
   /**
    * If true, the n^4 "speed-up" is not used with the Factored Parser.
    */
-  public boolean useN5 = false;
+  public boolean useN5;
 
   /** If true, use approximate factored algorithm, which just rescores
    *  PCFG k best, rather than exact factored algorithm.  This algorithm
@@ -59,11 +59,11 @@ public class TestOptions implements Serializable {
    *  guarding code only required for exact A* factored parsing is now
    *  if (op.doPCFG &amp;&amp; op.doDep &amp;&amp; ! Test.useFastFactored).
    */
-  public boolean useFastFactored = false;
+  public boolean useFastFactored;
 
 
   /** If true, use faster iterative deepening CKY algorithm. */
-  public boolean iterativeCKY = false;
+  public boolean iterativeCKY;
 
   /**
    * The maximum sentence length (including punctuation, etc.) to parse.
@@ -90,19 +90,19 @@ public class TestOptions implements Serializable {
   /**
    * Parse trees in test treebank in order of increasing length.
    */
-  public boolean increasingLength = false;
+  public boolean increasingLength;
 
   /**
    * Tag the sentences first, then parse given those (coarse) tags.
    */
-  public boolean preTag = false;
+  public boolean preTag;
 
   /**
    * Parse using only tags given from correct answer or the POS tagger
    */
   public boolean forceTags = preTag;
 
-  public boolean forceTagBeginnings = false;
+  public boolean forceTagBeginnings;
 
   /**
    * POS tagger model used when preTag is enabled.
@@ -119,35 +119,35 @@ public class TestOptions implements Serializable {
   /**
    * Write EvalB-readable output files.
    */
-  public boolean evalb = false;
+  public boolean evalb;
 
   /**
    * Print a lot of extra output as you parse.
    */
-  public boolean verbose = false; // Don't change this; set with -v
+  public boolean verbose; // Don't change this; set with -v
 
-  public final boolean exhaustiveTest = false;
+  public static final boolean exhaustiveTest = false;
 
   /** If this variable is true, and the sum of the inside and outside score
    *  for a constituent is worse than the best known score for a sentence by
-   *  more than <code>pcfgThresholdValue</code>, then -Inf is returned as the
-   *  outside Score by <code>oScore()</code> (while otherwise the true
+   *  more than {@code pcfgThresholdValue}, then -Inf is returned as the
+   *  outside Score by {@code oScore()} (while otherwise the true
    *  outside score is returned).
    */
-  public final boolean pcfgThreshold = false;
-  public final double pcfgThresholdValue = -2.0;
+  public static final boolean pcfgThreshold = false;
+  public static final double pcfgThresholdValue = -2.0;
 
   /**
    * Print out all best PCFG parses.
    */
-  public boolean printAllBestParses = false;
+  public boolean printAllBestParses;
 
   /**
    * Weighting on dependency log probs.  The dependency grammar negative log
    * probability scores are simply multiplied by this number.
    */
   public double depWeight = 1.0;
-  public boolean prunePunc = false;
+  public boolean prunePunc;
 
   /** If a token list does not have sentence final punctuation near the
    *  end, then automatically add the default one.
@@ -170,14 +170,14 @@ public class TestOptions implements Serializable {
   public boolean writeOutputFiles;
 
   /** If the writeOutputFiles option is true, then output files appear in
-   *  this directory.  An unset value (<code>null</code>) means to use
-   *  the directory of the source files.  Use <code>""</code> or <code>.</code>
+   *  this directory.  An unset value ({@code null}) means to use
+   *  the directory of the source files.  Use {@code ""} or {@code .}
    *  for the current directory.
    */
   public String outputFilesDirectory;
 
   /** If the writeOutputFiles option is true, then output files appear with
-   *  this extension. Use <code>""</code> for no extension.
+   *  this extension. Use {@code ""} for no extension.
    */
   public String outputFilesExtension = "stp";
 
@@ -205,22 +205,22 @@ public class TestOptions implements Serializable {
    * (except decreased efficiency) unless maxSpanForTags is greater than one.
    * Works only for PCFG (so far).
    */
-  public boolean lengthNormalization = false;
+  public boolean lengthNormalization;
 
   /**
    * Used when you want to generate sample parses instead of finding the best
    * parse.  (NOT YET USED.)
    */
-  public boolean sample = false;
+  public boolean sample;
 
   /** Printing k-best parses from PCFG, when k &gt; 0. */
-  public int printPCFGkBest = 0;
+  public int printPCFGkBest;
 
   /** If using a kBest eval, use this many trees. */
   public int evalPCFGkBest = 100;
 
   /** Printing k-best parses from PCFG, when k &gt; 0. */
-  public int printFactoredKGood = 0;
+  public int printFactoredKGood;
 
   /** What evaluations to report and how to report them
    *  (using LexicalizedParser). Known evaluations
@@ -229,7 +229,7 @@ public class TestOptions implements Serializable {
    *  depDA, depTA, depLL,
    *  factLB, factCB, factDA, factTA, factLL, factChildSpecific.
    *  The default is pcfgLB,depDA,factLB,factTA.  You need to negate those
-   *  ones out (e.g., <code>-evals "depDA=false"</code>) if you don't want
+   *  ones out (e.g., {@code -evals "depDA=false"}) if you don't want
    *  them.
    *  LB = ParseEval labeled bracketing,   <br>
    *  CB = crossing brackets and zero crossing bracket rate,   <br>
@@ -262,11 +262,11 @@ public class TestOptions implements Serializable {
    *  dependency grammar.  (Otherwise, a MLE is used is w is seen, and a constant if
    *  w is unseen.
    */
-  public boolean useLexiconToScoreDependencyPwGt = false;
+  public boolean useLexiconToScoreDependencyPwGt;
 
   /** If this is true, perform non-projective dependency parsing.
    */
-  public boolean useNonProjectiveDependencyParser = false;
+  public boolean useNonProjectiveDependencyParser;
 
   /**
    * Number of threads to use at test time.  For example,
@@ -294,13 +294,13 @@ public class TestOptions implements Serializable {
 
   @Override
   public String toString() {
-    return ("Test parameters" + 
-            " maxLength=" + maxLength + 
-            " preTag=" + preTag + 
-            " outputFormat=" + outputFormat + 
-            " outputFormatOptions=" + outputFormatOptions + 
-            " printAllBestParses=" + printAllBestParses + 
-            " testingThreads=" + testingThreads);
+    return "Test parameters" +
+            " maxLength=" + maxLength +
+            " preTag=" + preTag +
+            " outputFormat=" + outputFormat +
+            " outputFormatOptions=" + outputFormatOptions +
+            " printAllBestParses=" + printAllBestParses +
+            " testingThreads=" + testingThreads;
   }
 
   private static final long serialVersionUID = 7256526346598L;

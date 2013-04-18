@@ -26,8 +26,8 @@ public class ChineseUtils {
 
   // These are good Unicode whitespace regexes for any language!
   public static final String ONEWHITE = "[\\s\\p{Zs}]";
-  public static final String WHITE = ONEWHITE + "*";
-  public static final String WHITEPLUS = ONEWHITE + "+";
+  public static final String WHITE = ONEWHITE + '*';
+  public static final String WHITEPLUS = ONEWHITE + '+';
 
   // Chinese numbers 1-10
   public static final String NUMBERS = "[\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d\u5341]";
@@ -53,7 +53,7 @@ public class ChineseUtils {
   private ChineseUtils() {}
 
   public static boolean isNumber(char c) {
-    return (StringUtils.matches(String.valueOf(c), NUMBERS) || Character.isDigit(c));
+    return StringUtils.matches(String.valueOf(c), NUMBERS) || Character.isDigit(c);
   }
 
   public static String normalize(String in) {
@@ -107,58 +107,66 @@ public class ChineseUtils {
           }
         }
         Character.UnicodeBlock cub = Character.UnicodeBlock.of(cp);
-        if (cub == Character.UnicodeBlock.PRIVATE_USE_AREA ||
-                cub == Character.UnicodeBlock.SUPPLEMENTARY_PRIVATE_USE_AREA_A ||
-                cub == Character.UnicodeBlock.SUPPLEMENTARY_PRIVATE_USE_AREA_A) {
+        if (cub.equals(Character.UnicodeBlock.PRIVATE_USE_AREA) ||
+                cub.equals(Character.UnicodeBlock.SUPPLEMENTARY_PRIVATE_USE_AREA_A) ||
+                cub.equals(Character.UnicodeBlock.SUPPLEMENTARY_PRIVATE_USE_AREA_A)) {
           EncodingPrintWriter.err.println("ChineseUtils.normalize warning: private use area codepoint U+" + Integer.toHexString(cp) + " in " + in);
         }
         delete = false;
-        switch (ascii) {
-          case LEAVE:
-            break;
-          case ASCII:
-            if (cp >= '\uFF01' && cp <= '\uFF5E') {
-              cp -= (0xFF00 - 0x0020);
-            }
-            break;
-          case FULLWIDTH:
-            if (cp >= '\u0021' && cp <= '\u007E') {
-              cp += (0xFF00 - 0x0020);
-            }
-            break;
-          default:
-            throw new IllegalArgumentException("ChineseUtils: Unsupported parameter option: ascii=" + ascii);
-        }
-        switch (spaceChar) {
-          case LEAVE:
-            break;
-          case ASCII:
-            if (Character.isSpaceChar(cp)) {
-              cp = ' ';
-            }
-            break;
-          case FULLWIDTH:
-            if (Character.isSpaceChar(cp)) {
-              cp = '\u3000';
-            }
-            break;
-          case DELETE:
-            if (Character.isSpaceChar(cp)) {
-              delete = true;
-            }
-            break;
-          case DELETE_EXCEPT_BETWEEN_ASCII:
-            char cpp = 0;
-            if (i > 0) { cpp = in.charAt(i - 1); }
-            char cpn = 0;
-            if (i < (len - 1)) { cpn = in.charAt(i + 1); }
-            // EncodingPrintWriter.out.println("cp: " + cp + "; cpp: " + cpp + "cpn: " + cpn +
-            //      "; isSpace: " + Character.isSpaceChar(cp) + "; isAsciiLHL: " + isAsciiLowHigh(cpp) +
-            //      "; isAsciiLHR: " + isAsciiLowHigh(cpn), "UTF-8");
-            if (Character.isSpaceChar(cp) && ! (isAsciiLowHigh(cpp) && isAsciiLowHigh(cpn))) {
-              delete = true;
-            }
-        }
+          switch (ascii) {
+              case LEAVE:
+                  break;
+              case ASCII:
+                  if (cp >= '\uFF01' && cp <= '\uFF5E') cp -= 0xFF00 - 0x0020;
+
+
+                  break;
+              case FULLWIDTH:
+                  if (cp >= '\u0021' && cp <= '\u007E') cp += 0xFF00 - 0x0020;
+
+
+                  break;
+              default:
+                  throw new IllegalArgumentException("ChineseUtils: Unsupported parameter option: ascii=" + ascii);
+          }
+          switch (spaceChar) {
+              case LEAVE:
+                  break;
+              case ASCII:
+                  if (Character.isSpaceChar(cp)) {
+                      cp = ' ';
+                  }
+
+                  break;
+              case FULLWIDTH:
+                  if (Character.isSpaceChar(cp)) {
+                      cp = '\u3000';
+                  }
+
+                  break;
+              case DELETE:
+                  if (Character.isSpaceChar(cp)) {
+                      delete = true;
+                  }
+
+                  break;
+              case DELETE_EXCEPT_BETWEEN_ASCII:
+                  char cpp = 0;
+                  if (i > 0) {
+                      cpp = in.charAt(i - 1);
+                  }
+                  char cpn = 0;
+                  if (i < len - 1) {
+                      cpn = in.charAt(i + 1);
+                  }
+                  // EncodingPrintWriter.out.println("cp: " + cp + "; cpp: " + cpp + "cpn: " + cpn +
+                  //      "; isSpace: " + Character.isSpaceChar(cp) + "; isAsciiLHL: " + isAsciiLowHigh(cpp) +
+                  //      "; isAsciiLHR: " + isAsciiLowHigh(cpn), "UTF-8");
+                  if (Character.isSpaceChar(cp) && !(isAsciiLowHigh(cpp) && isAsciiLowHigh(cpn))) {
+                      delete = true;
+                  }
+                  break;
+          }
         switch (midDot) {
           case LEAVE:
             break;
@@ -197,9 +205,9 @@ public class ChineseUtils {
         int offset = in.offsetByCodePoints(0, i);
         int cp = in.codePointAt(offset);
         Character.UnicodeBlock cub = Character.UnicodeBlock.of(cp);
-        if (cub == Character.UnicodeBlock.PRIVATE_USE_AREA ||
-                cub == Character.UnicodeBlock.SUPPLEMENTARY_PRIVATE_USE_AREA_A ||
-                cub == Character.UnicodeBlock.SUPPLEMENTARY_PRIVATE_USE_AREA_A) {
+        if (cub.equals(Character.UnicodeBlock.PRIVATE_USE_AREA) ||
+                cub.equals(Character.UnicodeBlock.SUPPLEMENTARY_PRIVATE_USE_AREA_A) ||
+                cub.equals(Character.UnicodeBlock.SUPPLEMENTARY_PRIVATE_USE_AREA_A)) {
           EncodingPrintWriter.err.println("ChineseUtils.normalize warning: private use area codepoint U+" + Integer.toHexString(cp) + " in " + in);
         }
         delete = false;
@@ -208,12 +216,12 @@ public class ChineseUtils {
             break;
           case ASCII:
             if (cp >= '\uFF01' && cp <= '\uFF5E') {
-              cp -= (0xFF00 - 0x0020);
+              cp -= 0xFF00 - 0x0020;
             }
             break;
           case FULLWIDTH:
             if (cp >= '\u0021' && cp <= '\u007E') {
-              cp += (0xFF00 - 0x0020);
+              cp += 0xFF00 - 0x0020;
             }
             break;
           default:
@@ -241,7 +249,7 @@ public class ChineseUtils {
             int cpp = 0;
             if (i > 0) { cpp = in.codePointAt(i - 1); }
             int cpn = 0;
-            if (i < (numCP - 1)) { cpn = in.codePointAt(i + 1); }
+            if (i < numCP - 1) { cpn = in.codePointAt(i + 1); }
             if (Character.isSpaceChar(cp) && ! (isAsciiLowHigh(cpp) && isAsciiLowHigh(cpn))) {
               delete = true;
             }
@@ -287,7 +295,7 @@ public class ChineseUtils {
   }
 
   /** Mainly for testing.  Usage:
-   *  <code>ChineseUtils ascii spaceChar word*</code>
+   *  {@code ChineseUtils ascii spaceChar word*}
    *  <p>
    *  ascii and spaceChar are integers: 0 = leave, 1 = ascii, 2 = fullwidth.
    *  The words listed are then normalized and sent to stdout.
@@ -297,7 +305,7 @@ public class ChineseUtils {
    *  @param args Command line arguments as above
    *  @throws IOException If any problems accessing command-line files
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     if (args.length < 3) {
       System.err.println("usage: ChineseUtils ascii space midDot word*");
       System.err.println("  First 3 args are int flags; a filter or maps args as words; assumes UTF-8");
@@ -344,7 +352,7 @@ public class ChineseUtils {
         "\uff3d\uff01\uff02\uff08\uff09\uff0c\uff1b\uff1a\uff1c\uff1d\uff1e\uff1f" +
         "\uff3b\uff3c\uff40\uff5b\uff5c\uff5d\uff5e\uff3e]+");
   private final static Pattern ambiguousPuncChars = Pattern.compile("[-#$%&'*+/@_\uff0d\uff03\uff04\uff05\uff06\uff07\uff0a\uff0b\uff0f\uff20\uff3f]+");
-  private final static Pattern midDotPattern = Pattern.compile(ChineseUtils.MID_DOT_REGEX_STR + "+");
+  private final static Pattern midDotPattern = Pattern.compile(ChineseUtils.MID_DOT_REGEX_STR + '+');
 
 
   public static String shapeOf(String input,
@@ -367,11 +375,7 @@ public class ChineseUtils {
       shape = "S";
     } else if (ambiguousPuncChars.matcher(input).matches()) {
       shape = "A";
-    } else if (useMidDotShape && midDotPattern.matcher(input).matches()) {
-      shape = "M";
-    } else {
-      shape = "C";
-    }
+    } else shape = useMidDotShape && midDotPattern.matcher(input).matches() ? "M" : "C";
     return shape;
 
   }

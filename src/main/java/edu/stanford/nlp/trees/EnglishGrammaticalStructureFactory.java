@@ -23,11 +23,8 @@ public class EnglishGrammaticalStructureFactory implements GrammaticalStructureF
   public EnglishGrammaticalStructure newGrammaticalStructure(Tree t) {
     if (puncFilter == null && hf == null) {
       return new EnglishGrammaticalStructure(t);
-    } else if (hf == null) {
-      return new EnglishGrammaticalStructure(t, puncFilter);
-    } else {
-      return new EnglishGrammaticalStructure(t, puncFilter, hf);
-    }
+    } else
+        return hf == null ? new EnglishGrammaticalStructure(t, puncFilter) : new EnglishGrammaticalStructure(t, puncFilter, hf);
   }
   
 }

@@ -95,45 +95,61 @@ public class PrettyLogger {
       log(channels, description, (Dictionary)obj);
     } else if (obj instanceof Iterable) {
       log(channels, description, (Iterable)obj);
-    } else if (obj.getClass().isArray()) {
+    } else
+    if (obj.getClass().isArray()) {
       Object[] arrayCopy; // the array to log
       if(obj.getClass().getComponentType().isPrimitive()){
         //(case: a primitive array)
         Class componentClass = obj.getClass().getComponentType();
-        if(boolean.class.isAssignableFrom(componentClass)){
-          arrayCopy = new Object[((boolean[]) obj).length];
-          for(int i=0; i<arrayCopy.length; i++){ arrayCopy[i] = ((boolean[]) obj)[i]; }
-        } else if(byte.class.isAssignableFrom(componentClass)){
-          arrayCopy = new Object[((byte[]) obj).length];
-          for(int i=0; i<arrayCopy.length; i++){ arrayCopy[i] = ((byte[]) obj)[i]; }
-        } else if(char.class.isAssignableFrom(componentClass)){
-          arrayCopy = new Object[((char[]) obj).length];
-          for(int i=0; i<arrayCopy.length; i++){ arrayCopy[i] = ((char[]) obj)[i]; }
-        } else if(short.class.isAssignableFrom(componentClass)){
-          arrayCopy = new Object[((short[]) obj).length];
-          for(int i=0; i<arrayCopy.length; i++){ arrayCopy[i] = ((short[]) obj)[i]; }
-        } else if(int.class.isAssignableFrom(componentClass)){
-          arrayCopy = new Object[((int[]) obj).length];
-          for(int i=0; i<arrayCopy.length; i++){ arrayCopy[i] = ((int[]) obj)[i]; }
-        } else if(long.class.isAssignableFrom(componentClass)){
-          arrayCopy = new Object[((long[]) obj).length];
-          for(int i=0; i<arrayCopy.length; i++){ arrayCopy[i] = ((long[]) obj)[i]; }
-        } else if(float.class.isAssignableFrom(componentClass)){
-          arrayCopy = new Object[((float[]) obj).length];
-          for(int i=0; i<arrayCopy.length; i++){ arrayCopy[i] = ((float[]) obj)[i]; }
-        } else if(double.class.isAssignableFrom(componentClass)){
-          arrayCopy = new Object[((double[]) obj).length];
-          for(int i=0; i<arrayCopy.length; i++){ arrayCopy[i] = ((double[]) obj)[i]; }
-        } else {
-          throw new IllegalStateException("I forgot about the primitive class: " + componentClass);
-        }
+          if (boolean.class.isAssignableFrom(componentClass)) {
+              arrayCopy = new Object[((boolean[]) obj).length];
+              for (int i = 0; i < arrayCopy.length; i++) {
+                  arrayCopy[i] = ((boolean[]) obj)[i];
+              }
+          } else if (byte.class.isAssignableFrom(componentClass)) {
+              arrayCopy = new Object[((byte[]) obj).length];
+              for (int i = 0; i < arrayCopy.length; i++) {
+                  arrayCopy[i] = ((byte[]) obj)[i];
+              }
+          } else if (char.class.isAssignableFrom(componentClass)) {
+              arrayCopy = new Object[((char[]) obj).length];
+              for (int i = 0; i < arrayCopy.length; i++) {
+                  arrayCopy[i] = ((char[]) obj)[i];
+              }
+          } else if (short.class.isAssignableFrom(componentClass)) {
+              arrayCopy = new Object[((short[]) obj).length];
+              for (int i = 0; i < arrayCopy.length; i++) {
+                  arrayCopy[i] = ((short[]) obj)[i];
+              }
+          } else if (int.class.isAssignableFrom(componentClass)) {
+              arrayCopy = new Object[((int[]) obj).length];
+              for (int i = 0; i < arrayCopy.length; i++) {
+                  arrayCopy[i] = ((int[]) obj)[i];
+              }
+          } else if (long.class.isAssignableFrom(componentClass)) {
+              arrayCopy = new Object[((long[]) obj).length];
+              for (int i = 0; i < arrayCopy.length; i++) {
+                  arrayCopy[i] = ((long[]) obj)[i];
+              }
+          } else if (float.class.isAssignableFrom(componentClass)) {
+              arrayCopy = new Object[((float[]) obj).length];
+              for (int i = 0; i < arrayCopy.length; i++) {
+
+                  arrayCopy[i] = ((float[]) obj)[i];
+              }
+          } else if (double.class.isAssignableFrom(componentClass)) {
+              arrayCopy = new Object[((double[]) obj).length];
+              for (int i = 0; i < arrayCopy.length; i++) {
+                  arrayCopy[i] = ((double[]) obj)[i];
+              }
+          } else throw new IllegalStateException("I forgot about the primitive class: " + componentClass);
       } else {
-        //(case: a regular array)
+          //(case: a regular array)
         arrayCopy = (T[]) obj;
       }
       log(channels, description, arrayCopy);
     } else {
-      if (!description.equals("")) {
+      if (!description.isEmpty()) {
         description += ": ";
       }
       channels.log(description + obj);
@@ -149,14 +165,7 @@ public class PrettyLogger {
    */
   @SuppressWarnings("unchecked")
   public static boolean dispatchable(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    return obj instanceof PrettyLoggable ||
-      obj instanceof Map ||
-      obj instanceof Dictionary ||
-      obj instanceof Iterable ||
-      obj.getClass().isArray();
+      return obj != null && (obj instanceof PrettyLoggable || obj instanceof Map || obj instanceof Dictionary || obj instanceof Iterable || obj.getClass().isArray());
   }
 
   /*
@@ -167,22 +176,18 @@ public class PrettyLogger {
     Redwood.startTrack(description);
     if (mapping == null) {
       channels.log("(mapping is null)");
-    } else if (mapping.size() == 0) {
+    } else if (mapping.isEmpty()) {
       channels.log("(empty)");
     } else {
       // convert keys to sorted list, if possible
-      List<K> keys = new LinkedList<K>();
+      List<K> keys = new LinkedList<>();
       for (K key : mapping.keySet()) {
         keys.add(key);
       }
       Collections.sort(keys, new Comparator<K>() {
         @SuppressWarnings("unchecked")
         public int compare(K a, K b) {
-          if (a != null && Comparable.class.isAssignableFrom(a.getClass())) {
-            return ((Comparable) a).compareTo(b);
-          } else {
-            return 0;
-          }
+            return a != null && Comparable.class.isAssignableFrom(a.getClass()) ? ((Comparable) a).compareTo(b) : 0;
         }
       });
       // log key/value pairs
@@ -262,7 +267,7 @@ public class PrettyLogger {
    * Arrays
    */
 
-  private static <T> void log(RedwoodChannels channels, String description, T[] array) {
+  private static <T> void log(RedwoodChannels channels, String description, T... array) {
     Redwood.startTrack(description);
     if (array == null) {
       channels.log("(array is null)");

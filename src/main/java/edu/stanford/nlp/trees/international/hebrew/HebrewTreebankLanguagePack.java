@@ -18,9 +18,9 @@ public class HebrewTreebankLanguagePack extends AbstractTreebankLanguagePack {
   
   private static final String[] pennSFPunctTags = {"yyDOT","yyEXCL","yyQM"};
 
-  private static final String[] collinsPunctTags = {"-NONE-","yyCLN", "yyCM","yyDASH","yyDOT","yyEXCL","yyLRB","yyQM","yyQUOT","yyRRB","yySCLN"};;
+  private static final String[] collinsPunctTags = {"-NONE-","yyCLN", "yyCM","yyDASH","yyDOT","yyEXCL","yyLRB","yyQM","yyQUOT","yyRRB","yySCLN"};
 
-  private static final char[] annotationIntroducingChars = {'-', '=', '|', '#', '^', '~'};
+    private static final char[] annotationIntroducingChars = {'-', '=', '|', '#', '^', '~'};
 
   /**
    * wsg: This is the convention in Reut's preprocessed version of the treebank, and the Collins stuff.

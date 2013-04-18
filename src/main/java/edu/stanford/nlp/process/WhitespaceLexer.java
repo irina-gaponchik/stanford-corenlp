@@ -9,7 +9,7 @@ import edu.stanford.nlp.ling.Word;
  *  based on whitespace, including Unicode spaces such as the CJK ideographic space as well
  *  as traditional Unix whitespace characters.  It can optionally separate out and return
  *  newline characters, again recognizing all Unicode newline sequences.
- *  Designed to be called by <code>WhitespaceTokenizer</code>.
+ *  Designed to be called by {@code WhitespaceTokenizer}.
  *
  *  @author Roger Levy
  *  @author Christopher Manning
@@ -33,7 +33,7 @@ class WhitespaceLexer {
    *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
-  private static final int ZZ_LEXSTATE[] = { 
+  private static final int[] ZZ_LEXSTATE = {
      0, 0
   };
 
@@ -65,7 +65,7 @@ class WhitespaceLexer {
     return result;
   }
 
-  private static int zzUnpackAction(String packed, int offset, int [] result) {
+  private static int zzUnpackAction(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -93,13 +93,13 @@ class WhitespaceLexer {
     return result;
   }
 
-  private static int zzUnpackRowMap(String packed, int offset, int [] result) {
+  private static int zzUnpackRowMap(String packed, int offset, int... result) {
     int i = 0;  /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
     while (i < l) {
-      int high = packed.charAt(i++) << 16;
-      result[j++] = high | packed.charAt(i++);
+      int high = (int) packed.charAt(i++) << 16;
+      result[j++] = high | (int) packed.charAt(i++);
     }
     return j;
   }
@@ -120,7 +120,7 @@ class WhitespaceLexer {
     return result;
   }
 
-  private static int zzUnpackTrans(String packed, int offset, int [] result) {
+  private static int zzUnpackTrans(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -140,14 +140,14 @@ class WhitespaceLexer {
   private static final int ZZ_PUSHBACK_2BIG = 2;
 
   /* error messages for the codes above */
-  private static final String ZZ_ERROR_MSG[] = {
+  private static final String[] ZZ_ERROR_MSG = {
     "Unkown internal scanner error",
     "Error: could not match input",
     "Error: pushback value was too large"
   };
 
   /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
    */
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
@@ -161,7 +161,7 @@ class WhitespaceLexer {
     return result;
   }
 
-  private static int zzUnpackAttribute(String packed, int offset, int [] result) {
+  private static int zzUnpackAttribute(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -180,11 +180,11 @@ class WhitespaceLexer {
   private int zzState;
 
   /** the current lexical state */
-  private int zzLexicalState = YYINITIAL;
+  private int zzLexicalState;
 
   /** this buffer contains the current text to be matched and is
       the source of the yytext() string */
-  private char zzBuffer[] = new char[ZZ_BUFFERSIZE];
+  private char[] zzBuffer = new char[ZZ_BUFFERSIZE];
 
   /** the textposition at the last accepting state */
   private int zzMarkedPos;
@@ -288,9 +288,9 @@ class WhitespaceLexer {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
-   * 
-   * @exception   java.io.IOException  if any I/O-Error occurs
+   * @return      {@code false}, iff there was new input.
+   *
+   * @exception java.io.IOException  if any I/O-Error occurs
    */
   private boolean zzRefill() throws java.io.IOException {
 
@@ -310,7 +310,7 @@ class WhitespaceLexer {
     /* is the buffer big enough? */
     if (zzCurrentPos >= zzBuffer.length) {
       /* if not: blow it up */
-      char newBuffer[] = new char[zzCurrentPos*2];
+      char[] newBuffer = new char[(zzCurrentPos << 1)];
       System.arraycopy(zzBuffer, 0, newBuffer, 0, zzBuffer.length);
       zzBuffer = newBuffer;
     }
@@ -437,7 +437,7 @@ class WhitespaceLexer {
    *
    * @param   errorCode  the code of the errormessage to display
    */
-  private void zzScanError(int errorCode) {
+  private static void zzScanError(int errorCode) {
     String message;
     try {
       message = ZZ_ERROR_MSG[errorCode];
@@ -527,7 +527,7 @@ class WhitespaceLexer {
               zzInput = zzBufferL[zzCurrentPosL++];
             }
           }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+          int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 
@@ -545,25 +545,19 @@ class WhitespaceLexer {
       zzMarkedPos = zzMarkedPosL;
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
-        case 2: 
-          { return tokenFactory.makeToken(NEWLINE, yychar, yylength());
-          }
-        case 4: break;
-        case 1: 
-          { return tokenFactory.makeToken(yytext(), yychar, yylength());
-          }
-        case 5: break;
-        case 3: 
-          { 
-          }
-        case 6: break;
+        case 2:
+            return tokenFactory.makeToken(NEWLINE, yychar, yylength());
+          case 4: break;
+        case 1:
+            return tokenFactory.makeToken(yytext(), yychar, yylength());
+          case 5: break;
+        case 3:
+          case 6: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;
-              {
-                return null;
-              }
-          } 
+              return null;
+          }
           else {
             zzScanError(ZZ_NO_MATCH);
           }

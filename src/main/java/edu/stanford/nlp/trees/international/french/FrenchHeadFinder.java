@@ -93,13 +93,13 @@ public class FrenchHeadFinder extends AbstractCollinsHeadFinder {
   /**
    * Go through trees and determine their heads and print them.
    * Just for debugging. <br>
-   * Usage: <code>
+   * Usage: {@code
    * java edu.stanford.nlp.trees.FrenchHeadFinder treebankFilePath
-   * </code>
+   * }
    *
    * @param args The treebankFilePath
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Treebank treebank = new DiskTreebank();
     CategoryWordTag.suppressTerminalDetails = true;
     treebank.loadPath(args[0]);

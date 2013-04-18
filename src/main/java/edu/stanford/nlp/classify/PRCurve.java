@@ -30,10 +30,10 @@ public class PRCurve {
    */
   public PRCurve(String filename) {
     try {
-      ArrayList<Pair<Double, Integer>> dataScores = new ArrayList<Pair<Double, Integer>>();
+      ArrayList<Pair<Double, Integer>> dataScores = new ArrayList<>();
       for(String line : ObjectBank.getLineIterator(new File(filename))) {
         List<String> elems = StringUtils.split(line);
-        Pair<Double, Integer> p = new Pair<Double, Integer>(new Double(elems.get(0).toString()), Integer.valueOf(elems.get(1).toString()));
+        Pair<Double, Integer> p = new Pair<>(new Double(elems.get(0)), Integer.valueOf(elems.get(1)));
         dataScores.add(p);
       }
       init(dataScores);
@@ -51,15 +51,15 @@ public class PRCurve {
   public PRCurve(String filename, boolean svm) {
     try {
 
-      ArrayList<Pair<Double, Integer>> dataScores = new ArrayList<Pair<Double, Integer>>();
+      ArrayList<Pair<Double, Integer>> dataScores = new ArrayList<>();
       for(String line : ObjectBank.getLineIterator(new File(filename))) {
         List<String> elems = StringUtils.split(line);
-        int cls = (new Double(elems.get(0).toString())).intValue();
+        int cls = new Double(elems.get(0)).intValue();
         if (cls == -1) {
           cls = 0;
         }
-        double score = Double.parseDouble(elems.get(1).toString()) + 0.5;
-        Pair<Double, Integer> p = new Pair<Double, Integer>(new Double(score), Integer.valueOf(cls));
+        double score = Double.parseDouble(elems.get(1)) + 0.5;
+        Pair<Double, Integer> p = new Pair<>(score, cls);
         dataScores.add(p);
       }
       init(dataScores);
@@ -83,9 +83,9 @@ public class PRCurve {
   }
 
   public void init(List<Pair<Double, Integer>> dataScores) {
-    PriorityQueue<Pair<Integer, Pair<Double, Integer>>> q = new BinaryHeapPriorityQueue<Pair<Integer, Pair<Double, Integer>>>();
+    PriorityQueue<Pair<Integer, Pair<Double, Integer>>> q = new BinaryHeapPriorityQueue<>();
     for (int i = 0; i < dataScores.size(); i++) {
-      q.add(new Pair<Integer, Pair<Double, Integer>>(Integer.valueOf(i), dataScores.get(i)), -dataScores.get(i).first().doubleValue());
+      q.add(new Pair<>(i, dataScores.get(i)), -dataScores.get(i).first());
     }
     List<Pair<Integer, Pair<Double, Integer>>> sorted = q.toSortedList();
     scores = new double[sorted.size()];
@@ -94,17 +94,17 @@ public class PRCurve {
 
     for (int i = 0; i < sorted.size(); i++) {
       Pair<Double, Integer> next = sorted.get(i).second();
-      scores[i] = next.first().doubleValue();
-      classes[i] = next.second().intValue();
+      scores[i] = next.first();
+      classes[i] = next.second();
     }
     init();
   }
 
 
   public void initMC(ArrayList<Triple<Double, Integer, Integer>> dataScores) {
-    PriorityQueue<Pair<Integer, Triple<Double, Integer, Integer>>> q = new BinaryHeapPriorityQueue<Pair<Integer, Triple<Double, Integer, Integer>>>();
+    PriorityQueue<Pair<Integer, Triple<Double, Integer, Integer>>> q = new BinaryHeapPriorityQueue<>();
     for (int i = 0; i < dataScores.size(); i++) {
-      q.add(new Pair<Integer, Triple<Double, Integer, Integer>>(Integer.valueOf(i), dataScores.get(i)), -dataScores.get(i).first().doubleValue());
+      q.add(new Pair<>(i, dataScores.get(i)), -dataScores.get(i).first());
     }
     List<Pair<Integer, Triple<Double, Integer, Integer>>> sorted = q.toSortedList();
     scores = new double[sorted.size()];
@@ -114,9 +114,9 @@ public class PRCurve {
 
     for (int i = 0; i < sorted.size(); i++) {
       Triple<Double, Integer, Integer> next = sorted.get(i).second();
-      scores[i] = next.first().doubleValue();
-      classes[i] = next.second().intValue();
-      guesses[i] = next.third().intValue();
+      scores[i] = next.first();
+      classes[i] = next.second();
+      guesses[i] = next.third();
     }
     init();
   }
@@ -199,8 +199,8 @@ public class PRCurve {
     int totalcorrect = 0;
 
     while (totaltaken < recall) {
-      double confr = Math.abs(scores[rightIndex] - .5);
-      double confl = Math.abs(scores[leftIndex] - .5);
+      double confr = Math.abs(scores[rightIndex] - 0.5);
+      double confl = Math.abs(scores[leftIndex] - 0.5);
       int chosen = leftIndex;
       if (confr > confl) {
         chosen = rightIndex;
@@ -209,10 +209,10 @@ public class PRCurve {
         leftIndex++;
       }
       //System.err.println("chose "+chosen+" score "+scores[chosen]+" class "+classes[chosen]+" correct "+correct(scores[chosen],classes[chosen]));
-      if ((scores[chosen] >= .5) && (classes[chosen] == 1)) {
+      if (scores[chosen] >= 0.5 && classes[chosen] == 1) {
         totalcorrect++;
       }
-      if ((scores[chosen] < .5) && (classes[chosen] == 0)) {
+      if (scores[chosen] < 0.5 && classes[chosen] == 0) {
         totalcorrect++;
       }
       totaltaken++;
@@ -228,7 +228,7 @@ public class PRCurve {
    */
   public double optFmeasure(int recall) {
     double max = 0;
-    for (int i = 0; i < (recall + 1); i++) {
+    for (int i = 0; i < recall + 1; i++) {
       double f = fmeasure(i, recall - i);
       if (f > max) {
         max = f;
@@ -253,8 +253,8 @@ public class PRCurve {
     int leftIndex = 0; //next left candidate
     int tp = 0, fp = 0, fn = 0;
     while (totaltaken < recall) {
-      double confr = Math.abs(scores[rightIndex] - .5);
-      double confl = Math.abs(scores[leftIndex] - .5);
+      double confr = Math.abs(scores[rightIndex] - 0.5);
+      double confl = Math.abs(scores[leftIndex] - 0.5);
       int chosen = leftIndex;
       if (confr > confl) {
         chosen = rightIndex;
@@ -263,14 +263,14 @@ public class PRCurve {
         leftIndex++;
       }
       //System.err.println("chose "+chosen+" score "+scores[chosen]+" class "+classes[chosen]+" correct "+correct(scores[chosen],classes[chosen]));
-      if ((scores[chosen] >= .5)) {
+      if (scores[chosen] >= 0.5) {
         if (classes[chosen] == 1) {
           tp++;
         } else {
           fp++;
         }
       }
-      if ((scores[chosen] < .5)) {
+      if (scores[chosen] < 0.5) {
         if (classes[chosen] == 1) {
           fn++;
         }
@@ -345,12 +345,12 @@ public class PRCurve {
 
 
   public static boolean correct(double score, int cls) {
-    return ((score >= .5) && (cls == 1)) || ((score < .5) && (cls == 0));
+    return score >= 0.5 && cls == 1 || score < 0.5 && cls == 0;
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
-    PriorityQueue<String> q = new BinaryHeapPriorityQueue<String>();
+    PriorityQueue<String> q = new BinaryHeapPriorityQueue<>();
     q.add("bla", 2);
     q.add("bla3", 2);
     System.err.println("size of q " + q.size());
@@ -358,8 +358,8 @@ public class PRCurve {
     PRCurve pr = new PRCurve("c:/data0204/precsvm", true);
     System.err.println("acc " + pr.accuracy() + " opt " + pr.optimalAccuracy() + " cwa " + pr.cwa() + " optcwa " + pr.optimalCwa());
     for (int r = 1; r <= pr.numSamples(); r++) {
-      System.err.println("optimal precision at recall " + r + " " + pr.precision(r));
-      System.err.println("model precision at recall " + r + " " + pr.logPrecision(r));
+      System.err.println("optimal precision at recall " + r + ' ' + pr.precision(r));
+      System.err.println("model precision at recall " + r + ' ' + pr.logPrecision(r));
     }
   }
 

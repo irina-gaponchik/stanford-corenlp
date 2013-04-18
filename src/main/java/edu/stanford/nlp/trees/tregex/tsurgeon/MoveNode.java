@@ -12,7 +12,7 @@ class MoveNode extends TsurgeonPattern {
   TreeLocation l;
 
   public MoveNode(TsurgeonPattern child, TreeLocation l) {
-    super("move", new TsurgeonPattern[] { child });
+    super("move", child);
     this.l = l;
   }
 
@@ -34,7 +34,7 @@ class MoveNode extends TsurgeonPattern {
 
   @Override
   public String toString() {
-    return label + "(" + children[0] + " " + l + ")"; 
+    return label + '(' + children[0] + ' ' + l + ')';
   }
 
 

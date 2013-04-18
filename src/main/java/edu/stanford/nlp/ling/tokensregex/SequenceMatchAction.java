@@ -31,11 +31,7 @@ public interface SequenceMatchAction<T> {
 
     public SequenceMatchResult<T> apply(SequenceMatchResult<T> seqMatchResult, int... groups) {
       SequenceMatcher<T> matcher = pattern.getMatcher(seqMatchResult.elements());
-      if (matcher.find()) {
-        return matcher;
-      } else {
-        return null;
-      }
+        return matcher.find() ? matcher : null;
     }
   }
 
@@ -43,11 +39,7 @@ public interface SequenceMatchAction<T> {
     public SequenceMatchResult<T> apply(SequenceMatchResult<T> seqMatchResult, int... groups) {
       if (seqMatchResult instanceof SequenceMatcher) {
         SequenceMatcher<T> matcher = (SequenceMatcher<T>) seqMatchResult;
-        if (matcher.find()) {
-          return matcher;
-        } else {
-          return null;
-        }
+          return matcher.find() ? matcher : null;
       } else {
         return null;
       }
@@ -67,9 +59,9 @@ public interface SequenceMatchAction<T> {
 
     public SequenceMatchResult<T> apply(SequenceMatchResult<T> seqMatchResult, int... groups) {
       if (filter.accept(seqMatchResult)) {
-        return (acceptBranch != null)? acceptBranch.apply(seqMatchResult):null;
+        return acceptBranch != null ? acceptBranch.apply(seqMatchResult):null;
       } else {
-        return (rejectBranch != null)? rejectBranch.apply(seqMatchResult):null;
+        return rejectBranch != null ? rejectBranch.apply(seqMatchResult):null;
       }
     }
   }

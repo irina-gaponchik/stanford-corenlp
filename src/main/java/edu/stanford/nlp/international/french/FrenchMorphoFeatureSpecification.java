@@ -46,7 +46,7 @@ public class FrenchMorphoFeatureSpecification extends MorphoFeatureSpecification
     MorphoFeatures feats = new MorphoFeatures();
 
     //Usually this is the boundary symbol
-    if(spec == null || spec.equals(""))
+    if(spec == null || spec.isEmpty())
       return feats;
 
     boolean isOtherActive = isActive(MorphoFeatureType.OTHER);
@@ -60,7 +60,7 @@ public class FrenchMorphoFeatureSpecification extends MorphoFeatureSpecification
         feats.setAltTag("ADVWH");
       }
 
-    } else if(spec.startsWith("A")) {
+    } else if(!spec.isEmpty() && spec.charAt(0) == 'A') {
       feats.setAltTag("ADJ");
       if(spec.contains("int")) {
         if (isOtherActive) {
@@ -106,7 +106,7 @@ public class FrenchMorphoFeatureSpecification extends MorphoFeatureSpecification
 
       addPhiFeatures(feats,spec);
 
-    } else if(spec.startsWith("D")) {
+    } else if(!spec.isEmpty() && spec.charAt(0) == 'D') {
       feats.setAltTag("DET");
       if(spec.contains("int")) {
         if (isOtherActive) {
@@ -117,7 +117,7 @@ public class FrenchMorphoFeatureSpecification extends MorphoFeatureSpecification
 
       addPhiFeatures(feats,spec);
 
-    } else if(spec.startsWith("N")) {
+    } else if(!spec.isEmpty() && spec.charAt(0) == 'N') {
       feats.setAltTag("N");//TODO These are usually N-card...make these CD?
       if(spec.contains("P")) {
         if (isOtherActive) {
@@ -151,7 +151,7 @@ public class FrenchMorphoFeatureSpecification extends MorphoFeatureSpecification
 
       addPhiFeatures(feats,spec);
 
-    } else if(spec.startsWith("V")) {
+    } else if(!spec.isEmpty() && spec.charAt(0) == 'V') {
       feats.setAltTag("V");
       if(spec.contains("Y")) {
         if (isOtherActive) {
@@ -201,10 +201,7 @@ public class FrenchMorphoFeatureSpecification extends MorphoFeatureSpecification
     String[] toks = spec.split("\\-+");
 
     String morphStr;
-    if(toks.length == 3 && toks[0].equals("PRO") && toks[2].equals("neg"))
-      morphStr = toks[1];
-    else
-      morphStr = toks[toks.length-1];
+      morphStr = toks.length == 3 && toks[0].equals("PRO") && toks[2].equals("neg") ? toks[1] : toks[toks.length - 1];
 
     //wsg2011: The analyses have mixed casing....
     morphStr = morphStr.toLowerCase();
@@ -239,7 +236,7 @@ public class FrenchMorphoFeatureSpecification extends MorphoFeatureSpecification
    * 
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if(args.length != 1) {
       System.err.printf("Usage: java %s file%n", FrenchMorphoFeatureSpecification.class.getName());
       System.exit(-1);
@@ -261,8 +258,6 @@ public class FrenchMorphoFeatureSpecification extends MorphoFeatureSpecification
 
       br.close();
 
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }

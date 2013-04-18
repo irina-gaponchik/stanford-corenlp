@@ -48,8 +48,8 @@ public class LinearGrammarSmoother implements Function<Pair<UnaryGrammar,BinaryG
   public Pair<UnaryGrammar,BinaryGrammar> apply(Pair<UnaryGrammar,BinaryGrammar> bgug) {
     
     ALPHA = trainOptions.ruleSmoothingAlpha;
-    Counter<String> symWeights = new ClassicCounter<String>();
-    Counter<String> symCounts = new ClassicCounter<String>();
+    Counter<String> symWeights = new ClassicCounter<>();
+    Counter<String> symCounts = new ClassicCounter<>();
 
     //Tally unary rules
     for (UnaryRule rule : bgug.first()) {
@@ -78,7 +78,7 @@ public class LinearGrammarSmoother implements Function<Pair<UnaryGrammar,BinaryG
     if(DEBUG) {
       System.err.printf("%s: %d basic symbols in the grammar%n",this.getClass().getName(),symWeights.keySet().size());
       for(String s : symWeights.keySet())
-        System.err.print(s + ",");
+        System.err.print(s + ',');
       System.err.println();
     }
     
@@ -105,7 +105,7 @@ public class LinearGrammarSmoother implements Function<Pair<UnaryGrammar,BinaryG
     double pRule = Math.exp(rule.score());
 
     double pSmooth = (1.0 - ALPHA)*pRule;
-    pSmooth += ALPHA*(pSum / n);
+    pSmooth += ALPHA* pSum / n;
     pSmooth = Math.log(pSmooth);
     
     if(DEBUG)
@@ -125,7 +125,7 @@ public class LinearGrammarSmoother implements Function<Pair<UnaryGrammar,BinaryG
         if (i == 0) {
           sawAtZero = true;
           seenAtZero = ch;
-        } else if (sawAtZero && ch == seenAtZero) {
+        } else if (sawAtZero && ch.equals(seenAtZero)) {
           sawAtZero = false;
         } else {
           break;

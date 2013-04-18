@@ -105,7 +105,7 @@ public class SynchronizedInterner<T> {
   }
 
   /**
-   * Returns a <code>Set</code> such that each element in the returned set
+   * Returns a {@code Set} such that each element in the returned set
    * is a unique object e' that .equals the corresponding element e in the
    * original set.
    */
@@ -125,15 +125,15 @@ public class SynchronizedInterner<T> {
    * Test method: interns its arguments and says whether they == themselves.
    * @throws InterruptedException
    */
-  public static void main(final String[] args) throws InterruptedException {
-    final Thread[] threads = new Thread[100];
+  public static void main(final String... args) throws InterruptedException {
+    Thread[] threads = new Thread[100];
     for (int i = 0; i < threads.length; i++) {
       threads[i] = new Thread(new Runnable(){
         public void run() {
           for (String str : args) {
             String interned = SynchronizedInterner.globalIntern(str);
             Thread.yield();
-            if (interned != str)
+            if (!interned.equals(str))
               throw new AssertionError("Interning failed for " + str);
           }
         }

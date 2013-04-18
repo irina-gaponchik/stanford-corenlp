@@ -21,7 +21,7 @@ public class SVMLightClassifier<L, F> extends LinearClassifier<L, F> {
    * 
    */
   private static final long serialVersionUID = 1L;
-  public LinearClassifier<L, L> platt = null;
+  public LinearClassifier<L, L> platt;
 
   public SVMLightClassifier(ClassicCounter<Pair<F, L>> weightCounter, ClassicCounter<L> thresholds) {
     super(weightCounter, thresholds);

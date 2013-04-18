@@ -61,12 +61,12 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
 
     // read the coref graph (old format)
     line = reader.readLine().trim();
-    if(line.length() > 0){
+    if(!line.isEmpty()){
       String [] bits = line.split(" ");
       if(bits.length % 4 != 0){
         throw new RuntimeIOException("ERROR: Incorrect format for the serialized coref graph: " + line);
       }
-      List<Pair<IntTuple, IntTuple>> corefGraph = new ArrayList<Pair<IntTuple,IntTuple>>();
+      List<Pair<IntTuple, IntTuple>> corefGraph = new ArrayList<>();
       for(int i = 0; i < bits.length; i += 4){
         IntTuple src = new IntTuple(2);
         IntTuple dst = new IntTuple(2);
@@ -74,13 +74,13 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
         src.set(1, Integer.parseInt(bits[i + 1]));
         dst.set(0, Integer.parseInt(bits[i + 2]));
         dst.set(1, Integer.parseInt(bits[i + 3]));
-        corefGraph.add(new Pair<IntTuple, IntTuple>(src, dst));
+        corefGraph.add(new Pair<>(src, dst));
       }
       doc.set(CorefCoreAnnotations.CorefGraphAnnotation.class, corefGraph);
     }
 
     // read individual sentences
-    List<CoreMap> sentences = new ArrayList<CoreMap>();
+    List<CoreMap> sentences = new ArrayList<>();
     while((line = reader.readLine()) != null){
       CoreMap sentence = new Annotation("");
 
@@ -94,9 +94,9 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
       IntermediateSemanticGraph intermCcDeps = loadDependencyGraph(reader);
 
       // the remaining lines until empty line are tokens
-      List<CoreLabel> tokens = new ArrayList<CoreLabel>();
+      List<CoreLabel> tokens = new ArrayList<>();
       while((line = reader.readLine()) != null){
-        if(line.length() == 0) break;
+        if(line.isEmpty()) break;
         CoreLabel token = loadToken(line, haveExplicitAntecedent);
         tokens.add(token);
       }
@@ -141,9 +141,9 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
     // add all edges to the actual graph
     for(IntermediateEdge ie: ig.edges){
       IndexedWord source = nodes.get(ie.source);
-      assert(source != null);
+      assert source != null;
       IndexedWord target = nodes.get(ie.target);
-      assert(target != null);
+      assert target != null;
       synchronized (LOCK) {
         // this is not thread-safe: there are static fields in GrammaticalRelation
         GrammaticalRelation rel = GrammaticalRelation.valueOf(ie.dep);
@@ -167,8 +167,8 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
     List<IntermediateNode> nodes;
     List<IntermediateEdge> edges;
     IntermediateSemanticGraph() {
-      nodes = new ArrayList<IntermediateNode>();
-      edges = new ArrayList<IntermediateEdge>();
+      nodes = new ArrayList<>();
+      edges = new ArrayList<>();
     }
   }
 
@@ -204,7 +204,7 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
     // first line: list of nodes
     String line = reader.readLine().trim();
     // System.out.println("PARSING LINE: " + line);
-    if(line.length() > 0){
+    if(!line.isEmpty()){
       String [] bits = line.split("\t");
       if(bits.length < 3) throw new RuntimeException("ERROR: Invalid dependency node line: " + line);
       String docId = bits[0];
@@ -226,7 +226,7 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
 
     // second line: list of deps
     line = reader.readLine().trim();
-    if(line.length() > 0){
+    if(!line.isEmpty()){
       String [] bits = line.split("\t");
       for(String bit: bits){
         String [] bbits = bit.split(" ");
@@ -236,7 +236,7 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
         String dep = bbits[0];
         int source = Integer.valueOf(bbits[1]);
         int target = Integer.valueOf(bbits[2]);
-        boolean isExtra = (bbits.length == 4) ? Boolean.valueOf(bbits[3]) : false;
+        boolean isExtra = bbits.length == 4 ? Boolean.valueOf(bbits[3]) : false;
         graph.edges.add(new IntermediateEdge(dep, source, target, isExtra));
       }
     }
@@ -262,7 +262,7 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
       // indicate: docid, sentence index
       if (!outputHeader) {
         String docId = node.get(CoreAnnotations.DocIDAnnotation.class);
-        if(docId != null && docId.length() > 0) pw.print(docId);
+        if(docId != null && !docId.isEmpty()) pw.print(docId);
         else pw.print("-");
         pw.print("\t");
         pw.print(node.get(CoreAnnotations.SentenceIndexAnnotation.class));
@@ -318,10 +318,10 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
     pw.println(chains.size());
 
     // save each cluster
-    for(Integer cid: chains.keySet()) {
+    for(Map.Entry<Integer, CorefChain> integerCorefChainEntry : chains.entrySet()) {
       // cluster id + how many mentions in the cluster
-      CorefChain cluster = chains.get(cid);
-      saveCorefChain(pw, cid, cluster);
+      CorefChain cluster = integerCorefChainEntry.getValue();
+      saveCorefChain(pw, integerCorefChainEntry.getKey(), cluster);
     }
 
     // an empty line at end
@@ -346,12 +346,12 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
     pw.println(cid + " " + countMentions(cluster));
     // each mention saved on one line
     Map<IntPair, Set<CorefChain.CorefMention>> mentionMap = cluster.getMentionMap();
-    for(IntPair mid: mentionMap.keySet()) {
+    for(Map.Entry<IntPair, Set<CorefChain.CorefMention>> intPairSetEntry : mentionMap.entrySet()) {
       // all mentions with the same head
-      Set<CorefChain.CorefMention> mentions = mentionMap.get(mid);
+      Set<CorefChain.CorefMention> mentions = intPairSetEntry.getValue();
       for(CorefChain.CorefMention mention: mentions) {
         // one mention per line
-        pw.print(mid.getSource() + " " + mid.getTarget());
+        pw.print(intPairSetEntry.getKey().getSource() + " " + intPairSetEntry.getKey().getTarget());
         if(mention == cluster.getRepresentativeMention()) pw.print(" " + 1);
         else pw.print(" " + 0);
 
@@ -368,7 +368,7 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
         pw.print(" " + mention.position.length());
         for(int i = 0; i < mention.position.length(); i ++)
           pw.print(" " + mention.position.get(i));
-        pw.print(" " + escapeSpace(mention.mentionSpan));
+        pw.print(' ' + escapeSpace(mention.mentionSpan));
         pw.println();
       }
     }
@@ -414,7 +414,7 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
    */
   private static Map<Integer, CorefChain> loadCorefChains(BufferedReader reader) throws IOException {
     String line = reader.readLine().trim();
-    if(line.length() == 0) return null;
+    if(line.isEmpty()) return null;
     int clusterCount = Integer.valueOf(line);
     Map<Integer, CorefChain> chains = Generics.newHashMap();
     // read each cluster
@@ -554,26 +554,26 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
     // if(word.length() == 0) System.err.println("FOUND 0-LENGTH TOKEN!");
 
     // lemma
-    if(bits[1].length() > 0 || bits[0].length() == 0){
+    if(!bits[1].isEmpty() || bits[0].isEmpty()){
       String lemma = bits[1].replaceAll(SPACE_HOLDER, " ");
       token.set(CoreAnnotations.LemmaAnnotation.class, lemma);
     }
     // POS tag
-    if(bits[2].length() > 0) token.set(CoreAnnotations.PartOfSpeechAnnotation.class, bits[2]);
+    if(!bits[2].isEmpty()) token.set(CoreAnnotations.PartOfSpeechAnnotation.class, bits[2]);
     // NE tag
-    if(bits[3].length() > 0) token.set(CoreAnnotations.NamedEntityTagAnnotation.class, bits[3]);
+    if(!bits[3].isEmpty()) token.set(CoreAnnotations.NamedEntityTagAnnotation.class, bits[3]);
     // Normalized NE tag
-    if(bits[4].length() > 0) token.set(CoreAnnotations.NormalizedNamedEntityTagAnnotation.class, bits[4]);
+    if(!bits[4].isEmpty()) token.set(CoreAnnotations.NormalizedNamedEntityTagAnnotation.class, bits[4]);
     // Character offsets
-    if(bits[5].length() > 0) token.set(CoreAnnotations.CharacterOffsetBeginAnnotation.class, Integer.parseInt(bits[5]));
-    if(bits[6].length() > 0) token.set(CoreAnnotations.CharacterOffsetEndAnnotation.class, Integer.parseInt(bits[6]));
+    if(!bits[5].isEmpty()) token.set(CoreAnnotations.CharacterOffsetBeginAnnotation.class, Integer.parseInt(bits[5]));
+    if(!bits[6].isEmpty()) token.set(CoreAnnotations.CharacterOffsetEndAnnotation.class, Integer.parseInt(bits[6]));
 
     if(haveExplicitAntecedent){
       // This block is specific to KBP
       // We may have AntecedentAnnotation
       if(bits.length > 7){
         String aa = bits[7].replaceAll(SPACE_HOLDER, " ");
-        if(aa.length() > 0) token.set(CoreAnnotations.AntecedentAnnotation.class, aa);
+        if(!aa.isEmpty()) token.set(CoreAnnotations.AntecedentAnnotation.class, aa);
       }
     }
 
@@ -632,18 +632,18 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
     }
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     Properties props = StringUtils.argsToProperties(args);
     StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
     String file = props.getProperty("file");
     String loadFile = props.getProperty("loadFile");
-    if (loadFile != null && ! loadFile.equals("")) {
+    if (loadFile != null && !loadFile.isEmpty()) {
       CustomAnnotationSerializer ser = new CustomAnnotationSerializer(false, false);
       InputStream is = new FileInputStream(loadFile);
       Annotation anno = ser.load(is);
       System.out.println(anno.toShorterString(new String[0]));
       is.close();
-    } else if (file != null && ! file.equals("")) {
+    } else if (file != null && !file.isEmpty()) {
       String text = edu.stanford.nlp.io.IOUtils.slurpFile(file);
       Annotation doc = new Annotation(text);
       pipeline.annotate(doc);

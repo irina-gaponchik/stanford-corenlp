@@ -7,7 +7,7 @@ import edu.stanford.nlp.io.*;
 
 /** A lexer for the Penn Treebank-style context-free version of the
  * NEGRA corpus.  Inherits ACCEPT and IGNORE fields from
- * edu.stanford.nlp.trees.international.<code>Lexer</code>.
+ * edu.stanford.nlp.trees.international.{@code Lexer}.
  *
  * @author Roger Levy
  */
@@ -31,7 +31,7 @@ class NegraPennLexer implements Lexer {
    *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
-  private static final int ZZ_LEXSTATE[] = { 
+  private static final int[] ZZ_LEXSTATE = {
      0,  0,  1, 1
   };
 
@@ -65,7 +65,7 @@ class NegraPennLexer implements Lexer {
     return result;
   }
 
-  private static int zzUnpackAction(String packed, int offset, int [] result) {
+  private static int zzUnpackAction(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -95,13 +95,13 @@ class NegraPennLexer implements Lexer {
     return result;
   }
 
-  private static int zzUnpackRowMap(String packed, int offset, int [] result) {
+  private static int zzUnpackRowMap(String packed, int offset, int... result) {
     int i = 0;  /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
     while (i < l) {
-      int high = packed.charAt(i++) << 16;
-      result[j++] = high | packed.charAt(i++);
+      int high = (int) packed.charAt(i++) << 16;
+      result[j++] = high | (int) packed.charAt(i++);
     }
     return j;
   }
@@ -126,7 +126,7 @@ class NegraPennLexer implements Lexer {
     return result;
   }
 
-  private static int zzUnpackTrans(String packed, int offset, int [] result) {
+  private static int zzUnpackTrans(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -146,14 +146,14 @@ class NegraPennLexer implements Lexer {
   private static final int ZZ_PUSHBACK_2BIG = 2;
 
   /* error messages for the codes above */
-  private static final String ZZ_ERROR_MSG[] = {
+  private static final String[] ZZ_ERROR_MSG = {
     "Unkown internal scanner error",
     "Error: could not match input",
     "Error: pushback value was too large"
   };
 
   /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
    */
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
@@ -168,7 +168,7 @@ class NegraPennLexer implements Lexer {
     return result;
   }
 
-  private static int zzUnpackAttribute(String packed, int offset, int [] result) {
+  private static int zzUnpackAttribute(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -187,11 +187,11 @@ class NegraPennLexer implements Lexer {
   private int zzState;
 
   /** the current lexical state */
-  private int zzLexicalState = YYINITIAL;
+  private int zzLexicalState;
 
   /** this buffer contains the current text to be matched and is
       the source of the yytext() string */
-  private char zzBuffer[] = new char[ZZ_BUFFERSIZE];
+  private char[] zzBuffer = new char[ZZ_BUFFERSIZE];
 
   /** the textposition at the last accepting state */
   private int zzMarkedPos;
@@ -281,9 +281,9 @@ class NegraPennLexer implements Lexer {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
-   * 
-   * @exception   java.io.IOException  if any I/O-Error occurs
+   * @return      {@code false}, iff there was new input.
+   *
+   * @exception java.io.IOException  if any I/O-Error occurs
    */
   private boolean zzRefill() throws java.io.IOException {
 
@@ -303,7 +303,7 @@ class NegraPennLexer implements Lexer {
     /* is the buffer big enough? */
     if (zzCurrentPos >= zzBuffer.length) {
       /* if not: blow it up */
-      char newBuffer[] = new char[zzCurrentPos*2];
+      char[] newBuffer = new char[(zzCurrentPos << 1)];
       System.arraycopy(zzBuffer, 0, newBuffer, 0, zzBuffer.length);
       zzBuffer = newBuffer;
     }
@@ -430,7 +430,7 @@ class NegraPennLexer implements Lexer {
    *
    * @param   errorCode  the code of the errormessage to display
    */
-  private void zzScanError(int errorCode) {
+  private static void zzScanError(int errorCode) {
     String message;
     try {
       message = ZZ_ERROR_MSG[errorCode];
@@ -518,7 +518,7 @@ class NegraPennLexer implements Lexer {
               zzInput = zzBufferL[zzCurrentPosL++];
             }
           }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+          int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 
@@ -536,23 +536,19 @@ class NegraPennLexer implements Lexer {
       zzMarkedPos = zzMarkedPosL;
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
-        case 2: 
-          { return ACCEPT;
-          }
-        case 5: break;
-        case 1: 
-          { System.err.println("Error: " + yytext());
-                            return IGNORE;
-          }
-        case 6: break;
-        case 4: 
-          { System.out.print(yytext());
-          }
-        case 7: break;
-        case 3: 
-          { return IGNORE;
-          }
-        case 8: break;
+        case 2:
+            return ACCEPT;
+          case 5: break;
+        case 1:
+            System.err.println("Error: " + yytext());
+            return IGNORE;
+          case 6: break;
+        case 4:
+            System.out.print(yytext());
+          case 7: break;
+        case 3:
+            return IGNORE;
+          case 8: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;
@@ -574,29 +570,26 @@ class NegraPennLexer implements Lexer {
    * @param argv   the command line, contains the filenames to run
    *               the scanner on.
    */
-  public static void main(String argv[]) {
+  public static void main(String... argv) {
     if (argv.length == 0) {
       System.out.println("Usage : java NegraPennLexer <inputfile>");
     }
     else {
-      for (int i = 0; i < argv.length; i++) {
-        NegraPennLexer scanner = null;
-        try {
-          scanner = new NegraPennLexer( new java.io.FileReader(argv[i]) );
-          while ( !scanner.zzAtEOF ) scanner.yylex();
+        for (String anArgv : argv) {
+            NegraPennLexer scanner = null;
+            try {
+                scanner = new NegraPennLexer(new FileReader(anArgv));
+                while (!scanner.zzAtEOF) scanner.yylex();
+            } catch (FileNotFoundException e) {
+                System.out.println("File not found : \"" + anArgv + '"');
+            } catch (IOException e) {
+                System.out.println("IO error scanning file \"" + anArgv + '"');
+                System.out.println(e);
+            } catch (Exception e) {
+                System.out.println("Unexpected exception:");
+                e.printStackTrace();
+            }
         }
-        catch (java.io.FileNotFoundException e) {
-          System.out.println("File not found : \""+argv[i]+"\"");
-        }
-        catch (java.io.IOException e) {
-          System.out.println("IO error scanning file \""+argv[i]+"\"");
-          System.out.println(e);
-        }
-        catch (Exception e) {
-          System.out.println("Unexpected exception:");
-          e.printStackTrace();
-        }
-      }
     }
   }
 

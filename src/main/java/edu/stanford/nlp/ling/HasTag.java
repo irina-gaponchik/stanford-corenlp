@@ -1,7 +1,7 @@
 package edu.stanford.nlp.ling;
 
 /**
- * Something that implements the <code>HasTag</code> interface
+ * Something that implements the {@code HasTag} interface
  * knows about part-of-speech tags.
  *
  * @author Christopher Manning

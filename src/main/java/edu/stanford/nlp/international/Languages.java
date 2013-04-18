@@ -18,14 +18,14 @@ public class Languages {
 
   private Languages() {}
 
-  public static enum Language {Arabic,Chinese,English,German,French,Hebrew}
+  public enum Language {Arabic,Chinese,English,German,French,Hebrew}
   
   private static String langList;
   static {
     StringBuilder sb = new StringBuilder();
     for(Language lang : Language.values()) {
       sb.append(lang.toString());
-      sb.append(" ");
+      sb.append(' ');
     }
     langList = sb.toString().trim();
   }

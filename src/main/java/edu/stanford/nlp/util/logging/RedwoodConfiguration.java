@@ -18,16 +18,17 @@ import edu.stanford.nlp.util.Generics;
  * @author Gabor Angeli (angeli at cs.stanford)
  */
 public class RedwoodConfiguration {
-  //-- Properties Regular Expressions --
+    public static final Pattern COMPILE1 = Pattern.compile(",");
+    //-- Properties Regular Expressions --
   private static Pattern consoleColor = Pattern.compile("^log\\.console\\.(.*?)Color$");
-  private static Pattern fileColor = Pattern.compile("^log\\.file\\.(.*?)Color$");
-  private static Pattern consoleStyle = Pattern.compile("^log\\.console\\.(.*?)Style$");
-  private static Pattern fileStyle = Pattern.compile("^log\\.file\\.(.*?)Style$");
+    private static Pattern consoleStyle = Pattern.compile("^log\\.console\\.(.*?)Style$");
+    private static Pattern fileColor = Pattern.compile("^log\\.file\\.(.*?)Color$");
+    private static Pattern fileStyle = Pattern.compile("^log\\.file\\.(.*?)Style$");
 
   /**
    * A list of tasks to run when the configuration is applied
    */
-  private LinkedList<Runnable> tasks = new LinkedList<Runnable>();
+  private LinkedList<Runnable> tasks = new LinkedList<>();
 
   /**
    * Private constructor to prevent use of "new RedwoodConfiguration()"
@@ -47,7 +48,7 @@ public class RedwoodConfiguration {
    * @return this
    */
   public RedwoodConfiguration clear(){
-    tasks = new LinkedList<Runnable>();
+    tasks = new LinkedList<>();
     tasks.add(new Runnable(){ public void run(){
       Redwood.clearHandlers();
       Redwood.restoreSystemStreams();
@@ -248,7 +249,7 @@ public class RedwoodConfiguration {
    * @param channels The names of the channels to hide.
    * @return this
    */
-  public RedwoodConfiguration hideChannels(final Object[] channels){
+  public RedwoodConfiguration hideChannels(final Object... channels){
      tasks.add(new Runnable() { public void run() { Redwood.hideChannels(channels); } });
     return this;
   }
@@ -258,7 +259,7 @@ public class RedwoodConfiguration {
    * @param channels The names of the channels to show.
    * @return this
    */
-  public RedwoodConfiguration showOnlyChannels(final Object[] channels){
+  public RedwoodConfiguration showOnlyChannels(final Object... channels){
      tasks.add(new Runnable() { public void run() { Redwood.showOnlyChannels(channels); } });
     return this;
   }
@@ -404,10 +405,10 @@ public class RedwoodConfiguration {
     //--Method
     String method = get(props,"log.method","default",used).toLowerCase();
     if(method.equalsIgnoreCase("redwood")){
-      edu.stanford.nlp.util.logging.JavaUtilLoggingAdaptor.adapt();
+      JavaUtilLoggingAdaptor.adapt();
       config = config.handler(repeat == null ? visibility : repeat, console);
     } else if(method.equalsIgnoreCase("java.util.logging")){
-      edu.stanford.nlp.util.logging.JavaUtilLoggingAdaptor.adapt();
+      JavaUtilLoggingAdaptor.adapt();
       String loggerName = get(props,"log.method.name","``error``",used);
       if (loggerName.equals("``error``")) {
         throw new IllegalArgumentException("Logger name (log.method.name) required to adapt with java.util.logging");
@@ -445,16 +446,12 @@ public class RedwoodConfiguration {
     }
     // (set visibility)
     if (channelsToShow != null) {
-      if(channelsToShow.equalsIgnoreCase("true")){
-        config = config.printChannels(channelWidth);
-      } else {
-        config = config.printChannels(channelWidth).showOnlyChannels(channelsToShow.split(","));
-      }
+        config = channelsToShow.equalsIgnoreCase("true") ? config.printChannels(channelWidth) : config.printChannels(channelWidth).showOnlyChannels(COMPILE1.split(channelsToShow));
     } else if (channelsToHide != null) {
-      config = config.printChannels(channelWidth).hideChannels(channelsToHide.split(","));
+      config = config.printChannels(channelWidth).hideChannels(COMPILE1.split(channelsToHide));
     }
     if (!channelsDebug) {
-      config = config.hideChannels(new Object[]{Redwood.Flag.DEBUG});
+      config = config.hideChannels(Redwood.Flag.DEBUG);
     }
     //--Error Check
     for(Object propAsObj : props.keySet()) {

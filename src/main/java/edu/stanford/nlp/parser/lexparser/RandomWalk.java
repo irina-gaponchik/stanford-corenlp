@@ -45,9 +45,9 @@ class RandomWalk implements Serializable {
       return hiddenToSeen.get(hidden).getCount(seen) / hiddenToSeen.get(hidden).totalCount();
     } else {
       double total = 0;
-      for (Object seen1 : seenToHidden.keySet()) {
+      for (Map.Entry<Object, Counter> objectCounterEntry : seenToHidden.entrySet()) {
         for (Object hidden1 : hiddenToSeen.keySet()) {
-          double subtotal = hiddenToSeen.get(hidden).getCount(seen1) / hiddenToSeen.get(hidden).totalCount() * (seenToHidden.get(seen1).getCount(hidden1) / seenToHidden.get(seen1).totalCount());
+          double subtotal = hiddenToSeen.get(hidden).getCount(objectCounterEntry.getKey()) / hiddenToSeen.get(hidden).totalCount() * objectCounterEntry.getValue().getCount(hidden1) / objectCounterEntry.getValue().totalCount();
           subtotal += score(hidden1, seen, steps - 1);
           total += subtotal;
         }
@@ -76,20 +76,18 @@ class RandomWalk implements Serializable {
   /**
    * builds a random walk model with n steps.
    *
-   * @param data A collection of seen/hidden event <code>Pair</code>s
+   * @param data A collection of seen/hidden event {@code Pair}s
    */
   public RandomWalk(Collection<Pair<?,?>> data, int steps) {
     train(data);
-    for (Iterator i = seenToHidden.keySet().iterator(); i.hasNext();) {
-      Object seen = i.next();
-      if (!model.containsKey(seen)) {
-        model.put(seen, new ClassicCounter());
+      for (Object seen : seenToHidden.keySet()) {
+          if (!model.containsKey(seen)) {
+              model.put(seen, new ClassicCounter());
+          }
+          for (Object hidden : hiddenToSeen.keySet()) {
+              model.get(seen).setCount(hidden, score(seen, hidden, steps));
+          }
       }
-      for (Iterator j = hiddenToSeen.keySet().iterator(); j.hasNext();) {
-        Object hidden = j.next();
-        model.get(seen).setCount(hidden, score(seen, hidden, steps));
-      }
-    }
   }
 
 }

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 /**
  * Container class for aligning acronyms.
@@ -12,11 +13,12 @@ import java.util.Arrays;
  */
 
 public class Alignment {
-  public char[] longForm;
+    private static final Pattern COMPILE = Pattern.compile("\\s+");
+    public char[] longForm;
   public char[] shortForm;
   public int[] pointers;
 
-  public Alignment(char[] longForm, char[] shortForm, int[] pointers) {
+  public Alignment(char[] longForm, char[] shortForm, int... pointers) {
     this.longForm = longForm;
     this.shortForm = shortForm;
     this.pointers = pointers;
@@ -25,10 +27,10 @@ public class Alignment {
   public void serialize(PrintWriter writer) {
     writer.println(new String(longForm));
     writer.println(new String(shortForm));
-    StringBuffer sb = new StringBuffer();
-    for (int i = 0; i < pointers.length; ++i) {
-      sb.append(pointers[i] + " ");
-    }
+    StringBuilder sb = new StringBuilder();
+      for (int pointer : pointers) {
+          sb.append(pointer).append(' ');
+      }
     writer.println(sb.toString());
   }
 
@@ -48,7 +50,7 @@ public class Alignment {
     if (line == null) {
       throw new IOException();
     }
-    String[] pstrings = line.split("\\s+");
+    String[] pstrings = COMPILE.split(line);
     if (pstrings.length != shortForm.length) {
       throw new IOException("Number of pointers != size of short form");
     }
@@ -70,10 +72,10 @@ public class Alignment {
   private static final char[] spaces = "                      ".toCharArray();
 
   public String toString(String prefix) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append(prefix);
     buf.append(longForm);
-    buf.append("\n");
+    buf.append('\n');
     buf.append(spaces, 0, prefix.length());
     int l = 0;
     for (int s = 0; s < shortForm.length; ++s) {
@@ -81,7 +83,7 @@ public class Alignment {
         continue;
       }
       for (; l < longForm.length && pointers[s] != l; ++l) {
-        buf.append(" ");
+        buf.append(' ');
       }
       if (l < longForm.length) {
         buf.append(shortForm[s]);
@@ -93,7 +95,7 @@ public class Alignment {
 
   @Override
   public boolean equals(Object o) {
-    if (o == null || !(o instanceof Alignment)) {
+    if (!(o instanceof Alignment)) {
       return false;
     }
     Alignment cmp = (Alignment) o;
@@ -104,10 +106,10 @@ public class Alignment {
   @Override
   public int hashCode() {
     int code = 0;
-    for (int i = 0; i < pointers.length; ++i) {
-      code += pointers[i];
-      code *= 31;
-    }
+      for (int pointer : pointers) {
+          code += pointer;
+          code *= 31;
+      }
     return code;
   }
 }

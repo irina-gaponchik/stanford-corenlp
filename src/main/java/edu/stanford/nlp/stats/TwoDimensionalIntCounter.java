@@ -40,7 +40,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
   // the MapFactory used to make new maps in the inner counter
   private MapFactory<K2, MutableInteger> innerMF;
 
-  private int defaultValue = 0;
+  private int defaultValue;
 
   public void defaultReturnValue(double rv) { defaultValue = (int) rv; }
 
@@ -50,10 +50,8 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (o == this) return true;
-    if (!(o instanceof TwoDimensionalIntCounter)) return false;
+      return o == this || o instanceof TwoDimensionalIntCounter && ((TwoDimensionalIntCounter<?, ?>) o).map.equals(map);
 
-    return ((TwoDimensionalIntCounter<?,?>) o).map.equals(map);
   }
 
   @Override
@@ -67,7 +65,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
   public IntCounter<K2> getCounter(K1 o) {
     IntCounter<K2> c = map.get(o);
     if (c == null) {
-      c = new IntCounter<K2>(innerMF);
+      c = new IntCounter<>(innerMF);
       c.setDefaultReturnValue(defaultValue);
       map.put(o, c);
     }
@@ -155,7 +153,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
     int oldCount = getCount(o1, o2);
     total -= oldCount;
     c.remove(o2);
-    if (c.size()==0) {
+    if (c.isEmpty()) {
       map.remove(o1);
     }
     return oldCount;
@@ -185,9 +183,9 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
   }
 
   public IntCounter<K1> totalCounts() {
-    IntCounter<K1> tc = new IntCounter<K1>();
-    for (K1 k1:map.keySet()) {
-      tc.setCount(k1, map.get(k1).totalCount());
+    IntCounter<K1> tc = new IntCounter<>();
+    for (Map.Entry<K1, IntCounter<K2>> k1IntCounterEntry : map.entrySet()) {
+      tc.setCount(k1IntCounterEntry.getKey(), k1IntCounterEntry.getValue().totalCount());
     }
     return tc;
   }
@@ -212,7 +210,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
    *
    * @return a new ConditionalCounter, where order of indices is reversed
    */
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public static <K1,K2> TwoDimensionalIntCounter<K2,K1> reverseIndexOrder(TwoDimensionalIntCounter<K1,K2> cc) {
     // they typing on the outerMF is violated a bit, but it'll work....
     TwoDimensionalIntCounter<K2,K1> result = new TwoDimensionalIntCounter<K2,K1>(
@@ -243,16 +241,16 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
       IntCounter<K2> c = getCounter(key1);
       for (K2 key2 : c.keySet()) {
         double score = c.getCount(key2);
-        buff.append(key1).append("\t").append(key2).append("\t").append(score).append("\n");
+        buff.append(key1).append('\t').append(key2).append('\t').append(score).append('\n');
       }
     }
     return buff.toString();
   }
 
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public String toMatrixString(int cellSize) {
-    List<K1> firstKeys = new ArrayList<K1>(firstKeySet());
-    List<K2> secondKeys = new ArrayList<K2>(secondKeySet());
+    List<K1> firstKeys = new ArrayList<>(firstKeySet());
+    List<K2> secondKeys = new ArrayList<>(secondKeySet());
     Collections.sort((List<? extends Comparable>)firstKeys);
     Collections.sort((List<? extends Comparable>)secondKeys);
     int[][] counts = toMatrix(firstKeys, secondKeys);
@@ -273,10 +271,10 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
     return counts;
   }
 
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public String toCSVString(NumberFormat nf) {
-    List<K1> firstKeys = new ArrayList<K1>(firstKeySet());
-    List<K2> secondKeys = new ArrayList<K2>(secondKeySet());
+    List<K1> firstKeys = new ArrayList<>(firstKeySet());
+    List<K2> secondKeys = new ArrayList<>(secondKeySet());
     Collections.sort((List<? extends Comparable>)firstKeys);
     Collections.sort((List<? extends Comparable>)secondKeys);
     StringBuilder b = new StringBuilder();
@@ -285,7 +283,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
     for (int j = 0; j < secondKeys.size(); j++) {
       headerRow[j + 1] = secondKeys.get(j).toString();
     }
-    b.append(StringUtils.toCSVString(headerRow)).append("\n");
+    b.append(StringUtils.toCSVString(headerRow)).append('\n');
     for (K1 rowLabel : firstKeys) {
       String[] row = new String[secondKeys.size() + 1];
       row[0] = rowLabel.toString();
@@ -293,7 +291,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
         K2 colLabel = secondKeys.get(j);
         row[j + 1] = nf.format(getCount(rowLabel, colLabel));
       }
-      b.append(StringUtils.toCSVString(row)).append("\n");
+      b.append(StringUtils.toCSVString(row)).append('\n');
     }
     return b.toString();
   }
@@ -313,12 +311,12 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
   }
 
   public IntCounter<Pair<K1, K2>> flatten() {
-    IntCounter<Pair<K1, K2>> result = new IntCounter<Pair<K1, K2>>();
+    IntCounter<Pair<K1, K2>> result = new IntCounter<>();
     result.setDefaultReturnValue(defaultValue);
     for (K1 key1 : firstKeySet()) {
       IntCounter<K2> inner = getCounter(key1);
       for (K2 key2 : inner.keySet()) {
-        result.setCount(new Pair<K1, K2>(key1, key2), inner.getIntCount(key2));
+        result.setCount(new Pair<>(key1, key2), inner.getIntCount(key2));
       }
     }
     return result;
@@ -363,7 +361,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
     for (K1 k1 : firstKeySet) {
       IntCounter<K2> c = getCounter(k1);
       Counters.retainNonZeros(c);
-      if (c.size()==0) map.remove(k1); // it's empty, get rid of it!
+      if (c.isEmpty()) map.remove(k1); // it's empty, get rid of it!
     }
   }
 
@@ -414,8 +412,8 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
     total = 0;
   }
 
-  public static void main(String[] args) {
-    TwoDimensionalIntCounter<String,String> cc = new TwoDimensionalIntCounter<String,String>();
+  public static void main(String... args) {
+    TwoDimensionalIntCounter<String,String> cc = new TwoDimensionalIntCounter<>();
     cc.setCount("a", "c", 1.0);
     cc.setCount("b", "c", 1.0);
     cc.setCount("a", "d", 1.0);

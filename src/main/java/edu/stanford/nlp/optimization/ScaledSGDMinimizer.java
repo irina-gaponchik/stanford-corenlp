@@ -27,14 +27,14 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
 
 
   private static int method = 1;  // 0=MinErr  1=Bradley
-  public List<double[]> yList = null;
-  public List<double[]> sList = null;
+  public List<double[]> yList;
+  public List<double[]> sList;
   public double[] diag;
 
   private double fixedGain = 0.99;
   private double[] s,y;
   private static int pairMem = 20;
-  private double aMax = 1e6;
+  private double aMax = 1.0e6;
 
 
   public double tuneFixedGain(edu.stanford.nlp.optimization.Function function, double[] initial, long msPerTest,double fixedStart){
@@ -61,7 +61,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
       this.fixedGain = f;
       System.err.println("Testing with batchsize: " + bSize + "    gain:  " + gain + "  fixedGain:  " + nf.format(fixedGain) );
       this.numPasses = 10000;
-      this.minimize(function, 1e-100, xtest);
+      this.minimize(function, 1.0e-100, xtest);
       double result = dfunction.valueAt(xtest);
 
       if(it == 1){
@@ -93,7 +93,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
 
 
   private class setFixedGain implements PropertySetter<Double>{
-    ScaledSGDMinimizer parent = null;
+    ScaledSGDMinimizer parent;
 
     public setFixedGain(ScaledSGDMinimizer min){parent = min;}
 
@@ -110,12 +110,12 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
 
     for(int i =0;i<2; i++){
       this.fixedGain = tuneDouble(function,initial,msPerTest,new setFixedGain(this),0.1,1.0);
-      gain = tuneGain(function,initial,msPerTest,1e-7,1.0);
+      gain = tuneGain(function,initial,msPerTest, 1.0e-7,1.0);
       bSize = tuneBatch(function,initial,msPerTest,1);
       System.err.println("Results:  fixedGain: " + nf.format(this.fixedGain) + "  gain: " + nf.format(gain) + "  batch " + bSize );
     }
 
-    return new Pair<Integer,Double>(bSize, gain);
+    return new Pair<>(bSize, gain);
   }
 
   @Override
@@ -173,7 +173,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
   @Override
   protected void takeStep(AbstractStochasticCachingDiffFunction dfunction){
     for(int i = 0; i < x.length; i++){
-      double thisGain = fixedGain*gainSchedule(k,5*numBatches)/(diag[i]);
+      double thisGain = fixedGain*gainSchedule(k,5*numBatches)/ diag[i];
       newX[i] = x[i] - thisGain*grad[i];
     }
 
@@ -207,8 +207,8 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
     diag = new double[x.length];
     memory = 1;
     for(int i=0;i<x.length;i++){diag[i]=fixedGain/gain;}
-    sList = new ArrayList<double[]>();
-    yList = new ArrayList<double[]>();
+    sList = new ArrayList<>();
+    yList = new ArrayList<>();
   }
 
 
@@ -216,7 +216,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
 
 
 
-  private void updateDiag(double[] diag,double[] s,double[] y){
+  private void updateDiag(double[] diag,double[] s, double... y){
 
     if(method == 0){
       updateDiagMinErr(diag,s,y);
@@ -227,7 +227,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
   }
 
 
-  private void updateDiagBFGS(double[] diag,double[] s,double[] y){
+  private void updateDiagBFGS(double[] diag,double[] s, double... y){
 
     double sDs = 0.0;
     double sy = 0.0;
@@ -254,7 +254,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
 
 
 
-  private void updateDiagMinErr(double[] diag,double[] s,double[] y){
+  private void updateDiagMinErr(double[] diag,double[] s, double... y){
 
     double low = 0.0;
     double high = 0.0;
@@ -264,7 +264,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
       high += tmp*tmp;
     }
     say("M");
-    double alpha = Math.sqrt((ArrayMath.norm(y)/ArrayMath.norm(s))) *Math.sqrt(( 50.0/ (50.0 + k) ));
+    double alpha = Math.sqrt(ArrayMath.norm(y)/ArrayMath.norm(s)) *Math.sqrt(50.0/ (50.0 + k));
     alpha = alpha*Math.sqrt(ArrayMath.average(diag));
     say(" alpha " + nf.format(alpha));
     high = Math.sqrt(high)/(2*alpha);
@@ -280,7 +280,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
     }
 
     for(int i=0;i<s.length;i++){
-      diag[i] = ( Math.abs(y[i]*s[i]) + 2*lamStar*diag[i])/(s[i]*s[i] + 1e-8 + 2*lamStar);
+      diag[i] = ( Math.abs(y[i]*s[i]) + 2*lamStar*diag[i])/(s[i]*s[i] + 1.0e-8 + 2*lamStar);
       //diag[i] = (y[i]*s[i] + 2*lamStar*diag[i])/(s[i]*s[i] + 2*lamStar);
       if (diag[i] <= 1.0/aMax) {
         diag[i] = 1.0/gain;
@@ -295,7 +295,7 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
   private double getRoot(Function<Double,Double> func, double lower, double upper){
     double mid = 0.5*(lower + upper);
     double fval = 0.0;
-    double TOL = 1e-8;
+    double TOL = 1.0e-8;
     double skew = 0.4;
     int count = 0;
 
@@ -358,11 +358,11 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
     public double [] d;
     private static final long serialVersionUID = 814182172645533781L;
 
-    public weight(double[] wt){
+    public weight(double... wt){
       w = wt;
     }
 
-    public weight(double[] wt,double[] di){
+    public weight(double[] wt, double... di){
       w = wt;
       d = di;
     }
@@ -370,11 +370,11 @@ public class ScaledSGDMinimizer<Q extends AbstractStochasticCachingDiffFunction>
   }
 
 
-  public static void serializeWeights(String serializePath,double[] weights) {
+  public static void serializeWeights(String serializePath, double... weights) {
     serializeWeights(serializePath,weights,null);
   }
 
-  public static void serializeWeights(String serializePath,double[] weights,double[] diag) {
+  public static void serializeWeights(String serializePath,double[] weights, double... diag) {
 
     System.err.println("Serializing weights to " + serializePath + "...");
 

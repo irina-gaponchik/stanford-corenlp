@@ -46,7 +46,7 @@ public abstract class TsurgeonPattern {
   String label;
   TsurgeonPattern[] children;
 
-  TsurgeonPattern(String label, TsurgeonPattern[] children) {
+  TsurgeonPattern(String label, TsurgeonPattern... children) {
     this.label = label;
     this.children = children;
   }

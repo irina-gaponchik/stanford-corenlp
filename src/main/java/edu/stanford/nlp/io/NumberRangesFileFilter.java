@@ -27,7 +27,7 @@ import java.util.List;
  * range = integer "-" integer <p>
  * Whitespace will be ignored.  If the filter constructor is passed anything
  * that is not a list of numeric ranges of this sort, including being passed
- * an empty String, then an <code>IllegalArgumentException</code> will be
+ * an empty String, then an {@code IllegalArgumentException} will be
  * thrown.
  *
  * @author Christopher Manning
@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class NumberRangesFileFilter implements FileFilter {
 
-  private List<Pair<Integer,Integer>> ranges = new ArrayList<Pair<Integer,Integer>>();
+  private List<Pair<Integer,Integer>> ranges = new ArrayList<>();
   private boolean recursively;
 
 
@@ -60,12 +60,8 @@ public class NumberRangesFileFilter implements FileFilter {
         } else {
           int low = Integer.parseInt(one[0].trim());
           int high;
-          if (one.length == 2) {
-            high = Integer.parseInt(one[1].trim());
-          } else {
-            high = low;
-          }
-          Pair<Integer, Integer> p = new Pair<Integer, Integer>(Integer.valueOf(low), Integer.valueOf(high));
+            high = one.length == 2 ? Integer.parseInt(one[1].trim()) : low;
+          Pair<Integer, Integer> p = new Pair<>(low, high);
           this.ranges.add(p);
         }
       }
@@ -130,8 +126,8 @@ public class NumberRangesFileFilter implements FileFilter {
     String theNumber = str.substring(j, k);
     int number = Integer.parseInt(theNumber);
     for (Pair<Integer,Integer> p : ranges) {
-      int low = p.first().intValue();
-      int high = p.second().intValue();
+      int low = p.first();
+      int high = p.second();
       if (number >= low && number <= high) {
         return true;
       }
@@ -143,15 +139,11 @@ public class NumberRangesFileFilter implements FileFilter {
   @Override
   public String toString() {
     StringBuilder sb;
-    if (recursively) {
-      sb = new StringBuilder("recursively ");
-    } else {
-      sb = new StringBuilder();
-    }
+      sb = recursively ? new StringBuilder("recursively ") : new StringBuilder();
     for (Iterator<Pair<Integer,Integer>> it = ranges.iterator(); it.hasNext(); ) {
       Pair<Integer,Integer> p = it.next();
-      int low = p.first().intValue();
-      int high = p.second().intValue();
+      int low = p.first();
+      int high = p.second();
       if (low == high) {
         sb.append(low);
       } else {

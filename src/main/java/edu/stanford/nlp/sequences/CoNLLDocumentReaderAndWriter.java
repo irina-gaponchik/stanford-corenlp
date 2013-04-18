@@ -85,7 +85,7 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
     if (TREAT_FILE_AS_ONE_DOCUMENT) {
       return Collections.singleton(IOUtils.slurpReader(r)).iterator();
     } else {
-      Collection<String> docs = new ArrayList<String>();
+      Collection<String> docs = new ArrayList<>();
       ObjectBank<String> ob = ObjectBank.getLineIterator(r);
       StringBuilder current = new StringBuilder();
       for (String line : ob) {
@@ -108,7 +108,7 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
 
 
   private List<CoreLabel> processDocument(String doc) {
-    List<CoreLabel> lis = new ArrayList<CoreLabel>();
+    List<CoreLabel> lis = new ArrayList<>();
     String[] lines = doc.split("\n");
     for (String line : lines) {
       if ( ! flags.deleteBlankLines || ! white.matcher(line).matches()) {
@@ -154,59 +154,43 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
       System.err.println("entitySubclassify: unknown style: " + style);
       how = 4;
     }
-    tokens = new PaddedList<CoreLabel>(tokens, new CoreLabel());
+    tokens = new PaddedList<>(tokens, new CoreLabel());
     int k = tokens.size();
     String[] newAnswers = new String[k];
     for (int i = 0; i < k; i++) {
-      final CoreLabel c = tokens.get(i);
-      final CoreLabel p = tokens.get(i - 1);
-      final CoreLabel n = tokens.get(i + 1);
-      final String cAns = c.get(CoreAnnotations.AnswerAnnotation.class);
+      CoreLabel c = tokens.get(i);
+      CoreLabel p = tokens.get(i - 1);
+      CoreLabel n = tokens.get(i + 1);
+      String cAns = c.get(CoreAnnotations.AnswerAnnotation.class);
       if (cAns.length() > 1 && cAns.charAt(1) == '-') {
         String pAns = p.get(CoreAnnotations.AnswerAnnotation.class);
         if (pAns == null) { pAns = OTHER; }
         String nAns = n.get(CoreAnnotations.AnswerAnnotation.class);
         if (nAns == null) { nAns = OTHER; }
-        final String base = cAns.substring(2, cAns.length());
-        String pBase = (pAns.length() > 2 ? pAns.substring(2, pAns.length()) : pAns);
-        String nBase = (nAns.length() > 2 ? nAns.substring(2, nAns.length()) : nAns);
+        String base = cAns.substring(2, cAns.length());
+        String pBase = pAns.length() > 2 ? pAns.substring(2, pAns.length()) : pAns;
+        String nBase = nAns.length() > 2 ? nAns.substring(2, nAns.length()) : nAns;
         char prefix = cAns.charAt(0);
-        char pPrefix = (pAns.length() > 0) ? pAns.charAt(0) : ' ';
-        char nPrefix = (nAns.length() > 0) ? nAns.charAt(0) : ' ';
+        char pPrefix = !pAns.isEmpty() ? pAns.charAt(0) : ' ';
+        char nPrefix = !nAns.isEmpty() ? nAns.charAt(0) : ' ';
         boolean isStartAdjacentSame = base.equals(pBase) &&
           (prefix == 'B' || prefix == 'S' || pPrefix == 'E' || pPrefix == 'S');
         boolean isEndAdjacentSame = base.equals(nBase) &&
           (prefix == 'E' || prefix == 'S' || nPrefix == 'B' || pPrefix == 'S');
-        boolean isFirst = (!base.equals(pBase)) || cAns.charAt(0) == 'B';
-        boolean isLast = (!base.equals(nBase)) || nAns.charAt(0) == 'B';
+        boolean isFirst = !base.equals(pBase) || cAns.charAt(0) == 'B';
+        boolean isLast = !base.equals(nBase) || nAns.charAt(0) == 'B';
         switch (how) {
         case 0:
-          if (isStartAdjacentSame) {
-            newAnswers[i] = intern("B-" + base);
-          } else {
-            newAnswers[i] = intern("I-" + base);
-          }
+            newAnswers[i] = isStartAdjacentSame ? intern("B-" + base) : intern("I-" + base);
           break;
         case 1:
-          if (isFirst) {
-            newAnswers[i] = intern("B-" + base);
-          } else {
-            newAnswers[i] = intern("I-" + base);
-          }
+            newAnswers[i] = isFirst ? intern("B-" + base) : intern("I-" + base);
           break;
         case 2:
-          if (isEndAdjacentSame) {
-            newAnswers[i] = intern("E-" + base);
-          } else {
-            newAnswers[i] = intern("I-" + base);
-          }
+            newAnswers[i] = isEndAdjacentSame ? intern("E-" + base) : intern("I-" + base);
           break;
         case 3:
-          if (isLast) {
-            newAnswers[i] = intern("E-" + base);
-          } else {
-            newAnswers[i] = intern("I-" + base);
-          }
+            newAnswers[i] = isLast ? intern("E-" + base) : intern("I-" + base);
           break;
         case 4:
           newAnswers[i] = intern("I-" + base);
@@ -214,13 +198,9 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
         case 5:
           if (isFirst && isLast) {
             newAnswers[i] = intern("S-" + base);
-          } else if ((!isFirst) && isLast) {
+          } else if (!isFirst && isLast) {
             newAnswers[i] = intern("E-" + base);
-          } else if (isFirst && (!isLast)) {
-            newAnswers[i] = intern("B-" + base);
-          } else {
-            newAnswers[i] = intern("I-" + base);
-          }
+          } else newAnswers[i] = isFirst && !isLast ? intern("B-" + base) : intern("I-" + base);
         }
       } else {
         newAnswers[i] = cAns;
@@ -283,11 +263,7 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
   }
 
   private String intern(String s) {
-    if (flags.intern) {
-      return s.intern();
-    } else {
-      return s;
-    }
+      return flags.intern ? s.intern() : s;
   }
 
   /** Return the coding scheme to IOB1 coding, regardless of what was used
@@ -299,7 +275,7 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
     if (flags.retainEntitySubclassification) {
       return;
     }
-    tokens = new PaddedList<CoreLabel>(tokens, new CoreLabel());
+    tokens = new PaddedList<>(tokens, new CoreLabel());
     int k = tokens.size();
     String[] newAnswers = new String[k];
     for (int i = 0; i < k; i++) {
@@ -307,14 +283,10 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
       CoreLabel p = tokens.get(i - 1);
       if (c.get(CoreAnnotations.AnswerAnnotation.class).length() > 1 && c.get(CoreAnnotations.AnswerAnnotation.class).charAt(1) == '-') {
         String base = c.get(CoreAnnotations.AnswerAnnotation.class).substring(2);
-        String pBase = (p.get(CoreAnnotations.AnswerAnnotation.class).length() <= 2 ? p.get(CoreAnnotations.AnswerAnnotation.class) : p.get(CoreAnnotations.AnswerAnnotation.class).substring(2));
-        boolean isSecond = (base.equals(pBase));
-        boolean isStart = (c.get(CoreAnnotations.AnswerAnnotation.class).charAt(0) == 'B' || c.get(CoreAnnotations.AnswerAnnotation.class).charAt(0) == 'S');
-        if (isSecond && isStart) {
-          newAnswers[i] = intern("B-" + base);
-        } else {
-          newAnswers[i] = intern("I-" + base);
-        }
+        String pBase = p.get(CoreAnnotations.AnswerAnnotation.class).length() <= 2 ? p.get(CoreAnnotations.AnswerAnnotation.class) : p.get(CoreAnnotations.AnswerAnnotation.class).substring(2);
+        boolean isSecond = base.equals(pBase);
+        boolean isStart = c.get(CoreAnnotations.AnswerAnnotation.class).charAt(0) == 'B' || c.get(CoreAnnotations.AnswerAnnotation.class).charAt(0) == 'S';
+          newAnswers[i] = isSecond && isStart ? intern("B-" + base) : intern("I-" + base);
       } else {
         newAnswers[i] = c.get(CoreAnnotations.AnswerAnnotation.class);
       }
@@ -331,7 +303,7 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
    *  @param doc The document: A List of CoreLabel
    *  @param out Where to send the answers to
    */
-  @SuppressWarnings({"StringEquality"})
+  @SuppressWarnings("StringEquality")
   public void printAnswers(List<CoreLabel> doc, PrintWriter out) {
     // boolean tagsMerged = flags.mergeTags;
     // boolean useHead = flags.splitOnHead;
@@ -350,7 +322,7 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
         String guess = fl.get(CoreAnnotations.AnswerAnnotation.class);
         // System.err.println(fl.word() + "\t" + fl.get(CoreAnnotations.AnswerAnnotation.class) + "\t" + fl.get(CoreAnnotations.AnswerAnnotation.class));
         String pos = fl.tag();
-        String chunk = (fl.get(CoreAnnotations.ChunkAnnotation.class) == null ? "" : fl.get(CoreAnnotations.ChunkAnnotation.class));
+        String chunk = fl.get(CoreAnnotations.ChunkAnnotation.class) == null ? "" : fl.get(CoreAnnotations.ChunkAnnotation.class);
         out.println(fl.word() + '\t' + pos + '\t' + chunk + '\t' +
                     gold + '\t' + guess);
       }
@@ -359,7 +331,7 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
 
   /** Count some stats on what occurs in a file.
    */
-  public static void main(String[] args) throws IOException, ClassNotFoundException {
+  public static void main(String... args) throws IOException, ClassNotFoundException {
     CoNLLDocumentReaderAndWriter f = new CoNLLDocumentReaderAndWriter();
     f.init(new SeqClassifierFlags());
     int numDocs = 0;

@@ -1,7 +1,6 @@
 package edu.stanford.nlp.trees;
 
 import edu.stanford.nlp.ling.*;
-import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseEnglishWordMap;
 import edu.stanford.nlp.util.*;
@@ -13,7 +12,7 @@ import java.util.*;
 
 /**
  * A class for customizing the print method(s) for a
- * <code>edu.stanford.nlp.trees.Tree</code> as the output of the
+ * {@code edu.stanford.nlp.trees.Tree} as the output of the
  * parser.  This class supports printing in multiple ways and altering
  * behavior via properties specified at construction.
  *
@@ -126,12 +125,12 @@ public class TreePrint {
    *                CC propagation, which we generally recommend.)
    * @param optionsString Options that additionally specify how trees are to
    *                be printed (for instance, whether stemming should be done).
-   *                Known options are: <code>stem, lexicalize, markHeadNodes,
+   *                Known options are: {@code stem, lexicalize, markHeadNodes,
    *                xml, removeTopBracket, transChinese,
    *                includePunctuationDependencies, basicDependencies, treeDependencies,
    *                CCPropagatedDependencies, collapsedDependencies, nonCollapsedDependencies,
    *                nonCollapsedDependenciesSeparated
-   *                </code>.
+   *                }.
    * @param tlp     The TreebankLanguagePack used to do things like delete
    *                or ignore punctuation in output
    * @param hf      The HeadFinder used in printing output
@@ -158,21 +157,13 @@ public class TreePrint {
       dependencyWordFilter = Filters.acceptFilter();
       puncWordFilter = Filters.acceptFilter();
     } else {
-      dependencyFilter = new Dependencies.DependentPuncTagRejectFilter<Label, Label, Object>(tlp.punctuationTagRejectFilter());
-      dependencyWordFilter = new Dependencies.DependentPuncWordRejectFilter<Label, Label, Object>(tlp.punctuationWordRejectFilter());
+      dependencyFilter = new Dependencies.DependentPuncTagRejectFilter<>(tlp.punctuationTagRejectFilter());
+      dependencyWordFilter = new Dependencies.DependentPuncWordRejectFilter<>(tlp.punctuationWordRejectFilter());
       puncWordFilter = tlp.punctuationWordRejectFilter();
     }
-    if (propertyToBoolean(this.options, "stem")) {
-      stemmer = new WordStemmer();
-    } else {
-      stemmer = null;
-    }
-    if (formats.containsKey("typedDependenciesCollapsed") ||
-        formats.containsKey("typedDependencies")) {
-      gsf = tlp.grammaticalStructureFactory(puncWordFilter, typedDependencyHF);
-    } else {
-      gsf = null;
-    }
+      stemmer = propertyToBoolean(this.options, "stem") ? new WordStemmer() : null;
+      gsf = formats.containsKey("typedDependenciesCollapsed") ||
+              formats.containsKey("typedDependencies") ? tlp.grammaticalStructureFactory(puncWordFilter, typedDependencyHF) : null;
 
     lexicalize = propertyToBoolean(this.options, "lexicalize");
     markHeadNodes = propertyToBoolean(this.options, "markHeadNodes");
@@ -187,11 +178,7 @@ public class TreePrint {
     treeDependencies = propertyToBoolean(this.options, "treeDependencies");
 
     // if no option format for the dependencies is specified, CCPropagated is the default
-    if ( ! basicDependencies && ! collapsedDependencies && ! nonCollapsedDependencies && ! nonCollapsedDependenciesSeparated && ! treeDependencies) {
-      CCPropagatedDependencies = true;
-    } else {
-      CCPropagatedDependencies = propertyToBoolean(this.options, "CCPropagatedDependencies");
-    }
+      CCPropagatedDependencies = !basicDependencies && !collapsedDependencies && !nonCollapsedDependencies && !nonCollapsedDependenciesSeparated && !treeDependencies ? true : propertyToBoolean(this.options, "CCPropagatedDependencies");
   }
 
 
@@ -212,30 +199,30 @@ public class TreePrint {
    * @param t The tree to display
    * @param pw The PrintWriter to print it to
    */
-  public void printTree(final Tree t, PrintWriter pw) {
+  public void printTree(Tree t, PrintWriter pw) {
     printTree(t, "", pw);
   }
 
 
   /**
    * Prints the tree according to the options specified for this instance.
-   * If the tree <code>t</code> is <code>null</code>, then the code prints
+   * If the tree {@code t} is {@code null}, then the code prints
    * a line indicating a skipped tree.  Under the XML option this is
-   * an <code>s</code> element with the <code>skipped</code> attribute having
-   * value <code>true</code>, and, otherwise, it is the token
-   * <code>SENTENCE_SKIPPED_OR_UNPARSABLE</code>.
+   * an {@code s} element with the {@code skipped} attribute having
+   * value {@code true}, and, otherwise, it is the token
+   * {@code SENTENCE_SKIPPED_OR_UNPARSABLE}.
    *
    * @param t The tree to display
    * @param id A name for this sentence
    * @param pw Where to display the tree
    */
-  public void printTree(final Tree t, final String id, final PrintWriter pw) {
-    final boolean inXml = propertyToBoolean(options, "xml");
+  public void printTree(Tree t, String id, PrintWriter pw) {
+    boolean inXml = propertyToBoolean(options, "xml");
     if (t == null) {
       // Parsing didn't succeed.
       if (inXml) {
         pw.print("<s");
-        if (id != null && ! "".equals(id)) {
+        if (id != null && id != null && !id.isEmpty()) {
           pw.print(" id=\"" + XMLUtils.escapeXML(id) + '\"');
         }
         pw.println(" skipped=\"true\"/>");
@@ -246,7 +233,7 @@ public class TreePrint {
     } else {
       if (inXml) {
         pw.print("<s");
-        if (id != null && ! "".equals(id)) {
+        if (id != null && id != null && !id.isEmpty()) {
           pw.print(" id=\"" + XMLUtils.escapeXML(id) + '\"');
         }
         pw.println(">");
@@ -262,18 +249,18 @@ public class TreePrint {
 
   /**
    * Prints the trees according to the options specified for this instance.
-   * If the tree <code>t</code> is <code>null</code>, then the code prints
+   * If the tree {@code t} is {@code null}, then the code prints
    * a line indicating a skipped tree.  Under the XML option this is
-   * an <code>s</code> element with the <code>skipped</code> attribute having
-   * value <code>true</code>, and, otherwise, it is the token
-   * <code>SENTENCE_SKIPPED_OR_UNPARSABLE</code>.
+   * an {@code s} element with the {@code skipped} attribute having
+   * value {@code true}, and, otherwise, it is the token
+   * {@code SENTENCE_SKIPPED_OR_UNPARSABLE}.
    *
    * @param trees The list of trees to display
    * @param id A name for this sentence
    * @param pw Where to dislay the tree
    */
-  public void printTrees(final List<ScoredObject<Tree>> trees, final String id, final PrintWriter pw) {
-    final boolean inXml = propertyToBoolean(options, "xml");
+  public void printTrees(List<ScoredObject<Tree>> trees, String id, PrintWriter pw) {
+    boolean inXml = propertyToBoolean(options, "xml");
     int ii = 0;  // incremented before used, so first tree is numbered 1
     for (ScoredObject<Tree> tp : trees) {
       ii++;
@@ -284,7 +271,7 @@ public class TreePrint {
         // Parsing didn't succeed.
         if (inXml) {
           pw.print("<s");
-          if (id != null && ! "".equals(id)) {
+          if (id != null && id != null && !id.isEmpty()) {
             pw.print(" id=\"" + XMLUtils.escapeXML(id) + '\"');
           }
           pw.print(" n=\"");
@@ -299,7 +286,7 @@ public class TreePrint {
       } else {
         if (inXml) {
           pw.print("<s");
-          if (id != null && ! "".equals(id)) {
+          if (id != null && id != null && !id.isEmpty()) {
             pw.print(" id=\"");
             pw.print(XMLUtils.escapeXML(id));
             pw.print('\"');
@@ -335,7 +322,7 @@ public class TreePrint {
    * @param pw Where to print it to
    * @param inXml Whether to use XML style printing
    */
-  private void printTreeInternal(final Tree t, final PrintWriter pw, final boolean inXml) {
+  private void printTreeInternal(Tree t, PrintWriter pw, boolean inXml) {
     Tree outputTree = t;
 
     if (formats.containsKey("conll2007") || removeEmpty) {
@@ -464,7 +451,7 @@ public class TreePrint {
                                                  CoreLabel.factory());
         indexedTree.indexLeaves();
         Set<Dependency<Label, Label, Object>> depsSet = indexedTree.mapDependencies(dependencyWordFilter, hf);
-        List<Dependency<Label, Label, Object>> sortedDeps = new ArrayList<Dependency<Label, Label, Object>>(depsSet);
+        List<Dependency<Label, Label, Object>> sortedDeps = new ArrayList<>(depsSet);
         Collections.sort(sortedDeps, Dependencies.dependencyIndexComparator());
         pw.println("<dependencies style=\"untyped\">");
         for (Dependency<Label, Label, Object> d : sortedDeps) {
@@ -531,7 +518,7 @@ public class TreePrint {
         Tree indexedTree = outputTree.deepCopy(outputTree.treeFactory());
         indexedTree.indexLeaves();
         Set<Dependency<Label, Label, Object>> depsSet = indexedTree.mapDependencies(dependencyWordFilter, hf);
-        List<Dependency<Label, Label, Object>> sortedDeps = new ArrayList<Dependency<Label, Label, Object>>(depsSet);
+        List<Dependency<Label, Label, Object>> sortedDeps = new ArrayList<>(depsSet);
         Collections.sort(sortedDeps, Dependencies.dependencyIndexComparator());
         for (Dependency<Label, Label, Object> d : sortedDeps) {
           pw.println(d.toString("predicate"));
@@ -550,7 +537,7 @@ public class TreePrint {
 
         List<CoreLabel> tagged = it.taggedLabeledYield();
         Set<Dependency<Label, Label, Object>> depsSet = it.mapDependencies(dependencyFilter, hf, "root");
-        List<Dependency<Label, Label, Object>> sortedDeps = new ArrayList<Dependency<Label, Label, Object>>(depsSet);
+        List<Dependency<Label, Label, Object>> sortedDeps = new ArrayList<>(depsSet);
         Collections.sort(sortedDeps, Dependencies.dependencyIndexComparator());
 
         for (int i = 0; i < tagged.size(); i++) {
@@ -570,7 +557,7 @@ public class TreePrint {
           String feats = "_";
           String pHead = "_";
           String pDepRel = "_";
-          String depRel = (govi == 0) ? "ROOT" : "NULL";
+          String depRel = govi == 0 ? "ROOT" : "NULL";
 
           // The 2007 format has 10 fields
           pw.printf("%d\t%s\t%s\t%s\t%s\t%s\t%d\t%s\t%s\t%s%n", depi,word,lemma,tag,tag,feats,govi,depRel,pHead,pDepRel);
@@ -626,7 +613,7 @@ public class TreePrint {
               if (foundRoot) { throw new RuntimeException(); }
               foundRoot = true;
             }
-            pw.println(index+"\t"+word+"\t"+tag+"\t"+parent);
+            pw.println(index+"\t"+word+ '\t' +tag+ '\t' +parent);
             index++;
           }
           pw.println();
@@ -725,11 +712,7 @@ public class TreePrint {
       return t; // don't worry about head-marking leaves
     }
     Label newLabel;
-    if (t == head) {
-      newLabel = headMark(t.label());
-    } else {
-      newLabel = t.label();
-    }
+      newLabel = t.equals(head) ? headMark(t.label()) : t.label();
     Tree newHead = hf.determineHead(t);
     return t.treeFactory().newTreeNode(newLabel, Arrays.asList(headMarkChildren(t, newHead)));
   }
@@ -766,7 +749,7 @@ public class TreePrint {
    *
    *  @param args Command line arguments, as above.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     String format = "penn";
     String options = "";
     String tlpName = "edu.stanford.nlp.trees.PennTreebankLanguagePack";
@@ -808,20 +791,16 @@ public class TreePrint {
     } else {
       hf = tlp.headFinder();
     }
-    TreePrint print = new TreePrint(format, options, tlp, (hf == null) ? tlp.headFinder(): hf, tlp.typedDependencyHeadFinder());
+    TreePrint print = new TreePrint(format, options, tlp, hf == null ? tlp.headFinder(): hf, tlp.typedDependencyHeadFinder());
     Iterator<Tree> i; // initialized below
     if (args.length > 0) {
       Treebank trees; // initialized below
       TreeReaderFactory trf;
-      if (argsMap.keySet().contains("-useTLPTreeReader")) {
-        trf = tlp.treeReaderFactory();
-      } else {
-        trf = new TreeReaderFactory() {
-          public TreeReader newTreeReader(Reader in) {
-            return new PennTreeReader(in, new LabeledScoredTreeFactory(new StringLabelFactory()), new TreeNormalizer());
-          }
+        trf = argsMap.keySet().contains("-useTLPTreeReader") ? tlp.treeReaderFactory() : new TreeReaderFactory() {
+            public TreeReader newTreeReader(Reader in) {
+                return new PennTreeReader(in, new LabeledScoredTreeFactory(new StringLabelFactory()), new TreeNormalizer());
+            }
         };
-      }
       trees = new DiskTreebank(trf);
       trees.loadPath(args[0]);
       i = trees.iterator();
@@ -849,8 +828,8 @@ public class TreePrint {
    * </dd>
    * <dt>"readable"</dt>
    * <dd>Formats the dependencies as a table with columns
-   * <code>dependent</code>, <code>relation</code>, and
-   * <code>governor</code>, as exemplified by the following:
+   * {@code dependent}, {@code relation}, and
+   * {@code governor}, as exemplified by the following:
    * <pre>
    *  Sam-0               nsubj               died-1
    *  today-2             tmod                died-1
@@ -874,20 +853,17 @@ public class TreePrint {
    * </dl>
    *
    * @param dependencies The TypedDependencies to print
-   * @param format a <code>String</code> specifying the desired format
-   * @return a <code>String</code> representation of the typed
-   *         dependencies in this <code>GrammaticalStructure</code>
+   * @param format a {@code String} specifying the desired format
+   * @return a {@code String} representation of the typed
+   *         dependencies in this {@code GrammaticalStructure}
    */
   private static String toString(Collection<TypedDependency> dependencies, String format) {
     if (format != null && format.equals("xml")) {
       return toXMLString(dependencies);
     } else if (format != null && format.equals("readable")) {
       return toReadableString(dependencies);
-    } else if (format != null && format.equals("separator")) {
-        return toString(dependencies, true);
-    } else {
-      return toString(dependencies, false);
-    }
+    } else
+        return format != null && format.equals("separator") ? toString(dependencies, true) : toString(dependencies, false);
   }
 
   /**
@@ -901,13 +877,13 @@ public class TreePrint {
    *
    * @param dependencies The TypedDependencies to print
    * @param extraSep boolean indicating whether the extra dependencies have to be printed separately, after the basic ones
-   * @return a <code>String</code> representation of this set of
+   * @return a {@code String} representation of this set of
    *         typed dependencies
    */
   private static String toString(Collection<TypedDependency> dependencies, boolean extraSep) {
     StringBuilder buf = new StringBuilder();
     if (extraSep) {
-      List<TypedDependency> extraDeps =  new ArrayList<TypedDependency>();
+      List<TypedDependency> extraDeps =  new ArrayList<>();
       for (TypedDependency td : dependencies) {
         if (td.extra()) {
           extraDeps.add(td);
@@ -981,7 +957,7 @@ public class TreePrint {
   /**
    * USED BY TREEPRINT AND WSD.SUPWSD.PREPROCESS
    * Prints this set of typed dependencies to the specified
-   * <code>PrintWriter</code>.
+   * {@code PrintWriter}.
    * @param dependencies The collection of TypedDependency to print
    * @param pw Where to print them
    */
@@ -992,7 +968,7 @@ public class TreePrint {
   /**
    * USED BY TREEPRINT
    * Prints this set of typed dependencies to the specified
-   * <code>PrintWriter</code> in the specified format.
+   * {@code PrintWriter} in the specified format.
    * @param dependencies The collection of TypedDependency to print
    * @param format "xml" or "readable" or other
    * @param pw Where to print them

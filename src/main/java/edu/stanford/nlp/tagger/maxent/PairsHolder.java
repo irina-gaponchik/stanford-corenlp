@@ -19,11 +19,9 @@ import java.util.*;
  */
 public class PairsHolder {
 
-  private final ArrayList<WordTag> arr = new ArrayList<WordTag>();
+  private final ArrayList<WordTag> arr = new ArrayList<>();
 
-  public PairsHolder() {}
-
-  public void setSize(int s) {
+    public void setSize(int s) {
     while (arr.size() < s) {
       arr.add(new WordTag(null,"NN"));  // todo: remove NN.  NA okay?
     }
@@ -114,18 +112,10 @@ public class PairsHolder {
   }
 
   String getWord(History h, int position) {
-    if (((h.current + position) >= h.start) && (h.current + position <= h.end)) {
-      return arr.get(h.current + position).word();
-    } else {
-      return "NA";
-    }
+      return h.current + position >= h.start && h.current + position <= h.end ? arr.get(h.current + position).word() : "NA";
   }
 
   String getTag(History h, int position) {
-    if (((h.current + position) >= h.start) && (h.current + position <= h.end)) {
-      return arr.get(h.current + position).tag();
-    } else {
-      return "NA";
-    }
+      return h.current + position >= h.start && h.current + position <= h.end ? arr.get(h.current + position).tag() : "NA";
   }
 }

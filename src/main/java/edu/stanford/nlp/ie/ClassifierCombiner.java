@@ -45,14 +45,14 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
   private static final String DEFAULT_CLASSIFIER_PATH="/u/nlp/data/ner/goodClassifiers/english.all.3class.distsim.crf.ser.gz";
 
   /**
-   * @param p Properties File that specifies <code>loadClassifier</code>
-   * and <code>loadAuxClassifier</code> properties or, alternatively, <code>loadClassifier[1-10]</code> properties.
+   * @param p Properties File that specifies {@code loadClassifier}
+   * and {@code loadAuxClassifier} properties or, alternatively, {@code loadClassifier[1-10]} properties.
    * @throws FileNotFoundException If classifier files not found
    */
   public ClassifierCombiner(Properties p) throws FileNotFoundException {
     super(p);
     String loadPath1, loadPath2;
-    List<String> paths = new ArrayList<String>();
+    List<String> paths = new ArrayList<>();
 
     //
     // preferred configuration: specify up to 10 base classifiers using loadClassifier1 to loadClassifier10 properties
@@ -95,7 +95,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
    */
   public ClassifierCombiner(String... loadPaths) throws FileNotFoundException {
     super(new Properties());
-    List<String> paths = new ArrayList<String>(Arrays.asList(loadPaths));
+    List<String> paths = new ArrayList<>(Arrays.asList(loadPaths));
     loadClassifiers(paths);
   }
 
@@ -106,13 +106,13 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
    */
   public ClassifierCombiner(AbstractSequenceClassifier<IN>... classifiers) {
     super(new Properties());
-    baseClassifiers = new ArrayList<AbstractSequenceClassifier<IN>>(Arrays.asList(classifiers));
+    baseClassifiers = new ArrayList<>(Arrays.asList(classifiers));
     flags.backgroundSymbol = baseClassifiers.get(0).flags.backgroundSymbol;
   }
 
 
   private void loadClassifiers(List<String> paths) throws FileNotFoundException {
-    baseClassifiers = new ArrayList<AbstractSequenceClassifier<IN>>();
+    baseClassifiers = new ArrayList<>();
     for(String path: paths){
       AbstractSequenceClassifier<IN> cls = loadClassifierFromPath(path);
       baseClassifiers.add(cls);
@@ -120,7 +120,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
         System.err.printf("Successfully loaded classifier #%d from %s.\n", baseClassifiers.size(), path);
       }
     }
-    if (baseClassifiers.size() > 0) {
+    if (!baseClassifiers.isEmpty()) {
       flags.backgroundSymbol = baseClassifiers.get(0).flags.backgroundSymbol;
     }
   }
@@ -168,13 +168,13 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
    */
   private List<IN> mergeDocuments(List<List<IN>> baseDocuments){
     // we should only get here if there is something to merge
-    assert(! baseClassifiers.isEmpty() && ! baseDocuments.isEmpty());
+    assert ! baseClassifiers.isEmpty() && ! baseDocuments.isEmpty();
     // all base outputs MUST have the same length (we generated them internally!)
     for(int i = 1; i < baseDocuments.size(); i ++)
-      assert(baseDocuments.get(0).size() == baseDocuments.get(i).size());
+      assert baseDocuments.get(0).size() == baseDocuments.get(i).size();
 
     // baseLabels.get(i) points to the labels assigned by baseClassifiers.get(i)
-    List<Set<String>> baseLabels = new ArrayList<Set<String>>();
+    List<Set<String>> baseLabels = new ArrayList<>();
     Set<String> seenLabels = Generics.newHashSet();
     for (AbstractSequenceClassifier<? extends CoreMap> baseClassifier : baseClassifiers) {
       Set<String> labs = baseClassifier.labels();
@@ -231,7 +231,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
     boolean insideAuxTag = false;
     boolean auxTagValid = true;
     String prevAnswer = background;
-    Collection<INN> constituents = new ArrayList<INN>();
+    Collection<INN> constituents = new ArrayList<>();
 
     Iterator<INN> auxIterator = auxDocument.listIterator();
 
@@ -251,7 +251,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
             }
           }
           auxTagValid = true;
-          constituents = new ArrayList<INN>();
+          constituents = new ArrayList<>();
         }
         insideAuxTag = true;
         if (insideMainTag) { auxTagValid = false; }
@@ -264,7 +264,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
               wi.set(CoreAnnotations.AnswerAnnotation.class, prevAnswer);
             }
           }
-          constituents = new ArrayList<INN>();
+          constituents = new ArrayList<>();
         }
         insideAuxTag=false;
         auxTagValid = true;
@@ -291,7 +291,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
     if (baseClassifiers.isEmpty()) {
       return tokens;
     }
-    List<List<IN>> baseOutputs = new ArrayList<List<IN>>();
+    List<List<IN>> baseOutputs = new ArrayList<>();
 
     // the first base model works in place, modifying the original tokens
     List<IN> output = baseClassifiers.get(0).classifySentence(tokens);
@@ -308,7 +308,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
       output = baseClassifiers.get(i).classifySentence(tokens);
       baseOutputs.add(output);
     }
-    assert(baseOutputs.size() == baseClassifiers.size());
+    assert baseOutputs.size() == baseClassifiers.size();
     List<IN> finalAnswer = mergeDocuments(baseOutputs);
 
     return finalAnswer;
@@ -348,7 +348,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
    * @param args Command-line arguments as properties: -loadClassifier1 serializedFile -loadClassifier2 serializedFile
    * @throws Exception If IO or serialization error loading classifiers
    */
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     Properties props = StringUtils.argsToProperties(args);
     ClassifierCombiner ec = new ClassifierCombiner(props);
 

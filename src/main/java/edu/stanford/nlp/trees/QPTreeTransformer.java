@@ -95,12 +95,12 @@ public class QPTreeTransformer implements TreeTransformer {
       // have an easier time interpreting the tree later on
       if (children.size() >= 3) {
         boolean flat = true;
-        for (int i = 0; i < children.size(); ++i) {
-          if (!children.get(i).isPreTerminal()) {
-            flat = false;
-            break;
+          for (Tree aChildren : children) {
+              if (!aChildren.isPreTerminal()) {
+                  flat = false;
+                  break;
+              }
           }
-        }
         if (flat) {
           for (int i = 1; i < children.size() - 1; ++i) {
             if (children.get(i).value().startsWith("CC")) {
@@ -131,7 +131,7 @@ public class QPTreeTransformer implements TreeTransformer {
     LabelFactory lf = t.label().labelFactory();
     Tree leftQP = tf.newTreeNode(lf.newLabel("NP"), left);
     Tree rightQP = tf.newTreeNode(lf.newLabel("NP"), right);
-    List<Tree> newChildren = new ArrayList<Tree>();
+    List<Tree> newChildren = new ArrayList<>();
     newChildren.add(leftQP);
     newChildren.add(conj);
     newChildren.add(rightQP);
@@ -160,7 +160,7 @@ public class QPTreeTransformer implements TreeTransformer {
   }
 
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
     QPTreeTransformer transformer = new QPTreeTransformer();
     Treebank tb = new MemoryTreebank();

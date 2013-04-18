@@ -47,6 +47,7 @@ import java.io.*;
 import java.util.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.regex.Pattern;
 
 import static edu.stanford.nlp.util.logging.Redwood.Util.*;
 
@@ -81,9 +82,12 @@ import static edu.stanford.nlp.util.logging.Redwood.Util.*;
 
 public class StanfordCoreNLP extends AnnotationPipeline {
 
-  enum OutputFormat { TEXT, XML, SERIALIZED };
+    public static final Pattern COMPILE3 = Pattern.compile(",");
+    private static final Pattern COMPILE2 = Pattern.compile("[, \t]+");
 
-  // other constants
+    enum OutputFormat { TEXT, XML, SERIALIZED }
+
+    // other constants
   public static final String CUSTOM_ANNOTATOR_PREFIX = "customAnnotatorClass.";
   private static final String PROPS_SUFFIX = ".properties";
   public static final String NEWLINE_SPLITTER_PROPERTY = "ssplit.eolonly";
@@ -101,7 +105,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
   private int numWords;
 
   /** Maintains the shared pool of annotators */
-  private static AnnotatorPool pool = null;
+  private static AnnotatorPool pool;
 
   private Properties properties;
 
@@ -120,7 +124,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
    *
    */
   public StanfordCoreNLP(Properties props)  {
-    this(props, (props == null || PropertiesUtils.getBool(props, "enforceRequirements", true)));
+    this(props, props == null || PropertiesUtils.getBool(props, "enforceRequirements", true));
   }
 
   public StanfordCoreNLP(Properties props, boolean enforceRequirements)  {
@@ -250,7 +254,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
     AnnotatorPool pool = getDefaultAnnotatorPool(props);
 
     // now construct the annotators from the given properties in the given order
-    List<String> annoNames = Arrays.asList(getRequiredProperty(props, "annotators").split("[, \t]+"));
+    List<String> annoNames = Arrays.asList(COMPILE2.split(getRequiredProperty(props, "annotators")));
     Set<String> alreadyAddedAnnoNames = Generics.newHashSet();
     Set<Requirement> requirementsSatisfied = Generics.newHashSet();
     for (String name : annoNames) {
@@ -336,21 +340,17 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       public String signature() {
         // keep track of all relevant properties for this annotator here!
         StringBuilder os = new StringBuilder();
-        os.append("tokenize.whitespace:" +
-                properties.getProperty("tokenize.whitespace", "false"));
+        os.append("tokenize.whitespace:").append(properties.getProperty("tokenize.whitespace", "false"));
         if (Boolean.valueOf(properties.getProperty("tokenize.whitespace",
                 "false"))) {
-          os.append(WhitespaceTokenizerAnnotator.EOL_PROPERTY + ":" +
-                  properties.getProperty(WhitespaceTokenizerAnnotator.EOL_PROPERTY,
-                          "false"));
-          os.append(StanfordCoreNLP.NEWLINE_SPLITTER_PROPERTY + ":" +
-                  properties.getProperty(StanfordCoreNLP.NEWLINE_SPLITTER_PROPERTY,
-                          "false"));
+          os.append(WhitespaceTokenizerAnnotator.EOL_PROPERTY + ':').append(properties.getProperty(WhitespaceTokenizerAnnotator.EOL_PROPERTY,
+                  "false"));
+          os.append(StanfordCoreNLP.NEWLINE_SPLITTER_PROPERTY + ':').append(properties.getProperty(StanfordCoreNLP.NEWLINE_SPLITTER_PROPERTY,
+                  "false"));
           return os.toString();
         } else {
-          os.append(NEWLINE_SPLITTER_PROPERTY + ":" +
-                  Boolean.valueOf(properties.getProperty(NEWLINE_SPLITTER_PROPERTY,
-                          "false")));
+          os.append(NEWLINE_SPLITTER_PROPERTY + ':').append(Boolean.valueOf(properties.getProperty(NEWLINE_SPLITTER_PROPERTY,
+                  "false")));
         }
         return os.toString();
       }
@@ -410,13 +410,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
           boolean whitespaceTokenization = Boolean.valueOf(properties.getProperty("tokenize.whitespace", "false"));
           WordsToSentencesAnnotator wts;
           if (whitespaceTokenization) {
-            if (System.getProperty("line.separator").equals("\n")) {
-              wts = WordsToSentencesAnnotator.newlineSplitter(false, "\n");
-            } else {
-              // throw "\n" in just in case files use that instead of
-              // the system separator
-              wts = WordsToSentencesAnnotator.newlineSplitter(false, System.getProperty("line.separator"), "\n");
-            }
+              wts = System.getProperty("line.separator").equals("\n") ? WordsToSentencesAnnotator.newlineSplitter(false, "\n") : WordsToSentencesAnnotator.newlineSplitter(false, System.getProperty("line.separator"), "\n");
           } else {
             wts = WordsToSentencesAnnotator.newlineSplitter(false, PTBTokenizer.getNewlineToken());
           }
@@ -424,16 +418,12 @@ public class StanfordCoreNLP extends AnnotationPipeline {
         } else {
           WordsToSentencesAnnotator wts;
           String boundaryTokenRegex = properties.getProperty("ssplit.boundaryTokenRegex");
-          if (boundaryTokenRegex != null) {
-            wts = new WordsToSentencesAnnotator(false, boundaryTokenRegex);
-          } else {
-            wts = new WordsToSentencesAnnotator();
-          }
+            wts = boundaryTokenRegex != null ? new WordsToSentencesAnnotator(false, boundaryTokenRegex) : new WordsToSentencesAnnotator();
 
           // regular boundaries
           String bounds = properties.getProperty("ssplit.boundariesToDiscard");
           if (bounds != null){
-            String [] toks = bounds.split(",");
+            String [] toks = COMPILE3.split(bounds);
             // for(int i = 0; i < toks.length; i ++)
             //   System.err.println("BOUNDARY: " + toks[i]);
             wts.setSentenceBoundaryToDiscard(Generics.newHashSet (Arrays.asList(toks)));
@@ -442,7 +432,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
           // HTML boundaries
           bounds = properties.getProperty("ssplit.htmlBoundariesToDiscard");
           if (bounds != null){
-            String [] toks = bounds.split(",");
+            String [] toks = COMPILE3.split(bounds);
             wts.addHtmlSentenceBoundaryToDiscard(Generics.newHashSet (Arrays.asList(toks)));
           }
 
@@ -460,19 +450,14 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       public String signature() {
         // keep track of all relevant properties for this annotator here!
         StringBuilder os = new StringBuilder();
-        os.append(NEWLINE_SPLITTER_PROPERTY + ":" +
-                properties.getProperty(NEWLINE_SPLITTER_PROPERTY, "false"));
+        os.append(NEWLINE_SPLITTER_PROPERTY + ':').append(properties.getProperty(NEWLINE_SPLITTER_PROPERTY, "false"));
         if(Boolean.valueOf(properties.getProperty(NEWLINE_SPLITTER_PROPERTY,
                 "false"))) {
-          os.append("tokenize.whitespace:" +
-                  properties.getProperty("tokenize.whitespace", "false"));
+          os.append("tokenize.whitespace:").append(properties.getProperty("tokenize.whitespace", "false"));
         } else {
-          os.append("ssplit.boundariesToDiscard:" +
-                  properties.getProperty("ssplit.boundariesToDiscard", ""));
-          os.append("ssplit.htmlBoundariesToDiscard:" +
-                  properties.getProperty("ssplit.htmlBoundariesToDiscard", ""));
-          os.append("ssplit.isOneSentence:" +
-                  properties.getProperty("ssplit.isOneSentence", ""));
+          os.append("ssplit.boundariesToDiscard:").append(properties.getProperty("ssplit.boundariesToDiscard", ""));
+          os.append("ssplit.htmlBoundariesToDiscard:").append(properties.getProperty("ssplit.htmlBoundariesToDiscard", ""));
+          os.append("ssplit.isOneSentence:").append(properties.getProperty("ssplit.isOneSentence", ""));
         }
         return os.toString();
       }
@@ -495,9 +480,9 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       @Override
       public String signature() {
         // keep track of all relevant properties for this annotator here!
-        return ("pos.maxlen:" + properties.getProperty("pos.maxlen", "") +
+        return "pos.maxlen:" + properties.getProperty("pos.maxlen", "") +
                 "pos.model:" + properties.getProperty("pos.model", DefaultPaths.DEFAULT_POS_MODEL) +
-                "pos.nthreads:" + properties.getProperty("pos.nthreads", properties.getProperty("nthreads", "")));
+                "pos.nthreads:" + properties.getProperty("pos.nthreads", properties.getProperty("nthreads", ""));
       }
     });
 
@@ -526,13 +511,13 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       private static final long serialVersionUID = 1L;
       @Override
       public Annotator create() {
-        List<String> models = new ArrayList<String>();
+        List<String> models = new ArrayList<>();
         String modelNames = properties.getProperty("ner.model");
         if (modelNames == null) {
-          modelNames = DefaultPaths.DEFAULT_NER_THREECLASS_MODEL + "," + DefaultPaths.DEFAULT_NER_MUC_MODEL + "," + DefaultPaths.DEFAULT_NER_CONLL_MODEL;
+          modelNames = DefaultPaths.DEFAULT_NER_THREECLASS_MODEL + ',' + DefaultPaths.DEFAULT_NER_MUC_MODEL + ',' + DefaultPaths.DEFAULT_NER_CONLL_MODEL;
         }
-        if (modelNames.length() > 0) {
-          models.addAll(Arrays.asList(modelNames.split(",")));
+        if (!modelNames.isEmpty()) {
+          models.addAll(Arrays.asList(COMPILE3.split(modelNames)));
         }
         if (models.isEmpty()) {
           // Allow for no real NER model - can just use numeric classifiers or SUTime
@@ -573,10 +558,10 @@ public class StanfordCoreNLP extends AnnotationPipeline {
                 "ner.model.MISCclass:" +
                 properties.getProperty("ner.model.MISCclass",
                         DefaultPaths.DEFAULT_NER_CONLL_MODEL) +
-                NERClassifierCombiner.APPLY_NUMERIC_CLASSIFIERS_PROPERTY + ":" +
+                NERClassifierCombiner.APPLY_NUMERIC_CLASSIFIERS_PROPERTY + ':' +
                 properties.getProperty(NERClassifierCombiner.APPLY_NUMERIC_CLASSIFIERS_PROPERTY,
                         Boolean.toString(NERClassifierCombiner.APPLY_NUMERIC_CLASSIFIERS_DEFAULT)) +
-                NumberSequenceClassifier.USE_SUTIME_PROPERTY + ":" +
+                NumberSequenceClassifier.USE_SUTIME_PROPERTY + ':' +
                 properties.getProperty(NumberSequenceClassifier.USE_SUTIME_PROPERTY,
                         Boolean.toString(NumberSequenceClassifier.USE_SUTIME_DEFAULT));
       }
@@ -665,7 +650,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       private static final long serialVersionUID = 1L;
       @Override
       public Annotator create() {
-        final String className =
+        String className =
           "edu.stanford.nlp.pipeline.NFLTokenizerAnnotator";
         return ReflectionLoading.loadByReflection(className);
       }
@@ -689,7 +674,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
         // String gazetteer = properties.getProperty("nfl.gazetteer", DefaultPaths.DEFAULT_NFL_GAZETTEER);
         // String entityModel = properties.getProperty("nfl.entity.model", DefaultPaths.DEFAULT_NFL_ENTITY_MODEL);
         // String relationModel = properties.getProperty("nfl.relation.model", DefaultPaths.DEFAULT_NFL_RELATION_MODEL);
-        final String className = "edu.stanford.nlp.pipeline.NFLAnnotator";
+        String className = "edu.stanford.nlp.pipeline.NFLAnnotator";
         return ReflectionLoading.loadByReflection(className, properties);
       }
 
@@ -818,7 +803,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
             StringBuilder os = new StringBuilder();
             for(Object key: properties.keySet()) {
               String skey = (String) key;
-              os.append(skey + ":" + properties.getProperty(skey));
+              os.append(skey).append(':').append(properties.getProperty(skey));
             }
             return os.toString();
           }
@@ -894,7 +879,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
    * Added for backward compatibility.
    * @param annotation
    * @param w The Writer to send the output to
-   * @throws IOException
+   * @throws java.io.IOException
    */
   public void xmlPrint(Annotation annotation, Writer w) throws IOException {
     ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -907,20 +892,14 @@ public class StanfordCoreNLP extends AnnotationPipeline {
    * Displays the output of all annotators in XML format.
    * @param annotation Contains the output of all annotators
    * @param os The output stream
-   * @throws IOException
+   * @throws java.io.IOException
    */
   public void xmlPrint(Annotation annotation, OutputStream os) throws IOException {
     try {
       Class clazz = Class.forName("edu.stanford.nlp.pipeline.XMLOutputter");
       Method method = clazz.getMethod("xmlPrint", Annotation.class, OutputStream.class, StanfordCoreNLP.class);
       method.invoke(null, annotation, os, this);
-    } catch (NoSuchMethodException e) {
-      throw new RuntimeException(e);
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    } catch (ClassNotFoundException e) {
-      throw new RuntimeException(e);
-    } catch (InvocationTargetException e) {
+    } catch (NoSuchMethodException | InvocationTargetException | ClassNotFoundException | IllegalAccessException e) {
       throw new RuntimeException(e);
     }
   }
@@ -1042,10 +1021,10 @@ public class StanfordCoreNLP extends AnnotationPipeline {
   @Override
   public String timingInformation() {
     StringBuilder sb = new StringBuilder(super.timingInformation());
-    if (TIME && numWords >= 0) {
+    if (numWords >= 0) {
       long total = this.getTotalTime();
       sb.append(" for ").append(this.numWords).append(" tokens at ");
-      sb.append(String.format("%.1f", numWords / (((double) total)/1000)));
+      sb.append(String.format("%.1f", numWords / ((double) total /1000)));
       sb.append( " tokens/sec.");
     }
     return sb.toString();
@@ -1055,7 +1034,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
    * Runs an interactive shell where input text is processed with the given pipeline.
    *
    * @param pipeline The pipeline to be used
-   * @throws IOException If IO problem with stdin
+   * @throws java.io.IOException If IO problem with stdin
    */
   private static void shell(StanfordCoreNLP pipeline) throws IOException {
     String encoding = pipeline.getEncoding();
@@ -1067,7 +1046,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       if (line == null || line.equalsIgnoreCase("q")) {
         break;
       }
-      if (line.length() > 0) {
+      if (!line.isEmpty()) {
         Annotation anno = pipeline.process(line);
         pipeline.prettyPrint(anno, System.out);
       }
@@ -1080,8 +1059,8 @@ public class StanfordCoreNLP extends AnnotationPipeline {
 
 
 
-  public void processFiles(final Collection<File> files, int numThreads) throws IOException {
-    List<Runnable> toRun = new LinkedList<Runnable>();
+  public void processFiles(Collection<File> files, int numThreads) throws IOException {
+    List<Runnable> toRun = new LinkedList<>();
     //for each file...
     for (final File file : files) {
       //register a task...
@@ -1165,17 +1144,15 @@ public class StanfordCoreNLP extends AnnotationPipeline {
               fos.close();
               break;
             }
-            case TEXT: {
-              OutputStream fos = new BufferedOutputStream(new FileOutputStream(outputFilename));
-              prettyPrint(annotation, fos);
-              fos.close();
-              break;
-            }
-            case SERIALIZED: {
-              IOUtils.writeObjectToFile(annotation, outputFilename);
-              break;
-            }
-            default:
+            case TEXT:
+                OutputStream fos = new BufferedOutputStream(new FileOutputStream(outputFilename));
+                prettyPrint(annotation, fos);
+                fos.close();
+                break;
+                case SERIALIZED:
+                    IOUtils.writeObjectToFile(annotation, outputFilename);
+                    break;
+                default:
               throw new IllegalArgumentException("Unknown output format " + outputFormat);
             }
             endTrack("Processing file " + file.getAbsolutePath() + " ... writing to " + outputFilename);
@@ -1194,7 +1171,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
     }
   }
 
-  public void processFiles(final Collection<File> files) throws IOException {
+  public void processFiles(Collection<File> files) throws IOException {
     processFiles(files, 1);
   }
 
@@ -1212,7 +1189,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
    * @throws java.io.IOException If IO problem
    * @throws ClassNotFoundException If class loading problem
    */
-  public static void main(String[] args) throws IOException, ClassNotFoundException {
+  public static void main(String... args) throws IOException, ClassNotFoundException {
     Timing tim = new Timing();
     StanfordRedwoodConfiguration.minimalSetup();
 
@@ -1233,7 +1210,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       }
     }
     // multithreading thread count
-    String numThreadsString = (props == null) ? null : props.getProperty("threads");
+    String numThreadsString = props == null ? null : props.getProperty("threads");
     int numThreads = 1;
     try{
       if (numThreadsString != null) {
@@ -1247,7 +1224,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
     // construct the pipeline
     //
     StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-    props = pipeline.getProperties();
+    props = pipeline.properties;
     long setupTime = tim.report();
 
     // blank line after all the loading statements to make output more readable

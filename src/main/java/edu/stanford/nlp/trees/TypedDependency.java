@@ -3,11 +3,11 @@ package edu.stanford.nlp.trees;
 import java.io.Serializable;
 
 /**
- * A <code>TypedDependency</code> is a relation between two words in a
- * <code>GrammaticalStructure</code>.  Each <code>TypedDependency</code>
+ * A {@code TypedDependency} is a relation between two words in a
+ * {@code GrammaticalStructure}.  Each {@code TypedDependency}
  * consists of a governor word, a dependent word, and a relation, which is
  * normally an instance of {@link GrammaticalRelation
- * <code>GrammaticalRelation</code>}.
+ * {@code GrammaticalRelation}}.
  *
  * @author Bill MacCartney
  */
@@ -59,7 +59,7 @@ public class TypedDependency implements Comparable<TypedDependency>, Serializabl
     this.extra = true;
   }
 
-  @SuppressWarnings({"RedundantIfStatement"})
+  @SuppressWarnings("RedundantIfStatement")
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -68,7 +68,7 @@ public class TypedDependency implements Comparable<TypedDependency>, Serializabl
     if (!(o instanceof TypedDependency)) {
       return false;
     }
-    final TypedDependency typedDep = (TypedDependency) o;
+    TypedDependency typedDep = (TypedDependency) o;
 
     if (reln != null ? !reln.equals(typedDep.reln) : typedDep.reln != null) {
       return false;
@@ -85,7 +85,7 @@ public class TypedDependency implements Comparable<TypedDependency>, Serializabl
 
   @Override
   public int hashCode() {
-    int result = (reln != null ? reln.hashCode() : 17);
+    int result = reln != null ? reln.hashCode() : 17;
     result = 29 * result + (gov != null ? gov.hashCode() : 0);
     result = 29 * result + (dep != null ? dep.hashCode() : 0);
     return result;
@@ -93,16 +93,16 @@ public class TypedDependency implements Comparable<TypedDependency>, Serializabl
 
   @Override
   public String toString() {
-    return reln + "(" + gov + ", " + dep + ")";
+    return reln + "(" + gov + ", " + dep + ')';
   }
 
   public String toString(boolean noIndex) {
     if (!noIndex) return toString();
     String govWord = gov.toString();
     String depWord = dep.toString();
-    govWord = govWord.substring(0,govWord.lastIndexOf("-"));
-    depWord = depWord.substring(0,depWord.lastIndexOf("-"));
-    return reln + "(" + govWord + ", " + depWord + ")";
+    govWord = govWord.substring(0,govWord.lastIndexOf('-'));
+    depWord = depWord.substring(0,depWord.lastIndexOf('-'));
+    return reln + "(" + govWord + ", " + depWord + ')';
   }
 
 

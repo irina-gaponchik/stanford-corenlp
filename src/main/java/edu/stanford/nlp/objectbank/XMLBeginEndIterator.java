@@ -43,12 +43,12 @@ public class XMLBeginEndIterator<E> extends AbstractIterator<E> {
   private final boolean countDepth;
   private E nextToken; // stores the read-ahead next token to return
 
-  @SuppressWarnings({"unchecked"}) // Can't seem to do IdentityFunction without warning!
+  @SuppressWarnings("unchecked") // Can't seem to do IdentityFunction without warning!
   public XMLBeginEndIterator(Reader in, String tagNameRegexp) {
     this(in, tagNameRegexp, new IdentityFunction(), false);
   }
 
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public XMLBeginEndIterator(Reader in, String tagNameRegexp, boolean keepInternalTags) {
     this(in, tagNameRegexp, new IdentityFunction(), keepInternalTags);
   }
@@ -57,12 +57,12 @@ public class XMLBeginEndIterator<E> extends AbstractIterator<E> {
     this(in, tagNameRegexp, op, keepInternalTags, false);
   }
 
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public XMLBeginEndIterator(Reader in, String tagNameRegexp, boolean keepInternalTags, boolean keepDelimitingTags) {
     this(in, tagNameRegexp, new IdentityFunction(), keepInternalTags, keepDelimitingTags);
   }
 
-  @SuppressWarnings({"unchecked"})
+  @SuppressWarnings("unchecked")
   public XMLBeginEndIterator(Reader in, String tagNameRegexp, boolean keepInternalTags, boolean keepDelimitingTags, boolean countDepth) {
     this(in, tagNameRegexp, new IdentityFunction(), keepInternalTags, keepDelimitingTags, countDepth);
   }
@@ -121,7 +121,7 @@ public class XMLBeginEndIterator<E> extends AbstractIterator<E> {
           return null; // unexpected end of this element, so no more elements
         }
         if (tagNamePattern.matcher(tag.name).matches() && tag.isEndTag) {
-          if ((countDepth && depth == 1) || !countDepth) {
+          if (countDepth && depth == 1 || !countDepth) {
             if (keepDelimitingTags) {
               result.append(tagString);
             }
@@ -206,19 +206,19 @@ public class XMLBeginEndIterator<E> extends AbstractIterator<E> {
    * @return The IteratorFromReaderFactory
    */
   public static IteratorFromReaderFactory<String> getFactory(String tag) {
-    return new XMLBeginEndIterator.XMLBeginEndIteratorFactory<String>(tag, new IdentityFunction<String>(), false, false);
+    return new XMLBeginEndIterator.XMLBeginEndIteratorFactory<>(tag, new IdentityFunction<String>(), false, false);
   }
 
   public static IteratorFromReaderFactory<String> getFactory(String tag, boolean keepInternalTags, boolean keepDelimitingTags) {
-    return new XMLBeginEndIterator.XMLBeginEndIteratorFactory<String>(tag, new IdentityFunction<String>(), keepInternalTags, keepDelimitingTags);
+    return new XMLBeginEndIterator.XMLBeginEndIteratorFactory<>(tag, new IdentityFunction<String>(), keepInternalTags, keepDelimitingTags);
   }
 
   public static <E> IteratorFromReaderFactory<E> getFactory(String tag, Function<String,E> op) {
-    return new XMLBeginEndIterator.XMLBeginEndIteratorFactory<E>(tag, op, false, false);
+    return new XMLBeginEndIterator.XMLBeginEndIteratorFactory<>(tag, op, false, false);
   }
 
   public static <E> IteratorFromReaderFactory<E> getFactory(String tag, Function<String,E> op, boolean keepInternalTags, boolean keepDelimitingTags) {
-    return new XMLBeginEndIterator.XMLBeginEndIteratorFactory<E>(tag, op, keepInternalTags, keepDelimitingTags);
+    return new XMLBeginEndIterator.XMLBeginEndIteratorFactory<>(tag, op, keepInternalTags, keepDelimitingTags);
   }
 
   static class XMLBeginEndIteratorFactory<E> implements IteratorFromReaderFactory<E> {
@@ -237,17 +237,17 @@ public class XMLBeginEndIterator<E> extends AbstractIterator<E> {
 
     @Override
     public Iterator<E> getIterator(Reader r) {
-      return new XMLBeginEndIterator<E>(r, tag, op, keepInternalTags, keepDelimitingTags);
+      return new XMLBeginEndIterator<>(r, tag, op, keepInternalTags, keepDelimitingTags);
     }
   }
 
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     if (args.length < 3) {
       System.err.println("usage: XMLBeginEndIterator file element keepInternalBoolean");
       return;
     }
     Reader in = new FileReader(args[0]);
-    Iterator<String> iter = new XMLBeginEndIterator<String>(in, args[1], args[2].equalsIgnoreCase("true"));
+    Iterator<String> iter = new XMLBeginEndIterator<>(in, args[1], args[2].equalsIgnoreCase("true"));
     while (iter.hasNext()) {
       String s = iter.next();
       System.out.println("*************************************************");

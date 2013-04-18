@@ -79,7 +79,7 @@ public class FrenchUnknownWordSignatures {
   }
   
   public static String isCapitalized(String s) {
-    if(s.length() > 0) {
+    if(!s.isEmpty()) {
       Character ch = s.charAt(0);
       return Character.isUpperCase(ch) ? "-upper" : "";
     }

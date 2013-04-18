@@ -43,12 +43,7 @@ public class DependencyTreeTransformer implements TreeTransformer {
   }
 
   protected static String cleanUpRoot(String label) {
-    if (label == null || label.equals("TOP")) {
-      return "ROOT";
-      // String constants are always interned
-    } else {
-      return label;
-    }
+      return label == null || label.equals("TOP") ? "ROOT" : label;
   }
 
   // only leaves NP-TMP and NP-ADV

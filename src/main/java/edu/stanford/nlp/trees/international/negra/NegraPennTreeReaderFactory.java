@@ -35,7 +35,7 @@ public class NegraPennTreeReaderFactory implements TreeReaderFactory, Serializab
   }
 
   public TreeReader newTreeReader(Reader in) {
-    final NegraPennTreeNormalizer tn = new NegraPennTreeNormalizer(tlp, nodeCleanup);
+    NegraPennTreeNormalizer tn = new NegraPennTreeNormalizer(tlp, nodeCleanup);
     if (treeNormalizerInsertNPinPP)
       tn.setInsertNPinPP(true);
 
@@ -46,7 +46,7 @@ public class NegraPennTreeReaderFactory implements TreeReaderFactory, Serializab
    * 
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if(args.length < 1) {
       System.out.printf("Usage: java %s tree_file\n", NegraPennTreeReaderFactory.class.getName());
       System.exit(-1);
@@ -64,10 +64,6 @@ public class NegraPennTreeReaderFactory implements TreeReaderFactory, Serializab
       
       tr.close();
     
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }

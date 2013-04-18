@@ -48,7 +48,7 @@ public class SequenceSampler implements BestSequenceFinder {
       return 1.0;
     }
 
-    public double scoreOf(int[] sequence) {
+    public double scoreOf(int... sequence) {
       throw new UnsupportedOperationException();
     }
 
@@ -62,7 +62,7 @@ public class SequenceSampler implements BestSequenceFinder {
   } // end class TestSequenceModel
 
 
-  private static String arrayToString(int[] x) {
+  private static String arrayToString(int... x) {
     StringBuilder sb = new StringBuilder("(");
     for (int j = 0; j < x.length; j++) {
       sb.append(x[j]);
@@ -70,11 +70,11 @@ public class SequenceSampler implements BestSequenceFinder {
         sb.append(", ");
       }
     }
-    sb.append(")");
+    sb.append(')');
     return sb.toString();
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     SequenceSampler ti = new SequenceSampler();
     SequenceModel ts = new TestSequenceModel();
     int[] bestTags = ti.bestSequence(ts);

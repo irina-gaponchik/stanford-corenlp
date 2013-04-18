@@ -18,7 +18,7 @@ public class SemanticGraphEdge
   implements Comparable<SemanticGraphEdge>, Serializable 
 {
 
-  public static boolean printOnlyRelation = false; // a hack for displaying SemanticGraph in JGraph.  Should be redone better.
+  public static boolean printOnlyRelation; // a hack for displaying SemanticGraph in JGraph.  Should be redone better.
 
   private final GrammaticalRelation relation;
   private final double weight;
@@ -47,16 +47,12 @@ public class SemanticGraphEdge
   }
 
   public SemanticGraphEdge(SemanticGraphEdge e) {
-    this(e.getSource(), e.getTarget(), e.getRelation(), e.getWeight(), e.isExtra());
+    this(e.source, e.target, e.relation, e.weight, e.isExtra);
   }
 
   @Override
   public String toString() {
-    if (printOnlyRelation) {
-      return getSource() + " -> " + getTarget() + " (" + getRelation() + ")";
-    } else {
-      return getRelation().toString();
-    }
+      return printOnlyRelation ? source + " -> " + target + " (" + relation + ')' : relation.toString();
   }
 
   public GrammaticalRelation getRelation() {
@@ -68,7 +64,7 @@ public class SemanticGraphEdge
   }
 
   public IndexedWord getGovernor() {
-    return getSource();
+    return source;
   }
 
   public IndexedWord getTarget() {
@@ -76,7 +72,7 @@ public class SemanticGraphEdge
   }
 
   public IndexedWord getDependent() {
-    return getTarget();
+    return target;
   }
 
   public double getWeight() {
@@ -91,7 +87,7 @@ public class SemanticGraphEdge
    * @return true if the edges are of the same relation type
    */
   public boolean typeEquals(SemanticGraphEdge e) {
-    return (this.relation.equals(e.relation));
+    return this.relation.equals(e.relation);
   }
 
   private static class SemanticGraphEdgeTargetComparator implements Comparator<SemanticGraphEdge> {
@@ -122,16 +118,16 @@ public class SemanticGraphEdge
    * @return Whether this is smaller, same, or larger
    */
   public int compareTo(SemanticGraphEdge other) {
-    int sourceVal = getSource().compareTo(other.getSource());
+    int sourceVal = source.compareTo(other.source);
     if (sourceVal != 0) {
       return sourceVal;
     }
-    int targetVal = getTarget().compareTo(other.getTarget());
+    int targetVal = target.compareTo(other.target);
     if (targetVal !=0 ) {
       return targetVal;
     }
-    String thisRelation = getRelation().toString();
-    String thatRelation = other.getRelation().toString();
+    String thisRelation = relation.toString();
+    String thatRelation = other.relation.toString();
     return thisRelation.compareTo(thatRelation);
   }
 
@@ -140,7 +136,7 @@ public class SemanticGraphEdge
     if (this == o) return true;
     if (!(o instanceof SemanticGraphEdge)) return false;
 
-    final SemanticGraphEdge semanticGraphEdge = (SemanticGraphEdge) o;
+    SemanticGraphEdge semanticGraphEdge = (SemanticGraphEdge) o;
 
     if (relation != null) {
       boolean retFlag = relation.equals(semanticGraphEdge.relation);
@@ -157,9 +153,9 @@ public class SemanticGraphEdge
   @Override
   public int hashCode() {
     int result;
-    result = (relation != null ? relation.hashCode() : 0);
-    result = 29 * result + (getSource() != null ? getSource().hashCode() : 0);
-    result = 29 * result + (getTarget() != null ? getTarget().hashCode() : 0);
+    result = relation != null ? relation.hashCode() : 0;
+    result = 29 * result + (source != null ? source.hashCode() : 0);
+    result = 29 * result + (target != null ? target.hashCode() : 0);
     return result;
   }
 

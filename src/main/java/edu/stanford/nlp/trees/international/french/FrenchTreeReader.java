@@ -70,7 +70,7 @@ public class FrenchTreeReader implements TreeReader {
   /**
    * Read parse trees from a Reader.
    *
-   * @param in The <code>Reader</code>
+   * @param in The {@code Reader}
    */
   public FrenchTreeReader(Reader in) {
     this(in, new LabeledScoredTreeFactory(), new FrenchTreeNormalizer());
@@ -91,14 +91,12 @@ public class FrenchTreeReader implements TreeReader {
 
     DocumentBuilder parser = XMLUtils.getXmlParser();
     try {
-      final Document xml = parser.parse(stream);
-      final Element root = xml.getDocumentElement();
+      Document xml = parser.parse(stream);
+      Element root = xml.getDocumentElement();
       sentences = root.getElementsByTagName(NODE_SENT);
       sentIdx = 0;
 
-    } catch (SAXException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
+    } catch (SAXException | IOException e) {
       e.printStackTrace();
     }
   }
@@ -133,13 +131,13 @@ public class FrenchTreeReader implements TreeReader {
 
   //wsg2010: Sometimes the cat attribute is not present, in which case the POS
   //is in the attribute catint, which indicates a part of a compound / MWE
-  private String getPOS(Element node) {
+  private static String getPOS(Element node) {
     String attrPOS = node.hasAttribute(ATTR_POS) ? node.getAttribute(ATTR_POS).trim() : "";
     String attrPOSMWE = node.hasAttribute(ATTR_POS_MWE) ? node.getAttribute(ATTR_POS_MWE).trim() : "";
 
-    if(attrPOS != "")
+    if(!attrPOS.equals(""))
       return attrPOS;
-    else if(attrPOSMWE != "")
+    else if(!attrPOSMWE.equals(""))
       return attrPOSMWE;
 
     return MISSING_POS;
@@ -152,7 +150,7 @@ public class FrenchTreeReader implements TreeReader {
    */
   private List<String> getLemma(Element node) {
     String lemma = node.getAttribute(ATTR_LEMMA);
-    if (lemma == null || lemma.equals(""))
+    if (lemma == null || lemma.isEmpty())
       return null;
     return getWordString(lemma);
   }
@@ -188,8 +186,8 @@ public class FrenchTreeReader implements TreeReader {
    * @param text
    */
   private List<String> getWordString(String text) {
-    List<String> toks = new ArrayList<String>();
-    if(text == null || text.equals(""))
+    List<String> toks = new ArrayList<>();
+    if(text == null || text.isEmpty())
       toks.add(EMPTY_LEAF);
     else {
       //Strip spurious parens
@@ -204,14 +202,14 @@ public class FrenchTreeReader implements TreeReader {
         toks = Arrays.asList(text.split("\\s+"));
     }
 
-    if(toks.size() == 0)
+    if(toks.isEmpty())
       throw new RuntimeException(this.getClass().getName() + ": Zero length token list for: " + text);
 
     return toks;
   }
 
   private Tree getTreeFromXML(Node root) {
-    final Element eRoot = (Element) root;
+    Element eRoot = (Element) root;
 
     if (eRoot.getNodeName().equals(NODE_WORD) &&
         eRoot.getElementsByTagName(NODE_WORD).getLength() == 0) {
@@ -234,12 +232,12 @@ public class FrenchTreeReader implements TreeReader {
       //Terminals can have multiple tokens (MWEs). Make these into a
       //flat structure for now.
       Tree t = null;
-      List<Tree> kids = new ArrayList<Tree>();
+      List<Tree> kids = new ArrayList<>();
       if(leafToks.size() > 1) {
         for (int i = 0; i < leafToks.size(); ++i) {
           String tok = leafToks.get(i);
           String s = treeNormalizer.normalizeTerminal(tok);
-          List<Tree> leafList = new ArrayList<Tree>();
+          List<Tree> leafList = new ArrayList<>();
           Tree leafNode = treeFactory.newLeaf(s);
           if(leafNode.label() instanceof HasWord)
             ((HasWord) leafNode.label()).setWord(s);
@@ -285,7 +283,7 @@ public class FrenchTreeReader implements TreeReader {
       return t;
     }
 
-    List<Tree> kids = new ArrayList<Tree>();
+    List<Tree> kids = new ArrayList<>();
     for(Node childNode = eRoot.getFirstChild(); childNode != null; childNode = childNode.getNextSibling()) {
       if(childNode.getNodeType() != Node.ELEMENT_NODE) continue;
       Tree t = getTreeFromXML(childNode);
@@ -302,7 +300,7 @@ public class FrenchTreeReader implements TreeReader {
     if(isMWE)
       rootLabel = eRoot.getAttribute(ATTR_POS).trim();
 
-    Tree t = (kids.size() == 0) ? null : treeFactory.newTreeNode(treeNormalizer.normalizeNonterminal(rootLabel), kids);
+    Tree t = kids.isEmpty() ? null : treeFactory.newTreeNode(treeNormalizer.normalizeNonterminal(rootLabel), kids);
 
     if(t != null && isMWE)
       t = postProcessMWE(t);
@@ -314,7 +312,7 @@ public class FrenchTreeReader implements TreeReader {
   private Tree postProcessMWE(Tree t) {
     String tYield = Sentence.listToString(t.yield()).replaceAll("\\s+", "");
     if(tYield.matches("[\\d\\p{Punct}]*")) {
-      List<Tree> kids = new ArrayList<Tree>();
+      List<Tree> kids = new ArrayList<>();
       kids.add(treeFactory.newLeaf(tYield));
       t = treeFactory.newTreeNode(t.value(), kids);
     } else {
@@ -329,15 +327,14 @@ public class FrenchTreeReader implements TreeReader {
    *
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if(args.length < 1) {
       System.err.printf("Usage: java %s tree_file(s)%n%n",FrenchTreeReader.class.getName());
       System.exit(-1);
     }
 
-    List<File> fileList = new ArrayList<File>();
-    for(int i = 0; i < args.length; i++)
-      fileList.add(new File(args[i]));
+    List<File> fileList = new ArrayList<>();
+      for (String arg : args) fileList.add(new File(arg));
 
     TreeReaderFactory trf = new FrenchTreeReaderFactory(true);
     int totalTrees = 0;
@@ -370,9 +367,6 @@ public class FrenchTreeReader implements TreeReader {
 //        System.err.println(analysis);
 
       System.err.printf("%nRead %d trees%n",totalTrees);
-
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
 
     } catch (IOException e) {
       e.printStackTrace();

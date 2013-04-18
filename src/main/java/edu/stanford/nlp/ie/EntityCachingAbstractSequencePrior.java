@@ -29,7 +29,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
   protected Index<String> classIndex;
   protected List<IN> doc;
 
-  public EntityCachingAbstractSequencePrior(String backgroundSymbol, Index<String> classIndex, List<IN> doc) {
+  protected EntityCachingAbstractSequencePrior(String backgroundSymbol, Index<String> classIndex, List<IN> doc) {
     this.classIndex = classIndex;
     this.backgroundSymbol = classIndex.indexOf(backgroundSymbol);
     this.numClasses = classIndex.size();
@@ -40,7 +40,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
     this.doc = doc;
   }
 
-  private boolean VERBOSE = false;
+  private boolean VERBOSE;
 
   Entity[] entities;
 
@@ -95,7 +95,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
     return probs;
   }
 
-  public void setInitialSequence(int[] initialSequence) {
+  public void setInitialSequence(int... initialSequence) {
     this.sequence = initialSequence;
     entities = new Entity[initialSequence.length];
     Arrays.fill(entities, null);
@@ -123,7 +123,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
     Entity entity = new Entity();
     entity.type = sequence[position];
     entity.startPosition = position;
-    entity.words = new ArrayList<String>();
+    entity.words = new ArrayList<>();
     for ( ; position < sequence.length; position++) {
       if (sequence[position] == entity.type) {
       	String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
@@ -144,11 +144,11 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
    * words in this entity occurs.
    */
   public int[] otherOccurrences(Entity entity){
-    List<Integer> other = new ArrayList<Integer>();
+    List<Integer> other = new ArrayList<>();
     for (int i = 0; i < doc.size(); i++) {
       if (i == entity.startPosition) { continue; }
       if (matches(entity, i)) {
-        other.add(Integer.valueOf(i));
+        other.add(i);
       }
     }
     return toArray(other);
@@ -182,38 +182,25 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
 
 
   public boolean joiningTwoEntities(int[] sequence, int position) {
-    if (sequence[position] == backgroundSymbol) { return false; }
-    if (position > 0 && position < sequence.length - 1) {
-      return (sequence[position] == sequence[position - 1] &&
-              sequence[position] == sequence[position + 1]);
-    }
-    return false;
+      return sequence[position] != backgroundSymbol && position > 0 && position < sequence.length - 1 && sequence[position] == sequence[position - 1] && sequence[position] == sequence[position + 1];
   }
 
   public boolean splittingTwoEntities(int[] sequence, int position) {
-    if (position > 0 && position < sequence.length - 1) {
-      return (entities[position - 1] == entities[position + 1] &&
-              entities[position - 1] != null);
-    }
-    return false;
+      return position > 0 && position < sequence.length - 1 && entities[position - 1].equals(entities[position + 1]) && entities[position - 1] != null;
   }
 
   public boolean appendingEntity(int[] sequence, int position) {
     if (position > 0) {
       if (entities[position - 1] == null) { return false; }
       Entity prev = entities[position - 1];
-      return (sequence[position] == sequence[position - 1] &&
-              prev.startPosition + prev.words.size() == position);
+      return sequence[position] == sequence[position - 1] &&
+              prev.startPosition + prev.words.size() == position;
     }
     return false;
   }
 
   public boolean prependingEntity(int[] sequence, int position) {
-    if (position < sequence.length - 1) {
-      if (entities[position + 1] == null) { return false; }
-      return (sequence[position] == sequence[position + 1]);
-    }
-    return false;
+      return position < sequence.length - 1 && entities[position + 1] != null && sequence[position] == sequence[position + 1];
   }
 
   public boolean addingSingletonEntity(int[] sequence, int position) {
@@ -232,7 +219,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
       if (sequence[position - 1] == backgroundSymbol) { return false; }
       Entity prev = entities[position - 1];
       if (prev != null) {
-        return (prev.startPosition + prev.words.size() > position);
+        return prev.startPosition + prev.words.size() > position;
       }
     }
     return false;
@@ -243,7 +230,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
       if (sequence[position + 1] == backgroundSymbol) { return false; }
       Entity next = entities[position + 1];
       if (next != null) {
-        return (next.startPosition <= position);
+        return next.startPosition <= position;
       }
     }
     return false;
@@ -252,12 +239,12 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
   public boolean noChange(int[] sequence, int position) {
     if (position > 0) {
       if (sequence[position - 1] == sequence[position]) {
-        return entities[position - 1] == entities[position];
+        return entities[position - 1].equals(entities[position]);
       }
     }
     if (position < sequence.length - 1) {
       if (sequence[position + 1] == sequence[position]) {
-        return entities[position] == entities[position + 1];
+        return entities[position].equals(entities[position + 1]);
       }
     }
     // actually, can't tell.  either no change, or singleton
@@ -283,17 +270,17 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
       Entity prev = entities[position - 1];
       Entity next = entities[position + 1];
       newEntity.startPosition = prev.startPosition;
-      newEntity.words = new ArrayList<String>();
+      newEntity.words = new ArrayList<>();
       newEntity.words.addAll(prev.words);
       String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
       newEntity.words.add(word);
       newEntity.words.addAll(next.words);
       newEntity.type = sequence[position];
-      List<Integer> other = new ArrayList<Integer>();
+      List<Integer> other = new ArrayList<>();
       for (int i = 0; i < prev.otherOccurrences.length; i++) {
         int pos = prev.otherOccurrences[i];
         if (matches(newEntity, pos)) {
-          other.add(Integer.valueOf(pos));
+          other.add(pos);
         }
       }
       newEntity.otherOccurrences = toArray(other);
@@ -308,13 +295,13 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
       Entity prev = new Entity();
       prev.type = entity.type;
       prev.startPosition = entity.startPosition;
-      prev.words = new ArrayList<String>(entity.words.subList(0, position - entity.startPosition));
+      prev.words = new ArrayList<>(entity.words.subList(0, position - entity.startPosition));
       prev.otherOccurrences = otherOccurrences(prev);
       addEntityToEntitiesArray(prev);
       Entity next = new Entity();
       next.type = entity.type;
       next.startPosition = position + 1;
-      next.words = new ArrayList<String>(entity.words.subList(position - entity.startPosition + 1, entity.words.size()));
+      next.words = new ArrayList<>(entity.words.subList(position - entity.startPosition + 1, entity.words.size()));
       next.otherOccurrences = otherOccurrences(next);
       addEntityToEntitiesArray(next);
       if (sequence[position] == backgroundSymbol) {
@@ -323,7 +310,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
         Entity newEntity = new Entity();
         newEntity.startPosition = position;
         newEntity.type = sequence[position];
-        newEntity.words = new ArrayList<String>();
+        newEntity.words = new ArrayList<>();
         String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
         newEntity.words.add(word);
         newEntity.otherOccurrences = otherOccurrences(newEntity);
@@ -338,7 +325,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
       Entity newEntity = new Entity();
       Entity next = entities[position + 1];
       newEntity.startPosition = position;
-      newEntity.words = new ArrayList<String>();
+      newEntity.words = new ArrayList<>();
       String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
       newEntity.words.add(word);
       newEntity.words.addAll(next.words);
@@ -362,16 +349,16 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
       Entity newEntity = new Entity();
       Entity prev = entities[position - 1];
       newEntity.startPosition = prev.startPosition;
-      newEntity.words = new ArrayList<String>();
+      newEntity.words = new ArrayList<>();
       newEntity.words.addAll(prev.words);
       String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
       newEntity.words.add(word);
       newEntity.type = sequence[position];
-      List<Integer> other = new ArrayList<Integer>();
+      List<Integer> other = new ArrayList<>();
       for (int i = 0; i < prev.otherOccurrences.length; i++) {
         int pos = prev.otherOccurrences[i];
         if (matches(newEntity, pos)) {
-          other.add(Integer.valueOf(pos));
+          other.add(pos);
         }
       }
       newEntity.otherOccurrences = toArray(other);
@@ -390,7 +377,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
       Entity newEntity = new Entity();
       if (VERBOSE) System.out.println("adding singleton entity");
       newEntity.startPosition = position;
-      newEntity.words = new ArrayList<String>();
+      newEntity.words = new ArrayList<>();
       String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
       newEntity.words.add(word);
       newEntity.type = sequence[position];
@@ -437,37 +424,37 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
 
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (int i = 0; i < entities.length; i++) {
       sb.append(i);
-      sb.append("\t");
+      sb.append('\t');
       String word = doc.get(i).get(CoreAnnotations.TextAnnotation.class);
       sb.append(word);
-      sb.append("\t");
+      sb.append('\t');
       sb.append(classIndex.get(sequence[i]));
       if (entities[i] != null) {
-        sb.append("\t");
+        sb.append('\t');
         sb.append(entities[i].toString(classIndex));
       }
-      sb.append("\n");
+      sb.append('\n');
     }
     return sb.toString();
   }
 
   public String toString(int pos) {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (int i = Math.max(0, pos - 10); i < Math.min(entities.length, pos + 10); i++) {
       sb.append(i);
-      sb.append("\t");
+      sb.append('\t');
       String word = doc.get(i).get(CoreAnnotations.TextAnnotation.class);
       sb.append(word);
-      sb.append("\t");
+      sb.append('\t');
       sb.append(classIndex.get(sequence[i]));
       if (entities[i] != null) {
-        sb.append("\t");
+        sb.append('\t');
         sb.append(entities[i].toString(classIndex));
       }
-      sb.append("\n");
+      sb.append('\n');
     }
     return sb.toString();
   }
@@ -485,8 +472,8 @@ class Entity {
   public int[] otherOccurrences;
 
   public String toString(Index<String> classIndex) {
-    StringBuffer sb = new StringBuffer();
-    sb.append("\"");
+    StringBuilder sb = new StringBuilder();
+    sb.append('"');
     sb.append(StringUtils.join(words, " "));
     sb.append("\" start: ");
     sb.append(startPosition);

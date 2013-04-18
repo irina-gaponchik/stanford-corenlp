@@ -9,7 +9,7 @@ public class Semantics {
   public Semantics() {}
 
   public Semantics(Dictionaries dict) throws Exception{
-    Constructor<?> wordnetConstructor = (Class.forName("edu.stanford.nlp.dcoref.WordNet")).getConstructor();
+    Constructor<?> wordnetConstructor = Class.forName("edu.stanford.nlp.dcoref.WordNet").getConstructor();
     wordnet = wordnetConstructor.newInstance();
   }
 }

@@ -64,8 +64,8 @@ abstract class Relation implements Serializable {
    * @return An Iterator over the nodes
    *     of the root tree that satisfy the relation.
    */
-  abstract Iterator<Tree> searchNodeIterator(final Tree t,
-                                             final TregexMatcher matcher);
+  abstract Iterator<Tree> searchNodeIterator(Tree t,
+                                             TregexMatcher matcher);
 
   private static final Pattern parentOfLastChild = Pattern.compile("(<-|<`)");
 
@@ -105,17 +105,22 @@ abstract class Relation implements Serializable {
 
     // finally try relations with headFinders
     Relation r;
-    if (s.equals(">>#")) {
-      r = new Heads(headFinder);
-    } else if (s.equals("<<#")) {
-      r = new HeadedBy(headFinder);
-    } else if (s.equals(">#")) {
-      r = new ImmediatelyHeads(headFinder);
-    } else if (s.equals("<#")) {
-      r = new ImmediatelyHeadedBy(headFinder);
-    } else {
-      throw new ParseException("Unrecognized simple relation " + s);
-    }
+      switch (s) {
+          case ">>#":
+              r = new Heads(headFinder);
+              break;
+          case "<<#":
+              r = new HeadedBy(headFinder);
+              break;
+          case ">#":
+              r = new ImmediatelyHeads(headFinder);
+              break;
+          case "<#":
+              r = new ImmediatelyHeadedBy(headFinder);
+              break;
+          default:
+              throw new ParseException("Unrecognized simple relation " + s);
+      }
 
     return Interner.globalIntern(r);
   }
@@ -141,22 +146,29 @@ abstract class Relation implements Serializable {
       return getRelation(s, basicCatFunction, headFinder);
     }
     Relation r;
-    if (s.equals("<")) {
-      r = new HasIthChild(Integer.parseInt(arg));
-    } else if (s.equals(">")) {
-      r = new IthChildOf(Integer.parseInt(arg));
-    } else if (s.equals("<+")) {
-      r = new UnbrokenCategoryDominates(arg, basicCatFunction);
-    } else if (s.equals(">+")) {
-      r = new UnbrokenCategoryIsDominatedBy(arg, basicCatFunction);
-    } else if (s.equals(".+")) {
-      r = new UnbrokenCategoryPrecedes(arg, basicCatFunction);
-    } else if (s.equals(",+")) {
-      r = new UnbrokenCategoryFollows(arg, basicCatFunction);
-    } else {
-      throw new ParseException("Unrecognized compound relation " + s + ' '
-          + arg);
-    }
+      switch (s) {
+          case "<":
+              r = new HasIthChild(Integer.parseInt(arg));
+              break;
+          case ">":
+              r = new IthChildOf(Integer.parseInt(arg));
+              break;
+          case "<+":
+              r = new UnbrokenCategoryDominates(arg, basicCatFunction);
+              break;
+          case ">+":
+              r = new UnbrokenCategoryIsDominatedBy(arg, basicCatFunction);
+              break;
+          case ".+":
+              r = new UnbrokenCategoryPrecedes(arg, basicCatFunction);
+              break;
+          case ",+":
+              r = new UnbrokenCategoryFollows(arg, basicCatFunction);
+              break;
+          default:
+              throw new ParseException("Unrecognized compound relation " + s + ' '
+                      + arg);
+      }
     return Interner.globalIntern(r);
   }
 
@@ -174,7 +186,7 @@ abstract class Relation implements Serializable {
    * overriding advance and/or initialize, it is an efficient implementation.
    */
   abstract static class SearchNodeIterator implements Iterator<Tree> {
-    public SearchNodeIterator() {
+    protected SearchNodeIterator() {
       initialize();
     }
 
@@ -228,12 +240,12 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      return t1 == t2;
+      return t1.equals(t2);
     }
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
@@ -249,12 +261,12 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      return t1 == t2;
+      return t1.equals(t2);
     }
 
     @Override
-    Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+    Iterator<Tree> searchNodeIterator(Tree t,
+                                      TregexMatcher matcher) {
       return Collections.singletonList(t).iterator();
     }
 
@@ -271,8 +283,8 @@ abstract class Relation implements Serializable {
     }
 
     @Override
-    Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+    Iterator<Tree> searchNodeIterator(Tree t,
+                                      TregexMatcher matcher) {
       return matcher.getRoot().iterator();
     }
   };
@@ -283,18 +295,18 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      return t1 != t2 && t1.dominates(t2);
+      return !t1.equals(t2) && t1.dominates(t2);
     }
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         Stack<Tree> searchStack;
 
         @Override
         public void initialize() {
-          searchStack = new Stack<Tree>();
+          searchStack = new Stack<>();
           for (int i = t.numChildren() - 1; i >= 0; i--) {
             searchStack.push(t.getChild(i));
           }
@@ -351,17 +363,17 @@ abstract class Relation implements Serializable {
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
       Tree[] kids = t1.children();
-      for (int i = 0, n = kids.length; i < n; i++) {
-        if (kids[i] == t2) {
-          return true;
+        for (Tree kid : kids) {
+            if (kid.equals(t2)) {
+                return true;
+            }
         }
-      }
       return false;
     }
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         int nextNum; // subtle bug warning here: if we use int nextNum=0;
 
@@ -422,11 +434,11 @@ abstract class Relation implements Serializable {
 
         @Override
         public void initialize() {
-          searchStack = new Stack<Tree>();
+          searchStack = new Stack<>();
           Tree current = t;
           Tree parent = matcher.getParent(t);
           while (parent != null) {
-            for (int i = parent.numChildren() - 1; parent.getChild(i) != current; i--) {
+            for (int i = parent.numChildren() - 1; !parent.getChild(i).equals(current); i--) {
               searchStack.push(parent.getChild(i));
             }
             current = parent;
@@ -474,10 +486,10 @@ abstract class Relation implements Serializable {
               next = null;
               return;
             }
-          } while (parent.lastChild() == current);
+          } while (parent.lastChild().equals(current));
 
           for (int i = 1, n = parent.numChildren(); i < n; i++) {
-            if (parent.getChild(i - 1) == current) {
+            if (parent.getChild(i - 1).equals(current)) {
               next = parent.getChild(i);
               return;
             }
@@ -486,11 +498,7 @@ abstract class Relation implements Serializable {
 
         @Override
         public void advance() {
-          if (next.isLeaf()) {
-            next = null;
-          } else {
-            next = next.firstChild();
-          }
+            next = next.isLeaf() ? null : next.firstChild();
         }
       };
     }
@@ -513,11 +521,11 @@ abstract class Relation implements Serializable {
 
         @Override
         public void initialize() {
-          searchStack = new Stack<Tree>();
+          searchStack = new Stack<>();
           Tree current = t;
           Tree parent = matcher.getParent(t);
           while (parent != null) {
-            for (int i = 0; parent.getChild(i) != current; i++) {
+            for (int i = 0; !parent.getChild(i).equals(current); i++) {
               searchStack.push(parent.getChild(i));
             }
             current = parent;
@@ -565,10 +573,10 @@ abstract class Relation implements Serializable {
               next = null;
               return;
             }
-          } while (parent.firstChild() == current);
+          } while (parent.firstChild().equals(current));
 
           for (int i = 0, n = parent.numChildren() - 1; i < n; i++) {
-            if (parent.getChild(i + 1) == current) {
+            if (parent.getChild(i + 1).equals(current)) {
               next = parent.getChild(i);
               return;
             }
@@ -577,11 +585,7 @@ abstract class Relation implements Serializable {
 
         @Override
         public void advance() {
-          if (next.isLeaf()) {
-            next = null;
-          } else {
-            next = next.lastChild();
-          }
+            next = next.isLeaf() ? null : next.lastChild();
         }
       };
     }
@@ -593,17 +597,13 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      if (t1.isLeaf()) {
-        return false;
-      } else {
-        return (t1.children()[0] == t2)
-            || satisfies(t1.children()[0], t2, root);
-      }
+        return t1.isLeaf() ? false : t1.children()[0].equals(t2)
+                || satisfies(t1.children()[0], t2, root);
     }
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
@@ -613,11 +613,7 @@ abstract class Relation implements Serializable {
 
         @Override
         public void advance() {
-          if (next.isLeaf()) {
-            next = null;
-          } else {
-            next = next.firstChild();
-          }
+            next = next.isLeaf() ? null : next.firstChild();
         }
       };
     }
@@ -633,13 +629,13 @@ abstract class Relation implements Serializable {
         return false;
       } else {
         Tree lastKid = t1.children()[t1.children().length - 1];
-        return (lastKid == t2) || satisfies(lastKid, t2, root);
+        return lastKid.equals(t2) || satisfies(lastKid, t2, root);
       }
     }
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
@@ -649,11 +645,7 @@ abstract class Relation implements Serializable {
 
         @Override
         public void advance() {
-          if (next.isLeaf()) {
-            next = null;
-          } else {
-            next = next.lastChild();
-          }
+            next = next.isLeaf() ? null : next.lastChild();
         }
       };
     }
@@ -682,7 +674,7 @@ abstract class Relation implements Serializable {
         public void advance() {
           Tree last = next;
           next = matcher.getParent(next);
-          if (next != null && next.firstChild() != last) {
+          if (next != null && !next.firstChild().equals(last)) {
             next = null;
           }
         }
@@ -713,7 +705,7 @@ abstract class Relation implements Serializable {
         public void advance() {
           Tree last = next;
           next = matcher.getParent(next);
-          if (next != null && next.lastChild() != last) {
+          if (next != null && !next.lastChild().equals(last)) {
             next = null;
           }
         }
@@ -727,7 +719,7 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      if (t1 == t2 || t1 == root) {
+      if (t1.equals(t2) || t1.equals(root)) {
         return false;
       }
       Tree parent = t1.parent(root);
@@ -755,7 +747,7 @@ abstract class Relation implements Serializable {
         public void advance() {
           if (nextNum < parent.numChildren()) {
             next = parent.getChild(nextNum++);
-            if (next == t) {
+            if (next.equals(t)) {
               advance();
             }
           } else {
@@ -772,16 +764,16 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      if (t1 == t2 || t1 == root) {
+      if (t1.equals(t2) || t1.equals(root)) {
         return false;
       }
       Tree parent = t1.parent(root);
       Tree[] kids = parent.children();
       for (int i = kids.length - 1; i > 0; i--) {
-        if (kids[i] == t1) {
+        if (kids[i].equals(t1)) {
           return false;
         }
-        if (kids[i] == t2) {
+        if (kids[i].equals(t2)) {
           return true;
         }
       }
@@ -808,7 +800,7 @@ abstract class Relation implements Serializable {
         @Override
         public void advance() {
           next = parent.getChild(nextNum--);
-          if (next == t) {
+          if (next.equals(t)) {
             next = null;
           }
         }
@@ -845,7 +837,7 @@ abstract class Relation implements Serializable {
         @Override
         public void advance() {
           next = parent.getChild(nextNum++);
-          if (next == t) {
+          if (next.equals(t)) {
             next = null;
           }
         }
@@ -859,16 +851,16 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      if (t1 == t2 || t1 == root) {
+      if (t1.equals(t2) || t1.equals(root)) {
         return false;
       }
       Tree[] sisters = t1.parent(root).children();
       for (int i = sisters.length - 1; i > 0; i--) {
-        if (sisters[i] == t1) {
+        if (sisters[i].equals(t1)) {
           return false;
         }
-        if (sisters[i] == t2) {
-          return sisters[i - 1] == t1;
+        if (sisters[i].equals(t2)) {
+          return sisters[i - 1].equals(t1);
         }
       }
       return false;
@@ -880,10 +872,10 @@ abstract class Relation implements Serializable {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
-          if (t != matcher.getRoot()) {
+          if (!t.equals(matcher.getRoot())) {
             Tree parent = matcher.getParent(t);
             int i = 0;
-            while (parent.getChild(i) != t) {
+            while (!parent.getChild(i).equals(t)) {
               i++;
             }
             if (i + 1 < parent.numChildren()) {
@@ -910,10 +902,10 @@ abstract class Relation implements Serializable {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
-          if (t != matcher.getRoot()) {
+          if (!t.equals(matcher.getRoot())) {
             Tree parent = matcher.getParent(t);
             int i = 0;
-            while (parent.getChild(i) != t) {
+            while (!parent.getChild(i).equals(t)) {
               i++;
             }
             if (i > 0) {
@@ -931,7 +923,7 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      return t2.children().length == 1 && t2.firstChild() == t1;
+      return t2.children().length == 1 && t2.firstChild().equals(t1);
     }
 
     @Override
@@ -940,7 +932,7 @@ abstract class Relation implements Serializable {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
-          if (t != matcher.getRoot()) {
+          if (!t.equals(matcher.getRoot())) {
             next = matcher.getParent(t);
             if (next.numChildren() != 1) {
               next = null;
@@ -957,12 +949,12 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      return t1.children().length == 1 && t1.firstChild() == t2;
+      return t1.children().length == 1 && t1.firstChild().equals(t2);
     }
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
@@ -983,21 +975,18 @@ abstract class Relation implements Serializable {
       if (t1.isLeaf() || t1.children().length > 1)
         return false;
       Tree onlyDtr = t1.children()[0];
-      if (onlyDtr == t2)
-        return true;
-      else
-        return satisfies(onlyDtr, t2, root);
+        return onlyDtr.equals(t2) ? true : satisfies(onlyDtr, t2, root);
     }
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         Stack<Tree> searchStack;
 
         @Override
         public void initialize() {
-          searchStack = new Stack<Tree>();
+          searchStack = new Stack<>();
           if (!t.isLeaf() && t.children().length == 1)
             searchStack.push(t.getChild(0));
           if (!searchStack.isEmpty()) {
@@ -1028,10 +1017,7 @@ abstract class Relation implements Serializable {
       if (t2.isLeaf() || t2.children().length > 1)
         return false;
       Tree onlyDtr = t2.children()[0];
-      if (onlyDtr == t1)
-        return true;
-      else
-        return satisfies(t1, onlyDtr, root);
+        return onlyDtr.equals(t1) ? true : satisfies(t1, onlyDtr, root);
     }
 
     @Override
@@ -1042,7 +1028,7 @@ abstract class Relation implements Serializable {
 
         @Override
         public void initialize() {
-          searchStack = new Stack<Tree>();
+          searchStack = new Stack<>();
           Tree parent = matcher.getParent(t);
           if (parent != null && !parent.isLeaf() &&
               parent.children().length == 1)
@@ -1102,7 +1088,7 @@ abstract class Relation implements Serializable {
       return false;
     }
 
-    final Relation relation = (Relation) o;
+    Relation relation = (Relation) o;
 
     return symbol.equals(relation.symbol);
   }
@@ -1129,14 +1115,10 @@ abstract class Relation implements Serializable {
       if (t2.isLeaf()) {
         return false;
       } else if (t2.isPreTerminal()) {
-        return (t2.firstChild() == t1);
+        return t2.firstChild().equals(t1);
       } else {
         Tree head = hf.determineHead(t2);
-        if (head == t1) {
-          return true;
-        } else {
-          return satisfies(t1, head, root);
-        }
+          return head.equals(t1) ? true : satisfies(t1, head, root);
       }
     }
 
@@ -1154,7 +1136,7 @@ abstract class Relation implements Serializable {
         public void advance() {
           Tree last = next;
           next = matcher.getParent(next);
-          if (next != null && hf.determineHead(next) != last) {
+          if (next != null && !hf.determineHead(next).equals(last)) {
             next = null;
           }
         }
@@ -1173,13 +1155,10 @@ abstract class Relation implements Serializable {
         return false;
       }
 
-      final Heads heads = (Heads) o;
+      Heads heads = (Heads) o;
 
-      if (hf != null ? !hf.equals(heads.hf) : heads.hf != null) {
-        return false;
-      }
+        return !(hf != null ? !hf.equals(heads.hf) : heads.hf != null);
 
-      return true;
     }
 
     @Override
@@ -1209,7 +1188,7 @@ abstract class Relation implements Serializable {
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
@@ -1219,11 +1198,7 @@ abstract class Relation implements Serializable {
 
         @Override
         public void advance() {
-          if (next.isLeaf()) {
-            next = null;
-          } else {
-            next = heads.hf.determineHead(next);
-          }
+            next = next.isLeaf() ? null : heads.hf.determineHead(next);
         }
       };
     }
@@ -1240,14 +1215,11 @@ abstract class Relation implements Serializable {
         return false;
       }
 
-      final HeadedBy headedBy = (HeadedBy) o;
+      HeadedBy headedBy = (HeadedBy) o;
 
-      if (heads != null ? !heads.equals(headedBy.heads)
-          : headedBy.heads != null) {
-        return false;
-      }
+        return !(heads != null ? !heads.equals(headedBy.heads)
+                : headedBy.heads != null);
 
-      return true;
     }
 
     @Override
@@ -1273,7 +1245,7 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-      return hf.determineHead(t2) == t1;
+      return hf.determineHead(t2).equals(t1);
     }
 
     @Override
@@ -1282,9 +1254,9 @@ abstract class Relation implements Serializable {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
-          if (t != matcher.getRoot()) {
+          if (!t.equals(matcher.getRoot())) {
             next = matcher.getParent(t);
-            if (hf.determineHead(next) != t) {
+            if (!hf.determineHead(next).equals(t)) {
               next = null;
             }
           }
@@ -1304,13 +1276,10 @@ abstract class Relation implements Serializable {
         return false;
       }
 
-      final ImmediatelyHeads immediatelyHeads = (ImmediatelyHeads) o;
+      ImmediatelyHeads immediatelyHeads = (ImmediatelyHeads) o;
 
-      if (!hf.equals(immediatelyHeads.hf)) {
-        return false;
-      }
+        return hf.equals(immediatelyHeads.hf);
 
-      return true;
     }
 
     @Override
@@ -1341,7 +1310,7 @@ abstract class Relation implements Serializable {
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
@@ -1364,15 +1333,12 @@ abstract class Relation implements Serializable {
         return false;
       }
 
-      final ImmediatelyHeadedBy immediatelyHeadedBy = (ImmediatelyHeadedBy) o;
+      ImmediatelyHeadedBy immediatelyHeadedBy = (ImmediatelyHeadedBy) o;
 
-      if (immediatelyHeads != null ? !immediatelyHeads
-          .equals(immediatelyHeadedBy.immediatelyHeads)
-          : immediatelyHeadedBy.immediatelyHeads != null) {
-        return false;
-      }
+        return !(immediatelyHeads != null ? !immediatelyHeads
+                .equals(immediatelyHeadedBy.immediatelyHeads)
+                : immediatelyHeadedBy.immediatelyHeads != null);
 
-      return true;
     }
 
     @Override
@@ -1407,13 +1373,10 @@ abstract class Relation implements Serializable {
       if (kids.length < Math.abs(childNum)) {
         return false;
       }
-      if (childNum > 0 && kids[childNum - 1] == t1) {
+      if (childNum > 0 && kids[childNum - 1].equals(t1)) {
         return true;
       }
-      if (childNum < 0 && kids[kids.length + childNum] == t1) {
-        return true;
-      }
-      return false;
+        return childNum < 0 && kids[kids.length + childNum].equals(t1);
     }
 
     @Override
@@ -1422,15 +1385,15 @@ abstract class Relation implements Serializable {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
-          if (t != matcher.getRoot()) {
+          if (!t.equals(matcher.getRoot())) {
             next = matcher.getParent(t);
             if (childNum > 0
-                && (next.numChildren() < childNum || next
-                    .getChild(childNum - 1) != t)
+                && (next.numChildren() < childNum || !next
+                    .getChild(childNum - 1).equals(t))
                 || childNum < 0
-                && (next.numChildren() < -childNum || next.getChild(next
+                && (next.numChildren() < -childNum || !next.getChild(next
                     .numChildren()
-                    + childNum) != t)) {
+                    + childNum).equals(t))) {
               next = null;
             }
           }
@@ -1447,13 +1410,10 @@ abstract class Relation implements Serializable {
         return false;
       }
 
-      final IthChildOf ithChildOf = (IthChildOf) o;
+      IthChildOf ithChildOf = (IthChildOf) o;
 
-      if (childNum != ithChildOf.childNum) {
-        return false;
-      }
+        return childNum == ithChildOf.childNum;
 
-      return true;
     }
 
     @Override
@@ -1482,17 +1442,13 @@ abstract class Relation implements Serializable {
 
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         @Override
         void initialize() {
           int childNum = ithChildOf.childNum;
           if (t.numChildren() >= Math.abs(childNum)) {
-            if (childNum > 0) {
-              next = t.getChild(childNum - 1);
-            } else {
-              next = t.getChild(t.numChildren() + childNum);
-            }
+              next = childNum > 0 ? t.getChild(childNum - 1) : t.getChild(t.numChildren() + childNum);
           }
         }
       };
@@ -1510,14 +1466,11 @@ abstract class Relation implements Serializable {
         return false;
       }
 
-      final HasIthChild hasIthChild = (HasIthChild) o;
+      HasIthChild hasIthChild = (HasIthChild) o;
 
-      if (ithChildOf != null ? !ithChildOf.equals(hasIthChild.ithChildOf)
-          : hasIthChild.ithChildOf != null) {
-        return false;
-      }
+        return !(ithChildOf != null ? !ithChildOf.equals(hasIthChild.ithChildOf)
+                : hasIthChild.ithChildOf != null);
 
-      return true;
     }
 
     @Override
@@ -1534,8 +1487,10 @@ abstract class Relation implements Serializable {
   private static class UnbrokenCategoryDominates extends Relation {
 
     private static final long serialVersionUID = -4174923168221859262L;
+      private static final Pattern COMPILE = Pattern.compile("__");
+      private static final Pattern PATTERN = Pattern.compile("/.*/");
 
-    private final Pattern pattern;
+      private final Pattern pattern;
     private final boolean negatedPattern;
     private final boolean basicCat;
     private Function<String, String> basicCatFunction;
@@ -1549,33 +1504,29 @@ abstract class Relation implements Serializable {
     UnbrokenCategoryDominates(String arg,
                               Function<String, String> basicCatFunction) {
       super("<+(" + arg + ')');
-      if (arg.startsWith("!")) {
+      if (!arg.isEmpty() && arg.charAt(0) == '!') {
         negatedPattern = true;
         arg = arg.substring(1);
       } else {
         negatedPattern = false;
       }
-      if (arg.startsWith("@")) {
+      if (!arg.isEmpty() && arg.charAt(0) == '@') {
         basicCat = true;
         this.basicCatFunction = basicCatFunction;
         arg = arg.substring(1);
       } else {
         basicCat = false;
       }
-      if (arg.matches("/.*/")) {
+      if (PATTERN.matcher(arg).matches()) {
         pattern = Pattern.compile(arg.substring(1, arg.length() - 1));
-      } else if (arg.matches("__")) {
-        pattern = Pattern.compile("^.*$");
-      } else {
-        pattern = Pattern.compile("^(?:" + arg + ")$");
-      }
+      } else pattern = COMPILE.matcher(arg).matches() ? Pattern.compile("^.*$") : Pattern.compile("^(?:" + arg + ")$");
     }
 
     /** {@inheritDoc} */
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
       for (Tree kid : t1.children()) {
-        if (kid == t2) {
+        if (kid.equals(t2)) {
           return true;
         } else {
           if (pathMatchesNode(kid) && satisfies(kid, t2, root)) {
@@ -1604,13 +1555,13 @@ abstract class Relation implements Serializable {
     /** {@inheritDoc} */
     @Override
     Iterator<Tree> searchNodeIterator(final Tree t,
-                                      final TregexMatcher matcher) {
+                                      TregexMatcher matcher) {
       return new SearchNodeIterator() {
         Stack<Tree> searchStack;
 
         @Override
         public void initialize() {
-          searchStack = new Stack<Tree>();
+          searchStack = new Stack<>();
           for (int i = t.numChildren() - 1; i >= 0; i--) {
             searchStack.push(t.getChild(i));
           }
@@ -1644,16 +1595,13 @@ abstract class Relation implements Serializable {
         return false;
       }
 
-      final UnbrokenCategoryDominates unbrokenCategoryDominates = (UnbrokenCategoryDominates) o;
+      UnbrokenCategoryDominates unbrokenCategoryDominates = (UnbrokenCategoryDominates) o;
 
       if (negatedPattern != unbrokenCategoryDominates.negatedPattern) {
         return false;
       }
-      if (!pattern.equals(unbrokenCategoryDominates.pattern)) {
-        return false;
-      }
+        return pattern.equals(unbrokenCategoryDominates.pattern);
 
-      return true;
     }
 
     @Override
@@ -1677,7 +1625,7 @@ abstract class Relation implements Serializable {
                                   Function<String, String> basicCatFunction) {
       super(">+(" + arg + ')');
       unbrokenCategoryDominates = Interner
-        .globalIntern((new UnbrokenCategoryDominates(arg, basicCatFunction)));
+        .globalIntern(new UnbrokenCategoryDominates(arg, basicCatFunction));
     }
 
     /** {@inheritDoc} */
@@ -1698,11 +1646,7 @@ abstract class Relation implements Serializable {
 
         @Override
         public void advance() {
-          if (unbrokenCategoryDominates.pathMatchesNode(next)) {
-            next = matcher.getParent(next);
-          } else {
-            next = null;
-          }
+            next = unbrokenCategoryDominates.pathMatchesNode(next) ? matcher.getParent(next) : null;
         }
       };
     }
@@ -1719,7 +1663,7 @@ abstract class Relation implements Serializable {
         return false;
       }
 
-      final UnbrokenCategoryIsDominatedBy unbrokenCategoryIsDominatedBy = (UnbrokenCategoryIsDominatedBy) o;
+      UnbrokenCategoryIsDominatedBy unbrokenCategoryIsDominatedBy = (UnbrokenCategoryIsDominatedBy) o;
 
       return unbrokenCategoryDominates.equals(unbrokenCategoryIsDominatedBy.unbrokenCategoryDominates);
     }
@@ -1742,8 +1686,10 @@ abstract class Relation implements Serializable {
   private static class UnbrokenCategoryPrecedes extends Relation {
 
     private static final long serialVersionUID = 6866888667804306111L;
+      private static final Pattern COMPILE = Pattern.compile("__");
+      private static final Pattern PATTERN = Pattern.compile("/.*/");
 
-    private final Pattern pattern;
+      private final Pattern pattern;
     private final boolean negatedPattern;
     private final boolean basicCat;
     private Function<String, String> basicCatFunction;
@@ -1754,26 +1700,22 @@ abstract class Relation implements Serializable {
     UnbrokenCategoryPrecedes(String arg,
                              Function<String, String> basicCatFunction) {
       super(".+(" + arg + ')');
-      if (arg.startsWith("!")) {
+      if (!arg.isEmpty() && arg.charAt(0) == '!') {
         negatedPattern = true;
         arg = arg.substring(1);
       } else {
         negatedPattern = false;
       }
-      if (arg.startsWith("@")) {
+      if (!arg.isEmpty() && arg.charAt(0) == '@') {
         basicCat = true;
         this.basicCatFunction = basicCatFunction; // todo -- this was missing a this. which must be testable in a unit test!!! Make one
         arg = arg.substring(1);
       } else {
         basicCat = false;
       }
-      if (arg.matches("/.*/")) {
+      if (PATTERN.matcher(arg).matches()) {
         pattern = Pattern.compile(arg.substring(1, arg.length() - 1));
-      } else if (arg.matches("__")) {
-        pattern = Pattern.compile("^.*$");
-      } else {
-        pattern = Pattern.compile("^(?:" + arg + ")$");
-      }
+      } else pattern = COMPILE.matcher(arg).matches() ? Pattern.compile("^.*$") : Pattern.compile("^(?:" + arg + ")$");
     }
 
     /** {@inheritDoc} */
@@ -1807,29 +1749,25 @@ abstract class Relation implements Serializable {
 
         @Override
         public void initialize() {
-          nodesToSearch = new IdentityHashSet<Tree>();
-          searchStack = new Stack<Tree>();
+          nodesToSearch = new IdentityHashSet<>();
+          searchStack = new Stack<>();
           initializeHelper(searchStack, t, matcher.getRoot());
           advance();
         }
 
         private void initializeHelper(Stack<Tree> stack, Tree node, Tree root) {
-          if (node==root) {
+          if (node.equals(root)) {
             return;
           }
           Tree parent = matcher.getParent(node);
           int i = parent.objectIndexOf(node);
-          while (i == parent.children().length-1 && parent != root) {
+          while (i == parent.children().length-1 && !parent.equals(root)) {
             node = parent;
             parent = matcher.getParent(parent);
             i = parent.objectIndexOf(node);
           }
           Tree followingNode;
-          if (i+1 < parent.children().length) {
-            followingNode = parent.children()[i+1];
-          } else {
-            followingNode = null;
-          }
+            followingNode = i + 1 < parent.children().length ? parent.children()[i + 1] : null;
           while (followingNode != null) {
             //System.err.println("adding to stack node " + followingNode.toString());
             if (! nodesToSearch.contains(followingNode)) {
@@ -1839,21 +1777,13 @@ abstract class Relation implements Serializable {
             if (pathMatchesNode(followingNode)) {
               initializeHelper(stack, followingNode, root);
             }
-            if (! followingNode.isLeaf()) {
-              followingNode = followingNode.children()[0];
-            } else {
-              followingNode = null;
-            }
+              followingNode = !followingNode.isLeaf() ? followingNode.children()[0] : null;
           }
         }
 
         @Override
         void advance() {
-          if (searchStack.isEmpty()) {
-            next = null;
-          } else {
-            next = searchStack.pop();
-          }
+            next = searchStack.isEmpty() ? null : searchStack.pop();
         }
       };
     }
@@ -1868,8 +1798,10 @@ abstract class Relation implements Serializable {
   private static class UnbrokenCategoryFollows extends Relation {
 
     private static final long serialVersionUID = -7890430001297866437L;
+      private static final Pattern COMPILE = Pattern.compile("__");
+      private static final Pattern PATTERN = Pattern.compile("/.*/");
 
-    private final Pattern pattern;
+      private final Pattern pattern;
     private final boolean negatedPattern;
     private final boolean basicCat;
     private Function<String, String> basicCatFunction;
@@ -1880,26 +1812,22 @@ abstract class Relation implements Serializable {
     UnbrokenCategoryFollows(String arg,
                             Function<String, String> basicCatFunction) {
       super(",+(" + arg + ')');
-      if (arg.startsWith("!")) {
+      if (!arg.isEmpty() && arg.charAt(0) == '!') {
         negatedPattern = true;
         arg = arg.substring(1);
       } else {
         negatedPattern = false;
       }
-      if (arg.startsWith("@")) {
+      if (!arg.isEmpty() && arg.charAt(0) == '@') {
         basicCat = true;
         this.basicCatFunction = basicCatFunction;
         arg = arg.substring(1);
       } else {
         basicCat = false;
       }
-      if (arg.matches("/.*/")) {
+      if (PATTERN.matcher(arg).matches()) {
         pattern = Pattern.compile(arg.substring(1, arg.length() - 1));
-      } else if (arg.matches("__")) {
-        pattern = Pattern.compile("^.*$");
-      } else {
-        pattern = Pattern.compile("^(?:" + arg + ")$");
-      }
+      } else pattern = COMPILE.matcher(arg).matches() ? Pattern.compile("^.*$") : Pattern.compile("^(?:" + arg + ")$");
     }
 
     /** {@inheritDoc} */
@@ -1933,29 +1861,25 @@ abstract class Relation implements Serializable {
 
         @Override
         public void initialize() {
-          nodesToSearch = new IdentityHashSet<Tree>();
-          searchStack = new Stack<Tree>();
+          nodesToSearch = new IdentityHashSet<>();
+          searchStack = new Stack<>();
           initializeHelper(searchStack, t, matcher.getRoot());
           advance();
         }
 
         private void initializeHelper(Stack<Tree> stack, Tree node, Tree root) {
-          if (node==root) {
+          if (node.equals(root)) {
             return;
           }
           Tree parent = matcher.getParent(node);
           int i = parent.objectIndexOf(node);
-          while (i == 0 && parent != root) {
+          while (i == 0 && !parent.equals(root)) {
             node = parent;
             parent = matcher.getParent(parent);
             i = parent.objectIndexOf(node);
           }
           Tree precedingNode;
-          if (i > 0) {
-            precedingNode = parent.children()[i-1];
-          } else {
-            precedingNode = null;
-          }
+            precedingNode = i > 0 ? parent.children()[i - 1] : null;
           while (precedingNode != null) {
             //System.err.println("adding to stack node " + precedingNode.toString());
             if ( ! nodesToSearch.contains(precedingNode)) {
@@ -1965,21 +1889,13 @@ abstract class Relation implements Serializable {
             if (pathMatchesNode(precedingNode)) {
               initializeHelper(stack, precedingNode, root);
             }
-            if (! precedingNode.isLeaf()) {
-              precedingNode = precedingNode.children()[0];
-            } else {
-              precedingNode = null;
-            }
+              precedingNode = !precedingNode.isLeaf() ? precedingNode.children()[0] : null;
           }
         }
 
         @Override
         void advance() {
-          if (searchStack.isEmpty()) {
-            next = null;
-          } else {
-            next = searchStack.pop();
-          }
+            next = searchStack.isEmpty() ? null : searchStack.pop();
         }
       };
     }

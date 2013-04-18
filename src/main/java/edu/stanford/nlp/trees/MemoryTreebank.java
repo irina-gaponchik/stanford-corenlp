@@ -13,8 +13,8 @@ import edu.stanford.nlp.objectbank.ObjectBank;
 
 
 /**
- * A <code>MemoryTreebank</code> object stores a corpus of examples with
- * given tree structures in memory (as a <code>List</code>).
+ * A {@code MemoryTreebank} object stores a corpus of examples with
+ * given tree structures in memory (as a {@code List}).
  *
  * @author Christopher Manning
  * @version 2004/09/01
@@ -38,7 +38,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
 
   /**
    * Create a new tree bank.
-   * The trees are made with a <code>LabeledScoredTreeReaderFactory</code>.
+   * The trees are made with a {@code LabeledScoredTreeReaderFactory}.
    * <p/>
    * <i>Compatibility note: Until Sep 2004, this used to create a Treebank
    * with a SimpleTreeReaderFactory, but this was changed as the old
@@ -51,7 +51,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
 
   /**
    * Create a new tree bank, using a specific TreeNormalizer.
-   * The trees are made with a <code>LabeledScoredTreeReaderFactory</code>.
+   * The trees are made with a {@code LabeledScoredTreeReaderFactory}.
    * <p/>
    * <i>Compatibility note: Until Sep 2004, this used to create a Treebank
    * with a SimpleTreeReaderFactory, but this was changed as the old
@@ -74,11 +74,11 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
    * Create a new tree bank.
    *
    * @param trf the factory class to be called to create a new
-   *            <code>TreeReader</code>
+   *            {@code TreeReader}
    */
   public MemoryTreebank(TreeReaderFactory trf) {
     super(trf);
-    parseTrees = new ArrayList<Tree>();
+    parseTrees = new ArrayList<>();
   }
 
 
@@ -86,12 +86,12 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
    * Create a new tree bank.
    *
    * @param trf      the factory class to be called to create a new
-   *                 <code>TreeReader</code>
+   *                 {@code TreeReader}
    * @param encoding the encoding to use for file access.
    */
   public MemoryTreebank(TreeReaderFactory trf, String encoding) {
     super(trf, encoding);
-    parseTrees = new ArrayList<Tree>();
+    parseTrees = new ArrayList<>();
   }
 
   /**
@@ -100,7 +100,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
    *
    * @param trees    The trees to put in the Treebank.
    * @param trf      the factory class to be called to create a new
-   *                 <code>TreeReader</code>
+   *                 {@code TreeReader}
    * @param encoding the encoding to use for file access.
    */
   public MemoryTreebank(List<Tree> trees, TreeReaderFactory trf, String encoding) {
@@ -124,16 +124,16 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
    *
    * @param initialCapacity The initial size of the underlying Collection
    * @param trf             the factory class to be called to create a new
-   *                        <code>TreeReader</code>
+   *                        {@code TreeReader}
    */
   public MemoryTreebank(int initialCapacity, TreeReaderFactory trf) {
     super(initialCapacity, trf);
-    parseTrees = new ArrayList<Tree>(initialCapacity);
+    parseTrees = new ArrayList<>(initialCapacity);
   }
 
 
   /**
-   * Empty a <code>Treebank</code>.
+   * Empty a {@code Treebank}.
    */
   @Override
   public void clear() {
@@ -158,7 +158,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
     srlMap = null;
   }
 
-  private Map<String,CollectionValuedMap<Integer,String>> srlMap = null;
+  private Map<String,CollectionValuedMap<Integer,String>> srlMap;
 
   private void readSRLFile(String srlFile) {
     srlMap = Generics.newHashMap();
@@ -169,7 +169,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
       String info = bits[2];
       CollectionValuedMap<Integer,String> cvm = srlMap.get(filename);
       if (cvm == null) {
-        cvm = new CollectionValuedMap<Integer,String>();
+        cvm = new CollectionValuedMap<>();
         srlMap.put(filename, cvm);
       }
       cvm.add(treeNum, info);
@@ -180,7 +180,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
    * Load a collection of parse trees from the file of given name.
    * Each tree may optionally be encased in parens to allow for Penn
    * Treebank style trees.
-   * This methods implements the <code>FileProcessor</code> interface.
+   * This methods implements the {@code FileProcessor} interface.
    *
    * @param file file to load a tree from
    */
@@ -192,9 +192,9 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
     if (this.srlMap != null) {
       // there must be a better way ...
       String filename = file.getAbsolutePath();
-      for (String suffix : this.srlMap.keySet()) {
-        if (filename.endsWith(suffix)) {
-          srlMap = this.srlMap.get(suffix);
+      for (Map.Entry<String, CollectionValuedMap<Integer, String>> stringCollectionValuedMapEntry : this.srlMap.entrySet()) {
+        if (filename.endsWith(stringCollectionValuedMapEntry.getKey())) {
+          srlMap = this.srlMap.get(stringCollectionValuedMapEntry.getKey());
           break;
         }
       }
@@ -218,83 +218,53 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
           hi.setDocID(file.getName());
           hi.setSentIndex(sentIndex);
         }
-        if (srlMap == null) {
-          parseTrees.add(pt);
-        } else {
-          Collection<String> srls = srlMap.get(sentIndex);
-//           pt.pennPrint();
-//           System.err.println(srls);
-          parseTrees.add(pt);
-          if (srls.isEmpty()) {
-//            parseTrees.add(pt);
-          } else {
-            for (String srl : srls) {
-//              Tree t = pt.deepCopy();
-              String[] bits = srl.split("\\s+");
-              int verbIndex = Integer.parseInt(bits[0]);
-              String lemma = bits[2].split("\\.")[0];
-//              Tree verb = Trees.getTerminal(t, verbIndex);
-              Tree verb = Trees.getTerminal(pt, verbIndex);
-//              ((CoreLabel)verb.label()).set(SRLIDAnnotation.class, SRL_ID.REL);
-              ((CoreLabel)verb.label()).set(CoreAnnotations.CoNLLPredicateAnnotation.class, true);
-              for (int i = 4; i < bits.length; i++) {
-                String arg = bits[i];
-                String[] bits1;
-                if (arg.indexOf("ARGM") >= 0) {
-                  bits1 = arg.split("-");
-                } else {
-                  bits1 = arg.split("-");
-                }
-                String locs = bits1[0];
-                String argType = bits1[1];
-                if (argType.equals("rel")) {
-                  continue;
-                }
-                for (String loc : locs.split("[*,]")) {
-                  bits1 = loc.split(":");
-                  int term = Integer.parseInt(bits1[0]);
-                  int height = Integer.parseInt(bits1[1]);
-//                  Tree t1 = Trees.getPreTerminal(t, term);
-                  Tree t1 = Trees.getPreTerminal(pt, term);
-                  for (int j = 0; j < height; j++) {
-//                    t1 = t1.parent(t);
-                    t1 = t1.parent(pt);
+          if (srlMap != null) {
+            Collection<String> srls = srlMap.get(sentIndex);
+  //           pt.pennPrint();
+  //           System.err.println(srls);
+            parseTrees.add(pt);
+              if (!srls.isEmpty()) {
+                  for (String srl : srls) {
+        //              Tree t = pt.deepCopy();
+                      String[] bits = srl.split("\\s+");
+                      int verbIndex = Integer.parseInt(bits[0]);
+                      String lemma = bits[2].split("\\.")[0];
+        //              Tree verb = Trees.getTerminal(t, verbIndex);
+                      Tree verb = Trees.getTerminal(pt, verbIndex);
+        //              ((CoreLabel)verb.label()).set(SRLIDAnnotation.class, SRL_ID.REL);
+                      ((TypesafeMap) verb.label()).set(CoreAnnotations.CoNLLPredicateAnnotation.class, true);
+                      int length = bits.length;
+                      for (int i = 4; i < length; i++) {
+                          String arg = bits[i];
+                          String[] bits1 = arg.split("-");
+                          String locs = bits1[0];
+                          String argType = bits1[1];
+                          if (!argType.equals("rel")) for (String loc : locs.split("[*,]")) {
+                              bits1 = loc.split(":");
+                              int term = Integer.parseInt(bits1[0]);
+                              int height = Integer.parseInt(bits1[1]);
+                              //                  Tree t1 = Trees.getPreTerminal(t, term);
+                              Tree t1 = Trees.getPreTerminal(pt, term);
+                              for (int j = 0; j < height; j++) {
+                                  //                    t1 = t1.parent(t);
+                                  t1 = t1.parent(pt);
+                              }
+                              Map<Integer, String> roleMap = ((ArrayCoreMap) t1.label()).get(CoreAnnotations.CoNLLSRLAnnotation.class);
+                              if (roleMap == null) {
+                                  roleMap = Generics.newHashMap();
+                                  ((TypesafeMap) t1.label()).set(CoreAnnotations.CoNLLSRLAnnotation.class, roleMap);
+                              }
+                              roleMap.put(verbIndex, argType);
+                              //                  ((CoreLabel)t1.label()).set(SRLIDAnnotation.class, SRL_ID.ARG);
+                          }
+                      }
                   }
-                  Map<Integer,String> roleMap = ((CoreLabel)t1.label()).get(CoreAnnotations.CoNLLSRLAnnotation.class);
-                  if (roleMap == null) {
-                    roleMap = Generics.newHashMap();
-                    ((CoreLabel)t1.label()).set(CoreAnnotations.CoNLLSRLAnnotation.class, roleMap);
-                  }
-                  roleMap.put(verbIndex, argType);
-//                  ((CoreLabel)t1.label()).set(SRLIDAnnotation.class, SRL_ID.ARG);
-                }
               }
-//               for (Tree t1 : t) {
-//                 if (t1.isLeaf()) { continue; }
-//                 CoreLabel fl = (CoreLabel)t1.label();
-//                 if (fl.value() == null) { continue; }
-//                 if (!fl.has(SRLIDAnnotation.class)) {
-//                   boolean allNone = true;
-//                   for (Tree t2 : t1) {
-//                     SRL_ID s = ((CoreLabel)t2.label()).get(SRLIDAnnotation.class);
-//                     if (s == SRL_ID.ARG || s == SRL_ID.REL) {
-//                       allNone = false;
-//                       break;
-//                     }
-//                   }
-//                   if (allNone) {
-//                     fl.set(SRLIDAnnotation.class, SRL_ID.ALL_NO);
-//                   } else {
-//                     fl.set(SRLIDAnnotation.class, SRL_ID.NO);
-//                   }
-//                 }
-//               }
-//              parseTrees.add(t);
-            }
+          } else {
+            parseTrees.add(pt);
           }
-        }
 
-        sentIndex++;
+          sentIndex++;
       }
     } catch (IOException e) {
       throw new RuntimeIOException("MemoryTreebank.processFile IOException in file " + file, e);
@@ -324,7 +294,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
    * @param r The reader to read trees from.  (If you want it buffered,
    *    you should already have buffered it!)
    * @param id An ID for where these files come from (arbitrary, but
-   *    something like a filename.  Can be <code>null</code> for none.
+   *    something like a filename.  Can be {@code null} for none.
    */
   public void load(Reader r, String id) {
     try {
@@ -350,9 +320,9 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
 
   /**
    * Get a tree by index from the Treebank.
-   * This operation isn't in the <code>Treebank</code> feature set, and
-   * so is only available with a <code>MemoryTreebank</code>, but is
-   * useful in allowing the latter to be used as a <code>List</code>.
+   * This operation isn't in the {@code Treebank} feature set, and
+   * so is only available with a {@code MemoryTreebank}, but is
+   * useful in allowing the latter to be used as a {@code List}.
    *
    * @param i The integer (counting from 0) index of the tree
    * @return A tree
@@ -369,9 +339,9 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
    */
   @Override
   public void apply(TreeVisitor tp) {
-    for (int i = 0, size = parseTrees.size(); i < size; i++) {
-      tp.visitTree(parseTrees.get(i));
-    }
+      for (Tree parseTree : parseTrees) {
+          tp.visitTree(parseTree);
+      }
     // or could do as Iterator but slower
     // Iterator iter = parseTrees.iterator();
     // while (iter.hasNext()) {
@@ -394,7 +364,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
   /**
    * Returns the size of the Treebank.
    * Provides a more efficient implementation than the one for a
-   * generic <code>Treebank</code>
+   * generic {@code Treebank}
    *
    * @return the number of trees in the Treebank
    */
@@ -468,11 +438,11 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
   /**
    * Loads treebank grammar from first argument and prints it.
    * Just a demonstration of functionality. <br>
-   * <code>usage: java MemoryTreebank treebankFilesPath</code>
+   * {@code usage: java MemoryTreebank treebankFilesPath}
    *
    * @param args array of command-line arguments
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Timing.startTime();
     Treebank treebank = new MemoryTreebank(new TreeReaderFactory() {
       public TreeReader newTreeReader(Reader in) {

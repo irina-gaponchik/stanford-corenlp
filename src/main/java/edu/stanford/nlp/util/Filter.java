@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 /**
  * Filter is an interface for predicate objects which respond to the
- * <code>accept</code> method.
+ * {@code accept} method.
  *
  * @author <a href="mailto:klein@cs.stanford.edu">Dan Klein</a>
  * @version 1.0

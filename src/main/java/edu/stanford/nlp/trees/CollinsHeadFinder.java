@@ -76,7 +76,7 @@ public class CollinsHeadFinder extends AbstractCollinsHeadFinder {
   }
 
   @Override
-  protected int postOperationFix(int headIdx, Tree[] daughterTrees) {
+  protected int postOperationFix(int headIdx, Tree... daughterTrees) {
     if (headIdx >= 2) {
       String prevLab = tlp.basicCategory(daughterTrees[headIdx - 1].value());
       if (prevLab.equals("CC") || prevLab.equals("CONJP")) {
@@ -98,13 +98,13 @@ public class CollinsHeadFinder extends AbstractCollinsHeadFinder {
   /**
    * Go through trees and determine their heads and print them.
    * Just for debuggin'. <br>
-   * Usage: <code>
+   * Usage: {@code
    * java edu.stanford.nlp.trees.CollinsHeadFinder treebankFilePath
-   * </code>
+   * }
    *
    * @param args The treebankFilePath
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Treebank treebank = new DiskTreebank();
     CategoryWordTag.suppressTerminalDetails = true;
     treebank.loadPath(args[0]);

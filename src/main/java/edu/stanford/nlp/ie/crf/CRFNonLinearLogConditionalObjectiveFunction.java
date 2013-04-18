@@ -30,7 +30,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
   boolean useSigmoid;
   SeqClassifierFlags flags;
 
-  int count = 0;
+  int count;
   protected int prior;
   protected double sigma;
   protected double priorL1Lambda; //used for L1 Prior, L2's lambda calculated from sigma (1/(2*sigma*sigma))
@@ -65,7 +65,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
 
   String backgroundSymbol;
 
-  public static boolean VERBOSE = false;
+  public static boolean VERBOSE;
 
   public static int getPriorType(String priorTypeStr)
   {
@@ -105,10 +105,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
     this.priorL1Lambda = flags.priorL1Lambda;
     this.outputLayerSize = numClasses;
     this.numHiddenUnits = flags.numHiddenUnits;
-    if (flags.arbitraryInputLayerSize != -1)
-      this.inputLayerSize = flags.arbitraryInputLayerSize;
-    else
-      this.inputLayerSize = numHiddenUnits * numClasses;
+      this.inputLayerSize = flags.arbitraryInputLayerSize != -1 ? flags.arbitraryInputLayerSize : numHiddenUnits * numClasses;
     this.numNodeFeatures = numNodeFeatures;
     this.numEdgeFeatures = numEdgeFeatures;
     System.err.println("numOfEdgeFeatures: " + numEdgeFeatures);
@@ -132,10 +129,10 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
       edgeParamCount = numEdgeFeatures * labelIndices.get(1).size();
 
       originalFeatureCount = 0;
-      for (int i = 0; i < map.length; i++) {
-        int s = labelIndices.get(map[i]).size();
-        originalFeatureCount += s;
-      }
+        for (int aMap : map) {
+            int s = labelIndices.get(aMap).size();
+            originalFeatureCount += s;
+        }
 
       domainDimension += edgeParamCount;
       domainDimension += inputLayerSize * numNodeFeatures;
@@ -144,11 +141,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
       if (useOutputLayer) {
         if (flags.sparseOutputLayer) {
           domainDimension += outputLayerSize * numHiddenUnits;
-        } else if (flags.tieOutputLayer) {
-          domainDimension += 1 * numHiddenUnits;
-        } else {
-          domainDimension += outputLayerSize * inputLayerSize;
-        }
+        } else domainDimension += flags.tieOutputLayer ? numHiddenUnits : outputLayerSize * inputLayerSize;
       }
       System.err.println("edgeParamCount: "+edgeParamCount);
       System.err.println("originalFeatureCount: "+originalFeatureCount);
@@ -195,7 +188,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
           }
         }
         if (count != beforeOutputWeights) {
-          throw new RuntimeException("after blockInitialize, param Index (" + count + ") not equal to beforeOutputWeights (" + beforeOutputWeights + ")");
+          throw new RuntimeException("after blockInitialize, param Index (" + count + ") not equal to beforeOutputWeights (" + beforeOutputWeights + ')');
         }
       } else {
         double fanIn = 1 / Math.sqrt(numNodeFeatures+0.0);
@@ -229,10 +222,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
           }
           initial[count++] = val;
         }
-        if (flags.hardcodeSoftmaxOutputWeights)
-          initial[count++] = 1.0 / numHiddenUnits;
-        else
-          initial[count++] = total;
+          initial[count++] = flags.hardcodeSoftmaxOutputWeights ? 1.0 / numHiddenUnits : total;
       } else {
         for (int i = beforeOutputWeights; i < domainDimension(); i++) {
           val = random.nextDouble() * twoEpsilon - epsilon;
@@ -240,7 +230,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
         }
       }
       if (count != domainDimension()) {
-        throw new RuntimeException("after param initialization, param Index (" + count + ") not equal to domainDimension (" + domainDimension() + ")");
+        throw new RuntimeException("after param initialization, param Index (" + count + ") not equal to domainDimension (" + domainDimension() + ')');
       }
     }
     return initial;
@@ -275,9 +265,9 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
         int labelIndex = labelIndices.get(j).indexOf(crfLabel);
         int[] cliqueFeatures = docData[i][j];
         //System.err.println(crfLabel + " " + labelIndex);
-        for (int n = 0; n < cliqueFeatures.length; n++) {
-          Ehat[cliqueFeatures[n]][labelIndex]++;
-        }
+          for (int cliqueFeature : cliqueFeatures) {
+              Ehat[cliqueFeature][labelIndex]++;
+          }
       }
     }
   }
@@ -308,7 +298,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
     return temp;
   }
 
-  public Triple<double[][], double[][], double[][]> separateWeights(double[] x) {
+  public Triple<double[][], double[][], double[][]> separateWeights(double... x) {
     double[] linearWeights = new double[edgeParamCount];
     System.arraycopy(x, 0, linearWeights, 0, edgeParamCount);
     double[][] linearWeights2D = to2D(linearWeights);
@@ -325,19 +315,17 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
     for (int i = 0; i < outputLayerWeights.length; i++) {
       for (int j = 0; j < outputLayerWeights[i].length; j++) {
         if (useOutputLayer) {
-          if (flags.hardcodeSoftmaxOutputWeights)
-            outputLayerWeights[i][j] = 1.0 / numHiddenUnits;
-          else 
-            outputLayerWeights[i][j] = x[index++];
+            outputLayerWeights[i][j] = flags.hardcodeSoftmaxOutputWeights ? 1.0 / numHiddenUnits : x[index++];
         } else
           outputLayerWeights[i][j] = 1;
       }
     }
-    assert(index == x.length);
-    return new Triple<double[][], double[][], double[][]>(linearWeights2D, inputLayerWeights, outputLayerWeights);
+    assert index == x.length;
+    return new Triple<>(linearWeights2D, inputLayerWeights, outputLayerWeights);
   }
 
-  public CliquePotentialFunction getCliquePotentialFunction(double[] x) {
+  @Override
+  public CliquePotentialFunction getCliquePotentialFunction(double... x) {
     Triple<double[][], double[][], double[][]> allParams = separateWeights(x);
     double[][] linearWeights = allParams.first();
     double[][] W = allParams.second(); // inputLayerWeights 
@@ -349,7 +337,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
    * Calculates both value and partial derivatives at the point x, and save them internally.
    */
   @Override
-  public void calculate(double[] x) {
+  public void calculate(double... x) {
 
     double prob = 0.0; // the log prob of the sequence given the model, which is the negation of value at this point
     Triple<double[][], double[][], double[][]> allParams = separateWeights(x);
@@ -407,7 +395,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
         int label = docLabels[i];
         double p = cliqueTree.condLogProbGivenPrevious(i, label, given);
         if (VERBOSE) {
-          System.err.println("P(" + label + "|" + ArrayMath.toString(given) + ")=" + p);
+          System.err.println("P(" + label + '|' + ArrayMath.toString(given) + ")=" + p);
         }
         prob += p;
         System.arraycopy(given, 1, given, 0, given.length - 1);
@@ -438,11 +426,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
             fDeriv = new double[inputLayerSize];
             double fD = 0;
             for (int q = 0; q < inputLayerSize; q++) {
-              if (useSigmoid) {
-                fD = As[q] * (1 - As[q]); 
-              } else {
-                fD = 1 - As[q] * As[q]; 
-              }
+                fD = useSigmoid ? As[q] * (1 - As[q]) : 1 - As[q] * As[q];
               fDeriv[q] = fD;
             }
 
@@ -458,11 +442,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
 
               for (int k = 0; k < outputLayerSize; k++) {
                 double[] Yk = null;
-                if (flags.tieOutputLayer) {
-                  Yk = Y[0];
-                } else {
-                  Yk = Y[k];
-                }
+                  Yk = flags.tieOutputLayer ? Y[0] : Y[k];
                 double sum = 0;
                 for (int q = 0; q < inputLayerSize; q++) {
                   if (q % outputLayerSize == k) {
@@ -512,7 +492,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
                 if (k % outputLayerSize == givenLabelIndex) {
                   int hiddenUnitNo = k / outputLayerSize;
                   if (flags.softmaxOutputLayer) {
-                    UhatK[hiddenUnitNo] += (yTimesAK[hiddenUnitNo] - Yk[hiddenUnitNo] * sumOfYTimesAK);
+                    UhatK[hiddenUnitNo] += yTimesAK[hiddenUnitNo] - Yk[hiddenUnitNo] * sumOfYTimesAK;
                     deltaK *= Yk[hiddenUnitNo];
                   } else {
                     UhatK[hiddenUnitNo] += As[k];
@@ -640,9 +620,9 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
                 }
               }
             } else { // for edge features
-              for (int n = 0; n < cliqueFeatures.length; n++) {
-                E[cliqueFeatures[n]][k] += p;
-              }
+                for (int cliqueFeature : cliqueFeatures) {
+                    E[cliqueFeature][k] += p;
+                }
             }
           }
         }
@@ -662,43 +642,40 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
     int index = 0;
     for (int i = 0; i < E.length; i++) {
       for (int j = 0; j < E[i].length; j++) {
-        derivative[index++] = (E[i][j] - Ehat[i][j]);
+        derivative[index++] = E[i][j] - Ehat[i][j];
         if (VERBOSE) {
-          System.err.println("linearWeights deriv(" + i + "," + j + ") = " + E[i][j] + " - " + Ehat[i][j] + " = " + derivative[index - 1]);
+          System.err.println("linearWeights deriv(" + i + ',' + j + ") = " + E[i][j] + " - " + Ehat[i][j] + " = " + derivative[index - 1]);
         }
       }
     }
     if (index != edgeParamCount)
-      throw new RuntimeException("after edge derivative, index("+index+") != edgeParamCount("+edgeParamCount+")");
+      throw new RuntimeException("after edge derivative, index("+index+") != edgeParamCount("+edgeParamCount+ ')');
 
     for (int i = 0; i < eW.length; i++) {
       for (int j = 0; j < eW[i].length; j++) {
-        derivative[index++] = (eW[i][j] - What[i][j]);
+        derivative[index++] = eW[i][j] - What[i][j];
         if (VERBOSE) {
-          System.err.println("inputLayerWeights deriv(" + i + "," + j + ") = " + eW[i][j] + " - " + What[i][j] + " = " + derivative[index - 1]);
+          System.err.println("inputLayerWeights deriv(" + i + ',' + j + ") = " + eW[i][j] + " - " + What[i][j] + " = " + derivative[index - 1]);
         }
       }
     }
 
     if (index != beforeOutputWeights)
-      throw new RuntimeException("after W derivative, index("+index+") != beforeOutputWeights("+beforeOutputWeights+")");
+      throw new RuntimeException("after W derivative, index("+index+") != beforeOutputWeights("+beforeOutputWeights+ ')');
 
     if (useOutputLayer) {
       for (int i = 0; i < eU.length; i++) {
         for (int j = 0; j < eU[i].length; j++) {
-          if (flags.hardcodeSoftmaxOutputWeights)
-            derivative[index++] = 0;
-          else
-            derivative[index++] = (eU[i][j] - Uhat[i][j]);
+            derivative[index++] = flags.hardcodeSoftmaxOutputWeights ? 0 : eU[i][j] - Uhat[i][j];
           if (VERBOSE) {
-            System.err.println("outputLayerWeights deriv(" + i + "," + j + ") = " + eU[i][j] + " - " + Uhat[i][j] + " = " + derivative[index - 1]);
+            System.err.println("outputLayerWeights deriv(" + i + ',' + j + ") = " + eU[i][j] + " - " + Uhat[i][j] + " = " + derivative[index - 1]);
           }
         }
       }
     }
 
     if (index != x.length)
-      throw new RuntimeException("after W derivative, index("+index+") != x.length("+x.length+")");
+      throw new RuntimeException("after W derivative, index("+index+") != x.length("+x.length+ ')');
 
     int regSize = x.length;
     if (flags.skipOutputRegularization || flags.softmaxOutputLayer || flags.hardcodeSoftmaxOutputWeights) {
@@ -774,7 +751,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
           derivative[i] += w / epsilon / sigmaSq;
         } else {
           value += (wabs - epsilon / 2) / sigmaSq;
-          derivative[i] += ((w < 0.0) ? -1.0 : 1.0) / sigmaSq;
+          derivative[i] += (w < 0.0 ? -1.0 : 1.0) / sigmaSq;
         }
       }
     } else if (prior == QUARTIC_PRIOR) {
@@ -813,20 +790,21 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
       }
       */
       int count = 0;
-      for (int i = 0; i < U.length; i++) {  
-        for (int j = 0; j < U[i].length; j++) {
-          y = U[i][j];
-          value += (y-mean) * (y-mean) * softmaxLambda;
-          double grad = (y-mean) * oneDividedByTwoSigmaSq;
-          // System.err.println("U["+i+"]["+j+"]="+x[beforeOutputWeights+count]+", Y["+i+"]["+j+"]="+Y[i][j]+", grad="+grad);
-          derivative[beforeOutputWeights+count] += grad;
-          count++;
+        for (double[] aU : U) {
+            for (double anAU : aU) {
+                y = anAU;
+                value += (y - mean) * (y - mean) * softmaxLambda;
+                double grad = (y - mean) * oneDividedByTwoSigmaSq;
+                // System.err.println("U["+i+"]["+j+"]="+x[beforeOutputWeights+count]+", Y["+i+"]["+j+"]="+Y[i][j]+", grad="+grad);
+                derivative[beforeOutputWeights + count] += grad;
+                count++;
+            }
         }
-      }
     }
   }
 
-  public Set<Integer> getL1ParamRange(double[] x) {
+  @Override
+  public Set<Integer> getL1ParamRange(double... x) {
     if (prior == L1_PRIOR) {
       Set<Integer> paramRange = Generics.newHashSet(x.length);
       for (int i = 0; i < x.length; i++)
@@ -867,7 +845,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
     }
   }
 
-  public double[][] to2D(double[] linearWeights) {
+  public double[][] to2D(double... linearWeights) {
     double[][] newWeights = new double[numEdgeFeatures][];
     int index = 0;
     int labelIndicesSize = labelIndices.get(1).size();

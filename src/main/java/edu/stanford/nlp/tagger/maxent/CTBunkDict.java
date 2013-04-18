@@ -13,7 +13,7 @@ import java.util.Set;
 public class CTBunkDict {
 
   private final static String defaultFilename = "ctb_amb";
-  private static CTBunkDict CTBunkDictSingleton = null;
+  private static CTBunkDict CTBunkDictSingleton;
 
   private static Map<String, Set<String>> CTBunk_dict;
 
@@ -28,7 +28,7 @@ public class CTBunkDict {
 
 
   private CTBunkDict() {
-    readCTBunkDict("/u/nlp/data/pos-tagger/dictionary" + "/" + defaultFilename);
+    readCTBunkDict("/u/nlp/data/pos-tagger/dictionary" + '/' + defaultFilename);
   }
 
 
@@ -71,12 +71,8 @@ public class CTBunkDict {
    */
   protected static String getTag(String tag, String word) {
     CTBunkDict dict = CTBunkDict.getInstance();
-    Set<String> words = dict.get(tag);
-    if (words != null && words.contains(word)) {
-      return "1";
-    } else {
-      return "0";
-    }
+    Set<String> words = get(tag);
+      return words != null && words.contains(word) ? "1" : "0";
   }
 
 

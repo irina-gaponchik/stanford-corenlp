@@ -56,8 +56,8 @@ public class Maps {
    */
   public static <X, Y, Z> Map<X, Z> compose(Map<X, Y> map1, Map<Y, Z> map2) {
     Map<X, Z> composedMap = Generics.newHashMap();
-    for (X key : map1.keySet()) {
-      composedMap.put(key, map2.get(map1.get(key)));
+    for (Entry<X, Y> xyEntry : map1.entrySet()) {
+      composedMap.put(xyEntry.getKey(), map2.get(xyEntry.getValue()));
     }
     return composedMap;
   }
@@ -96,7 +96,7 @@ public class Maps {
    * Sorts a list of entries.  This menthod is here since the entries might come from a Counter.
    */
   public static <K extends Comparable<? super K>, V> List<Map.Entry<K, V>> sortedEntries(Collection<Map.Entry<K, V>> entries) {
-    List<Entry<K,V>> entriesList = new ArrayList<Map.Entry<K, V>>(entries);
+    List<Entry<K,V>> entriesList = new ArrayList<>(entries);
     Collections.sort(entriesList, new Comparator<Map.Entry<K, V>>() {
       public int compare(Map.Entry<K, V> e1, Map.Entry<K, V> e2) {
         return e1.getKey().compareTo(e2.getKey());
@@ -116,17 +116,17 @@ public class Maps {
    * Stringifies a Map in a stable fashion.
    */
   public static <K extends Comparable<K>, V> void toStringSorted(Map<K, V> map, StringBuilder builder) {
-    builder.append("{");
+    builder.append('{');
     List<Entry<K,V>> sortedProperties = Maps.sortedEntries(map);
     int index = 0;
     for (Entry<K, V> entry : sortedProperties) {
       if (index > 0) {
         builder.append(", ");
       }
-      builder.append(entry.getKey()).append("=").append(entry.getValue());
+      builder.append(entry.getKey()).append('=').append(entry.getValue());
       index++;
     }
-    builder.append("}");
+    builder.append('}');
   }
 
   /**
@@ -148,9 +148,9 @@ public class Maps {
   }
 
   /**
-   * Adds all of the keys in <code>from</code> to <code>to</code>,
-   * applying <code>function</code> to the values to transform them
-   * from <code>V2</code> to <code>V1</code>.
+   * Adds all of the keys in {@code from} to {@code to},
+   * applying {@code function} to the values to transform them
+   * from {@code V2} to {@code V1}.
    */
   public static <K, V1, V2> void addAll(Map<K, V1> to, Map<K, V2> from, Function<V2, V1> function) {
     for (Map.Entry<K, V2> entry : from.entrySet()) {
@@ -158,7 +158,7 @@ public class Maps {
     }
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Map<String, String> map1 = Generics.newHashMap();
     map1.put("a", "1");
     map1.put("b", "2");

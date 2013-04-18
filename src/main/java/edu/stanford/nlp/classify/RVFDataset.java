@@ -9,13 +9,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.RuntimeIOException;
@@ -32,7 +32,7 @@ import edu.stanford.nlp.util.HashIndex;
 
 /**
  * An interfacing class for {@link ClassifierFactory} that incrementally builds
- * a more memory-efficient representation of a {@link List} of {@link RVFDatum}
+ * a more memory-efficient representation of a {@link java.util.List} of {@link edu.stanford.nlp.ling.RVFDatum}
  * objects for the purposes of training a {@link Classifier} with a
  * {@link ClassifierFactory}.
  *
@@ -49,8 +49,13 @@ import edu.stanford.nlp.util.HashIndex;
 public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Iterable<RVFDatum<L, F>>, Serializable
 
   private static final long serialVersionUID = -3841757837680266182L;
+    public static final Pattern COMPILE5 = Pattern.compile(":");
+    private static final Pattern COMPILE = COMPILE5;
+    public static final Pattern COMPILE6 = Pattern.compile("\\s+");
+    private static final Pattern COMPILE1 = Pattern.compile("#.*");
+    private static final Pattern COMPILE4 = Pattern.compile("#.*$");
 
-  private double[][] values;  // [datumIndex][i] values of features listed in int[][] data
+    private double[][] values;  // [datumIndex][i] values of features listed in int[][] data
   private double[] minValues; // = null; //stores the minValues of all features
                               // for normalization.
   private double[] maxValues; // = null; //stores the maxValues of all features
@@ -117,8 +122,8 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     System.arraycopy(values, devSize, trainValues, 0, trainSize);
     System.arraycopy(labels, devSize, trainLabels, 0, trainSize);
 
-    RVFDataset<L, F> dev = new RVFDataset<L, F>(labelIndex, devLabels, featureIndex, devData, devValues);
-    RVFDataset<L, F> train = new RVFDataset<L, F>(labelIndex, trainLabels, featureIndex, trainData, trainValues);
+    RVFDataset<L, F> dev = new RVFDataset<>(labelIndex, devLabels, featureIndex, devData, devValues);
+    RVFDataset<L, F> train = new RVFDataset<>(labelIndex, trainLabels, featureIndex, trainData, trainValues);
 
     return new Pair<GeneralDataset<L, F>, GeneralDataset<L, F>>(train, dev);
 
@@ -148,7 +153,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
       }
     }
     for (int f = 0; f < this.numFeatures(); f++) {
-      stdevs[f] /= (this.size() - 1);
+      stdevs[f] /= this.size() - 1;
       stdevs[f] = Math.sqrt(stdevs[f]);
     }
     for (int i = 0; i < this.size(); i++) {
@@ -248,7 +253,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
    * @return a new dataset
    */
   public RVFDataset<L, F> scaleDataset(RVFDataset<L, F> dataset) {
-    RVFDataset<L, F> newDataset = new RVFDataset<L, F>(this.featureIndex, this.labelIndex);
+    RVFDataset<L, F> newDataset = new RVFDataset<>(this.featureIndex, this.labelIndex);
     for (int i = 0; i < dataset.size(); i++) {
       RVFDatum<L, F> datum = dataset.getDatum(i);
       newDataset.add(scaleDatum(datum));
@@ -269,24 +274,21 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     // scale this dataset before scaling the datum
     if (minValues == null || maxValues == null)
       scaleFeatures();
-    Counter<F> scaledFeatures = new ClassicCounter<F>();
+    Counter<F> scaledFeatures = new ClassicCounter<>();
     for (F feature : datum.asFeatures()) {
       int fID = this.featureIndex.indexOf(feature);
       if (fID >= 0) {
         double oldVal = datum.asFeaturesCounter().getCount(feature);
         double newVal;
-        if (minValues[fID] != maxValues[fID])
-          newVal = (oldVal - minValues[fID]) / (maxValues[fID] - minValues[fID]);
-        else
-          newVal = oldVal;
+          newVal = minValues[fID] != maxValues[fID] ? (oldVal - minValues[fID]) / (maxValues[fID] - minValues[fID]) : oldVal;
         scaledFeatures.incrementCount(feature, newVal);
       }
     }
-    return new RVFDatum<L, F>(scaledFeatures, datum.label());
+    return new RVFDatum<>(scaledFeatures, datum.label());
   }
 
   public RVFDataset<L, F> scaleDatasetGaussian(RVFDataset<L, F> dataset) {
-    RVFDataset<L, F> newDataset = new RVFDataset<L, F>(this.featureIndex, this.labelIndex);
+    RVFDataset<L, F> newDataset = new RVFDataset<>(this.featureIndex, this.labelIndex);
     for (int i = 0; i < dataset.size(); i++) {
       RVFDatum<L, F> datum = dataset.getDatum(i);
       newDataset.add(scaleDatumGaussian(datum));
@@ -298,20 +300,17 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     // scale this dataset before scaling the datum
     if (means == null || stdevs == null)
       scaleFeaturesGaussian();
-    Counter<F> scaledFeatures = new ClassicCounter<F>();
+    Counter<F> scaledFeatures = new ClassicCounter<>();
     for (F feature : datum.asFeatures()) {
       int fID = this.featureIndex.indexOf(feature);
       if (fID >= 0) {
         double oldVal = datum.asFeaturesCounter().getCount(feature);
         double newVal;
-        if (stdevs[fID] != 0)
-          newVal = (oldVal - means[fID]) / stdevs[fID];
-        else
-          newVal = oldVal;
+          newVal = stdevs[fID] != 0 ? (oldVal - means[fID]) / stdevs[fID] : oldVal;
         scaledFeatures.incrementCount(feature, newVal);
       }
     }
-    return new RVFDatum<L, F>(scaledFeatures, datum.label());
+    return new RVFDatum<>(scaledFeatures, datum.label());
   }
 
   @Override
@@ -338,10 +337,10 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     System.arraycopy(labels, 0, trainLabels, 0, start);
     System.arraycopy(labels, end, trainLabels, start, size() - end);
 
-    GeneralDataset<L, F> dev = new RVFDataset<L, F>(labelIndex, devLabels, featureIndex, devData, devValues);
-    GeneralDataset<L, F> train = new RVFDataset<L, F>(labelIndex, trainLabels, featureIndex, trainData, trainValues);
+    GeneralDataset<L, F> dev = new RVFDataset<>(labelIndex, devLabels, featureIndex, devData, devValues);
+    GeneralDataset<L, F> train = new RVFDataset<>(labelIndex, trainLabels, featureIndex, trainData, trainValues);
 
-    return new Pair<GeneralDataset<L, F>, GeneralDataset<L, F>>(train, dev);
+    return new Pair<>(train, dev);
 
   }
 
@@ -387,11 +386,11 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
    */
   @Override
   public RVFDatum<L, F> getRVFDatum(int index) {
-    ClassicCounter<F> c = new ClassicCounter<F>();
+    ClassicCounter<F> c = new ClassicCounter<>();
     for (int i = 0; i < data[index].length; i++) {
       c.incrementCount(featureIndex.get(data[index][i]), values[index][i]);
     }
-    return new RVFDatum<L, F>(c, labelIndex.get(labels[index]));
+    return new RVFDatum<>(c, labelIndex.get(labels[index]));
   }
 
   public String getRVFDatumSource(int index) {
@@ -403,12 +402,12 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
   }
 
   private void addSourceAndId(String src, String id) {
-    sourcesAndIds.add(new Pair<String, String>(src, id));
+    sourcesAndIds.add(new Pair<>(src, id));
   }
 
   private void addLabel(L label) {
     if (labels.length == size) {
-      int[] newLabels = new int[size * 2];
+      int[] newLabels = new int[(size << 1)];
       System.arraycopy(labels, 0, newLabels, 0, size);
       labels = newLabels;
     }
@@ -417,16 +416,16 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
 
   private void addFeatures(Counter<F> features) {
     if (data.length == size) {
-      int[][] newData = new int[size * 2][];
-      double[][] newValues = new double[size * 2][];
+      int[][] newData = new int[(size << 1)][];
+      double[][] newValues = new double[(size << 1)][];
       System.arraycopy(data, 0, newData, 0, size);
       System.arraycopy(values, 0, newValues, 0, size);
       data = newData;
       values = newValues;
     }
 
-    final List<F> featureNames = new ArrayList<F>(features.keySet());
-    final int nFeatures = featureNames.size();
+    List<F> featureNames = new ArrayList<>(features.keySet());
+    int nFeatures = featureNames.size();
     data[size] = new int[nFeatures];
     values[size] = new double[nFeatures];
     for (int i = 0; i < nFeatures; ++i) {
@@ -460,12 +459,12 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
 
   @Override
   protected void initialize(int numDatums) {
-    labelIndex = new HashIndex<L>();
-    featureIndex = new HashIndex<F>();
+    labelIndex = new HashIndex<>();
+    featureIndex = new HashIndex<>();
     labels = new int[numDatums];
     data = new int[numDatums][];
     values = new double[numDatums][];
-    sourcesAndIds = new ArrayList<Pair<String, String>>(numDatums);
+    sourcesAndIds = new ArrayList<>(numDatums);
     size = 0;
   }
 
@@ -525,13 +524,13 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
       Set<Integer> feats = Generics.newHashSet();
       for (int j = 0; j < data[i].length; j++) {
         int feature = data[i][j];
-        feats.add(Integer.valueOf(feature));
+        feats.add(feature);
       }
       for (int j = 0; j < featureIndex.size(); j++) {
         if (feats.contains(Integer.valueOf(j))) {
-          pw.print(sep + "1");
+          pw.print(sep + '1');
         } else {
-          pw.print(sep + "0");
+          pw.print(sep + '0');
         }
       }
       pw.println();
@@ -555,13 +554,13 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
       for (int j = 0; j < data[i].length; j++) {
         int feature = data[i][j];
         double val = values[i][j];
-        feats.put(Integer.valueOf(feature), new Double(val));
+        feats.put(feature, val);
       }
       for (int j = 0; j < featureIndex.size(); j++) {
-        if (feats.containsKey(Integer.valueOf(j))) {
-          pw.print(sep + feats.get(Integer.valueOf(j)));
+        if (feats.containsKey(j)) {
+          pw.print(sep + feats.get(j));
         } else {
-          pw.print(sep + " ");
+          pw.print(sep + ' ');
         }
       }
       pw.println();
@@ -600,7 +599,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
    * @param featureSet
    */
   public void selectFeaturesFromSet(Set<F> featureSet) {
-    HashIndex<F> newFeatureIndex = new HashIndex<F>();
+    HashIndex<F> newFeatureIndex = new HashIndex<>();
     int[] featMap = new int[featureIndex.size()];
     Arrays.fill(featMap, -1);
     for (F feature : featureSet) {
@@ -612,8 +611,8 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     }
     featureIndex = newFeatureIndex;
     for (int i = 0; i < size; i++) {
-      List<Integer> featList = new ArrayList<Integer>(data[i].length);
-      List<Double> valueList = new ArrayList<Double>(values[i].length);
+      List<Integer> featList = new ArrayList<>(data[i].length);
+      List<Double> valueList = new ArrayList<>(values[i].length);
       for (int j = 0; j < data[i].length; j++) {
         if (featMap[data[i][j]] >= 0) {
           featList.add(featMap[data[i][j]]);
@@ -635,7 +634,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
    */
   public void applyFeatureCountThreshold(int k) {
     float[] counts = getFeatureCounts();
-    HashIndex<F> newFeatureIndex = new HashIndex<F>();
+    HashIndex<F> newFeatureIndex = new HashIndex<>();
 
     int[] featMap = new int[featureIndex.size()];
     for (int i = 0; i < featMap.length; i++) {
@@ -654,8 +653,8 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     // counts = null; // This is unnecessary; JVM can clean it up
 
     for (int i = 0; i < size; i++) {
-      List<Integer> featList = new ArrayList<Integer>(data[i].length);
-      List<Double> valueList = new ArrayList<Double>(values[i].length);
+      List<Integer> featList = new ArrayList<>(data[i].length);
+      List<Double> valueList = new ArrayList<>(values[i].length);
       for (int j = 0; j < data[i].length; j++) {
         if (featMap[data[i][j]] >= 0) {
           featList.add(featMap[data[i][j]]);
@@ -677,7 +676,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
    */
   public void applyFeatureMaxCountThreshold(int k) {
     float[] counts = getFeatureCounts();
-    HashIndex<F> newFeatureIndex = new HashIndex<F>();
+    HashIndex<F> newFeatureIndex = new HashIndex<>();
 
     int[] featMap = new int[featureIndex.size()];
     for (int i = 0; i < featMap.length; i++) {
@@ -696,8 +695,8 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     // counts = null; // This is unnecessary; JVM can clean it up
 
     for (int i = 0; i < size; i++) {
-      List<Integer> featList = new ArrayList<Integer>(data[i].length);
-      List<Double> valueList = new ArrayList<Double>(values[i].length);
+      List<Integer> featList = new ArrayList<>(data[i].length);
+      List<Double> valueList = new ArrayList<>(values[i].length);
       for (int j = 0; j < data[i].length; j++) {
         if (featMap[data[i][j]] >= 0) {
           featList.add(featMap[data[i][j]]);
@@ -717,7 +716,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     BufferedReader in = null;
     RVFDataset<String, String> dataset;
     try {
-      dataset = new RVFDataset<String, String>(10, featureIndex, labelIndex);
+      dataset = new RVFDataset<>(10, featureIndex, labelIndex);
       in = new BufferedReader(new FileReader(filename));
 
       while (in.ready()) {
@@ -735,18 +734,18 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
   }
 
   public static RVFDatum<String, String> svmLightLineToRVFDatum(String l) {
-    l = l.replaceFirst("#.*$", ""); // remove any trailing comments
-    String[] line = l.split("\\s+");
-    ClassicCounter<String> features = new ClassicCounter<String>();
+    l = COMPILE4.matcher(l).replaceFirst(""); // remove any trailing comments
+    String[] line = COMPILE6.split(l);
+    ClassicCounter<String> features = new ClassicCounter<>();
     for (int i = 1; i < line.length; i++) {
-      String[] f = line[i].split(":");
+      String[] f = COMPILE5.split(line[i]);
       if (f.length != 2) {
         throw new IllegalArgumentException("Bad data format: " + l);
       }
       double val = Double.parseDouble(f[1]);
       features.incrementCount(f[0], val);
     }
-    return new RVFDatum<String, String>(features, line[0]);
+    return new RVFDatum<>(features, line[0]);
   }
 
   // todo [cdm 2012]: This duplicates the functionality of the methods above. Should be refactored.
@@ -761,17 +760,17 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
    */
   public void readSVMLightFormat(File file) {
     for (String line : IOUtils.readLines(file)) {
-      line = line.replaceAll("#.*", ""); // remove any trailing comments
-      String[] items = line.split("\\s+");
+      line = COMPILE1.matcher(line).replaceAll(""); // remove any trailing comments
+      String[] items = COMPILE6.split(line);
       Integer label = Integer.parseInt(items[0]);
-      Counter<F> features = new ClassicCounter<F>();
+      Counter<F> features = new ClassicCounter<>();
       for (int i = 1; i < items.length; i++) {
-        String[] featureItems = items[i].split(":");
+        String[] featureItems = COMPILE.split(items[i]);
         int feature = Integer.parseInt(featureItems[0]);
         double value = Double.parseDouble(featureItems[1]);
         features.incrementCount(this.featureIndex.get(feature), value);
       }
-      this.add(new RVFDatum<L, F>(features, this.labelIndex.get(label)));
+      this.add(new RVFDatum<>(features, this.labelIndex.get(label)));
     }
   }
 
@@ -781,7 +780,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
    * A strict SVM-light format will be written, where labels and features are
    * both encoded as integers, using the label and feature indexes of this
    * dataset. Datasets written by this method can be read by
-   * {@link #readSVMLightFormat(File)}.
+   * {@link #readSVMLightFormat(java.io.File)}.
    *
    * @param file The location where the dataset should be written.
    */
@@ -805,7 +804,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
 
   /**
    * Prints the sparse feature matrix using
-   * {@link #printSparseFeatureMatrix(PrintWriter)} to {@link System#out
+   * {@link #printSparseFeatureMatrix(java.io.PrintWriter)} to {@link System#out
    * System.out}.
    */
   public void printSparseFeatureMatrix() {
@@ -862,37 +861,37 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     pw.println();
   }
 
-  public static void main(String[] args) {
-    RVFDataset<String, String> data = new RVFDataset<String, String>();
-    ClassicCounter<String> c1 = new ClassicCounter<String>();
+  public static void main(String... args) {
+    RVFDataset<String, String> data = new RVFDataset<>();
+    ClassicCounter<String> c1 = new ClassicCounter<>();
     c1.incrementCount("fever", 3.5);
     c1.incrementCount("cough", 1.1);
     c1.incrementCount("congestion", 4.2);
 
-    ClassicCounter<String> c2 = new ClassicCounter<String>();
+    ClassicCounter<String> c2 = new ClassicCounter<>();
     c2.incrementCount("fever", 1.5);
     c2.incrementCount("cough", 2.1);
     c2.incrementCount("nausea", 3.2);
 
-    ClassicCounter<String> c3 = new ClassicCounter<String>();
+    ClassicCounter<String> c3 = new ClassicCounter<>();
     c3.incrementCount("cough", 2.5);
     c3.incrementCount("congestion", 3.2);
 
-    data.add(new RVFDatum<String, String>(c1, "cold"));
-    data.add(new RVFDatum<String, String>(c2, "flu"));
-    data.add(new RVFDatum<String, String>(c3, "cold"));
+    data.add(new RVFDatum<>(c1, "cold"));
+    data.add(new RVFDatum<>(c2, "flu"));
+    data.add(new RVFDatum<>(c3, "cold"));
     data.summaryStatistics();
 
-    LinearClassifierFactory<String, String> factory = new LinearClassifierFactory<String, String>();
+    LinearClassifierFactory<String, String> factory = new LinearClassifierFactory<>();
     factory.useQuasiNewton();
 
     LinearClassifier<String, String> c = factory.trainClassifier(data);
 
-    ClassicCounter<String> c4 = new ClassicCounter<String>();
+    ClassicCounter<String> c4 = new ClassicCounter<>();
     c4.incrementCount("cough", 2.3);
     c4.incrementCount("fever", 1.3);
 
-    RVFDatum<String, String> datum = new RVFDatum<String, String>(c4);
+    RVFDatum<String, String> datum = new RVFDatum<>(c4);
 
     c.justificationOf((Datum<String, String>) datum);
   }

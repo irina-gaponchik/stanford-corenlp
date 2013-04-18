@@ -11,7 +11,7 @@ import java.util.Iterator;
  * expected that an implementation of this interface has a constructor
  * that takes a Comparator, which is used for ordering ("scoring")
  * objects:
- * <code>public Heap(Comparator cmp) {}</code>
+ * {@code public Heap(Comparator cmp) {}}
  *
  * @author Dan Klein
  * @version 12/14/00
@@ -52,20 +52,20 @@ public interface Heap<E> {
   /**
    * Returns true iff the heap is empty.
    *
-   * @return a <code>boolean</code> value
+   * @return a {@code boolean} value
    */
   public boolean isEmpty();
 
   /**
    * Raises the priority of an object in the heap.  This works in a
-   * somewhat unusual way -- the object <code>o</code> should have
+   * somewhat unusual way -- the object {@code o} should have
    * changed with respect to the comparator passed in to the heap on
    * construction.  However, it should NOT have changed with respect
    * to its equals() method.  This is unlike the Java SortedSet where
    * the comparator should be consistent with equals(); here they
    * should not match.
    *
-   * @param o an <code>Object</code> value which has changed wrt the heap's ordering
+   * @param o an {@code Object} value which has changed wrt the heap's ordering
    * @return the cost of the decrease-key operation, for analysis
    */
   public int decreaseKey(E o); // should be void; int for analysis
@@ -73,7 +73,7 @@ public interface Heap<E> {
   /**
    * Returns an iterator over its elements, in order.
    *
-   * @return an <code>Iterator</code> value
+   * @return an {@code Iterator} value
    */
   public Iterator<E> iterator();
 

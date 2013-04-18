@@ -26,9 +26,9 @@ import java.util.*;
  */
 public class TTags {
 
-  private Index<String> index = new HashIndex<String>();
+  private Index<String> index = new HashIndex<>();
   private final Set<String> closed = Generics.newHashSet();
-  private Set<String> openTags = null; /* cache */
+  private Set<String> openTags; /* cache */
   private final boolean isEnglish; // for speed
   private static final boolean doDeterministicTagExpansion = true;
 
@@ -36,7 +36,7 @@ public class TTags {
   /** If true, then the open tags are fixed and we set closed tags based on
    *  index-openTags; otherwise, we set open tags based on index-closedTags.
    */
-  private boolean openFixed = false;
+  private boolean openFixed;
 
   /** When making a decision based on the training data as to whether a
    *  tag is closed, this is the threshold for how many tokens can be in
@@ -48,7 +48,7 @@ public class TTags {
   /** If true, when a model is trained, all tags that had fewer tokens than
    *  closedTagThreshold will be considered closed.
    */
-  private boolean learnClosedTags = false;
+  private boolean learnClosedTags;
 
 
   public TTags() {
@@ -322,7 +322,7 @@ public class TTags {
   protected void read(DataInputStream file) {
     try {
       int size = file.readInt();
-      index = new HashIndex<String>();
+      index = new HashIndex<>();
       for (int i = 0; i < size; i++) {
         String tag = file.readUTF();
         boolean inClosed = file.readBoolean();
@@ -337,11 +337,7 @@ public class TTags {
 
 
   protected boolean isClosed(String tag) {
-    if (openFixed) {
-      return !openTags.contains(tag);
-    } else {
-      return closed.contains(tag);
-    }
+      return openFixed ? !openTags.contains(tag) : closed.contains(tag);
   }
 
   void markClosed(String tag) {
@@ -353,7 +349,7 @@ public class TTags {
     learnClosedTags = learn;
   }
 
-  public void setOpenClassTags(String[] openClassTags) {
+  public void setOpenClassTags(String... openClassTags) {
     openTags = Generics.newHashSet();
     openTags.addAll(Arrays.asList(openClassTags));
     for (String tag : openClassTags) {
@@ -362,7 +358,7 @@ public class TTags {
     openFixed = true;
   }
 
-  public void setClosedClassTags(String[] closedClassTags) {
+  public void setClosedClassTags(String... closedClassTags) {
     for(String tag : closedClassTags) {
       markClosed(tag);
     }
@@ -391,8 +387,8 @@ public class TTags {
    * @param tags Known possible tags for the word
    * @return A superset of tags
    */
-  String[] deterministicallyExpandTags(String[] tags) {
-    if (isEnglish && doDeterministicTagExpansion) {
+  String[] deterministicallyExpandTags(String... tags) {
+    if (isEnglish) {
       boolean seenVBN = false;
       boolean seenVBD =	false;
       boolean seenVB =	false;
@@ -400,19 +396,24 @@ public class TTags {
       for (String tag : tags) {
         char ch = tag.charAt(0);
         if (ch == 'V') {
-          if ("VBD".equals(tag)) {
-            seenVBD = true;
-          } else if ("VBN".equals(tag)) {
-            seenVBN = true;
-          } else if ("VB".equals(tag)) {
-            seenVB = true;
-          } else if ("VBP".equals(tag)) {
-            seenVBP = true;
-          }
+            switch (tag) {
+                case "VBD":
+                    seenVBD = true;
+                    break;
+                case "VBN":
+                    seenVBN = true;
+                    break;
+                case "VB":
+                    seenVB = true;
+                    break;
+                case "VBP":
+                    seenVBP = true;
+                    break;
+            }
         }
       }
       int toAdd = 0;
-      if ((seenVBN ^ seenVBD)) { // ^ is xor
+      if (seenVBN ^ seenVBD) { // ^ is xor
         toAdd++;
       }
       if (seenVB ^ seenVBP) {

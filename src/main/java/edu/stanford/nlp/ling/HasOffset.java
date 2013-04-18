@@ -3,7 +3,7 @@ package edu.stanford.nlp.ling;
 import java.io.Serializable;
 
 /**
- * Something that implements the <code>HasOffset</code> interface
+ * Something that implements the {@code HasOffset} interface
  * bears a offset reference to the original text
  *
  * @author Richard Eckart (Technische Universitat Darmstadt)

@@ -21,7 +21,7 @@ public class AdaptedGaussianPriorObjectiveFunction<L, F> extends LogConditionalO
    * Calculate the conditional likelihood.
    */
   @Override
-  protected void calculate(double[] x) {
+  protected void calculate(double... x) {
     if (useSummedConditionalLikelihood) {
       calculateSCL(x);
     } else {
@@ -32,26 +32,22 @@ public class AdaptedGaussianPriorObjectiveFunction<L, F> extends LogConditionalO
 
   /**
    */
-  private void calculateSCL(double[] x) {
+  private static void calculateSCL(double... x) {
     throw new UnsupportedOperationException();
   }
 
   /**
    */
-  private void calculateCL(double[] x) {
+  private void calculateCL(double... x) {
     value = 0.0;
     if (derivativeNumerator == null) {
       derivativeNumerator = new double[x.length];
       for (int d = 0; d < data.length; d++) {
         int[] features = data[d];
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], labels[d]);
-          if (dataweights == null) {
-            derivativeNumerator[i] -= 1;
-          } else {
-            derivativeNumerator[i] -= dataweights[d];
+          for (int feature : features) {
+              int i = indexOf(feature, labels[d]);
+              derivativeNumerator[i] -= dataweights == null ? 1 : dataweights[d];
           }
-        }
       }
     }
     copy(derivative, derivativeNumerator);
@@ -65,10 +61,10 @@ public class AdaptedGaussianPriorObjectiveFunction<L, F> extends LogConditionalO
       Arrays.fill(sums, 0.0);
 
       for (int c = 0; c < numClasses; c++) {
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          sums[c] += x[i];
-        }
+          for (int feature : features) {
+              int i = indexOf(feature, c);
+              sums[c] += x[i];
+          }
       }
       double total = ArrayMath.logSum(sums);
       for (int c = 0; c < numClasses; c++) {
@@ -76,10 +72,10 @@ public class AdaptedGaussianPriorObjectiveFunction<L, F> extends LogConditionalO
         if (dataweights != null) {
           probs[c] *= dataweights[d];
         }
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          derivative[i] += probs[c];
-        }
+          for (int feature : features) {
+              int i = indexOf(feature, c);
+              derivative[i] += probs[c];
+          }
       }
 
       double dV = sums[labels[d]] - total;
@@ -97,11 +93,11 @@ public class AdaptedGaussianPriorObjectiveFunction<L, F> extends LogConditionalO
   /**
    */
   @Override
-  protected void rvfcalculate(double[] x) {
+  protected void rvfcalculate(double... x) {
     throw new UnsupportedOperationException();
   }
 
-  public AdaptedGaussianPriorObjectiveFunction(GeneralDataset<L, F> dataset, LogPrior prior, double weights[][]) {
+  public AdaptedGaussianPriorObjectiveFunction(GeneralDataset<L, F> dataset, LogPrior prior, double[][] weights) {
     super(dataset, prior);
     this.weights = to1D(weights);
   }

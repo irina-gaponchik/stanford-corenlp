@@ -48,7 +48,7 @@ public class ChineseLexicon extends BaseLexicon {
   @Override
   public float score(IntTaggedWord iTW, int loc, String word, String featureSpec) {
     double c_W = seenCounter.getCount(iTW);
-    boolean seen = (c_W > 0.0);
+    boolean seen = c_W > 0.0;
 
     if (seen) {
       return super.score(iTW, loc, word, featureSpec);

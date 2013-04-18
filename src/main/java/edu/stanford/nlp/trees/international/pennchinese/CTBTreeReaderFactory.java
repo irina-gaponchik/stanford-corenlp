@@ -6,7 +6,7 @@ import edu.stanford.nlp.trees.*;
 
 
 /**
- * The <code>CTBTreeReaderFactory</code> is a factory for creating a
+ * The {@code CTBTreeReaderFactory} is a factory for creating a
  * TreeReader suitable for the Penn CTB.
  *
  * @author Christopher Manning
@@ -30,17 +30,13 @@ public class CTBTreeReaderFactory implements TreeReaderFactory {
   }
 
   /**
-   * Create a new <code>TreeReader</code> using the provided
-   * <code>Reader</code>.
+   * Create a new {@code TreeReader} using the provided
+   * {@code Reader}.
    *
-   * @param in The <code>Reader</code> to build on
+   * @param in The {@code Reader} to build on
    * @return The new TreeReader
    */
   public TreeReader newTreeReader(Reader in) {
-    if (discardFrags) {
-      return new FragDiscardingPennTreeReader(in, new LabeledScoredTreeFactory(), tn, new CHTBTokenizer(in));
-    } else {
-      return new PennTreeReader(in, new LabeledScoredTreeFactory(), tn, new CHTBTokenizer(in));
-    }
+      return discardFrags ? new FragDiscardingPennTreeReader(in, new LabeledScoredTreeFactory(), tn, new CHTBTokenizer(in)) : new PennTreeReader(in, new LabeledScoredTreeFactory(), tn, new CHTBTokenizer(in));
   }
 }

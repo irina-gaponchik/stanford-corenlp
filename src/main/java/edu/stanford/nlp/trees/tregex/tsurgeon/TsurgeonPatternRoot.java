@@ -15,7 +15,7 @@ class TsurgeonPatternRoot extends TsurgeonPattern {
   Map<String, Tree> newNodeNames;
 
 
-  public TsurgeonPatternRoot(TsurgeonPattern[] children) {
+  public TsurgeonPatternRoot(TsurgeonPattern... children) {
     super("operations: ", children);
     setRoot(this);
   }

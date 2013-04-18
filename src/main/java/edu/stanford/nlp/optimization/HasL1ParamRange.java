@@ -8,5 +8,5 @@ import java.util.Set;
  * @author Mengqiu Wang
  */
 public interface HasL1ParamRange {
-  public Set<Integer> getL1ParamRange(double[] x);
+  public Set<Integer> getL1ParamRange(double... x);
 }

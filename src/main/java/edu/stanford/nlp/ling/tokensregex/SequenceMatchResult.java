@@ -78,13 +78,13 @@ public interface SequenceMatchResult<T> extends MatchResult, HasInterval<Integer
   public List<? extends T> groupNodes(String groupVar);
 
   /**
-   * Returns the <code>String</code> representing the matched group.
+   * Returns the {@code String} representing the matched group.
    * @param  groupVar
    *         The name of the capturing group in this matcher's pattern
-   * @return the matched group as a <code>String</code>
+   * @return the matched group as a {@code String}
    *         or <tt>null</tt> if there is no capturing group in the pattern
    *         with the given name
-   * @throws  IllegalStateException
+   * @throws IllegalStateException
    *          If no match has yet been attempted,
    *          or if the previous match operation failed
    */
@@ -240,13 +240,13 @@ public interface SequenceMatchResult<T> extends MatchResult, HasInterval<Integer
   public final static Comparator<MatchResult> SCORE_COMPARATOR = new Comparator<MatchResult>() {
     public int compare(MatchResult e1, MatchResult e2) {
       double s1 = 0;
-      if (e1 instanceof SequenceMatchResult) { s1 =  ((SequenceMatchResult) e1).score(); };
-      double s2 = 0;
-      if (e2 instanceof SequenceMatchResult) { s2 =  ((SequenceMatchResult) e2).score(); };
-      if (s1 == s2) {
+      if (e1 instanceof SequenceMatchResult) { s1 =  ((SequenceMatchResult) e1).score(); }
+        double s2 = 0;
+      if (e2 instanceof SequenceMatchResult) { s2 =  ((SequenceMatchResult) e2).score(); }
+        if (s1 == s2) {
         return 0;
       } else {
-        return (s1 > s2)? -1:1;
+        return s1 > s2 ? -1:1;
       }
     }
   };
@@ -255,13 +255,13 @@ public interface SequenceMatchResult<T> extends MatchResult, HasInterval<Integer
     new Comparator<MatchResult>() {
     public int compare(MatchResult e1, MatchResult e2) {
       int o1 = 0;
-      if (e1 instanceof SequenceMatchResult) {o1 =  ((SequenceMatchResult) e1).getOrder(); };
-      int o2 = 0;
-      if (e2 instanceof SequenceMatchResult) {o2 =  ((SequenceMatchResult) e2).getOrder(); };
-      if (o1 == o2) {
+      if (e1 instanceof SequenceMatchResult) {o1 =  ((SequenceMatchResult) e1).getOrder(); }
+        int o2 = 0;
+      if (e2 instanceof SequenceMatchResult) {o2 =  ((SequenceMatchResult) e2).getOrder(); }
+        if (o1 == o2) {
         return 0;
       } else {
-        return (o1 < o2)? -1:1;
+        return o1 < o2 ? -1:1;
       }
     }
   };
@@ -277,7 +277,7 @@ public interface SequenceMatchResult<T> extends MatchResult, HasInterval<Integer
         if (len1 == len2) {
           return 0;
         } else {
-          return (len1 > len2)? -1:1;
+          return len1 > len2 ? -1:1;
         }
       }
     };
@@ -289,10 +289,10 @@ public interface SequenceMatchResult<T> extends MatchResult, HasInterval<Integer
           if (e1.end() == e2.end()) {
             return 0;
           } else {
-            return (e1.end() < e2.end())? -1:1;
+            return e1.end() < e2.end() ? -1:1;
           }
         } else {
-          return (e1.start() < e2.start())? -1:1;
+          return e1.start() < e2.start() ? -1:1;
         }
       }
     };

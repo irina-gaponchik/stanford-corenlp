@@ -39,7 +39,7 @@ public class EventMention extends RelationMention {
       List<String> argNames) {
     super(objectId, sentence, span, type, subtype, args, argNames);
     this.anchor = anchor;
-    this.parents = new IdentityHashSet<ExtractionObject>();
+    this.parents = new IdentityHashSet<>();
     
     // set ourselves as the parent of any EventMentions in our args 
     for (ExtractionObject arg : args) {
@@ -50,8 +50,8 @@ public class EventMention extends RelationMention {
   }
   
   public void resetArguments() {
-    args = new ArrayList<ExtractionObject>();
-    argNames = new ArrayList<String>();
+    args = new ArrayList<>();
+    argNames = new ArrayList<>();
   }
   
   public void removeFromParents() {
@@ -91,8 +91,8 @@ public class EventMention extends RelationMention {
   }
   
   public ExtractionObject getSingleParent(CoreMap sentence) {
-    if(getParents().size() > 1){
-      Set<ExtractionObject> parents = getParents();
+    if(parents.size() > 1){
+      Set<ExtractionObject> parents = this.parents;
       System.err.println("This event has multiple parents: " + this);
       int count = 1;
       for(ExtractionObject po: parents){
@@ -102,7 +102,7 @@ public class EventMention extends RelationMention {
       System.err.println("DOC " + sentence.get(CoreAnnotations.DocIDAnnotation.class));
       System.err.print("SENTENCE:");
       for(CoreLabel t: sentence.get(CoreAnnotations.TokensAnnotation.class)){
-        System.err.print(" " + t.word());
+        System.err.print(' ' + t.word());
       }
       System.err.println("EVENTS IN SENTENCE:");
       count = 1;
@@ -112,8 +112,8 @@ public class EventMention extends RelationMention {
       }
     }
     
-    assert(getParents().size() <= 1);
-    for(ExtractionObject p: getParents()){
+    assert parents.size() <= 1;
+    for(ExtractionObject p: parents){
       return p;
     }
     return null;
@@ -129,11 +129,11 @@ public class EventMention extends RelationMention {
       + ", start=" + getExtentTokenStart() + ", end=" + getExtentTokenEnd()
       + (anchor != null ? ", anchor=" + anchor : "")
       + (args != null ? ", args=" + args : "") 
-      + (argNames != null ? ", argNames=" + argNames : "") + "]";
+      + (argNames != null ? ", argNames=" + argNames : "") + ']';
   }
   
   public boolean contains(EventMention e) {
-    if(this == e) return true;
+    if(this.equals(e)) return true;
     
     for(ExtractionObject a: getArgs()){
       if(a instanceof EventMention){
@@ -152,7 +152,7 @@ public class EventMention extends RelationMention {
     for(int i = 0; i < getArgs().size(); i ++){
       ExtractionObject myArg = getArg(i);
       String myArgName = getArgNames().get(i);
-      if(myArg == a){
+      if(myArg.equals(a)){
         if(myArgName.equals(an)){
           // safe to discard this arg: we already have it with the same name
           return;
@@ -183,7 +183,7 @@ public class EventMention extends RelationMention {
   
   public void addArgs(List<ExtractionObject> args, List<String> argNames, boolean discardSameArgDifferentName){
     if(args == null) return;
-    assert (args.size() == argNames.size());
+    assert args.size() == argNames.size();
     for(int i = 0; i < args.size(); i ++){
       addArg(args.get(i), argNames.get(i), discardSameArgDifferentName);
     }

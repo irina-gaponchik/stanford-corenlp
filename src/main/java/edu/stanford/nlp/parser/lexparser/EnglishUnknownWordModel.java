@@ -99,7 +99,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
   @Override
   public float score(IntTaggedWord iTW, int loc, double c_Tseen, double total, double smooth, String word) {
     double pb_T_S = scoreProbTagGivenWordSignature(iTW, loc, smooth, word);
-    double p_T = (c_Tseen / total);
+    double p_T = c_Tseen / total;
     double p_W = 1.0 / total;
     double pb_W_T = Math.log(pb_T_S * p_W / p_T);
 
@@ -153,7 +153,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
     int sig = wordIndex.indexOf(uwSig, true);
     if (DEBUG_UWM) {
       System.err.println("Signature (" + unknownLevel + "): mapped " + word +
-                         " (" + index + ") to " + uwSig + " (" + sig + ")");
+                         " (" + index + ") to " + uwSig + " (" + sig + ')');
     }
     return sig;
   }
@@ -210,7 +210,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
   } // end getSignature()
 
 
-  @SuppressWarnings({"MethodMayBeStatic"})
+  @SuppressWarnings("MethodMayBeStatic")
   private void getSignature7(String word, int loc, StringBuilder sb) {
     // New Sep 2008. Like 2 but rely more on Caps somewhere than initial Caps
     // {-ALLC, -INIT, -UC somewhere, -LC, zero} +
@@ -321,7 +321,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
     if (hasDash) {
       sb.append("-DASH");
     }
-    if (lowered.endsWith("s") && wlen >= 3) {
+    if (!lowered.isEmpty() && lowered.charAt(lowered.length() - 1) == 's' && wlen >= 3) {
       // here length 3, so you don't miss out on ones like 80s
       char ch2 = lowered.charAt(wlen - 2);
       // not -ess suffixes or greek/latin -us, -is
@@ -345,7 +345,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
         sb.append("-ly");
       } else if (lowered.endsWith("ity")) {
         sb.append("-ity");
-      } else if (lowered.endsWith("y")) {
+      } else if (!lowered.isEmpty() && lowered.charAt(lowered.length() - 1) == 'y') {
         sb.append("-y");
       } else if (lowered.endsWith("al")) {
         sb.append("-al");
@@ -409,7 +409,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
     if (hasDash) {
       sb.append("-DASH");
     }
-    if (lowered.endsWith("s") && wlen >= 3) {
+    if (!lowered.isEmpty() && lowered.charAt(lowered.length() - 1) == 's' && wlen >= 3) {
       // here length 3, so you don't miss out on ones like 80s
       char ch2 = lowered.charAt(wlen - 2);
       // not -ess suffixes or greek/latin -us, -is
@@ -433,7 +433,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
         sb.append("-ly");
       } else if (lowered.endsWith("ity")) {
         sb.append("-ity");
-      } else if (lowered.endsWith("y")) {
+      } else if (!lowered.isEmpty() && lowered.charAt(lowered.length() - 1) == 'y') {
         sb.append("-y");
       } else if (lowered.endsWith("al")) {
         sb.append("-al");
@@ -446,7 +446,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
   }
 
 
-  @SuppressWarnings({"MethodMayBeStatic"})
+  @SuppressWarnings("MethodMayBeStatic")
   private void getSignature4(String word, int loc, StringBuilder sb) {
     boolean hasDigit = false;
     boolean hasNonDigit = false;
@@ -522,7 +522,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
   }
 
 
-  @SuppressWarnings({"MethodMayBeStatic"})
+  @SuppressWarnings("MethodMayBeStatic")
   private void getSignature3(String word, int loc, StringBuilder sb) {
     // This basically works right, except note that 'S' is applied to all
     // capitalized letters in first word of sentence, not just first....
@@ -533,22 +533,14 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
       char ch = word.charAt(i);
       char newClass;
       if (Character.isUpperCase(ch) || Character.isTitleCase(ch)) {
-        if (loc == 0) {
-          newClass = 'S';
-        } else {
-          newClass = 'L';
-        }
+          newClass = loc == 0 ? 'S' : 'L';
       } else if (Character.isLetter(ch)) {
         newClass = 'l';
       } else if (Character.isDigit(ch)) {
         newClass = 'd';
       } else if (ch == '-') {
         newClass = 'h';
-      } else if (ch == '.') {
-        newClass = 'p';
-      } else {
-        newClass = 's';
-      }
+      } else newClass = ch == '.' ? 'p' : 's';
       if (newClass != lastClass) {
         lastClass = newClass;
         sb.append(lastClass);
@@ -570,7 +562,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
   }
 
 
-  @SuppressWarnings({"MethodMayBeStatic"})
+  @SuppressWarnings("MethodMayBeStatic")
   private void getSignature2(String word, int loc, StringBuilder sb) {
     // {-ALLC, -INIT, -UC, -LC, zero} +
     // {-DASH, zero} +
@@ -625,7 +617,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
   }
 
 
-  @SuppressWarnings({"MethodMayBeStatic"})
+  @SuppressWarnings("MethodMayBeStatic")
   private void getSignature1(String word, int loc, StringBuilder sb) {
     sb.append('-');
     sb.append(word.substring(Math.max(word.length() - 2, 0), word.length()));
@@ -645,13 +637,12 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
     }
   }
 
-  @SuppressWarnings({"MethodMayBeStatic"})
   private void getSignature8(String word, StringBuilder sb) {
     sb.append('-');
     boolean digit = true;
     for (int i = 0; i < word.length(); i++) {
       char c = word.charAt(i);
-      if ( ! (Character.isDigit(c) || c == '.' || c == ',' || (i == 0 && (c == '-' || c == '+')))) {
+      if ( ! (Character.isDigit(c) || c == '.' || c == ',' || i == 0 && (c == '-' || c == '+'))) {
         digit = false;
       }
     }

@@ -68,7 +68,7 @@ public class PunctEquivalenceClasser {
   public static String getPunctClass(String punc) {
     if(punc.equals("%") || punc.equals("-PLUS-"))//-PLUS- is an escape for "+" in the ATB
       return "perc";
-    else if(punc.startsWith("*"))
+    else if(!punc.isEmpty() && punc.charAt(0) == '*')
       return "bullet";
     else if(sfClass.contains(punc))
       return "sf";

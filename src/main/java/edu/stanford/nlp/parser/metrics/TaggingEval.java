@@ -40,7 +40,7 @@ public class TaggingEval extends AbstractEval {
 
   private final Lexicon lex;
 
-  private static boolean doCatLevelEval = false;
+  private static boolean doCatLevelEval;
   private Counter<String> precisions;
   private Counter<String> recalls;
   private Counter<String> f1s;
@@ -62,23 +62,23 @@ public class TaggingEval extends AbstractEval {
     this.lex = lex;
 
     if(doCatLevelEval) {
-      precisions = new ClassicCounter<String>();
-      recalls = new ClassicCounter<String>();
-      f1s = new ClassicCounter<String>();
+      precisions = new ClassicCounter<>();
+      recalls = new ClassicCounter<>();
+      f1s = new ClassicCounter<>();
 
-      precisions2 = new ClassicCounter<String>();
-      recalls2 = new ClassicCounter<String>();
-      pnums2 = new ClassicCounter<String>();
-      rnums2 = new ClassicCounter<String>();
+      precisions2 = new ClassicCounter<>();
+      recalls2 = new ClassicCounter<>();
+      pnums2 = new ClassicCounter<>();
+      rnums2 = new ClassicCounter<>();
 
-      percentOOV = new ClassicCounter<String>();
-      percentOOV2 = new ClassicCounter<String>();
+      percentOOV = new ClassicCounter<>();
+      percentOOV2 = new ClassicCounter<>();
     }
   }
 
   @Override
   protected Set<HasTag> makeObjects(Tree tree) {
-    return (tree == null) ? Generics.<HasTag>newHashSet() : Generics.<HasTag>newHashSet(tree.taggedLabeledYield());
+    return tree == null ? Generics.<HasTag>newHashSet() : Generics.<HasTag>newHashSet(tree.taggedLabeledYield());
   }
 
   private static Map<String,Set<Label>> makeObjectsByCat(Tree t) {
@@ -108,13 +108,13 @@ public class TaggingEval extends AbstractEval {
     super.evaluate(guess, gold, pw);
 
     if(doCatLevelEval) {
-      final Map<String,Set<Label>> guessCats = makeObjectsByCat(guess);
-      final Map<String,Set<Label>> goldCats = makeObjectsByCat(gold);
-      final Set<String> allCats = Generics.newHashSet();
+      Map<String,Set<Label>> guessCats = makeObjectsByCat(guess);
+      Map<String,Set<Label>> goldCats = makeObjectsByCat(gold);
+      Set<String> allCats = Generics.newHashSet();
       allCats.addAll(guessCats.keySet());
       allCats.addAll(goldCats.keySet());
 
-      for(final String cat : allCats) {
+      for(String cat : allCats) {
         Set<Label> thisGuessCats = guessCats.get(cat);
         Set<Label> thisGoldCats = goldCats.get(cat);
 
@@ -126,7 +126,7 @@ public class TaggingEval extends AbstractEval {
         double currentPrecision = precision(thisGuessCats, thisGoldCats);
         double currentRecall = precision(thisGoldCats, thisGuessCats);
 
-        double currentF1 = (currentPrecision > 0.0 && currentRecall > 0.0 ? 2.0 / (1.0 / currentPrecision + 1.0 / currentRecall) : 0.0);
+        double currentF1 = currentPrecision > 0.0 && currentRecall > 0.0 ? 2.0 / (1.0 / currentPrecision + 1.0 / currentRecall) : 0.0;
 
         precisions.incrementCount(cat, currentPrecision);
         recalls.incrementCount(cat, currentRecall);
@@ -141,10 +141,10 @@ public class TaggingEval extends AbstractEval {
         if(lex != null) measureOOV(guess,gold);
 
         if (pw != null && runningAverages) {
-          pw.println(cat + "\tP: " + ((int) (currentPrecision * 10000)) / 100.0 + " (sent ave " + ((int) (precisions.getCount(cat) * 10000 / num)) / 100.0 + ") (evalb " + ((int) (precisions2.getCount(cat) * 10000 / pnums2.getCount(cat))) / 100.0 + ")");
-          pw.println("\tR: " + ((int) (currentRecall * 10000)) / 100.0 + " (sent ave " + ((int) (recalls.getCount(cat) * 10000 / num)) / 100.0 + ") (evalb " + ((int) (recalls2.getCount(cat) * 10000 / rnums2.getCount(cat))) / 100.0 + ")");
+          pw.println(cat + "\tP: " + (int) (currentPrecision * 10000) / 100.0 + " (sent ave " + (int) (precisions.getCount(cat) * 10000 / num) / 100.0 + ") (evalb " + (int) (precisions2.getCount(cat) * 10000 / pnums2.getCount(cat)) / 100.0 + ')');
+          pw.println("\tR: " + (int) (currentRecall * 10000) / 100.0 + " (sent ave " + (int) (recalls.getCount(cat) * 10000 / num) / 100.0 + ") (evalb " + (int) (recalls2.getCount(cat) * 10000 / rnums2.getCount(cat)) / 100.0 + ')');
           double cF1 = 2.0 / (rnums2.getCount(cat) / recalls2.getCount(cat) + pnums2.getCount(cat) / precisions2.getCount(cat));
-          String emit = str + " F1: " + ((int) (currentF1 * 10000)) / 100.0 + " (sent ave " + ((int) (10000 * f1s.getCount(cat) / num)) / 100.0 + ", evalb " + ((int) (10000 * cF1)) / 100.0 + ")";
+          String emit = str + " F1: " + (int) (currentF1 * 10000) / 100.0 + " (sent ave " + (int) (10000 * f1s.getCount(cat) / num) / 100.0 + ", evalb " + (int) (10000 * cF1) / 100.0 + ')';
           pw.println(emit);
         }
       }
@@ -180,13 +180,13 @@ public class TaggingEval extends AbstractEval {
     super.display(verbose, pw);
 
     if(doCatLevelEval) {
-      final NumberFormat nf = new DecimalFormat("0.00");
-      final Set<String> cats = Generics.newHashSet();
-      final Random rand = new Random();
+      NumberFormat nf = new DecimalFormat("0.00");
+      Set<String> cats = Generics.newHashSet();
+      Random rand = new Random();
       cats.addAll(precisions.keySet());
       cats.addAll(recalls.keySet());
 
-      Map<Double,String> f1Map = new TreeMap<Double,String>();
+      Map<Double,String> f1Map = new TreeMap<>();
       for (String cat : cats) {
         double pnum2 = pnums2.getCount(cat);
         double rnum2 = rnums2.getCount(cat);
@@ -196,7 +196,7 @@ public class TaggingEval extends AbstractEval {
 
         if(new Double(f1).equals(Double.NaN)) f1 = -1.0;
         if(f1Map.containsKey(f1))
-          f1Map.put(f1 + (rand.nextDouble()/1000.0), cat);
+          f1Map.put(f1 + rand.nextDouble()/1000.0, cat);
         else
           f1Map.put(f1, cat);
       }
@@ -214,12 +214,12 @@ public class TaggingEval extends AbstractEval {
         rec *= 100.0;
         double f1 = 2.0 / (1.0 / prec + 1.0 / rec);
 
-        double oovRate = (lex == null) ? -1.0 : percentOOV.getCount(cat) / percentOOV2.getCount(cat);
+        double oovRate = lex == null ? -1.0 : percentOOV.getCount(cat) / percentOOV2.getCount(cat);
 
-        pw.println(cat + "\tLP: " + ((pnum2 == 0.0) ? " N/A": nf.format(prec)) + "\tguessed: " + (int) pnum2 +
-            "\tLR: " + ((rnum2 == 0.0) ? " N/A": nf.format(rec)) + "\tgold:  " + (int) rnum2 +
-            "\tF1: " + ((pnum2 == 0.0 || rnum2 == 0.0) ? " N/A": nf.format(f1)) +
-            "\tOOV: " + ((lex == null) ? " N/A" : nf.format(oovRate)));
+        pw.println(cat + "\tLP: " + (pnum2 == 0.0 ? " N/A": nf.format(prec)) + "\tguessed: " + (int) pnum2 +
+            "\tLR: " + (rnum2 == 0.0 ? " N/A": nf.format(rec)) + "\tgold:  " + (int) rnum2 +
+            "\tF1: " + (pnum2 == 0.0 || rnum2 == 0.0 ? " N/A": nf.format(f1)) +
+            "\tOOV: " + (lex == null ? " N/A" : nf.format(oovRate)));
       }
 
       pw.println("============================================================");
@@ -232,7 +232,7 @@ public class TaggingEval extends AbstractEval {
     usage.append(String.format("Usage: java %s [OPTS] gold guess\n\n",TaggingEval.class.getName()));
     usage.append("Options:\n");
     usage.append("  -v         : Verbose mode.\n");
-    usage.append("  -l lang    : Select language settings from " + Languages.listOfLanguages() + "\n");
+    usage.append("  -l lang    : Select language settings from ").append(Languages.listOfLanguages()).append('\n');
     usage.append("  -y num     : Skip gold trees with yields longer than num.\n");
     usage.append("  -c         : Compute LP/LR/F1 by category.\n");
     usage.append("  -e         : Input encoding.\n");
@@ -253,7 +253,7 @@ public class TaggingEval extends AbstractEval {
    *
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
     if(args.length < minArgs) {
       System.out.println(usage.toString());
@@ -304,21 +304,21 @@ public class TaggingEval extends AbstractEval {
     }
 
     tlpp.setInputEncoding(encoding);
-    final PrintWriter pwOut = tlpp.pw();
+    PrintWriter pwOut = tlpp.pw();
 
-    final Treebank guessTreebank = tlpp.diskTreebank();
+    Treebank guessTreebank = tlpp.diskTreebank();
     guessTreebank.loadPath(guessFile);
     pwOut.println("GUESS TREEBANK:");
     pwOut.println(guessTreebank.textualSummary());
 
-    final Treebank goldTreebank = tlpp.diskTreebank();
+    Treebank goldTreebank = tlpp.diskTreebank();
     goldTreebank.loadPath(goldFile);
     pwOut.println("GOLD TREEBANK:");
     pwOut.println(goldTreebank.textualSummary());
 
-    final TaggingEval metric = new TaggingEval("Tagging LP/LR");
+    TaggingEval metric = new TaggingEval("Tagging LP/LR");
 
-    final TreeTransformer tc = tlpp.collinizer();
+    TreeTransformer tc = tlpp.collinizer();
 
     //The evalb ref implementation assigns status for each tree pair as follows:
     //
@@ -327,8 +327,8 @@ public class TaggingEval extends AbstractEval {
     //   2 - null parse e.g. (()).
     //
     //In the cases of 1,2, evalb does not include the tree pair in the LP/LR computation.
-    final Iterator<Tree> goldItr = goldTreebank.iterator();
-    final Iterator<Tree> guessItr = guessTreebank.iterator();
+    Iterator<Tree> goldItr = goldTreebank.iterator();
+    Iterator<Tree> guessItr = guessTreebank.iterator();
     int goldLineId = 0;
     int guessLineId = 0;
     int skippedGuessTrees = 0;
@@ -354,10 +354,10 @@ public class TaggingEval extends AbstractEval {
         continue;
       }
 
-      final Tree evalGuess = tc.transformTree(guessTree);
-      final Tree evalGold = tc.transformTree(goldTree);
+      Tree evalGuess = tc.transformTree(guessTree);
+      Tree evalGold = tc.transformTree(goldTree);
 
-      metric.evaluate(evalGuess, evalGold, ((VERBOSE) ? pwOut : null));
+      metric.evaluate(evalGuess, evalGold, VERBOSE ? pwOut : null);
     }
 
     if(guessItr.hasNext() || goldItr.hasNext()) {

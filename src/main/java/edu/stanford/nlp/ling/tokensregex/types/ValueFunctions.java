@@ -36,7 +36,7 @@ public class ValueFunctions {
     protected String name;
     protected String signature;
 
-    public NamedValueFunction(String name) {
+    protected NamedValueFunction(String name) {
       this.name = name;
     }
 
@@ -46,9 +46,9 @@ public class ValueFunctions {
       if (signature == null) {
         StringBuilder sb = new StringBuilder();
         sb.append(name);
-        sb.append("(");
+        sb.append('(');
         sb.append(getParamDesc());
-        sb.append(")");
+        sb.append(')');
         signature = sb.toString();
       }
       return signature;
@@ -73,16 +73,16 @@ public class ValueFunctions {
     List<ParamInfo> paramInfos;
     int nargs;
 
-    public TypeCheckedFunction(String name, List<ParamInfo> paramInfos) {
+    protected TypeCheckedFunction(String name, List<ParamInfo> paramInfos) {
       super(name);
       this.paramInfos = paramInfos;
-      nargs = (paramInfos != null)? paramInfos.size():0;
+      nargs = paramInfos != null ? paramInfos.size():0;
     }
 
-    public TypeCheckedFunction(String name, ParamInfo... paramInfos) {
+    protected TypeCheckedFunction(String name, ParamInfo... paramInfos) {
       super(name);
       this.paramInfos = Arrays.asList(paramInfos);
-      nargs = (paramInfos != null)? paramInfos.length:0;
+      nargs = paramInfos != null ? paramInfos.length:0;
     }
 
     @Override
@@ -118,7 +118,7 @@ public class ValueFunctions {
             return false;
           }
           if (v.get() != null) {
-            if (p.className != null && !(p.className.isAssignableFrom(v.get().getClass()))) {
+            if (p.className != null && !p.className.isAssignableFrom(v.get().getClass())) {
               return false;
             }
           }
@@ -175,66 +175,42 @@ public class ValueFunctions {
   public static final ValueFunction ADD_FUNCTION = new NumericFunction("ADD", 2) {
     @Override
     public Number compute(Number... in) {
-      if (isInteger(in[0]) && isInteger(in[1])) {
-        return in[0].longValue() + in[1].longValue();
-      } else {
-        return in[0].doubleValue() + in[1].doubleValue();
-      }
+        return isInteger(in[0]) && isInteger(in[1]) ? in[0].longValue() + in[1].longValue() : in[0].doubleValue() + in[1].doubleValue();
     }
   };
 
   public static final ValueFunction SUBTRACT_FUNCTION = new NumericFunction("SUBTRACT", 2) {
     @Override
     public Number compute(Number... in) {
-      if (isInteger(in[0]) && isInteger(in[1])) {
-        return in[0].longValue() - in[1].longValue();
-      } else {
-        return in[0].doubleValue() - in[1].doubleValue();
-      }
+        return isInteger(in[0]) && isInteger(in[1]) ? in[0].longValue() - in[1].longValue() : in[0].doubleValue() - in[1].doubleValue();
     }
   };
 
   public static final ValueFunction MULTIPLY_FUNCTION = new NumericFunction("MULTIPLY", 2) {
     @Override
     public Number compute(Number... in) {
-      if (isInteger(in[0]) && isInteger(in[1])) {
-        return in[0].longValue() * in[1].longValue();
-      } else {
-        return in[0].doubleValue() * in[1].doubleValue();
-      }
+        return isInteger(in[0]) && isInteger(in[1]) ? in[0].longValue() * in[1].longValue() : in[0].doubleValue() * in[1].doubleValue();
     }
   };
 
   public static final ValueFunction DIVIDE_FUNCTION = new NumericFunction("DIVIDE", 2) {
     @Override
     public Number compute(Number... in) {
-      if (isInteger(in[0]) && isInteger(in[1])) {
-        return in[0].longValue() / in[1].longValue();
-      } else {
-        return in[0].doubleValue() / in[1].doubleValue();
-      }
+        return isInteger(in[0]) && isInteger(in[1]) ? in[0].longValue() / in[1].longValue() : in[0].doubleValue() / in[1].doubleValue();
     }
   };
 
   public static final ValueFunction MOD_FUNCTION = new NumericFunction("MOD", 2) {
     @Override
     public Number compute(Number... in) {
-      if (isInteger(in[0]) && isInteger(in[1])) {
-        return in[0].longValue() % in[1].longValue();
-      } else {
-        return in[0].doubleValue() % in[1].doubleValue();
-      }
+        return isInteger(in[0]) && isInteger(in[1]) ? in[0].longValue() % in[1].longValue() : in[0].doubleValue() % in[1].doubleValue();
     }
   };
 
   public static final ValueFunction NEGATE_FUNCTION = new NumericFunction("NEGATE", 1) {
     @Override
     public Number compute(Number... in) {
-      if (isInteger(in[0])) {
-        return - in[0].longValue();
-      } else {
-        return - in[0].doubleValue();
-      }
+        return isInteger(in[0]) ? -in[0].longValue() : -in[0].doubleValue();
     }
   };
 
@@ -349,11 +325,7 @@ public class ValueFunctions {
       for (int i = 0; i < in.size(); i++) {
         if (in.get(i).get() instanceof String) {
           strs[i] = (String) in.get(i).get();
-        } else if (in.get(i).get() != null) {
-          strs[i] = in.get(i).get().toString();
-        } else {
-          strs[i] = null;
-        }
+        } else strs[i] = in.get(i).get() != null ? in.get(i).get().toString() : null;
       }
       String res = compute(strs);
       return new Expressions.PrimitiveValue(resultTypeName, res);
@@ -387,10 +359,7 @@ public class ValueFunctions {
       if (in.size() < 1) {
         return false;
       }
-      if (in.get(0) == null || !(in.get(0).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(0) == null || !(in.get(0).get() instanceof String));
     }
 
     @Override
@@ -411,10 +380,7 @@ public class ValueFunctions {
       if (in.size() < 1) {
         return false;
       }
-      if (in.get(0) == null || !(in.get(0).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(0) == null || !(in.get(0).get() instanceof String));
     }
 
     @Override
@@ -435,10 +401,7 @@ public class ValueFunctions {
       if (in.size() < 1) {
         return false;
       }
-      if (in.get(0) == null || !(in.get(0).get() instanceof List)) {
-        return false;
-      }
-      return true;
+        return !(in.get(0) == null || !(in.get(0).get() instanceof List));
     }
 
     @Override
@@ -465,13 +428,13 @@ public class ValueFunctions {
               if (in.get(0) == null) return null;
               List list = (List) in.get(0).get();
               ValueFunction func = (ValueFunction) in.get(1).get();
-              List<Value> res = new ArrayList<Value>(list.size());
+              List<Value> res = new ArrayList<>(list.size());
               for (Object elem:list) {
-                List<Value> args = new ArrayList<Value>(1);
+                List<Value> args = new ArrayList<>(1);
                 args.add(Expressions.createValue(Expressions.TYPE_LIST, elem));
                 res.add(func.apply(env, args));
               }
-              return new Expressions.PrimitiveValue<List<Value>>(Expressions.TYPE_LIST, res);
+              return new Expressions.PrimitiveValue<>(Expressions.TYPE_LIST, res);
             }
           };
   private static final ParamInfo PARAM_INFO_FUNCTION = new ParamInfo("FUNCTION", Expressions.TYPE_FUNCTION, Function.class, false);
@@ -484,11 +447,11 @@ public class ValueFunctions {
               if (in.get(0) == null) return null;
               List list = (List) in.get(0).get();
               Function func = (Function) in.get(1).get();
-              List<Object> res = new ArrayList<Object>(list.size());
+              List<Object> res = new ArrayList<>(list.size());
               for (Object elem:list) {
                 res.add(func.apply(elem));
               }
-              return new Expressions.PrimitiveValue<List<Object>>(null, res);
+              return new Expressions.PrimitiveValue<>(null, res);
             }
           };
 
@@ -508,7 +471,7 @@ public class ValueFunctions {
               TokenSequencePattern pattern = (TokenSequencePattern) in.get(1).get();
               TokenSequenceMatcher matcher = pattern.getMatcher(cms);
               boolean matches = matcher.matches();
-              return (matches)? Expressions.TRUE: Expressions.FALSE;
+              return matches ? Expressions.TRUE: Expressions.FALSE;
             }
           };
 
@@ -546,7 +509,7 @@ public class ValueFunctions {
               Pattern pattern = env.getStringPattern(regex);
               Matcher matcher = pattern.matcher(str);
               boolean matches = matcher.matches();
-              return (matches)? Expressions.TRUE: Expressions.FALSE;
+              return matches ? Expressions.TRUE: Expressions.FALSE;
             }
           };
 
@@ -590,7 +553,7 @@ public class ValueFunctions {
           };
 
   public static boolean isInteger(Number n) {
-    return (n instanceof Long || n instanceof Integer || n instanceof Short);
+    return n instanceof Long || n instanceof Integer || n instanceof Short;
   }
   public static final NumericComparator NUMBER_COMPARATOR = new NumericComparator();
 
@@ -613,7 +576,7 @@ public class ValueFunctions {
     }
   }
 
-  public static enum CompareType { GT, LT, GE, LE, EQ, NE }
+  public enum CompareType { GT, LT, GE, LE, EQ, NE }
   public static class CompareFunction<T> extends NamedValueFunction {
     Comparator<T> comparator;
     CompareType compType;
@@ -645,10 +608,10 @@ public class ValueFunctions {
         return false;
       }
       if (clazz != null) {
-        if (in.get(0) == null || !(clazz.isAssignableFrom(in.get(0).get().getClass()))) {
+        if (in.get(0) == null || !clazz.isAssignableFrom(in.get(0).get().getClass())) {
           return false;
         }
-        if (in.get(1) == null || !(clazz.isAssignableFrom(in.get(1).get().getClass()))) {
+        if (in.get(1) == null || !clazz.isAssignableFrom(in.get(1).get().getClass())) {
           return false;
         }
       }
@@ -664,7 +627,7 @@ public class ValueFunctions {
         return null; // Can't compare...
       }
       Boolean res = compare((T) in.get(0).get(), (T) in.get(1).get());
-      return (res)? Expressions.TRUE: Expressions.FALSE;
+      return res ? Expressions.TRUE: Expressions.FALSE;
     }
   }
 
@@ -681,13 +644,10 @@ public class ValueFunctions {
       }
       boolean res = false;
       if (in.get(0) == null || in.get(1) == null) {
-        res = (in.get(0) == in.get(1));
-      } else if (in.get(0).get() == null || in.get(1).get() == null) {
-        res = (in.get(0).get() == in.get(1).get());
-      } else {
-        res = in.get(0).get().equals(in.get(1).get());
-      }
-      return (res)? Expressions.FALSE: Expressions.TRUE;
+        res = in.get(0).equals(in.get(1));
+      } else
+          res = in.get(0).get() == null || in.get(1).get() == null ? in.get(0).get().equals(in.get(1).get()) : in.get(0).get().equals(in.get(1).get());
+      return res ? Expressions.FALSE: Expressions.TRUE;
     }
   };
 
@@ -705,13 +665,10 @@ public class ValueFunctions {
       }
       boolean res = false;
       if (in.get(0) == null || in.get(1) == null) {
-        res = (in.get(0) == in.get(1));
-      } else if (in.get(0).get() == null || in.get(1).get() == null) {
-        res = (in.get(0).get() == in.get(1).get());
-      } else {
-        res = in.get(0).get().equals(in.get(1).get());
-      }
-      return (res)? Expressions.TRUE: Expressions.FALSE;
+        res = in.get(0).equals(in.get(1));
+      } else
+          res = in.get(0).get() == null || in.get(1).get() == null ? in.get(0).get().equals(in.get(1).get()) : in.get(0).get().equals(in.get(1).get());
+      return res ? Expressions.TRUE: Expressions.FALSE;
     }
   };
 
@@ -725,14 +682,11 @@ public class ValueFunctions {
         return false;
       }
       if (in.get(0) == null ||
-              (!(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List))) {
+              !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) {
         return false;
       }
-      if (in.get(1) == null ||
-              (!(in.get(1).get() instanceof Class) && !(in.get(1).get() instanceof String))) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null ||
+                !(in.get(1).get() instanceof Class) && !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -753,7 +707,7 @@ public class ValueFunctions {
         CoreMap cm = (CoreMap) cmv.get();
         if (in.size() >= 3) {
           Value v = in.get(2);
-          Object annotationObject = (v != null)? v.get():null;
+          Object annotationObject = v != null ? v.get():null;
           cm.set(annotationFieldClass, annotationObject);
         }
         Object obj = cm.get(annotationFieldClass);
@@ -762,12 +716,12 @@ public class ValueFunctions {
         List<CoreMap> cmList = (List<CoreMap>) cmv.get();
         if (in.size() >= 3) {
           Value v = in.get(2);
-          Object annotationObject = (v != null)? v.get():null;
+          Object annotationObject = v != null ? v.get():null;
           for (CoreMap cm:cmList) {
             cm.set(annotationFieldClass, annotationObject);
           }
         }
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
         Value res = new Expressions.PrimitiveValue(Expressions.TYPE_LIST, list);
         for (CoreMap cm:cmList) {
           list.add(cm.get(annotationFieldClass));
@@ -789,19 +743,16 @@ public class ValueFunctions {
       }
       if (in.get(0) == null || in.get(0).get() == null) return true; // Allow for NULL
       if (in.get(0) == null ||
-              (!(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List))) {
+              !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
 
     public Value getTag(CoreMap cm, String tag)
     {
       Tags tags = cm.get(Tags.TagsAnnotation.class);
-      return (tags != null)? tags.getTag(tag): null;
+      return tags != null ? tags.getTag(tag): null;
     }
 
     @Override
@@ -814,7 +765,7 @@ public class ValueFunctions {
         res = getTag((CoreMap) v.get(), tag);
       } else if (v.get() instanceof List) {
         List<CoreMap> cmList = (List<CoreMap>) v.get();
-        List<Value> list = new ArrayList<Value>();
+        List<Value> list = new ArrayList<>();
         res = new Expressions.PrimitiveValue(Expressions.TYPE_LIST, list);
         for (CoreMap cm:cmList) {
           list.add(getTag(cm, tag));
@@ -836,13 +787,10 @@ public class ValueFunctions {
         return false;
       }
       if (in.get(0) == null ||
-              (!(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List))) {
+              !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
 
     public void setTag(CoreMap cm, String tag, Value tagValue)
@@ -858,7 +806,7 @@ public class ValueFunctions {
     public Value apply(Env env, List<Value> in) {
       Value v = in.get(0);
       String tag = (String) in.get(1).get();
-      Value tagValue = (in.size() >= 3)? in.get(2):null;
+      Value tagValue = in.size() >= 3 ? in.get(2):null;
       if (v.get() instanceof CoreMap) {
         setTag((CoreMap) v.get(), tag, tagValue);
       } else if (v.get() instanceof List) {
@@ -882,13 +830,10 @@ public class ValueFunctions {
         return false;
       }
       if (in.get(0) == null ||
-              (!(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List))) {
+              !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     public void removeTag(CoreMap cm, String tag)
     {
@@ -928,10 +873,7 @@ public class ValueFunctions {
       if (in.get(0) == null || !(in.get(0).get() instanceof Tags)) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -958,10 +900,7 @@ public class ValueFunctions {
       if (in.get(0) == null) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -971,7 +910,7 @@ public class ValueFunctions {
         v.setTags(tags = new Tags());
       }
       String tag = (String) in.get(1).get();
-      Value tagValue = (in.size() >= 3)? in.get(2):null;
+      Value tagValue = in.size() >= 3 ? in.get(2):null;
       tags.addTag(tag, tagValue);
       return v;
     }
@@ -988,10 +927,7 @@ public class ValueFunctions {
       if (in.get(0) == null) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
 
     @Override
@@ -999,7 +935,7 @@ public class ValueFunctions {
       Value v = in.get(0);
       Tags tags = v.getTags();
       String tag = (String) in.get(1).get();
-      return (tags != null)? tags.getTag(tag):null;
+      return tags != null ? tags.getTag(tag):null;
     }
   };
 
@@ -1014,10 +950,7 @@ public class ValueFunctions {
       if (in.get(0) == null) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1045,10 +978,7 @@ public class ValueFunctions {
       if (in.get(0) == null || !(in.get(0) instanceof Expressions.CompositeValue)) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1070,16 +1000,13 @@ public class ValueFunctions {
         return false;
       }
       if (in.get(0) == null || in.get(0).get() == null) return true;   // Allow for null
-      if (in.get(0) == null || !(in.get(0) instanceof Expressions.CompositeValue)) {
-        return false;
-      }
-      return true;
+        return !(in.get(0) == null || !(in.get(0) instanceof Expressions.CompositeValue));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
       if (in.get(0) == null || in.get(0).get() == null ) return null;   // Allow for null
       Expressions.CompositeValue v = (Expressions.CompositeValue) in.get(0);
-      List<String> res = new ArrayList<String>(v.getAttributes());
+      List<String> res = new ArrayList<>(v.getAttributes());
       return Expressions.createValue(Expressions.TYPE_LIST, res);
     }
   };
@@ -1097,10 +1024,7 @@ public class ValueFunctions {
       if (in.get(0) == null || !(in.get(0) instanceof Object)) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof String)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
 
     @Override
@@ -1125,7 +1049,7 @@ public class ValueFunctions {
                 List list = (List) fieldValue.get();
                 Type[] fieldParamTypes = ((ParameterizedType) f.getGenericType()).getActualTypeArguments();
                 if (fieldParamTypes[0] instanceof Value) {
-                  List<Value> list2 = new ArrayList<Value>(list.size());
+                  List<Value> list2 = new ArrayList<>(list.size());
                   for (Object elem:list) {
                     list2.add(Expressions.asValue(env, elem));
                   }
@@ -1142,7 +1066,7 @@ public class ValueFunctions {
                   f.set(obj, list2);
                 }
               } else {
-                f.set(obj, Arrays.asList(fieldValue.get()));
+                f.set(obj, Collections.singletonList(fieldValue.get()));
               }
             } else {
               f.set(obj, fieldValue.get());
@@ -1150,9 +1074,7 @@ public class ValueFunctions {
           }
         }
         return Expressions.createValue(null, f.get(obj));
-      } catch (NoSuchFieldException ex) {
-        throw new RuntimeException("Cannot get field " + fieldName + " from " + v, ex);
-      } catch (IllegalAccessException ex) {
+      } catch (NoSuchFieldException | IllegalAccessException ex) {
         throw new RuntimeException("Cannot get field " + fieldName + " from " + v, ex);
       }
     }
@@ -1171,10 +1093,7 @@ public class ValueFunctions {
       if (in.get(0) == null || !(in.get(0).get() instanceof List)) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof Integer)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof Integer));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1211,10 +1130,7 @@ public class ValueFunctions {
       if (in.get(0) == null || !(in.get(0).get() instanceof Map)) {
         return false;
       }
-      if (in.get(1) == null || !(in.get(1).get() instanceof Object)) {
-        return false;
-      }
-      return true;
+        return !(in.get(1) == null || !(in.get(1).get() instanceof Object));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1250,10 +1166,7 @@ public class ValueFunctions {
         return false;
       }
       if (in.get(0) == null || in.get(0).get() == null) return true;   // Allow for null
-      if (in.get(0) == null || !(in.get(0).get() instanceof Map)) {
-        return false;
-      }
-      return true;
+        return !(in.get(0) == null || !(in.get(0).get() instanceof Map));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1275,16 +1188,13 @@ public class ValueFunctions {
       if (in.get(0) == null || !(in.get(0).get() instanceof ValueFunction)) {
         return false;
       }
-      if (in.get(1) == null) {
-        return false;
-      }
-      return true;
+        return in.get(1) != null;
     }
     @Override
     public Value apply(Env env, List<Value> in) {
       ValueFunction func = (ValueFunction) in.get(0).get();
       Value res = in.get(1);
-      List<Value> args = new ArrayList<Value>(2);
+      List<Value> args = new ArrayList<>(2);
       for (int i = 2; i < in.size(); i++) {
         args.set(0, res);
         args.set(1, in.get(i));
@@ -1295,7 +1205,7 @@ public class ValueFunctions {
   };
 
   static final CollectionValuedMap<String, ValueFunction> registeredFunctions =
-          new CollectionValuedMap<String,ValueFunction>(CollectionFactory.<ValueFunction>arrayListFactory());
+          new CollectionValuedMap<>(CollectionFactory.<ValueFunction>arrayListFactory());
   static {
     registeredFunctions.add("Add", ADD_FUNCTION);
     registeredFunctions.add("Subtract", SUBTRACT_FUNCTION);
@@ -1322,12 +1232,12 @@ public class ValueFunctions {
     registeredFunctions.add("Replace", TOKENS_REPLACE_FUNCTION);
     registeredFunctions.add("Replace", STRING_REPLACE_FUNCTION);
 
-    registeredFunctions.add("GE", new CompareFunction<Number>("GE", NUMBER_COMPARATOR, CompareType.GE, Number.class) );
-    registeredFunctions.add("GT", new CompareFunction<Number>("GT", NUMBER_COMPARATOR, CompareType.GT, Number.class) );
-    registeredFunctions.add("LE", new CompareFunction<Number>("LE", NUMBER_COMPARATOR, CompareType.LE, Number.class) );
-    registeredFunctions.add("LT", new CompareFunction<Number>("LT", NUMBER_COMPARATOR, CompareType.LT, Number.class) );
-    registeredFunctions.add("EQ", new CompareFunction<Number>("EQ", NUMBER_COMPARATOR, CompareType.EQ, Number.class) );
-    registeredFunctions.add("NE", new CompareFunction<Number>("NE", NUMBER_COMPARATOR, CompareType.NE, Number.class) );
+    registeredFunctions.add("GE", new CompareFunction<>("GE", NUMBER_COMPARATOR, CompareType.GE, Number.class) );
+    registeredFunctions.add("GT", new CompareFunction<>("GT", NUMBER_COMPARATOR, CompareType.GT, Number.class) );
+    registeredFunctions.add("LE", new CompareFunction<>("LE", NUMBER_COMPARATOR, CompareType.LE, Number.class) );
+    registeredFunctions.add("LT", new CompareFunction<>("LT", NUMBER_COMPARATOR, CompareType.LT, Number.class) );
+    registeredFunctions.add("EQ", new CompareFunction<>("EQ", NUMBER_COMPARATOR, CompareType.EQ, Number.class) );
+    registeredFunctions.add("NE", new CompareFunction<>("NE", NUMBER_COMPARATOR, CompareType.NE, Number.class) );
     registeredFunctions.add("EQ", EQUALS_FUNCTION );
     registeredFunctions.add("NE", NOT_EQUALS_FUNCTION );
 

@@ -33,7 +33,7 @@ import edu.stanford.nlp.util.Function;
  * WordTag stem(String word, string tag) or WordTag stem(WordTag wordTag).
  * <br>
  * Another way of using Morphology is to run it on an input file by running
- * <code>java Morphology filename</code>.  In this case, POS tags MUST be
+ * {@code java Morphology filename}.  In this case, POS tags MUST be
  * separated from words by an underscore ("_").
  * <br>
  * Note that a single instance of Morphology is not thread-safe, as
@@ -77,11 +77,7 @@ public class Morphology implements Function {
 
   public Word next() throws IOException {
     String nx = lexer.next();
-    if (nx == null) {
-      return null;
-    } else {
-      return new Word(nx);
-    }
+      return nx == null ? null : new Word(nx);
   }
 
   static boolean isProper(String posTag) {
@@ -122,7 +118,7 @@ public class Morphology implements Function {
   }
 
   /**
-   * Adds annotation <code>ann</code> to the given CoreLabel.
+   * Adds annotation {@code ann} to the given CoreLabel.
    * Assumes that it has a TextAnnotation and PartOfSpeechAnnotation.
    */
   public void stem(CoreLabel label,
@@ -146,7 +142,7 @@ public class Morphology implements Function {
       quotedWord = quotedWord.replaceAll(" ", "\u1CF1");
     }
     String wordtag = quotedWord + '_' + tag;
-    if (DEBUG) System.err.println("Trying to normalize |" + wordtag + "|");
+    if (DEBUG) System.err.println("Trying to normalize |" + wordtag + '|');
     try {
       lexer.setOption(1, lowercase);
       lexer.yyreset(new StringReader(wordtag));
@@ -160,7 +156,7 @@ public class Morphology implements Function {
       }
       return wordRes;
     } catch (IOException e) {
-      LOGGER.warning("Morphology.stem() had error on word " + word + "/" + tag);
+      LOGGER.warning("Morphology.stem() had error on word " + word + '/' + tag);
       return word;
     }
   }
@@ -223,7 +219,7 @@ public class Morphology implements Function {
   }
 
   /**
-   * Lemmatize returning a <code>WordLemmaTag </code>.
+   * Lemmatize returning a {@code WordLemmaTag }.
    */
   public WordLemmaTag lemmatize(WordTag wT) {
     String tag = wT.tag();
@@ -251,7 +247,7 @@ public class Morphology implements Function {
    *  words, they must be in the format of whitespace separated word_tag pairs.
    * </ul>
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     if (args.length == 0) {
       System.err.println("java Morphology [-rebuildVerbTable file|-stem word+|file+]");
     } else if (args.length == 2 && args[0].equals("-rebuildVerbTable")) {
@@ -259,7 +255,7 @@ public class Morphology implements Function {
       String[] words = verbs.split("\\s+");
       System.out.print(" private static final String[] verbStems = { ");
       for (int i = 0; i < words.length; i++) {
-        System.out.print("\"" + words[i] + "\"");
+        System.out.print('"' + words[i] + '"');
         if (i != words.length - 1) {
           System.out.print(", ");
           if (i % 5 == 0) {
@@ -280,7 +276,7 @@ public class Morphology implements Function {
           try {
             flags = Integer.parseInt(arg.substring(1));
           } catch (NumberFormatException nfe) {
-            System.err.println("Couldn't handle flag: " + arg + "\n");
+            System.err.println("Couldn't handle flag: " + arg + '\n');
             // ignore flag
           }
         } else {

@@ -57,34 +57,34 @@ public class SisterAnnotationStats implements TreeVisitor {
    * p is parent
    */
   public void recurse(Tree t, Tree p) {
-    if (t.isLeaf() || (t.isPreTerminal() && (!DO_TAGS))) {
+    if (t.isLeaf()) {
       return;
     }
     if (!(p == null || t.label().value().equals("ROOT"))) {
       sisterCounters(t, p);
     }
     Tree[] kids = t.children();
-    for (int i = 0; i < kids.length; i++) {
-      recurse(kids[i], t);
-    }
+      for (Tree kid : kids) {
+          recurse(kid, t);
+      }
   }
 
   /**
    * string-value labels of left sisters; from inside to outside (right-left)
    */
   public static List<String> leftSisterLabels(Tree t, Tree p) {
-    List<String> l = new ArrayList<String>();
+    List<String> l = new ArrayList<>();
     if (p == null) {
       return l;
     }
     Tree[] kids = p.children();
-    for (int i = 0; i < kids.length; i++) {
-      if (kids[i].equals(t)) {
-        break;
-      } else {
-        l.add(0, kids[i].label().value());
+      for (Tree kid : kids) {
+          if (kid.equals(t)) {
+              break;
+          } else {
+              l.add(0, kid.label().value());
+          }
       }
-    }
     return l;
   }
 
@@ -92,7 +92,7 @@ public class SisterAnnotationStats implements TreeVisitor {
    * string-value labels of right sisters; from inside to outside (left-right)
    */
   public static List<String> rightSisterLabels(Tree t, Tree p) {
-    List<String> l = new ArrayList<String>();
+    List<String> l = new ArrayList<>();
     if (p == null) {
       return l;
     }
@@ -110,10 +110,10 @@ public class SisterAnnotationStats implements TreeVisitor {
 
   public static List<String> kidLabels(Tree t) {
     Tree[] kids = t.children();
-    List<String> l = new ArrayList<String>(kids.length);
-    for (int i = 0; i < kids.length; i++) {
-      l.add(kids[i].label().value());
-    }
+    List<String> l = new ArrayList<>(kids.length);
+      for (Tree kid : kids) {
+          l.add(kid.label().value());
+      }
     return l;
   }
 
@@ -145,16 +145,16 @@ public class SisterAnnotationStats implements TreeVisitor {
 
   }
 
-  protected void sideCounters(String label, List rewrite, List sideSisters, Map sideRules) {
-    for (Iterator i = sideSisters.iterator(); i.hasNext();) {
-      String sis = (String) i.next();
+  protected static void sideCounters(String label, List rewrite, List sideSisters, Map sideRules) {
+      for (Object sideSister : sideSisters) {
+          String sis = (String) sideSister;
 
-      if (!((Map) sideRules.get(label)).containsKey(sis)) {
-        ((Map) sideRules.get(label)).put(sis, new ClassicCounter());
+          if (!((Map) sideRules.get(label)).containsKey(sis)) {
+              ((Map) sideRules.get(label)).put(sis, new ClassicCounter());
+          }
+
+          ((ClassicCounter) ((HashMap) sideRules.get(label)).get(sis)).incrementCount(rewrite);
       }
-
-      ((ClassicCounter) ((HashMap) sideRules.get(label)).get(sis)).incrementCount(rewrite);
-    }
   }
 
 
@@ -178,85 +178,85 @@ public class SisterAnnotationStats implements TreeVisitor {
      * later */
     ArrayList topScores = new ArrayList();
 
-    for (Iterator it = nodeRules.keySet().iterator(); it.hasNext();) {
-      ArrayList answers = new ArrayList();
-      String label = (String) it.next();
-      ClassicCounter cntr = (ClassicCounter) nodeRules.get(label);
-      double support = (cntr.totalCount());
-      System.out.println("Node " + label + " support is " + support);
+      for (Object o : nodeRules.keySet()) {
+          ArrayList answers = new ArrayList();
+          String label = (String) o;
+          ClassicCounter cntr = (ClassicCounter) nodeRules.get(label);
+          double support = cntr.totalCount();
+          System.out.println("Node " + label + " support is " + support);
 
 
-      for (Iterator it2 = ((HashMap) leftRules.get(label)).keySet().iterator(); it2.hasNext();) {
-        String sis = (String) it2.next();
-        ClassicCounter cntr2 = (ClassicCounter) ((HashMap) leftRules.get(label)).get(sis);
-        double support2 = (cntr2.totalCount());
+          for (Object o2 : ((HashMap) leftRules.get(label)).keySet()) {
+              String sis = (String) o2;
+              ClassicCounter cntr2 = (ClassicCounter) ((HashMap) leftRules.get(label)).get(sis);
+              double support2 = cntr2.totalCount();
 
         /* alternative 1: use full distribution to calculate score */
-        double kl = Counters.klDivergence(cntr2, cntr);
+              double kl = Counters.klDivergence(cntr2, cntr);
 
         /* alternative 2: hold out test-context data to calculate score */
         /* this doesn't work because it can lead to zero-probability
          * data points hence infinite divergence */
-        // 	Counter tempCounter = new Counter();
-        // 	tempCounter.addCounter(cntr2);
-        // 	for(Iterator i = tempCounter.seenSet().iterator(); i.hasNext();) {
-        // 	  Object o = i.next();
-        // 	  tempCounter.setCount(o,-1*tempCounter.countOf(o));
-        // 	}
-        // 	System.out.println(tempCounter); //debugging
-        // 	tempCounter.addCounter(cntr);
-        // 	System.out.println(tempCounter); //debugging
-        // 	System.out.println(cntr);
-        // 	double kl = cntr2.klDivergence(tempCounter);
+              // 	Counter tempCounter = new Counter();
+              // 	tempCounter.addCounter(cntr2);
+              // 	for(Iterator i = tempCounter.seenSet().iterator(); i.hasNext();) {
+              // 	  Object o = i.next();
+              // 	  tempCounter.setCount(o,-1*tempCounter.countOf(o));
+              // 	}
+              // 	System.out.println(tempCounter); //debugging
+              // 	tempCounter.addCounter(cntr);
+              // 	System.out.println(tempCounter); //debugging
+              // 	System.out.println(cntr);
+              // 	double kl = cntr2.klDivergence(tempCounter);
         /* alternative 2 ends here */
 
-        String annotatedLabel = label + "=l=" + sis;
-        System.out.println("KL(" + annotatedLabel + "||" + label + ") = " + nf.format(kl) + "\t" + "support(" + sis + ") = " + support2);
-        answers.add(new Pair(annotatedLabel, new Double(kl * support2)));
-        topScores.add(new Pair(annotatedLabel, new Double(kl * support2)));
-      }
-
-      for (Iterator it2 = ((HashMap) rightRules.get(label)).keySet().iterator(); it2.hasNext();) {
-        String sis = (String) it2.next();
-        ClassicCounter cntr2 = (ClassicCounter) ((HashMap) rightRules.get(label)).get(sis);
-        double support2 = (cntr2.totalCount());
-        double kl = Counters.klDivergence(cntr2, cntr);
-        String annotatedLabel = label + "=r=" + sis;
-        System.out.println("KL(" + annotatedLabel + "||" + label + ") = " + nf.format(kl) + "\t" + "support(" + sis + ") = " + support2);
-        answers.add(new Pair(annotatedLabel, new Double(kl * support2)));
-        topScores.add(new Pair(annotatedLabel, new Double(kl * support2)));
-      }
-
-		    
-      // upto
-		    
-      System.out.println("----");
-      System.out.println("Sorted descending support * KL");
-      Collections.sort(answers, new Comparator() {
-        public int compare(Object o1, Object o2) {
-          Pair p1 = (Pair) o1;
-          Pair p2 = (Pair) o2;
-          Double p12 = (Double) p1.second();
-          Double p22 = (Double) p2.second();
-          return p22.compareTo(p12);
-        }
-      });
-      for (int i = 0, size = answers.size(); i < size; i++) {
-        Pair p = (Pair) answers.get(i);
-        double psd = ((Double) p.second()).doubleValue();
-        System.out.println(p.first() + ": " + nf.format(psd));
-        if (psd >= CUTOFFS[0]) {
-          String annotatedLabel = (String) p.first();
-          for (int j = 0; j < CUTOFFS.length; j++) {
-            if (psd >= CUTOFFS[j]) {
-              //javaSB[j].append("\"").append(annotatedLabel);
-              //javaSB[j].append("\",");
-            }
+              String annotatedLabel = label + "=l=" + sis;
+              System.out.println("KL(" + annotatedLabel + "||" + label + ") = " + nf.format(kl) + '\t' + "support(" + sis + ") = " + support2);
+              answers.add(new Pair(annotatedLabel, kl * support2));
+              topScores.add(new Pair(annotatedLabel, kl * support2));
           }
-        }
+
+          for (Object o1 : ((HashMap) rightRules.get(label)).keySet()) {
+              String sis = (String) o1;
+              ClassicCounter cntr2 = (ClassicCounter) ((HashMap) rightRules.get(label)).get(sis);
+              double support2 = cntr2.totalCount();
+              double kl = Counters.klDivergence(cntr2, cntr);
+              String annotatedLabel = label + "=r=" + sis;
+              System.out.println("KL(" + annotatedLabel + "||" + label + ") = " + nf.format(kl) + '\t' + "support(" + sis + ") = " + support2);
+              answers.add(new Pair(annotatedLabel, kl * support2));
+              topScores.add(new Pair(annotatedLabel, kl * support2));
+          }
+
+
+          // upto
+
+          System.out.println("----");
+          System.out.println("Sorted descending support * KL");
+          Collections.sort(answers, new Comparator() {
+              public int compare(Object o1, Object o2) {
+                  Pair p1 = (Pair) o1;
+                  Pair p2 = (Pair) o2;
+                  Double p12 = (Double) p1.second();
+                  Double p22 = (Double) p2.second();
+                  return p22.compareTo(p12);
+              }
+          });
+          for (Object answer : answers) {
+              Pair p = (Pair) answer;
+              double psd = (Double) p.second();
+              System.out.println(p.first() + ": " + nf.format(psd));
+              if (psd >= CUTOFFS[0]) {
+                  String annotatedLabel = (String) p.first();
+                  for (double CUTOFF : CUTOFFS) {
+                      if (psd >= CUTOFF) {
+                          //javaSB[j].append("\"").append(annotatedLabel);
+                          //javaSB[j].append("\",");
+                      }
+                  }
+              }
+          }
+          System.out.println();
       }
-      System.out.println();
-    }
 
 
     Collections.sort(topScores, new Comparator() {
@@ -269,11 +269,11 @@ public class SisterAnnotationStats implements TreeVisitor {
       }
     });
     String outString = "All enriched categories, sorted by score\n";
-    for (int i = 0, size = topScores.size(); i < size; i++) {
-      Pair p = (Pair) topScores.get(i);
-      double psd = ((Double) p.second()).doubleValue();
-      System.out.println(p.first() + ": " + nf.format(psd));
-    }
+      for (Object topScore : topScores) {
+          Pair p = (Pair) topScore;
+          double psd = (Double) p.second();
+          System.out.println(p.first() + ": " + nf.format(psd));
+      }
 
 
     System.out.println();
@@ -281,7 +281,7 @@ public class SisterAnnotationStats implements TreeVisitor {
     int k = CUTOFFS.length - 1;
     for (int j = 0; j < topScores.size(); j++) {
       Pair p = (Pair) topScores.get(j);
-      double psd = ((Double) p.second()).doubleValue();
+      double psd = (Double) p.second();
       if (psd < CUTOFFS[k]) {
         if (k == 0) {
           break;
@@ -291,7 +291,7 @@ public class SisterAnnotationStats implements TreeVisitor {
           continue;
         }
       }
-      javaSB[k].append("\"").append(p.first());
+      javaSB[k].append('"').append(p.first());
       javaSB[k].append("\",");
     }
 
@@ -325,9 +325,9 @@ public class SisterAnnotationStats implements TreeVisitor {
    *
    * @param args One argument: path to the Treebank
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
-    ClassicCounter<String> c = new ClassicCounter<String>();
+    ClassicCounter<String> c = new ClassicCounter<>();
     c.setCount("A", 0);
     c.setCount("B", 1);
 

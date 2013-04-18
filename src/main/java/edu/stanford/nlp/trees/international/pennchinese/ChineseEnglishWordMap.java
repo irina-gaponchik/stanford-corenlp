@@ -51,14 +51,15 @@ public class ChineseEnglishWordMap implements Serializable {
    * 
    */
   private static final long serialVersionUID = 7655332268578049993L;
+    private static final Pattern COMPILE = Pattern.compile("\\s");
 
-  private Map<String, Set<String>> map = Generics.newHashMap(10000); // large dictionary!
+    private Map<String, Set<String>> map = Generics.newHashMap(10000); // large dictionary!
 
   private static final String defaultPattern = "[^ ]+ ([^ ]+)[^/]+/(.+)/";
   private static final String defaultDelimiter = "[/;]";
   private static final String defaultCharset = "UTF-8";
 
-  private static final String punctuations[] = {
+  private static final String[] punctuations = {
     "\uff08.*?\uff09",
     "\\(.*?\\)",
     "<.*?>",
@@ -67,15 +68,14 @@ public class ChineseEnglishWordMap implements Serializable {
 
   private static final boolean DEBUG = false;
 
-  private boolean normalized = false;
+  private boolean normalized;
 
 
   /**
    * SingletonHolder is loaded on the first execution of getInstance().
    */
   private static class SingletonHolder {
-    private SingletonHolder() {}
-    private final static ChineseEnglishWordMap INSTANCE = new ChineseEnglishWordMap();
+      private final static ChineseEnglishWordMap INSTANCE = new ChineseEnglishWordMap();
   }
 
 
@@ -121,8 +121,7 @@ public class ChineseEnglishWordMap implements Serializable {
     key = key.toLowerCase();
     key = key.trim();
     Set<String> strings = map.get(key);
-    if (strings == null) return null;
-    else return strings.iterator().next();
+      return strings == null ? null : strings.iterator().next();
   }
 
   public void readCEDict(String dictPath) {
@@ -141,7 +140,7 @@ public class ChineseEnglishWordMap implements Serializable {
       t = t.replaceAll(punc, "");
     }
     t = t.trim();
-    if (DEBUG && !origT.equals(t)) {
+    if (false) {
       System.err.println("orig="+origT);
       System.err.println("norm="+t);
     }
@@ -157,7 +156,7 @@ public class ChineseEnglishWordMap implements Serializable {
 
     for (String t : trans) {
       t = normalize(t);
-      if ( ! t.equals("")) {
+      if (!t.isEmpty()) {
         set.add(t);
       }
     }
@@ -172,7 +171,7 @@ public class ChineseEnglishWordMap implements Serializable {
       for (String line = infile.readLine(); line != null; line = infile.readLine()) {
         Matcher m = p.matcher(line);
         if (m.matches()) {
-          String word = (m.group(1)).toLowerCase();
+          String word = m.group(1).toLowerCase();
           word = word.trim(); // don't want leading or trailing spaces
           String transGroup = m.group(2);
           String[] trans = transGroup.split(delimiter);
@@ -181,17 +180,17 @@ public class ChineseEnglishWordMap implements Serializable {
             Set<String> oldtrans = map.get(word);
             for (String t : trans) {
               t = normalize(t);
-              if ( ! t.equals("")) {
+              if (!t.isEmpty()) {
                 if ( ! oldtrans.contains(t)) {
                   oldtrans.add(t);
                 }
               }
             }
           } else {
-            Set<String> transList = new LinkedHashSet<String>(Arrays.asList(trans));
+            Set<String> transList = new LinkedHashSet<>(Arrays.asList(trans));
             String normW = normalize(word);
             Set<String> normSet = normalize(transList);
-            if ( ! normW.equals("") && normSet.size() > 0) {
+            if (!normW.isEmpty() && !normSet.isEmpty()) {
               map.put(normW, normSet);
             }
           }
@@ -266,7 +265,7 @@ public class ChineseEnglishWordMap implements Serializable {
         Set<String> entry = rMap.get(trans);
         if (entry == null) {
           // reduce default size as most will be small
-          Set<String> toAdd = new LinkedHashSet<String>(6);
+          Set<String> toAdd = new LinkedHashSet<>(6);
           toAdd.add(k);
           rMap.put(trans, toAdd);
         } else {
@@ -288,14 +287,14 @@ public class ChineseEnglishWordMap implements Serializable {
       Set<String> addList = me.getValue();
       Set<String> origList = map.get(k);
       if (origList == null) {
-        map.put(k, new LinkedHashSet<String>(addList));
+        map.put(k, new LinkedHashSet<>(addList));
         Set<String> newList = map.get(k);
-        if (newList != null && newList.size() != 0) {
+        if (newList != null && !newList.isEmpty()) {
           newTrans+=addList.size();
         }
       } else {
         for (String toAdd : addList) {
-          if (!(origList.contains(toAdd))) {
+          if (!origList.contains(toAdd)) {
             origList.add(toAdd);
             newTrans++;
           }
@@ -331,7 +330,7 @@ public class ChineseEnglishWordMap implements Serializable {
    * The input and output encoding can be specified using the "-encoding" flag.
    * Otherwise UTF-8 is assumed.
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     Map<String, Integer> flagsToNumArgs = Generics.newHashMap();
     flagsToNumArgs.put("-dictPath" , 1);
     flagsToNumArgs.put("-encoding" , 1);
@@ -351,16 +350,16 @@ public class ChineseEnglishWordMap implements Serializable {
 
     TreebankLanguagePack tlp = new ChineseTreebankLanguagePack();
     String[] dpString = argMap.get("-dictPath");
-    ChineseEnglishWordMap cewm = (dpString == null) ? new ChineseEnglishWordMap() : new ChineseEnglishWordMap(dpString[0]);
+    ChineseEnglishWordMap cewm = dpString == null ? new ChineseEnglishWordMap() : new ChineseEnglishWordMap(dpString[0]);
     int totalWords = 0, coveredWords = 0;
 
     PrintWriter pw = new PrintWriter(new OutputStreamWriter(System.out, charset), true);
 
     for (String line = r.readLine(); line != null; line = r.readLine()) {
-      String[] words = line.split("\\s", 1000);
+      String[] words = COMPILE.split(line, 1000);
       for (String word : words) {
         totalWords++;
-        if (word.length() == 0) continue;
+        if (word.isEmpty()) continue;
         pw.print(StringUtils.pad(word + ':', 8));
         if (tlp.isPunctuationWord(word)) {
           totalWords--;
@@ -370,7 +369,7 @@ public class ChineseEnglishWordMap implements Serializable {
         } else if (cewm.containsKey(word)) {
           coveredWords++;
           if (allTranslations) {
-            List<String> trans = new ArrayList<String>(cewm.getAllTranslations(word));
+            List<String> trans = new ArrayList<>(cewm.getAllTranslations(word));
             for (String s : trans) {
               pw.print((trans.indexOf(s) > 0 ? "|" : "") + s);
             }

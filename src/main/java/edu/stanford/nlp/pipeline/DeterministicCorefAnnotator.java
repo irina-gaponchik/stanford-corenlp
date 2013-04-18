@@ -62,8 +62,8 @@ public class DeterministicCorefAnnotator implements Annotator {
   @Override
   public void annotate(Annotation annotation){
     try {
-      List<Tree> trees = new ArrayList<Tree>();
-      List<List<CoreLabel>> sentences = new ArrayList<List<CoreLabel>>();
+      List<Tree> trees = new ArrayList<>();
+      List<List<CoreLabel>> sentences = new ArrayList<>();
 
       // extract trees and sentence words
       // we are only supporting the new annotation standard for this Annotator!
@@ -126,7 +126,7 @@ public class DeterministicCorefAnnotator implements Annotator {
         // }
 
         // this graph is stored in CorefGraphAnnotation -- the raw links found by the coref system
-        List<Pair<IntTuple, IntTuple>> graph = new ArrayList<Pair<IntTuple,IntTuple>>();
+        List<Pair<IntTuple, IntTuple>> graph = new ArrayList<>();
 
         for(Pair<IntTuple, IntTuple> link: links){
           //
@@ -143,7 +143,7 @@ public class DeterministicCorefAnnotator implements Annotator {
           IntTuple src = new IntTuple(2);
           src.set(0, srcSent);
           src.set(1, srcTok);
-          graph.add(new Pair<IntTuple, IntTuple>(src, dst));
+          graph.add(new Pair<>(src, dst));
         }
         annotation.set(CorefCoreAnnotations.CorefGraphAnnotation.class, graph);
 
@@ -170,7 +170,7 @@ public class DeterministicCorefAnnotator implements Annotator {
 
   @Override
   public Set<Requirement> requires() {
-    return new ArraySet<Requirement>(TOKENIZE_REQUIREMENT, SSPLIT_REQUIREMENT, POS_REQUIREMENT, NER_REQUIREMENT, PARSE_REQUIREMENT);
+    return new ArraySet<>(TOKENIZE_REQUIREMENT, SSPLIT_REQUIREMENT, POS_REQUIREMENT, NER_REQUIREMENT, PARSE_REQUIREMENT);
   }
 
   @Override

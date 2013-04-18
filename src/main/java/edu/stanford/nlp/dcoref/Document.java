@@ -27,13 +27,7 @@
 package edu.stanford.nlp.dcoref;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import edu.stanford.nlp.dcoref.Dictionaries.Number;
 import edu.stanford.nlp.dcoref.Dictionaries.Person;
@@ -161,8 +155,8 @@ public class Document implements Serializable {
       try{
         int speakerMentionID = Integer.parseInt(m.headWord.get(CoreAnnotations.SpeakerAnnotation.class));
         if (utter != 0) {
-          speakerPairs.add(new Pair<Integer, Integer>(m.mentionID, speakerMentionID));
-          speakerPairs.add(new Pair<Integer, Integer>(speakerMentionID, m.mentionID));
+          speakerPairs.add(new Pair<>(m.mentionID, speakerMentionID));
+          speakerPairs.add(new Pair<>(speakerMentionID, m.mentionID));
         }
       } catch (Exception e){
         // no mention found for the speaker
@@ -191,12 +185,12 @@ public class Document implements Serializable {
         if (allPredictedMentions.containsKey(m.mentionID)) {
           SieveCoreferenceSystem.logger.warning("WARNING: Already contain mention " + m.mentionID);
           Mention m1 = allPredictedMentions.get(m.mentionID);
-          SieveCoreferenceSystem.logger.warning("OLD mention: " + m1.spanToString() + "[" + m1.startIndex + "," + m1.endIndex + "]");
-          SieveCoreferenceSystem.logger.warning("NEW mention: " + m.spanToString() + "[" + m.startIndex + "," + m.endIndex + "]");
+          SieveCoreferenceSystem.logger.warning("OLD mention: " + m1.spanToString() + '[' + m1.startIndex + ',' + m1.endIndex + ']');
+          SieveCoreferenceSystem.logger.warning("NEW mention: " + m.spanToString() + '[' + m.startIndex + ',' + m.endIndex + ']');
           //          SieveCoreferenceSystem.debugPrintMentions(System.err, "PREDICTED ORDERED", predictedOrderedMentionsBySentence);
 //          SieveCoreferenceSystem.debugPrintMentions(System.err, "GOLD ORDERED", goldOrderedMentionsBySentence);
         }
-        assert(!allPredictedMentions.containsKey(m.mentionID));
+        assert !allPredictedMentions.containsKey(m.mentionID);
         allPredictedMentions.put(m.mentionID, m);
 
         IntTuple pos = new IntTuple(2);
@@ -205,8 +199,8 @@ public class Document implements Serializable {
         positions.put(m, pos);
         m.sentNum = i;
 
-        assert(!corefClusters.containsKey(m.mentionID));
-        corefClusters.put(m.mentionID, new CorefCluster(m.mentionID, Generics.newHashSet(Arrays.asList(m))));
+        assert !corefClusters.containsKey(m.mentionID);
+        corefClusters.put(m.mentionID, new CorefCluster(m.mentionID, Generics.newHashSet(Collections.singletonList(m))));
         m.corefClusterID = m.mentionID;
 
         IntTuple headPosition = new IntTuple(2);
@@ -232,19 +226,19 @@ public class Document implements Serializable {
       // For CoNLL training there are some documents with gold mentions with the same position offsets
       // See /scr/nlp/data/conll-2011/v2/data/train/data/english/annotations/nw/wsj/09/wsj_0990.v2_auto_conll
       //  (Packwood - Roth)
-      CollectionValuedMap<IntPair, Mention> goldMentionPositions = new CollectionValuedMap<IntPair, Mention>();
+      CollectionValuedMap<IntPair, Mention> goldMentionPositions = new CollectionValuedMap<>();
       for(Mention g : golds) {
         IntPair ip = new IntPair(g.startIndex, g.endIndex);
         if (goldMentionPositions.containsKey(ip)) {
           StringBuilder existingMentions = new StringBuilder();
           for (Mention eg: goldMentionPositions.get(ip)) {
             if (existingMentions.length() > 0) {
-              existingMentions.append(",");
+              existingMentions.append(',');
             }
             existingMentions.append(eg.mentionID);
           }
           SieveCoreferenceSystem.logger.warning("WARNING: gold mentions with the same offsets: " + ip
-                  + " mentions=" + g.mentionID + "," + existingMentions + ", " + g.spanToString());
+                  + " mentions=" + g.mentionID + ',' + existingMentions + ", " + g.spanToString());
         }
         //assert(!goldMentionPositions.containsKey(ip));
         goldMentionPositions.add(new IntPair(g.startIndex, g.endIndex), g);
@@ -283,7 +277,7 @@ public class Document implements Serializable {
         goldMentionHeadPositions.get(g.headIndex).add(g);
       }
 
-      List<Mention> remains = new ArrayList<Mention>();
+      List<Mention> remains = new ArrayList<>();
       for (Mention p : predicts) {
         IntPair pos = new IntPair(p.startIndex, p.endIndex);
         if(goldMentionPositions.containsKey(pos)) {
@@ -358,10 +352,10 @@ public class Document implements Serializable {
 
   /** When there is no mentionID information (without gold annotation), assign mention IDs */
   protected void assignOriginalID(){
-    List<List<Mention>> orderedMentionsBySentence = this.getOrderedMentions();
+    List<List<Mention>> orderedMentionsBySentence = this.predictedOrderedMentionsBySentence;
     boolean hasOriginalID = true;
     for(List<Mention> l : orderedMentionsBySentence){
-      if (l.size()==0) continue;
+      if (l.isEmpty()) continue;
       for(Mention m : l){
         if(m.mentionID == -1){
           hasOriginalID = false;
@@ -405,7 +399,7 @@ public class Document implements Serializable {
   /** Extract gold coref link information */
   protected void extractGoldLinks() {
     //    List<List<Mention>> orderedMentionsBySentence = this.getOrderedMentions();
-    List<Pair<IntTuple, IntTuple>> links = new ArrayList<Pair<IntTuple,IntTuple>>();
+    List<Pair<IntTuple, IntTuple>> links = new ArrayList<>();
 
     // position of each mention in the input matrix, by id
     Map<Integer, IntTuple> positions = Generics.newHashMap();
@@ -429,7 +423,7 @@ public class Document implements Serializable {
         int id = m.mentionID;
         IntTuple src = positions.get(id);
 
-        assert (src != null);
+        assert src != null;
         if (m.originalRef >= 0) {
           IntTuple dst = positions.get(m.originalRef);
           if (dst == null) {
@@ -437,7 +431,7 @@ public class Document implements Serializable {
           }
 
           // to deal with cataphoric annotation
-          while (dst.get(0) > src.get(0) || (dst.get(0) == src.get(0) && dst.get(1) > src.get(1))) {
+          while (dst.get(0) > src.get(0) || dst.get(0) == src.get(0) && dst.get(1) > src.get(1)) {
             Mention dstMention = goldOrderedMentionsBySentence.get(dst.get(0)).get(dst.get(1));
             m.originalRef = dstMention.originalRef;
             dstMention.originalRef = id;
@@ -455,23 +449,23 @@ public class Document implements Serializable {
               IntTuple missed = new IntTuple(2);
               missed.set(0, k);
               missed.set(1, l);
-              if (links.contains(new Pair<IntTuple, IntTuple>(missed, dst))) {
+              if (links.contains(new Pair<>(missed, dst))) {
                 antecedents.get(id).add(missed);
-                links.add(new Pair<IntTuple, IntTuple>(src, missed));
+                links.add(new Pair<>(src, missed));
               }
             }
           }
 
-          links.add(new Pair<IntTuple, IntTuple>(src, dst));
+          links.add(new Pair<>(src, dst));
 
-          assert (antecedents.get(id) != null);
+          assert antecedents.get(id) != null;
           antecedents.get(id).add(dst);
 
           List<IntTuple> ants = antecedents.get(m.originalRef);
-          assert (ants != null);
+          assert ants != null;
           for (IntTuple ant : ants) {
             antecedents.get(id).add(ant);
-            links.add(new Pair<IntTuple, IntTuple>(src, ant));
+            links.add(new Pair<>(src, ant));
           }
         }
       }
@@ -487,16 +481,16 @@ public class Document implements Serializable {
         String w = l.get(CoreAnnotations.TextAnnotation.class);
 
         boolean noSpeakerInfo = !l.containsKey(CoreAnnotations.SpeakerAnnotation.class)
-        || l.get(CoreAnnotations.SpeakerAnnotation.class).equals("")
+        || l.get(CoreAnnotations.SpeakerAnnotation.class).isEmpty()
         || l.get(CoreAnnotations.SpeakerAnnotation.class).startsWith("PER");
 
         if(w.equals("``")
-            || (!insideQuotation && normalQuotationType && w.equals("\""))) {
+            || !insideQuotation && normalQuotationType && w.equals("\"")) {
           insideQuotation = true;
           maxUtter++;
           continue;
         } else if(w.equals("''")
-            || (insideQuotation && normalQuotationType && w.equals("\""))) {
+            || insideQuotation && normalQuotationType && w.equals("\"")) {
           insideQuotation = false;
         }
         if(insideQuotation) {
@@ -536,8 +530,8 @@ public class Document implements Serializable {
   }
   private void findSpeakersInArticle(Dictionaries dict) {
     List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
-    Pair<Integer, Integer> beginQuotation = new Pair<Integer, Integer>();
-    Pair<Integer, Integer> endQuotation = new Pair<Integer, Integer>();
+    Pair<Integer, Integer> beginQuotation = new Pair<>();
+    Pair<Integer, Integer> endQuotation = new Pair<>();
     boolean insideQuotation = false;
     int utterNum = -1;
 
@@ -606,11 +600,7 @@ public class Document implements Serializable {
               headPosition.set(0, sentNum);
               headPosition.set(1, subjectIndex-1);
               String speaker;
-              if(mentionheadPositions.containsKey(headPosition)) {
-                speaker = Integer.toString(mentionheadPositions.get(headPosition).mentionID);
-              } else {
-                speaker = subjectString;
-              }
+                speaker = mentionheadPositions.containsKey(headPosition) ? Integer.toString(mentionheadPositions.get(headPosition).mentionID) : subjectString;
               speakers.put(utterNum, speaker);
               return true;
             }
@@ -634,7 +624,7 @@ public class Document implements Serializable {
         }
       }
     }
-    List<CoreMap> paragraph = new ArrayList<CoreMap>();
+    List<CoreMap> paragraph = new ArrayList<>();
     int paragraphUtterIndex = 0;
     String nextParagraphSpeaker = "";
     int paragraphOffset = 0;
@@ -644,7 +634,7 @@ public class Document implements Serializable {
         nextParagraphSpeaker = findParagraphSpeaker(paragraph, paragraphUtterIndex, nextParagraphSpeaker, paragraphOffset, dict);
         paragraphUtterIndex = currentUtter;
         paragraphOffset += paragraph.size();
-        paragraph = new ArrayList<CoreMap>();
+        paragraph = new ArrayList<>();
       }
       paragraph.add(sent);
     }
@@ -654,7 +644,7 @@ public class Document implements Serializable {
   private String findParagraphSpeaker(List<CoreMap> paragraph,
       int paragraphUtterIndex, String nextParagraphSpeaker, int paragraphOffset, Dictionaries dict) {
     if(!speakers.containsKey(paragraphUtterIndex)) {
-      if(!nextParagraphSpeaker.equals("")) {
+      if(!nextParagraphSpeaker.isEmpty()) {
         speakers.put(paragraphUtterIndex, nextParagraphSpeaker);
       } else {  // find the speaker of this paragraph (John, nbc news)
         CoreMap lastSent = paragraph.get(paragraph.size()-1);
@@ -664,7 +654,7 @@ public class Document implements Serializable {
           CoreLabel w = lastSent.get(CoreAnnotations.TokensAnnotation.class).get(i);
           String pos = w.get(CoreAnnotations.PartOfSpeechAnnotation.class);
           String ner = w.get(CoreAnnotations.NamedEntityTagAnnotation.class);
-          if(pos.startsWith("V")) {
+          if(!pos.isEmpty() && pos.charAt(0) == 'V') {
             hasVerb = true;
             break;
           }
@@ -677,7 +667,7 @@ public class Document implements Serializable {
             }
           }
         }
-        if(!hasVerb && !speaker.equals("")) {
+        if(!hasVerb && !speaker.isEmpty()) {
           speakers.put(paragraphUtterIndex, speaker);
         }
       }

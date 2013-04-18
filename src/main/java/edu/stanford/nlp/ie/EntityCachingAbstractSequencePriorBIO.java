@@ -30,7 +30,7 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
   protected Index<String> tagIndex;
   private List<String> wordDoc;
 
-  public EntityCachingAbstractSequencePriorBIO(String backgroundSymbol, Index<String> classIndex, Index<String> tagIndex, List<IN> doc) {
+  protected EntityCachingAbstractSequencePriorBIO(String backgroundSymbol, Index<String> classIndex, Index<String> tagIndex, List<IN> doc) {
     this.classIndex = classIndex;
     this.tagIndex = tagIndex;
     this.backgroundSymbol = classIndex.indexOf(backgroundSymbol);
@@ -39,13 +39,13 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
     for (int i=0; i<numClasses; i++) {
       possibleValues[i] = i;
     }
-    this.wordDoc = new ArrayList<String>(doc.size());
+    this.wordDoc = new ArrayList<>(doc.size());
     for (IN w: doc) {
       wordDoc.add(w.get(CoreAnnotations.TextAnnotation.class));
     }
   }
 
-  private boolean VERBOSE = false;
+  private boolean VERBOSE;
 
   EntityBIO[] entities;
 
@@ -110,7 +110,7 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
     return probs;
   }
 
-  public void setInitialSequence(int[] initialSequence) {
+  public void setInitialSequence(int... initialSequence) {
     this.sequence = initialSequence;
     entities = new EntityBIO[initialSequence.length];
     Arrays.fill(entities, null);
@@ -145,7 +145,7 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
     EntityBIO entity = new EntityBIO();
     entity.type = tagIndex.indexOf(tag);
     entity.startPosition = position;
-    entity.words = new ArrayList<String>();
+    entity.words = new ArrayList<>();
     entity.words.add(wordDoc.get(position));
     int pos = position + 1;
     String rawTag = null;
@@ -169,11 +169,11 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
    * words in this entity occurs.
    */
   public int[] otherOccurrences(EntityBIO entity){
-    List<Integer> other = new ArrayList<Integer>();
+    List<Integer> other = new ArrayList<>();
     for (int i = 0; i < wordDoc.size(); i++) {
       if (i == entity.startPosition) { continue; }
       if (matches(entity, i)) {
-        other.add(Integer.valueOf(i));
+        other.add(i);
       }
     }
     return toArray(other);
@@ -229,7 +229,7 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
           EntityBIO oldEntity = entities[position];
           int oldLen = oldEntity.words.size();
           int offset = position - oldEntity.startPosition;
-          List<String> newWords = new ArrayList<String>();
+          List<String> newWords = new ArrayList<>();
           for (int i=0; i<offset; i++) {
             newWords.add(oldEntity.words.get(i));
           }
@@ -269,7 +269,7 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
             if (oldEntity != null) {// break old entity
               int oldLen = oldEntity.words.size();
               int offset = position - oldEntity.startPosition;
-              List<String> newWords = new ArrayList<String>();
+              List<String> newWords = new ArrayList<>();
               for (int i=0; i<offset; i++) {
                 newWords.add(oldEntity.words.get(i));
               }
@@ -315,7 +315,7 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
               EntityBIO oldEntity = entities[position];
               int oldLen = oldEntity.words.size();
               int offset = position - oldEntity.startPosition;
-              List<String> newWords = new ArrayList<String>();
+              List<String> newWords = new ArrayList<>();
               for (int i=0; i<offset; i++) {
                 newWords.add(oldEntity.words.get(i));
               }
@@ -342,37 +342,37 @@ public abstract class EntityCachingAbstractSequencePriorBIO <IN extends CoreMap>
 
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (int i = 0; i < entities.length; i++) {
       sb.append(i);
-      sb.append("\t");
+      sb.append('\t');
       String word = wordDoc.get(i);
       sb.append(word);
-      sb.append("\t");
+      sb.append('\t');
       sb.append(classIndex.get(sequence[i]));
       if (entities[i] != null) {
-        sb.append("\t");
+        sb.append('\t');
         sb.append(entities[i].toString(tagIndex));
       }
-      sb.append("\n");
+      sb.append('\n');
     }
     return sb.toString();
   }
 
   public String toString(int pos) {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     for (int i = Math.max(0, pos - 3); i < Math.min(entities.length, pos + 3); i++) {
       sb.append(i);
-      sb.append("\t");
+      sb.append('\t');
       String word = wordDoc.get(i);
       sb.append(word);
-      sb.append("\t");
+      sb.append('\t');
       sb.append(classIndex.get(sequence[i]));
       if (entities[i] != null) {
-        sb.append("\t");
+        sb.append('\t');
         sb.append(entities[i].toString(tagIndex));
       }
-      sb.append("\n");
+      sb.append('\n');
     }
     return sb.toString();
   }
@@ -390,8 +390,8 @@ class EntityBIO {
   public int[] otherOccurrences;
 
   public String toString(Index<String> tagIndex) {
-    StringBuffer sb = new StringBuffer();
-    sb.append("\"");
+    StringBuilder sb = new StringBuilder();
+    sb.append('"');
     sb.append(StringUtils.join(words, " "));
     sb.append("\" start: ");
     sb.append(startPosition);

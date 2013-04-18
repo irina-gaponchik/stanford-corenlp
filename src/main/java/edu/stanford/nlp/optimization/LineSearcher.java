@@ -9,8 +9,8 @@ public interface LineSearcher {
 
   /**
    * Attempts to find an unconstrained minimum of the objective
-   * <code>function</code> starting at <code>initial</code>, within
-   * <code>functionTolerance</code>.
+   * {@code function} starting at {@code initial}, within
+   * {@code functionTolerance}.
    *
    * @param function          the objective function
    */

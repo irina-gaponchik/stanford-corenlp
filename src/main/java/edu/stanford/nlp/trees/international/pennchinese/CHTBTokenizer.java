@@ -23,9 +23,9 @@ public class CHTBTokenizer extends AbstractTokenizer<String> {
    * Constructs a new tokenizer from a Reader.  Note that getting
    * the bytes going into the Reader into Java-internal Unicode is
    * not the tokenizer's job.  This can be done by converting the
-   * file with <code>ConvertEncodingThread</code>, or by specifying
+   * file with {@code ConvertEncodingThread}, or by specifying
    * the files encoding explicitly in the Reader with
-   * java.io.<code>InputStreamReader</code>.
+   * java.io.{@code InputStreamReader}.
    *
    * @param r Reader
    */
@@ -46,12 +46,7 @@ public class CHTBTokenizer extends AbstractTokenizer<String> {
       while ((a = lexer.yylex()) == CHTBLexer.IGNORE) {
         //System.err.println("#ignored: " + lexer.match());
       }
-      if (a == CHTBLexer.YYEOF) {
-        return null;
-      } else {
-        //System.err.println("#matched: " + lexer.match());
-        return lexer.match();
-      }
+        return a == CHTBLexer.YYEOF ? null : lexer.match();
     } catch (IOException ioe) {
       // do nothing, return null
     }
@@ -64,7 +59,7 @@ public class CHTBTokenizer extends AbstractTokenizer<String> {
    * and prints it to standard output in the specified Encoding.
    * Its arguments are (Infile, Encoding).
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
 
     String encoding = args[1];
     Reader in = new BufferedReader(new InputStreamReader(new FileInputStream(args[0]), encoding));

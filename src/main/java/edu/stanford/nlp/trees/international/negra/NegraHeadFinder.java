@@ -32,7 +32,7 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
     return result;
   }
   
-  private boolean coordSwitch = false;
+  private boolean coordSwitch;
 
   public NegraHeadFinder() {
     this(new NegraPennLanguagePack());
@@ -46,8 +46,8 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
 
     nonTerminalInfo = Generics.newHashMap();
 
-    left = (coordSwitch ? "right" : "left");
-    right = (coordSwitch ? "left" : "right");
+    left = coordSwitch ? "right" : "left";
+    right = coordSwitch ? "left" : "right";
 
     /* BEGIN ROGER TODO */
     //
@@ -106,13 +106,13 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
 
   /* Some Negra local trees have an explicitly marked head.  Use it if
   * possible. */
-  protected Tree findMarkedHead(Tree[] kids) {
-    for (int i = 0, n = kids.length; i < n; i++) {
-      if (kids[i].label() instanceof NegraLabel && ((NegraLabel) kids[i].label()).getEdge() != null && ((NegraLabel) kids[i].label()).getEdge().equals("HD")) {
-        //System.err.println("found manually-labeled head");
-        return kids[i];
+  protected static Tree findMarkedHead(Tree... kids) {
+      for (Tree kid : kids) {
+          if (kid.label() instanceof NegraLabel && ((NegraLabel) kid.label()).getEdge() != null && ((NegraLabel) kid.label()).getEdge().equals("HD")) {
+              //System.err.println("found manually-labeled head");
+              return kid;
+          }
       }
-    }
     return null;
   }
   
@@ -160,9 +160,7 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
       }
     }
     //for heads, there's one more char we want to check because we don't care about grammatical fns
-    if(ch == '-')
-      return true;
-    return false;
+      return ch == '-';
   }
 
   
@@ -175,7 +173,7 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
     if (DEBUG) {
       System.err.println("Looking for head of " + t.label() +
                          "; value is |" + t.label().value() + "|, " +
-                         " baseCat is |" + motherCat + "|");
+                         " baseCat is |" + motherCat + '|');
     }
     // We know we have nonterminals underneath
     // (a bit of a Penn Treebank assumption, but).
@@ -185,7 +183,7 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
     if (how == null) {
       if (DEBUG) {
         System.err.println("Warning: No rule found for " + motherCat +
-                           " (first char: " + motherCat.charAt(0) + ")");
+                           " (first char: " + motherCat.charAt(0) + ')');
         System.err.println("Known nonterms are: " + nonTerminalInfo.keySet());
       }
       if (defaultRule != null) {
@@ -198,7 +196,7 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
       }
     }
     for (int i = 0; i < how.length; i++) {
-      boolean deflt = (i == how.length - 1);
+      boolean deflt = i == how.length - 1;
       theHead = traverseLocate(t.children(), how[i], deflt);
       if (theHead != null) {
         break;

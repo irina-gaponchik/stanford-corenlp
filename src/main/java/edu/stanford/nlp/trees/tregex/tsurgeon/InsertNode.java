@@ -12,7 +12,7 @@ class InsertNode extends TsurgeonPattern {
   TreeLocation l;
 
   public InsertNode(TsurgeonPattern child, TreeLocation l) {
-    super("insert", new TsurgeonPattern[] { child });
+    super("insert", child);
     this.l = l;
   }
 

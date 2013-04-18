@@ -34,7 +34,7 @@ public class CoreMapExpressionNodePattern extends NodePattern<CoreMap> {
   {
     Value v = expression.evaluate(env, token);
     Boolean matched = Expressions.convertValueToBoolean(v, false);
-    return (matched != null)? matched:false;
+    return matched != null ? matched:false;
   }
 
   public String toString() {

@@ -31,12 +31,12 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
   private static final boolean DEBUG = false;
 
   /**
-   * Construct a new <code>GrammaticalStructure</code> from an existing parse
-   * tree. The new <code>GrammaticalStructure</code> has the same tree structure
+   * Construct a new {@code GrammaticalStructure} from an existing parse
+   * tree. The new {@code GrammaticalStructure} has the same tree structure
    * and label values as the given tree (but no shared storage). As part of
    * construction, the parse tree is analyzed using definitions from
-   * {@link GrammaticalRelation <code>GrammaticalRelation</code>} to populate
-   * the new <code>GrammaticalStructure</code> with as many labeled grammatical
+   * {@link GrammaticalRelation {@code GrammaticalRelation}} to populate
+   * the new {@code GrammaticalStructure} with as many labeled grammatical
    * relations as it can.
    *
    * @param t Parse tree to make grammatical structure from
@@ -67,12 +67,12 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
   }
 
   /**
-   * Construct a new <code>GrammaticalStructure</code> from an existing parse
-   * tree. The new <code>GrammaticalStructure</code> has the same tree structure
+   * Construct a new {@code GrammaticalStructure} from an existing parse
+   * tree. The new {@code GrammaticalStructure} has the same tree structure
    * and label values as the given tree (but no shared storage). As part of
    * construction, the parse tree is analyzed using definitions from
-   * {@link GrammaticalRelation <code>GrammaticalRelation</code>} to populate
-   * the new <code>GrammaticalStructure</code> with as many labeled grammatical
+   * {@link GrammaticalRelation {@code GrammaticalRelation}} to populate
+   * the new {@code GrammaticalStructure} with as many labeled grammatical
    * relations as it can.
    *
    * @param t Parse tree to make grammatical structure from
@@ -83,7 +83,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    */
   public EnglishGrammaticalStructure(Tree t, Filter<String> puncFilter, HeadFinder hf, boolean threadSafe) {
     // the tree is normalized (for index and functional tag stripping) inside CoordinationTransformer
-    super((new CoordinationTransformer()).transformTree(t), EnglishGrammaticalRelations.values(threadSafe), threadSafe ? EnglishGrammaticalRelations.valuesLock() : null, hf, puncFilter);
+    super(new CoordinationTransformer().transformTree(t), EnglishGrammaticalRelations.values(threadSafe), threadSafe ? EnglishGrammaticalRelations.valuesLock() : null, hf, puncFilter);
   }
 
   /** Used for postprocessing CoNLL X dependencies */
@@ -93,14 +93,14 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
 
   /**
-   * Tries to return a node representing the <code>SUBJECT</code> (whether
-   * nominal or clausal) of the given node <code>t</code>. Probably, node
-   * <code>t</code> should represent a clause or verb phrase.
+   * Tries to return a node representing the {@code SUBJECT} (whether
+   * nominal or clausal) of the given node {@code t}. Probably, node
+   * {@code t} should represent a clause or verb phrase.
    *
    * @param t
-   *          a node in this <code>GrammaticalStructure</code>
-   * @return a node which is the subject of node <code>t</code>, or else
-   *         <code>null</code>
+   *          a node in this {@code GrammaticalStructure}
+   * @return a node which is the subject of node {@code t}, or else
+   *         {@code null}
    */
   public static TreeGraphNode getSubject(TreeGraphNode t) {
     TreeGraphNode subj = getNodeInRelation(t, NOMINAL_SUBJECT);
@@ -108,11 +108,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       return subj;
     }
     subj = getNodeInRelation(t, CLAUSAL_SUBJECT);
-    if (subj != null) {
-      return subj;
-    } else {
-      return getNodeInRelation(t, NOMINAL_PASSIVE_SUBJECT);
-    }
+      return subj != null ? subj : getNodeInRelation(t, NOMINAL_PASSIVE_SUBJECT);
   }
 
   @Override
@@ -122,7 +118,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
   }
 
   private static void printListSorted(String title, Collection<TypedDependency> list) {
-    List<TypedDependency> lis = new ArrayList<TypedDependency>(list);
+    List<TypedDependency> lis = new ArrayList<>(list);
     Collections.sort(lis);
     if (title != null) {
       System.err.println(title);
@@ -145,32 +141,32 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
 
   /**
-   * Destructively modifies this <code>Collection&lt;TypedDependency&gt;</code>
+   * Destructively modifies this {@code Collection&lt;TypedDependency&gt;}
    * by collapsing several types of transitive pairs of dependencies.
    * If called with a tree of dependencies and both CCprocess and
    * includeExtras set to false, then the tree structure is preserved.
    * <dl>
    * <dt>prepositional object dependencies: pobj</dt>
    * <dd>
-   * <code>prep(cat, in)</code> and <code>pobj(in, hat)</code> are collapsed to
-   * <code>prep_in(cat, hat)</code></dd>
+   * {@code prep(cat, in)} and {@code pobj(in, hat)} are collapsed to
+   * {@code prep_in(cat, hat)}</dd>
    * <dt>prepositional complement dependencies: pcomp</dt>
    * <dd>
-   * <code>prep(heard, of)</code> and <code>pcomp(of, attacking)</code> are
-   * collapsed to <code>prepc_of(heard, attacking)</code></dd>
+   * {@code prep(heard, of)} and {@code pcomp(of, attacking)} are
+   * collapsed to {@code prepc_of(heard, attacking)}</dd>
    * <dt>conjunct dependencies</dt>
    * <dd>
-   * <code>cc(investors, and)</code> and
-   * <code>conj(investors, regulators)</code> are collapsed to
-   * <code>conj_and(investors,regulators)</code></dd>
+   * {@code cc(investors, and)} and
+   * {@code conj(investors, regulators)} are collapsed to
+   * {@code conj_and(investors, regulators)}</dd>
    * <dt>possessive dependencies: possessive</dt>
    * <dd>
-   * <code>possessive(Montezuma, 's)</code> will be erased. This is like a collapsing, but
+   * {@code possessive(Montezuma, 's)} will be erased. This is like a collapsing, but
    * due to the flatness of NPs, two dependencies are not actually composed.</dd>
    * <dt>For relative clauses, it will collapse referent</dt>
    * <dd>
-   * <code>ref(man, that)</code> and <code>dobj(love, that)</code> are collapsed
-   * to <code>dobj(love, man)</code></dd>
+   * {@code ref(man, that)} and {@code dobj(love, that)} are collapsed
+   * to {@code dobj(love, man)}</dd>
    * </dl>
    */
   @Override
@@ -294,8 +290,8 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     // Map<TreeGraphNode, TypedDependency> objectMap = new
     // HashMap<TreeGraphNode, TypedDependency>();
 
-    List<TreeGraphNode> rcmodHeads = new ArrayList<TreeGraphNode>();
-    List<TreeGraphNode> prepcDep = new ArrayList<TreeGraphNode>();
+    List<TreeGraphNode> rcmodHeads = new ArrayList<>();
+    List<TreeGraphNode> prepcDep = new ArrayList<>();
 
     for (TypedDependency typedDep : list) {
       if (!map.containsKey(typedDep.dep())) {
@@ -310,7 +306,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       }
 
       // look for subjects
-      if (typedDep.reln().getParent() == NOMINAL_SUBJECT || typedDep.reln().getParent() == SUBJECT || typedDep.reln().getParent() == CLAUSAL_SUBJECT) {
+      if (typedDep.reln().getParent().equals(NOMINAL_SUBJECT) || typedDep.reln().getParent().equals(SUBJECT) || typedDep.reln().getParent().equals(CLAUSAL_SUBJECT)) {
         if (!subjectMap.containsKey(typedDep.gov())) {
           subjectMap.put(typedDep.gov(), typedDep);
         }
@@ -326,7 +322,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // }
 
       // look for rcmod relations
-      if (typedDep.reln() == RELATIVE_CLAUSE_MODIFIER) {
+      if (typedDep.reln().equals(RELATIVE_CLAUSE_MODIFIER)) {
         rcmodHeads.add(typedDep.gov());
       }
       // look for prepc relations: put the dependent of such a relation in the
@@ -343,7 +339,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     // System.err.println(rcmodHeads);
 
     // create a new list of typed dependencies
-    Collection<TypedDependency> newTypedDeps = new ArrayList<TypedDependency>(list);
+    Collection<TypedDependency> newTypedDeps = new ArrayList<>(list);
 
     // find typed deps of form conj(gov,dep)
     for (TypedDependency td : list) {
@@ -359,10 +355,10 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
             // System.err.println("gov rel " + td1);
             TreeGraphNode newGov = td1.gov();
             GrammaticalRelation newRel = td1.reln();
-            if (newRel != ROOT) {
+            if (!newRel.equals(ROOT)) {
               if (rcmodHeads.contains(gov) && rcmodHeads.contains(dep)) {
               // to prevent wrong propagation in the case of long dependencies in relative clauses
-                if (newRel != DIRECT_OBJECT && newRel != NOMINAL_SUBJECT) {
+                if (!newRel.equals(DIRECT_OBJECT) && !newRel.equals(NOMINAL_SUBJECT)) {
                   if (DEBUG) {
                     System.err.println("Adding new " + newRel + " dependency from " + newGov + " to " + dep + " (subj/obj case)");
                   }
@@ -394,19 +390,19 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
           // check for wrong nsubjpass: if the new verb is VB or VBZ or VBP or JJ, then
           // add nsubj (if it is tagged correctly, should do this for VBD too, but we don't)
           GrammaticalRelation relation = tdsubj.reln();
-          if (relation == NOMINAL_PASSIVE_SUBJECT) {
+          if (relation.equals(NOMINAL_PASSIVE_SUBJECT)) {
             if (isDefinitelyActive(tag)) {
               relation = NOMINAL_SUBJECT;
             }
-          } else if (relation == CLAUSAL_PASSIVE_SUBJECT) {
+          } else if (relation.equals(CLAUSAL_PASSIVE_SUBJECT)) {
             if (isDefinitelyActive(tag)) {
               relation = CLAUSAL_SUBJECT;
             }
-          } else if (relation == NOMINAL_SUBJECT) {
+          } else if (relation.equals(NOMINAL_SUBJECT)) {
             if (withPassiveAuxiliary.contains(dep)) {
               relation = NOMINAL_PASSIVE_SUBJECT;
             }
-          } else if (relation == CLAUSAL_SUBJECT) {
+          } else if (relation.equals(CLAUSAL_SUBJECT)) {
             if (withPassiveAuxiliary.contains(dep)) {
               relation = CLAUSAL_PASSIVE_SUBJECT;
             }
@@ -458,10 +454,10 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    * @param list List of dependencies.
    */
   private static void collapseConj(Collection<TypedDependency> list) {
-    List<TreeGraphNode> govs = new ArrayList<TreeGraphNode>();
+    List<TreeGraphNode> govs = new ArrayList<>();
     // find typed deps of form cc(gov, dep)
     for (TypedDependency td : list) {
-      if (td.reln() == COORDINATION) { // i.e. "cc"
+      if (td.reln().equals(COORDINATION)) { // i.e. "cc"
         TreeGraphNode gov = td.gov();
         GrammaticalRelation conj = conjValue(td.dep().value());
         if (DEBUG) {
@@ -471,15 +467,15 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         // find other deps of that gov having reln "conj"
         boolean foundOne = false;
         for (TypedDependency td1 : list) {
-          if (td1.gov() == gov) {
-            if (td1.reln() == CONJUNCT) { // i.e., "conj"
+          if (td1.gov().equals(gov)) {
+            if (td1.reln().equals(CONJUNCT)) { // i.e., "conj"
               // change "conj" to the actual (lexical) conjunction
               if (DEBUG) {
                 System.err.println("Changing " + td1 + " to have relation " + conj);
               }
               td1.setReln(conj);
               foundOne = true;
-            } else if (td1.reln() == COORDINATION) {
+            } else if (td1.reln().equals(COORDINATION)) {
               conj = conjValue(td1.dep().value());
               if (DEBUG) {
                 System.err.println("Set conj to " + conj + " based on " + td1);
@@ -499,7 +495,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     // collapsed
     for (Iterator<TypedDependency> iter = list.iterator(); iter.hasNext();) {
       TypedDependency td2 = iter.next();
-      if (td2.reln() == COORDINATION && govs.contains(td2.gov())) {
+      if (td2.reln().equals(COORDINATION) && govs.contains(td2.gov())) {
         iter.remove();
       }
     }
@@ -513,10 +509,10 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
   private static void collapseReferent(Collection<TypedDependency> list) {
     // find typed deps of form ref(gov, dep)
     // put them in a List for processing; remove them from the set of deps
-    List<TypedDependency> refs = new ArrayList<TypedDependency>();
+    List<TypedDependency> refs = new ArrayList<>();
     for (Iterator<TypedDependency> iter = list.iterator(); iter.hasNext();) {
       TypedDependency td = iter.next();
-      if (td.reln() == REFERENT) {
+      if (td.reln().equals(REFERENT)) {
         refs.add(td);
         iter.remove();
       }
@@ -531,7 +527,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         // helped stop things going haywire a couple of times (it stops the
         // creation of a unit cycle that probably leaves something else
         // disconnected) [cdm Jan 2010]
-        if (td.dep() == dep && td.reln() != RELATIVE && td.reln() != REFERENT && td.gov() != ant) {
+        if (td.dep().equals(dep) && !td.reln().equals(RELATIVE) && !td.reln().equals(REFERENT) && !td.gov().equals(ant)) {
           if (DEBUG)
             System.err.print("referent: changing " + td);
           td.setDep(ant);
@@ -555,10 +551,10 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    * for the ref TypedDependency.
    */
   private static void addRef(Collection<TypedDependency> list) {
-    List<TypedDependency> newDeps = new ArrayList<TypedDependency>();
+    List<TypedDependency> newDeps = new ArrayList<>();
     
     for (TypedDependency rcmod : list) {
-      if (rcmod.reln() != RELATIVE_CLAUSE_MODIFIER) {
+      if (!rcmod.reln().equals(RELATIVE_CLAUSE_MODIFIER)) {
         // we only add ref dependencies across relative clauses
         continue;
       }
@@ -568,7 +564,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
       TypedDependency leftChild = null;
       for (TypedDependency child : list) {
-        if (child.gov() == modifier && 
+        if (child.gov().equals(modifier) &&
             RELATIVIZING_WORD_PATTERN.matcher(child.dep().label().value()).matches() &&
             (leftChild == null || child.dep().index() < leftChild.dep().index())) {
           leftChild = child;
@@ -578,11 +574,11 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // TODO: could be made more efficient
       TypedDependency leftGrandchild = null;
       for (TypedDependency child : list) {
-        if (child.gov() != modifier) {
+        if (!child.gov().equals(modifier)) {
           continue;
         }
         for (TypedDependency grandchild : list) {
-          if (grandchild.gov() == child.dep() && 
+          if (grandchild.gov().equals(child.dep()) &&
               RELATIVIZING_WORD_PATTERN.matcher(grandchild.dep().label().value()).matches() &&
               (leftGrandchild == null || grandchild.dep().index() < leftGrandchild.dep().index())) {
             leftGrandchild = grandchild;
@@ -623,10 +619,10 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    * sentences such as "he decided not to" with no following verb.
    */
   private static void addXSubj(Collection<TypedDependency> list) {
-    List<TypedDependency> newDeps = new ArrayList<TypedDependency>();
+    List<TypedDependency> newDeps = new ArrayList<>();
     
     for (TypedDependency xcomp : list) {
-      if (xcomp.reln() != XCLAUSAL_COMPLEMENT) {
+      if (!xcomp.reln().equals(XCLAUSAL_COMPLEMENT)) {
         // we only add xsubj dependencies to some xcomp dependencies
         continue;
       }
@@ -636,20 +632,20 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       
       boolean hasSubjectDaughter = false;
       boolean hasAux = false;
-      List<TreeGraphNode> subjects = new ArrayList<TreeGraphNode>();
+      List<TreeGraphNode> subjects = new ArrayList<>();
       for (TypedDependency dep : list) {
         // already have a subject dependency
-        if ((dep.reln() == NOMINAL_SUBJECT || dep.reln() == NOMINAL_PASSIVE_SUBJECT) && dep.gov() == modifier) {
+        if ((dep.reln().equals(NOMINAL_SUBJECT) || dep.reln().equals(NOMINAL_PASSIVE_SUBJECT)) && dep.gov().equals(modifier)) {
           hasSubjectDaughter = true;
           break;
         }
 
-        if (dep.reln() == AUX_MODIFIER && dep.gov() == modifier) {
+        if (dep.reln().equals(AUX_MODIFIER) && dep.gov().equals(modifier)) {
           hasAux = true;
         }
 
         // TODO: create an xsubjpass to go with the NOMINAL_PASSIVE_SUBJECT
-        if ((dep.reln() == NOMINAL_SUBJECT || dep.reln() == NOMINAL_PASSIVE_SUBJECT) && dep.gov() == head) {
+        if ((dep.reln().equals(NOMINAL_SUBJECT) || dep.reln().equals(NOMINAL_PASSIVE_SUBJECT)) && dep.gov().equals(head)) {
           subjects.add(dep.dep());
         }
       }
@@ -659,8 +655,8 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         continue;
       }
 
-      if ((modifier.label().value().equalsIgnoreCase("to") && hasAux) ||
-          (!modifier.label().value().equalsIgnoreCase("to") && !hasAux)) {
+      if (modifier.label().value().equalsIgnoreCase("to") && hasAux ||
+              !modifier.label().value().equalsIgnoreCase("to") && !hasAux) {
         continue;
       }
 
@@ -687,19 +683,19 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    */
   private static void correctSubjPassAndPoss(Collection<TypedDependency> list) {
     // put in a list verbs having an auxpass
-    List<TreeGraphNode> list_auxpass = new ArrayList<TreeGraphNode>();
+    List<TreeGraphNode> list_auxpass = new ArrayList<>();
     for (TypedDependency td : list) {
-      if (td.reln() == AUX_PASSIVE_MODIFIER) {
+      if (td.reln().equals(AUX_PASSIVE_MODIFIER)) {
         list_auxpass.add(td.gov());
       }
     }
     for (TypedDependency td : list) {
       // correct nsubj
-      if (td.reln() == NOMINAL_SUBJECT && list_auxpass.contains(td.gov())) {
+      if (td.reln().equals(NOMINAL_SUBJECT) && list_auxpass.contains(td.gov())) {
         // System.err.println("%%% Changing subj to passive: " + td);
         td.setReln(NOMINAL_PASSIVE_SUBJECT);
       }
-      if (td.reln() == CLAUSAL_SUBJECT && list_auxpass.contains(td.gov())) {
+      if (td.reln().equals(CLAUSAL_SUBJECT) && list_auxpass.contains(td.gov())) {
         // System.err.println("%%% Changing subj to passive: " + td);
         td.setReln(CLAUSAL_PASSIVE_SUBJECT);
       }
@@ -731,13 +727,13 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
     // Man oh man, how gnarly is the logic of this method....
 
-    Collection<TypedDependency> newTypedDeps = new ArrayList<TypedDependency>();
+    Collection<TypedDependency> newTypedDeps = new ArrayList<>();
 
     // Construct a map from tree nodes to the set of typed
     // dependencies in which the node appears as governor.
     // cdm: could use CollectionValuedMap here!
     Map<TreeGraphNode, SortedSet<TypedDependency>> map = Generics.newHashMap();
-    List<TreeGraphNode> partmod = new ArrayList<TreeGraphNode>();
+    List<TreeGraphNode> partmod = new ArrayList<>();
 
     for (TypedDependency typedDep : list) {
       if (!map.containsKey(typedDep.gov())) {
@@ -745,7 +741,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       }
       map.get(typedDep.gov()).add(typedDep);
 
-      if (typedDep.reln() == PARTICIPIAL_MODIFIER) {
+      if (typedDep.reln().equals(PARTICIPIAL_MODIFIER)) {
         partmod.add(typedDep.dep());
       }
     }
@@ -755,10 +751,10 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     // governor p NP and p NP case ... a lot of special code cdm jan 2006
 
     for (TypedDependency td1 : list) {
-      if (td1.reln() != PREPOSITIONAL_MODIFIER && td1.reln() != RELATIVE) {
+      if (!td1.reln().equals(PREPOSITIONAL_MODIFIER) && !td1.reln().equals(RELATIVE)) {
         continue;
       }
-      if (td1.reln() == KILL) {
+      if (td1.reln().equals(KILL)) {
         continue;
       }
 
@@ -774,14 +770,14 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       Pair<TypedDependency, Boolean> prepDep = null;
       TypedDependency ccDep = null; // treat as unique
       // list of dep and prepOtherDep and pobj (or  pcomp)
-      List<Triple<TypedDependency, TypedDependency, Boolean>> conjs = new ArrayList<Triple<TypedDependency, TypedDependency, Boolean>>();
-      Set<TypedDependency> otherDtrs = new TreeSet<TypedDependency>();
+      List<Triple<TypedDependency, TypedDependency, Boolean>> conjs = new ArrayList<>();
+      Set<TypedDependency> otherDtrs = new TreeSet<>();
 
       // first look for a conj(prep, prep) (there might be several conj relations!!!)
       boolean samePrepositionInEachConjunct = true;
       int conjIndex = -1;
       for (TypedDependency td2 : possibles) {
-        if (td2.reln() == CONJUNCT) {
+        if (td2.reln().equals(CONJUNCT)) {
           TreeGraphNode td2Dep = td2.dep();
           String td2DepPOS = td2Dep.parent().value();
           if (td2DepPOS.equals("IN") || td2DepPOS.equals("TO")) {
@@ -798,9 +794,9 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
                 // be able to delete the DEPENDENT disjunct
                 // maybe better to delete the DEPENDENT disjunct - it creates
                 // problem with multiple prep (mcdm)
-                if ((td3.reln() == PREPOSITIONAL_OBJECT || td3.reln() == PREPOSITIONAL_COMPLEMENT) && (!(td3DepPOS.equals("IN") || td3DepPOS.equals("TO"))) && prepOtherDep == null) {
+                if ((td3.reln().equals(PREPOSITIONAL_OBJECT) || td3.reln().equals(PREPOSITIONAL_COMPLEMENT)) && !(td3DepPOS.equals("IN") || td3DepPOS.equals("TO")) && prepOtherDep == null) {
                   prepOtherDep = td3;
-                  if (td3.reln() == PREPOSITIONAL_COMPLEMENT) {
+                  if (td3.reln().equals(PREPOSITIONAL_COMPLEMENT)) {
                     pobj = false;
                   }
                 } else {
@@ -811,7 +807,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
             if (conjIndex < td2Dep.index()) {
               conjIndex = td2Dep.index();
             }
-            conjs.add(new Triple<TypedDependency, TypedDependency, Boolean>(td2, prepOtherDep, pobj));
+            conjs.add(new Triple<>(td2, prepOtherDep, pobj));
           }
         }
       } // end td2:possibles
@@ -827,7 +823,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       for (TypedDependency td2 : possibles) {
         // we look for the cc linked to this conjDep
         // the cc dep must have an index smaller than the dep of conjDep
-        if (td2.reln() == COORDINATION && td2.dep().index() < conjIndex) {
+        if (td2.reln().equals(COORDINATION) && td2.dep().index() < conjIndex) {
           ccDep = td2;
         } else {
           TreeGraphNode td2Dep = td2.dep();
@@ -836,11 +832,11 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
           // "; td2.reln: " + td2.reln() + "; td1DepPos: " + td1DepPOS +
           // "; td2DepPos: " + td2DepPOS + "; index " + index +
           // "; td2.dep().index(): " + td2.dep().index());
-          if ((td2.reln() == DEPENDENT || td2.reln() == PREPOSITIONAL_OBJECT || td2.reln() == PREPOSITIONAL_COMPLEMENT) && (td1DepPOS.equals("IN") || td1DepPOS.equals("TO") || td1DepPOS.equals("VBG")) && prepDep == null && (!(td2DepPOS.equals("RB") || td2DepPOS.equals("IN") || td2DepPOS.equals("TO")))) {
+          if ((td2.reln().equals(DEPENDENT) || td2.reln().equals(PREPOSITIONAL_OBJECT) || td2.reln().equals(PREPOSITIONAL_COMPLEMENT)) && (td1DepPOS.equals("IN") || td1DepPOS.equals("TO") || td1DepPOS.equals("VBG")) && prepDep == null && !(td2DepPOS.equals("RB") || td2DepPOS.equals("IN") || td2DepPOS.equals("TO"))) {
             // same index trick, in case we have multiple deps
             // I deleted this to see if it helped [cdm Jan 2010] &&
             // td2.dep().index() < index)
-            prepDep = new Pair<TypedDependency, Boolean>(td2, td2.reln() != PREPOSITIONAL_COMPLEMENT);
+            prepDep = new Pair<>(td2, !td2.reln().equals(PREPOSITIONAL_COMPLEMENT));
           } else if (!inConjDeps(td2, conjs)) {// don't want to add the conjDep
             // again!
             otherDtrs.add(td2);
@@ -938,7 +934,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
           // System.err.println("[a] td2.reln " + td2.reln() + " td2.gov " +
           // td2.gov() + " td1.dep " + td1.dep());
           // }
-          if (td2.reln() != KILL && td2.gov() == td1.dep()) { // && td2.reln()
+          if (!td2.reln().equals(KILL) && td2.gov().equals(td1.dep())) { // && td2.reln()
             // != COORDINATION
             // && td2.reln()
             // != CONJUNCT
@@ -1040,7 +1036,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // CDM Feb 2010: This used to not move COORDINATION OR CONJUNCT, but now
       // it does, since they're not automatically deleted
       for (TypedDependency td2 : possibles) {
-        if (td2.reln() != KILL) { // && td2.reln() != COORDINATION &&
+        if (!td2.reln().equals(KILL)) { // && td2.reln() != COORDINATION &&
           // td2.reln() != CONJUNCT) {
           if (DEBUG) {
             System.err.println("Changing " + td2 + " to have governor of " + td1 + " [b]");
@@ -1053,7 +1049,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
     // below here is the single preposition/possessor basic case!!
     for (TypedDependency td1 : list) {
-      if (td1.reln() == KILL) {
+      if (td1.reln().equals(KILL)) {
         continue;
       }
 
@@ -1062,22 +1058,22 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // find all other typedDeps having our dep as gov
       Set<TypedDependency> possibles = map.get(td1Dep);
 
-      if (possibles != null && (td1.reln() == PREPOSITIONAL_MODIFIER || td1.reln() == RELATIVE || td1.reln() == POSSESSION_MODIFIER || td1.reln() == CONJUNCT)) {
+      if (possibles != null && (td1.reln().equals(PREPOSITIONAL_MODIFIER) || td1.reln().equals(RELATIVE) || td1.reln().equals(POSSESSION_MODIFIER) || td1.reln().equals(CONJUNCT))) {
 
         // look for the "second half"
         boolean pobj = true;// default for prep relation is prep_
         for (TypedDependency td2 : possibles) {
-          if (td2.reln() != COORDINATION && td2.reln() != CONJUNCT) {
+          if (!td2.reln().equals(COORDINATION) && !td2.reln().equals(CONJUNCT)) {
 
             TreeGraphNode td2Dep = td2.dep();
             String td2DepPOS = td2Dep.parent().value();
-            if ((td1.reln() == POSSESSION_MODIFIER || td1.reln() == CONJUNCT)) {
-              if (td2.reln() == POSSESSIVE_MODIFIER) {
+            if (td1.reln().equals(POSSESSION_MODIFIER) || td1.reln().equals(CONJUNCT)) {
+              if (td2.reln().equals(POSSESSIVE_MODIFIER)) {
                 if ( ! map.containsKey(td2Dep)) {  // if 's has no kids of its own (it shouldn't!)
                   td2.setReln(KILL);
                 }
               }
-            } else if ((td2.reln() == PREPOSITIONAL_OBJECT || td2.reln() == PREPOSITIONAL_COMPLEMENT) && (td1DepPOS.equals("IN") || td1DepPOS.equals("TO") || td1DepPOS.equals("VBG")) && (!(td2DepPOS.equals("RB") || td2DepPOS.equals("IN") || td2DepPOS.equals("TO"))) && !isConjWithNoPrep(td2.gov(), possibles)) {
+            } else if ((td2.reln().equals(PREPOSITIONAL_OBJECT) || td2.reln().equals(PREPOSITIONAL_COMPLEMENT)) && (td1DepPOS.equals("IN") || td1DepPOS.equals("TO") || td1DepPOS.equals("VBG")) && !(td2DepPOS.equals("RB") || td2DepPOS.equals("IN") || td2DepPOS.equals("TO")) && !isConjWithNoPrep(td2.gov(), possibles)) {
               // we don't collapse preposition conjoined with a non-preposition
               // to avoid disconnected constituents
               // OK, we have a pair td1, td2 to collapse to td3
@@ -1086,7 +1082,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
               }
 
               // check whether we are in a pcomp case:
-              if (td2.reln() == PREPOSITIONAL_COMPLEMENT) {
+              if (td2.reln().equals(PREPOSITIONAL_COMPLEMENT)) {
                 pobj = false;
               }
 
@@ -1116,9 +1112,9 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // longer appears. So, change its governor to 'drew'.
       // CDM Feb 2010: This used to not move COORDINATION OR CONJUNCT, but now
       // it does, since they're not automatically deleted
-      if (possibles != null && td1.reln() == KILL) {
+      if (possibles != null && td1.reln().equals(KILL)) {
         for (TypedDependency td2 : possibles) {
-          if (td2.reln() != KILL) { // && td2.reln() != COORDINATION &&
+          if (!td2.reln().equals(KILL)) { // && td2.reln() != COORDINATION &&
             // td2.reln() != CONJUNCT) {
             if (DEBUG) {
               System.err.println("Changing " + td2 + " to have governor of " + td1 + " [c]");
@@ -1133,7 +1129,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     // now remove typed dependencies with reln "kill" and add new ones.
     for (Iterator<TypedDependency> iter = list.iterator(); iter.hasNext();) {
       TypedDependency td = iter.next();
-      if (td.reln() == KILL) {
+      if (td.reln().equals(KILL)) {
         if (DEBUG) {
           System.err.println("Removing dep killed in poss/prep (conj) collapse: " + td);
         }
@@ -1160,7 +1156,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       Set<TypedDependency> aux_pass_poss = map.get(topPrep.gov());
       if (aux_pass_poss != null) {
         for (TypedDependency td_pass : aux_pass_poss) {
-          if (td_pass.reln() == AUX_PASSIVE_MODIFIER) {
+          if (td_pass.reln().equals(AUX_PASSIVE_MODIFIER)) {
             agent = true;
           }
         }
@@ -1174,16 +1170,12 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     GrammaticalRelation reln;
     if (agent) {
       reln = AGENT;
-    } else if (pc.reln() == RELATIVE) {
+    } else if (pc.reln().equals(RELATIVE)) {
       reln = RELATIVE;
     } else {
       // for prepositions, use the preposition
       // for pobj: we collapse into "prep"; for pcomp: we collapse into "prepc"
-      if (pobj) {
-        reln = EnglishGrammaticalRelations.getPrep(preposition);
-      } else {
-        reln = EnglishGrammaticalRelations.getPrepC(preposition);
-      }
+        reln = pobj ? EnglishGrammaticalRelations.getPrep(preposition) : EnglishGrammaticalRelations.getPrepC(preposition);
     }
     return reln;
   }
@@ -1209,7 +1201,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    */
   private static boolean isConjWithNoPrep(TreeGraphNode node, Collection<TypedDependency> list) {
     for (TypedDependency td : list) {
-      if (td.gov() == node && td.reln() == CONJUNCT) {
+      if (td.gov().equals(node) && td.reln().equals(CONJUNCT)) {
         // we have a conjunct
         // check the POS of the dependent
         String tdDepPOS = td.dep().parent().value();
@@ -1243,7 +1235,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    *          list of typedDependencies to work on
    */
   private static void collapse2WP(Collection<TypedDependency> list) {
-    Collection<TypedDependency> newTypedDeps = new ArrayList<TypedDependency>();
+    Collection<TypedDependency> newTypedDeps = new ArrayList<>();
 
     for (String[] mwp : MULTIWORD_PREPS) {
       // first look for patterns such as:
@@ -1303,7 +1295,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     TreeGraphNode governor = null;
     TypedDependency prep = null;
     for (TypedDependency td1 : list) {
-      if (td1.dep() == mwp0 && (td1.reln() == PREPOSITIONAL_MODIFIER || td1.reln() == ADVERBIAL_MODIFIER || td1.reln() == ADJECTIVAL_MODIFIER || td1.reln() == DEPENDENT || td1.reln() == MULTI_WORD_EXPRESSION)) {
+      if (td1.dep().equals(mwp0) && (td1.reln().equals(PREPOSITIONAL_MODIFIER) || td1.reln().equals(ADVERBIAL_MODIFIER) || td1.reln().equals(ADJECTIVAL_MODIFIER) || td1.reln().equals(DEPENDENT) || td1.reln().equals(MULTI_WORD_EXPRESSION))) {
         // we found prep|advmod|dep|amod(gov, mwp0)
         prep = td1;
         governor = prep.gov();
@@ -1317,16 +1309,12 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     TypedDependency pobj = null;
     TypedDependency newtd = null;
     for (TypedDependency td2 : list) {
-      if ((td2.gov() == mwp1 || td2.gov() == mwp0) && (td2.reln() == PREPOSITIONAL_OBJECT || td2.reln() == PREPOSITIONAL_COMPLEMENT)) {
+      if ((td2.gov().equals(mwp1) || td2.gov().equals(mwp0)) && (td2.reln().equals(PREPOSITIONAL_OBJECT) || td2.reln().equals(PREPOSITIONAL_COMPLEMENT))) {
         if (pobj == null || pobj.dep().index() > td2.dep().index()) {
           pobj = td2;
           // create the new gr relation
           GrammaticalRelation gr;
-          if (td2.reln() == PREPOSITIONAL_COMPLEMENT) {
-            gr = EnglishGrammaticalRelations.getPrepC(str_mwp0 + '_' + str_mwp1);
-          } else {
-            gr = EnglishGrammaticalRelations.getPrep(str_mwp0 + '_' + str_mwp1);
-          }
+            gr = td2.reln().equals(PREPOSITIONAL_COMPLEMENT) ? EnglishGrammaticalRelations.getPrepC(str_mwp0 + '_' + str_mwp1) : EnglishGrammaticalRelations.getPrep(str_mwp0 + '_' + str_mwp1);
           if (governor != null) {
             newtd = new TypedDependency(gr, governor, pobj.dep());
           }
@@ -1349,13 +1337,13 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // now remove typed dependencies with reln "kill"
       // and promote possible orphans
       for (TypedDependency td1 : list) {
-        if (td1.reln() != KILL) {
-          if (td1.gov() == mwp0 || td1.gov() == mwp1) {
+        if (!td1.reln().equals(KILL)) {
+          if (td1.gov().equals(mwp0) || td1.gov().equals(mwp1)) {
             // CDM: Thought of adding this in Jan 2010, but it causes
             // conflicting relations tmod vs. pobj. Needs more thought
             // maybe restrict pobj to first NP in PP, and allow tmod for a later
             // one?
-            if (td1.reln() == TEMPORAL_MODIFIER) {
+            if (td1.reln().equals(TEMPORAL_MODIFIER)) {
               // special case when an extra NP-TMP is buried in a PP for
               // "during the same period last year"
               td1.setGov(pobj.dep());
@@ -1383,7 +1371,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    *          List of typedDependencies to work on
    */
   private static void collapse2WPbis(Collection<TypedDependency> list) {
-    Collection<TypedDependency> newTypedDeps = new ArrayList<TypedDependency>();
+    Collection<TypedDependency> newTypedDeps = new ArrayList<>();
 
     for (String[] mwp : MULTIWORD_PREPS) {
 
@@ -1399,7 +1387,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // first find the first part of the multi_preposition: advmod|prt(gov, mwp[0])
 
       for (TypedDependency td : list) {
-        if (td.dep().value().equalsIgnoreCase(mwp[0]) && (td.reln() == PHRASAL_VERB_PARTICLE || td.reln() == ADVERBIAL_MODIFIER || td.reln() == DEPENDENT || td.reln() == MULTI_WORD_EXPRESSION)) {
+        if (td.dep().value().equalsIgnoreCase(mwp[0]) && (td.reln().equals(PHRASAL_VERB_PARTICLE) || td.reln().equals(ADVERBIAL_MODIFIER) || td.reln().equals(DEPENDENT) || td.reln().equals(MULTI_WORD_EXPRESSION))) {
           // we found advmod(gov, mwp0) or prt(gov, mwp0)
           governor = td.gov();
           mwp0 = td.dep();
@@ -1412,7 +1400,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // (difference of indexes = 1)
 
       for (TypedDependency td1 : list) {
-        if (mwp0 != null && td1.dep().value().equalsIgnoreCase(mwp[1]) && td1.gov() == governor && td1.reln() == PREPOSITIONAL_MODIFIER && Math.abs(td1.dep().index() - mwp0.index()) == 1) {// we
+        if (mwp0 != null && td1.dep().value().equalsIgnoreCase(mwp[1]) && td1.gov().equals(governor) && td1.reln().equals(PREPOSITIONAL_MODIFIER) && Math.abs(td1.dep().index() - mwp0.index()) == 1) {// we
           // found
           // prep(gov,
           // mwp1)
@@ -1423,7 +1411,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
       // search for the complement: pobj|pcomp(mwp1,X)
       for (TypedDependency td2 : list) {
-        if (td2.gov() == mwp1 && td2.reln() == PREPOSITIONAL_OBJECT) {
+        if (td2.gov().equals(mwp1) && td2.reln().equals(PREPOSITIONAL_OBJECT)) {
           pobj = td2;
           // create the new gr relation
           GrammaticalRelation gr = EnglishGrammaticalRelations.getPrep(mwp[0] + '_' + mwp[1]);
@@ -1431,7 +1419,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
             newtd = new TypedDependency(gr, governor, pobj.dep());
           }
         }
-        if (td2.gov() == mwp1 && td2.reln() == PREPOSITIONAL_COMPLEMENT) {
+        if (td2.gov().equals(mwp1) && td2.reln().equals(PREPOSITIONAL_COMPLEMENT)) {
           pobj = td2;
           // create the new gr relation
           GrammaticalRelation gr = EnglishGrammaticalRelations.getPrepC(mwp[0] + '_' + mwp[1]);
@@ -1452,8 +1440,8 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         // now remove typed dependencies with reln "kill"
         // and promote possible orphans
         for (TypedDependency td1 : list) {
-          if (td1.reln() != KILL) {
-            if (td1.gov() == mwp0 || td1.gov() == mwp1) {
+          if (!td1.reln().equals(KILL)) {
+            if (td1.gov().equals(mwp0) || td1.gov().equals(mwp1)) {
               td1.setGov(governor);
             }
             if (!newTypedDeps.contains(td1)) {
@@ -1490,7 +1478,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    *          List of typedDependencies to work on
    */
   private static void collapse3WP(Collection<TypedDependency> list) {
-    Collection<TypedDependency> newTypedDeps = new ArrayList<TypedDependency>();
+    Collection<TypedDependency> newTypedDeps = new ArrayList<>();
 
     // first, loop over the prepositions for NP annotation
     for (String[] mwp : THREEWORD_PREPS) {
@@ -1519,7 +1507,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // indexes = 1)
 
       for (TypedDependency td : list) {
-        if (td.gov() == mwp1 && td.dep().value().equalsIgnoreCase(mwp[2]) && Math.abs(td.gov().index() - td.dep().index()) == 1) {
+        if (td.gov().equals(mwp1) && td.dep().value().equalsIgnoreCase(mwp[2]) && Math.abs(td.gov().index() - td.dep().index()) == 1) {
           mwp2 = td.dep();
           dep2 = td;
         }
@@ -1531,7 +1519,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         TreeGraphNode governor = null;
         TypedDependency prep = null;
         for (TypedDependency td1 : list) {
-          if (td1.dep() == mwp0 && td1.reln() == PREPOSITIONAL_MODIFIER) {// we
+          if (td1.dep().equals(mwp0) && td1.reln().equals(PREPOSITIONAL_MODIFIER)) {// we
             // found
             // prep(gov,
             // mwp0)
@@ -1545,7 +1533,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         TypedDependency pobj = null;
         TypedDependency newtd = null;
         for (TypedDependency td2 : list) {
-          if (td2.gov() == mwp2 && td2.reln() == PREPOSITIONAL_OBJECT) {
+          if (td2.gov().equals(mwp2) && td2.reln().equals(PREPOSITIONAL_OBJECT)) {
             pobj = td2;
             // create the new gr relation
             GrammaticalRelation gr = EnglishGrammaticalRelations.getPrep(mwp[0] + '_' + mwp[1] + '_' + mwp[2]);
@@ -1553,7 +1541,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
               newtd = new TypedDependency(gr, governor, pobj.dep());
             }
           }
-          if (td2.gov() == mwp2 && td2.reln() == PREPOSITIONAL_COMPLEMENT) {
+          if (td2.gov().equals(mwp2) && td2.reln().equals(PREPOSITIONAL_COMPLEMENT)) {
             pobj = td2;
             // create the new gr relation
             GrammaticalRelation gr = EnglishGrammaticalRelations.getPrepC(mwp[0] + '_' + mwp[1] + '_' + mwp[2]);
@@ -1576,8 +1564,8 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
           // now remove typed dependencies with reln "kill"
           // and promote possible orphans
           for (TypedDependency td1 : list) {
-            if (td1.reln() != KILL) {
-              if (td1.gov() == mwp0 || td1.gov() == mwp1 || td1.gov() == mwp2) {
+            if (!td1.reln().equals(KILL)) {
+              if (td1.gov().equals(mwp0) || td1.gov().equals(mwp1) || td1.gov().equals(mwp2)) {
                 td1.setGov(governor);
               }
               if (!newTypedDeps.contains(td1)) {
@@ -1616,7 +1604,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
       // the two words should be one word apart in the sentence (difference of
       // indexes = 2)
       for (TypedDependency td : list) {
-        if (td.gov() == mwp0 && td.dep().value().equalsIgnoreCase(mwp[2]) && Math.abs(td.gov().index() - td.dep().index()) == 2) {
+        if (td.gov().equals(mwp0) && td.dep().value().equalsIgnoreCase(mwp[2]) && Math.abs(td.gov().index() - td.dep().index()) == 2) {
           mwp2 = td.dep();
           dep2 = td;
         }
@@ -1628,7 +1616,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         TreeGraphNode governor = null;
         TypedDependency prep = null;
         for (TypedDependency td1 : list) {
-          if (td1.dep() == mwp0 && td1.reln() == PREPOSITIONAL_MODIFIER) {// we
+          if (td1.dep().equals(mwp0) && td1.reln().equals(PREPOSITIONAL_MODIFIER)) {// we
             // found
             // prep(gov,
             // mwp0)
@@ -1642,7 +1630,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         TypedDependency pobj = null;
         TypedDependency newtd = null;
         for (TypedDependency td2 : list) {
-          if (td2.gov() == mwp0 && td2.reln() == PREPOSITIONAL_OBJECT) {
+          if (td2.gov().equals(mwp0) && td2.reln().equals(PREPOSITIONAL_OBJECT)) {
             pobj = td2;
             // create the new gr relation
             GrammaticalRelation gr = EnglishGrammaticalRelations.getPrep(mwp[0] + '_' + mwp[1] + '_' + mwp[2]);
@@ -1650,7 +1638,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
               newtd = new TypedDependency(gr, governor, pobj.dep());
             }
           }
-          if (td2.gov() == mwp0 && td2.reln() == PREPOSITIONAL_COMPLEMENT) {
+          if (td2.gov().equals(mwp0) && td2.reln().equals(PREPOSITIONAL_COMPLEMENT)) {
             pobj = td2;
             // create the new gr relation
             GrammaticalRelation gr = EnglishGrammaticalRelations.getPrepC(mwp[0] + '_' + mwp[1] + '_' + mwp[2]);
@@ -1673,8 +1661,8 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
           // now remove typed dependencies with reln "kill"
           // and promote possible orphans
           for (TypedDependency td1 : list) {
-            if (td1.reln() != KILL) {
-              if (td1.gov() == mwp0 || td1.gov() == mwp1 || td1.gov() == mwp2) {
+            if (!td1.reln().equals(KILL)) {
+              if (td1.gov().equals(mwp0) || td1.gov().equals(mwp1) || td1.gov().equals(mwp2)) {
                 td1.setGov(governor);
               }
               if (!newTypedDeps.contains(td1)) {
@@ -1730,7 +1718,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    *          List of typedDependencies to work on
    */
   private static void collapseFlatMWP(Collection<TypedDependency> list) {
-    Collection<TypedDependency> newTypedDeps = new ArrayList<TypedDependency>();
+    Collection<TypedDependency> newTypedDeps = new ArrayList<>();
 
     for (String[] mwp : MULTIWORD_PREPS) {
 
@@ -1751,7 +1739,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
       // now search for prep(gov, mwp1)
       for (TypedDependency td1 : list) {
-        if (td1.dep() == mwp1 && td1.reln() == PREPOSITIONAL_MODIFIER) {// we
+        if (td1.dep().equals(mwp1) && td1.reln().equals(PREPOSITIONAL_MODIFIER)) {// we
           // found
           // prep(gov,
           // mwp1)
@@ -1762,13 +1750,13 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
       // search for the complement: pobj|pcomp(mwp1,X)
       for (TypedDependency td2 : list) {
-        if (td2.gov() == mwp1 && td2.reln() == PREPOSITIONAL_OBJECT) {
+        if (td2.gov().equals(mwp1) && td2.reln().equals(PREPOSITIONAL_OBJECT)) {
           pobj = td2;
           // create the new gr relation
           GrammaticalRelation gr = EnglishGrammaticalRelations.getPrep(mwp[0] + '_' + mwp[1]);
           newTypedDeps.add(new TypedDependency(gr, governor, pobj.dep()));
         }
-        if (td2.gov() == mwp1 && td2.reln() == PREPOSITIONAL_COMPLEMENT) {
+        if (td2.gov().equals(mwp1) && td2.reln().equals(PREPOSITIONAL_COMPLEMENT)) {
           pobj = td2;
           // create the new gr relation
           GrammaticalRelation gr = EnglishGrammaticalRelations.getPrepC(mwp[0] + '_' + mwp[1]);
@@ -1785,8 +1773,8 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         // now remove typed dependencies with reln "kill"
         // and promote possible orphans
         for (TypedDependency td1 : list) {
-          if (td1.reln() != KILL) {
-            if (td1.gov() == mwp1) {
+          if (!td1.reln().equals(KILL)) {
+            if (td1.gov().equals(mwp1)) {
               td1.setGov(governor);
             }
             if (!newTypedDeps.contains(td1)) {
@@ -1812,12 +1800,12 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
   private static void eraseMultiConj(Collection<TypedDependency> list) {
     // find typed deps of form cc(gov, x)
     for (TypedDependency td1 : list) {
-      if (td1.reln() == COORDINATION) {
+      if (td1.reln().equals(COORDINATION)) {
         TreeGraphNode x = td1.dep();
         // find typed deps of form dep(x,y) and kill them
         for (TypedDependency td2 : list) {
-          if (td2.gov().equals(x) && (td2.reln() == DEPENDENT || td2.reln() == MULTI_WORD_EXPRESSION || td2.reln() == COORDINATION ||
-                  td2.reln() == ADVERBIAL_MODIFIER || td2.reln() == NEGATION_MODIFIER || td2.reln() == AUX_MODIFIER)) {
+          if (td2.gov().equals(x) && (td2.reln().equals(DEPENDENT) || td2.reln().equals(MULTI_WORD_EXPRESSION) || td2.reln().equals(COORDINATION) ||
+                  td2.reln().equals(ADVERBIAL_MODIFIER) || td2.reln().equals(NEGATION_MODIFIER) || td2.reln().equals(AUX_MODIFIER))) {
             td2.setReln(KILL);
           }
         }
@@ -1827,7 +1815,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     // now remove typed dependencies with reln "kill"
     for (Iterator<TypedDependency> iter = list.iterator(); iter.hasNext();) {
       TypedDependency td = iter.next();
-      if (td.reln() == KILL) {
+      if (td.reln().equals(KILL)) {
         if (DEBUG) {
           System.err.println("Removing rest of multiword conj: " + td);
         }
@@ -1852,7 +1840,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
         TreeGraphNode dep = td1.dep();
 
         for (TypedDependency td2 : list) {
-          if (td2.reln() == DEPENDENT && td2.gov() == gov && td2.dep() == dep) {
+          if (td2.reln().equals(DEPENDENT) && td2.gov().equals(gov) && td2.dep().equals(dep)) {
             td2.setReln(KILL);
           }
         }
@@ -1862,7 +1850,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     // now remove typed dependencies with reln "kill"
     for (Iterator<TypedDependency> iter = list.iterator(); iter.hasNext();) {
       TypedDependency td = iter.next();
-      if (td.reln() == KILL) {
+      if (td.reln().equals(KILL)) {
         if (DEBUG) {
           System.err.println("Removing duplicate relation: " + td);
         }
@@ -1880,7 +1868,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    * is a List, they may both now be in the List.
    */
   private static void removeExactDuplicates(Collection<TypedDependency> list) {
-    Set<TypedDependency> set = new TreeSet<TypedDependency>(list);
+    Set<TypedDependency> set = new TreeSet<>(list);
     list.clear();
     list.addAll(set);
   }

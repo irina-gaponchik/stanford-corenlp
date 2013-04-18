@@ -155,15 +155,15 @@ public class CorefCluster implements Serializable{
   public void printCorefCluster(Logger logger){
     logger.finer("Cluster ID: "+clusterID+"\tNumbers: "+numbers+"\tGenders: "+genders+"\tanimacies: "+animacies);
     logger.finer("NE: "+nerStrings+"\tfirst Mention's ID: "+firstMention.mentionID+"\tHeads: "+heads+"\twords: "+words);
-    TreeMap<Integer, Mention> forSortedPrint = new TreeMap<Integer, Mention>();
+    TreeMap<Integer, Mention> forSortedPrint = new TreeMap<>();
     for(Mention m : this.corefMentions){
       forSortedPrint.put(m.mentionID, m);
     }
     for(Mention m : forSortedPrint.values()){
       if(m.goldCorefClusterID==-1){
-        logger.finer("mention-> id:"+m.mentionID+"\toriginalRef: "+m.originalRef+"\t"+m.spanToString() +"\tsentNum: "+m.sentNum+"\tstartIndex: "+m.startIndex);
+        logger.finer("mention-> id:"+m.mentionID+"\toriginalRef: "+m.originalRef+ '\t' +m.spanToString() +"\tsentNum: "+m.sentNum+"\tstartIndex: "+m.startIndex);
       } else{
-        logger.finer("mention-> id:"+m.mentionID+"\toriginalClusterID: "+m.goldCorefClusterID+"\t"+m.spanToString() +"\tsentNum: "+m.sentNum+"\tstartIndex: "+m.startIndex +"\toriginalRef: "+m.originalRef+"\tType: "+m.mentionType);
+        logger.finer("mention-> id:"+m.mentionID+"\toriginalClusterID: "+m.goldCorefClusterID+ '\t' +m.spanToString() +"\tsentNum: "+m.sentNum+"\tstartIndex: "+m.startIndex +"\toriginalRef: "+m.originalRef+"\tType: "+m.mentionType);
       }
     }
   }

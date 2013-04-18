@@ -34,7 +34,7 @@ public class CTBErrorCorrectingTreeNormalizer extends BobChrisTreeNormalizer {
   private static final Pattern PPTmpPattern = Pattern.compile("PP.*-TMP.*");
   private static final Pattern TmpPattern = Pattern.compile(".*-TMP.*");
 
-  @SuppressWarnings({"NonSerializableFieldInSerializableClass"})
+  @SuppressWarnings("NonSerializableFieldInSerializableClass")
   private TreeTransformer tagExtender;
 
   private boolean splitNPTMP;
@@ -105,9 +105,9 @@ public class CTBErrorCorrectingTreeNormalizer extends BobChrisTreeNormalizer {
     public boolean accept(Tree t) {
       Tree[] kids = t.children();
       Label l = t.label();
-      if ((l != null) && l.value() != null && // there appears to be a mistake in CTB3 where the label "-NONE-1" is used once
+      if (l != null && l.value() != null && // there appears to be a mistake in CTB3 where the label "-NONE-1" is used once
               // presumably it should be "-NONE-" and be spliced out here.
-              (l.value().matches("-NONE-.*")) && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf()) {
+              l.value().matches("-NONE-.*") && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf()) {
         // Delete empty/trace nodes (ones marked '-NONE-')
         if ( ! l.value().equals("-NONE-")) {
           EncodingPrintWriter.err.println("Deleting errant node " + l.value() + " as if -NONE-: " + t, ChineseTreebankLanguagePack.ENCODING);

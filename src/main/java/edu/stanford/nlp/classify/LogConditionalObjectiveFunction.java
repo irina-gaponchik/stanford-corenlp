@@ -32,27 +32,27 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
 
   protected LogPrior prior;
 
-  protected int numFeatures = 0;
-  protected int numClasses = 0;
+  protected int numFeatures;
+  protected int numClasses;
 
-  protected int[][] data = null;
-  protected Iterable<Datum<L, F>> dataIterable = null;
-  protected double[][] values = null;
-  protected int[] labels = null;
-  protected float[] dataweights = null;
-  protected double[] derivativeNumerator = null;
+  protected int[][] data;
+  protected Iterable<Datum<L, F>> dataIterable;
+  protected double[][] values;
+  protected int[] labels;
+  protected float[] dataweights;
+  protected double[] derivativeNumerator;
 
-  protected DoubleAD[] xAD = null;
-  protected double [] priorDerivative = null; //The only reason this is around is because the Prior Functions don't handle stochastic calculations yet.
-  protected DoubleAD[] derivativeAD = null;
-  protected DoubleAD[] sums = null;
-  protected DoubleAD[] probs = null;
+  protected DoubleAD[] xAD;
+  protected double [] priorDerivative; //The only reason this is around is because the Prior Functions don't handle stochastic calculations yet.
+  protected DoubleAD[] derivativeAD;
+  protected DoubleAD[] sums;
+  protected DoubleAD[] probs;
 
-  protected Index<L> labelIndex = null;
-  protected Index<F> featureIndex = null;
-  protected boolean useIterable = false;
+  protected Index<L> labelIndex;
+  protected Index<F> featureIndex;
+  protected boolean useIterable;
 
-  protected boolean useSummedConditionalLikelihood = false; //whether to use sumConditional or logConditional
+  protected boolean useSummedConditionalLikelihood; //whether to use sumConditional or logConditional
 
   @Override
   public int domainDimension() {
@@ -76,7 +76,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
     return f * numClasses + c;
   }
 
-  public double[][] to2D(double[] x) {
+  public double[][] to2D(double... x) {
     double[][] x2 = new double[numFeatures][numClasses];
     for (int i = 0; i < numFeatures; i++) {
       for (int j = 0; j < numClasses; j++) {
@@ -88,12 +88,12 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
 
   /**
    * Calculate the conditional likelihood.
-   * If <code>useSummedConditionalLikelihood</code> is <code>false</code> (the default),
+   * If {@code useSummedConditionalLikelihood} is {@code false} (the default),
    * this calculates standard(product) CL, otherwise this calculates summed CL.
    * What's the difference?  See Klein and Manning's 2002 EMNLP paper.
    */
   @Override
-  protected void calculate(double[] x) {
+  protected void calculate(double... x) {
     //If the batchSize is 0 then use the regular calculate methods
     if (useSummedConditionalLikelihood) {
       calculateSCL(x);
@@ -113,7 +113,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
 
 
   @Override
-  public void calculateStochastic(double[] x, double[] v, int[] batch){
+  public void calculateStochastic(double[] x, double[] v, int... batch){
 
     if(method.calculatesHessianVectorProduct() && v != null){
       //  This is used for Stochastic Methods that involve second order information (SMD for example)
@@ -137,7 +137,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
    * conditional estimates.
    *
    */
-  private void calculateSCL(double[] x) {
+  private void calculateSCL(double... x) {
     //System.out.println("Checking at: "+x[0]+" "+x[1]+" "+x[2]);
     value = 0.0;
     Arrays.fill(derivative, 0.0);
@@ -154,10 +154,10 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
       // activation
       Arrays.fill(sums, 0.0);
       for (int c = 0; c < numClasses; c++) {
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          sums[c] += x[i];
-        }
+          for (int feature : features) {
+              int i = indexOf(feature, c);
+              sums[c] += x[i];
+          }
       }
       // expectation (slower routine replaced by fast way)
       // double total = Double.NEGATIVE_INFINITY;
@@ -168,16 +168,16 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
       int ld = labels[d];
       for (int c = 0; c < numClasses; c++) {
         probs[c] = Math.exp(sums[c] - total);
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          derivative[i] += probs[ld] * probs[c];
-        }
+          for (int feature : features) {
+              int i = indexOf(feature, c);
+              derivative[i] += probs[ld] * probs[c];
+          }
       }
       // observed
-      for (int f = 0; f < features.length; f++) {
-        int i = indexOf(features[f], labels[d]);
-        derivative[i] -= probs[ld];
-      }
+        for (int feature : features) {
+            int i = indexOf(feature, labels[d]);
+            derivative[i] -= probs[ld];
+        }
       value -= probs[ld];
     }
     // priors
@@ -196,7 +196,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
    * conditional estimates.
    *
    */
-  private void calculateCL(double[] x) {
+  private void calculateCL(double... x) {
     if (values != null) {
       rvfcalculate(x);
       return;
@@ -219,14 +219,10 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
           //           continue;
           //         }
           int[] features = data[d];
-          for (int f = 0; f < features.length; f++) {
-            int i = indexOf(features[f], labels[d]);
-            if (dataweights == null) {
-              derivativeNumerator[i] -= 1;
-            } else {
-              derivativeNumerator[i] -= dataweights[d];
+            for (int feature : features) {
+                int i = indexOf(feature, labels[d]);
+                derivativeNumerator[i] -= dataweights == null ? 1 : dataweights[d];
             }
-          }
         }
       }
       //TODO: Make sure this work as expected!!
@@ -286,10 +282,10 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
         int[] featuresArr = data[d];
 
         for (int c = 0; c < numClasses; c++) {
-          for (int f = 0; f < featuresArr.length; f++) {
-            int i = indexOf(featuresArr[f], c);
-            sums[c] += x[i];
-          }
+            for (int aFeaturesArr : featuresArr) {
+                int i = indexOf(aFeaturesArr, c);
+                sums[c] += x[i];
+            }
         }
         // expectation (slower routine replaced by fast way)
         // double total = Double.NEGATIVE_INFINITY;
@@ -302,10 +298,10 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
           if (dataweights != null) {
             probs[c] *= dataweights[d];
           }
-          for (int f = 0; f < featuresArr.length; f++) {
-            int i = indexOf(featuresArr[f], c);
-            derivative[i] += probs[c];
-          }
+            for (int aFeaturesArr : featuresArr) {
+                int i = indexOf(aFeaturesArr, c);
+                derivative[i] += probs[c];
+            }
         }
       } else {
         Collection<F> features = datum.asFeatures();
@@ -334,10 +330,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
       }
 
       int labelindex;
-      if(useIterable)
-        labelindex = labelIndex.indexOf(datum.label());
-      else
-        labelindex = labels[d];
+        labelindex = useIterable ? labelIndex.indexOf(datum.label()) : labels[d];
       double dV = sums[labelindex] - total;
       if (dataweights != null) {
         dV *= dataweights[d];
@@ -350,7 +343,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
 
 
 
-  public void calculateStochasticFiniteDifference(double[] x,double[] v, double h, int[] batch){
+  public void calculateStochasticFiniteDifference(double[] x,double[] v, double h, int... batch){
     //  THOUGHTS:
     //  does applying the renormalization (g(x+hv)-g(x)) / h at each step along the way
     //  introduce too much error to makes this method numerically accurate?
@@ -385,67 +378,65 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
     double[] probs = new double[numClasses];
     double[] probsV = new double[numClasses];
 
-    for (int d = 0; d <batch.length; d++) {
+      for (int m : batch) {
 
-      //Sets the index based on the current batch
-      int m = batch[d];
-
-
-      int[] features = data[m];
-      // activation
+          //Sets the index based on the current batch
+          int[] features = data[m];
+          // activation
 
 
-      Arrays.fill(sums, 0.0);
-      Arrays.fill(sumsV,0.0);
+          Arrays.fill(sums, 0.0);
+          Arrays.fill(sumsV, 0.0);
 
-      for (int c = 0; c < numClasses; c++) {
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          sums[c] += x[i];
-          sumsV[c] += x[i] + h*v[i];
-        }
+          for (int c = 0; c < numClasses; c++) {
+              for (int feature : features) {
+                  int i = indexOf(feature, c);
+                  sums[c] += x[i];
+                  sumsV[c] += x[i] + h * v[i];
+              }
+          }
+
+
+          double total = ArrayMath.logSum(sums);
+          double totalV = ArrayMath.logSum(sumsV);
+
+          for (int c = 0; c < numClasses; c++) {
+              probs[c] = Math.exp(sums[c] - total);
+              probsV[c] = Math.exp(sumsV[c] - totalV);
+
+              if (dataweights != null) {
+                  probs[c] *= dataweights[m];
+                  probsV[c] *= dataweights[m];
+              }
+              for (int feature : features) {
+                  int i = indexOf(feature, c);
+                  //derivative[i] += (-1);
+                  derivative[i] += probs[c];
+                  HdotV[i] += (probsV[c] - probs[c]) / h;
+                  if (c == labels[m]) {
+                      derivative[i] -= 1;
+                  }
+
+              }
+          }
+
+          double dV = sums[labels[m]] - total;
+          if (dataweights != null) {
+              dV *= dataweights[m];
+          }
+          value -= dV;
       }
-
-
-
-      double total = ArrayMath.logSum(sums);
-      double totalV = ArrayMath.logSum(sumsV);
-
-      for (int c = 0; c < numClasses; c++) {
-        probs[c] = Math.exp(sums[c] - total);
-        probsV[c] = Math.exp(sumsV[c]- totalV);
-
-        if (dataweights != null) {
-          probs[c] *= dataweights[m];
-          probsV[c] *= dataweights[m];
-        }
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          //derivative[i] += (-1);
-          derivative[i] += probs[c];
-          HdotV[i] += (probsV[c] - probs[c])/h;
-          if( c == labels[m]) {derivative[i] -= 1;}
-
-        }
-      }
-
-      double dV = sums[labels[m]] - total;
-      if (dataweights != null) {
-        dV *= dataweights[m];
-      }
-      value -= dV;
-    }
 
     //Why was this being copied?  -akleeman
     //double[] tmpDeriv = new double[derivative.length];
     //System.arraycopy(derivative,0,tmpDeriv,0,derivative.length);
-    value += ((double) batch.length)/((double) data.length)*prior.compute(x,priorDerivative);
+    value += (double) batch.length / (double) data.length *prior.compute(x,priorDerivative);
   }
 
 
 
 
-  public void calculateStochasticGradientOnly(double[] x, int[] batch) {
+  public void calculateStochasticGradientOnly(double[] x, int... batch) {
     if (values != null) {
       rvfcalculate(x);
       return;
@@ -469,88 +460,83 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
     double[] probs = new double[numClasses];
     //double[] probsV = new double[numClasses];
 
-    for (int d = 0; d <batchSize; d++) {
+      for (int m : batch) {
 
-      //Sets the index based on the current batch
-      int m = batch[d];
+          //Sets the index based on the current batch
+          int[] features = data[m];
+          // activation
 
-      int[] features = data[m];
-      // activation
+          Arrays.fill(sums, 0.0);
+          //Arrays.fill(sumsV,0.0);
 
-      Arrays.fill(sums, 0.0);
-      //Arrays.fill(sumsV,0.0);
+          for (int c = 0; c < numClasses; c++) {
+              for (int feature : features) {
+                  int i = indexOf(feature, c);
+                  sums[c] += x[i];
+              }
+          }
 
-      for (int c = 0; c < numClasses; c++) {
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          sums[c] += x[i];
-        }
+          double total = ArrayMath.logSum(sums);
+          //double totalV = ArrayMath.logSum(sumsV);
+
+          for (int c = 0; c < numClasses; c++) {
+              probs[c] = Math.exp(sums[c] - total);
+              //probsV[c] = Math.exp(sumsV[c]- totalV);
+
+              if (dataweights != null) {
+                  probs[c] *= dataweights[m];
+                  //probsV[c] *= dataweights[m];
+              }
+              for (int feature : features) {
+                  int i = indexOf(feature, c);
+                  //derivative[i] += (-1);
+                  derivative[i] += probs[c];
+                  if (c == labels[m]) {
+                      derivative[i] -= 1;
+                  }
+
+              }
+          }
+
+          double dV = sums[labels[m]] - total;
+          if (dataweights != null) {
+              dV *= dataweights[m];
+          }
+          value -= dV;
       }
 
-      double total = ArrayMath.logSum(sums);
-      //double totalV = ArrayMath.logSum(sumsV);
 
-      for (int c = 0; c < numClasses; c++) {
-        probs[c] = Math.exp(sums[c] - total);
-        //probsV[c] = Math.exp(sumsV[c]- totalV);
-
-        if (dataweights != null) {
-          probs[c] *= dataweights[m];
-          //probsV[c] *= dataweights[m];
-        }
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          //derivative[i] += (-1);
-          derivative[i] += probs[c];
-          if( c == labels[m]) {derivative[i] -= 1;}
-
-        }
-      }
-
-      double dV = sums[labels[m]] - total;
-      if (dataweights != null) {
-        dV *= dataweights[m];
-      }
-      value -= dV;
-    }
-
-
-    value += ((double) batchSize)/((double) data.length)*prior.compute(x,priorDerivative);
+    value += (double) batchSize / (double) data.length *prior.compute(x,priorDerivative);
 
 
 
   }
 
   @Override
-  public double valueAt(double[] x, double xscale, int[] batch) {
+  public double valueAt(double[] x, double xscale, int... batch) {
     value = 0.0;
     int batchSize = batch.length;
     double[] sums = new double[numClasses];
 
-    for (int d = 0; d <batchSize; d++) {
-      //Sets the index based on the current batch
-      int m = batch[d];
-      int[] features = data[m];
-      Arrays.fill(sums, 0.0);
+      for (int m : batch) {
+          //Sets the index based on the current batch
+          int[] features = data[m];
+          Arrays.fill(sums, 0.0);
 
-      for (int c = 0; c < numClasses; c++) {
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          if (values != null) {
-             sums[c] += x[i]*xscale*values[m][f];
-          } else {
-             sums[c] += x[i]*xscale;
+          for (int c = 0; c < numClasses; c++) {
+              for (int f = 0; f < features.length; f++) {
+                  int i = indexOf(features[f], c);
+                  sums[c] += values != null ? x[i] * xscale * values[m][f] : x[i] * xscale;
+              }
           }
-        }
-      }
 
-      double total = ArrayMath.logSum(sums);
-      double dV = sums[labels[m]] - total;
-      if (dataweights != null) {
-        dV *= dataweights[m];
+          double total = ArrayMath.logSum(sums);
+          double dV = sums[labels[m]] - total;
+          if (dataweights != null) {
+              dV *= dataweights[m];
+          }
+          value -= dV;
       }
-      value -= dV;
-    }
     return value;
   }
 
@@ -563,60 +549,54 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
     double[] sums = new double[numClasses];
     double[] probs = new double[numClasses];
 
-    for (int d = 0; d <batchSize; d++) {
+      for (int m : batch) {
 
-      //Sets the index based on the current batch
-      int m = batch[d];
+          //Sets the index based on the current batch
+          int[] features = data[m];
+          // activation
 
-      int[] features = data[m];
-      // activation
+          Arrays.fill(sums, 0.0);
 
-      Arrays.fill(sums, 0.0);
-
-      for (int c = 0; c < numClasses; c++) {
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          if (values != null) {
-             sums[c] += x[i]*xscale*values[m][f];
-          } else {
-             sums[c] += x[i]*xscale;
+          for (int c = 0; c < numClasses; c++) {
+              for (int f = 0; f < features.length; f++) {
+                  int i = indexOf(features[f], c);
+                  sums[c] += values != null ? x[i] * xscale * values[m][f] : x[i] * xscale;
+              }
           }
-        }
+
+          for (int f = 0; f < features.length; f++) {
+              int i = indexOf(features[f], labels[m]);
+              double v = values != null ? values[m][f] : 1;
+              double delta = dataweights != null ? dataweights[m] * v : v;
+              x[i] += delta * gain;
+          }
+
+          double total = ArrayMath.logSum(sums);
+
+          for (int c = 0; c < numClasses; c++) {
+              probs[c] = Math.exp(sums[c] - total);
+
+              if (dataweights != null) {
+                  probs[c] *= dataweights[m];
+              }
+              for (int f = 0; f < features.length; f++) {
+                  int i = indexOf(features[f], c);
+                  double v = values != null ? values[m][f] : 1;
+                  double delta = probs[c] * v;
+                  x[i] -= delta * gain;
+              }
+          }
+
+          double dV = sums[labels[m]] - total;
+          if (dataweights != null) {
+              dV *= dataweights[m];
+          }
+          value -= dV;
       }
-
-      for (int f = 0; f < features.length; f++) {
-        int i = indexOf(features[f], labels[m]);
-        double v = (values != null)? values[m][f]:1;
-        double delta = (dataweights != null)? dataweights[m]*v:v;
-        x[i] += delta*gain;
-      }
-
-      double total = ArrayMath.logSum(sums);
-
-      for (int c = 0; c < numClasses; c++) {
-        probs[c] = Math.exp(sums[c] - total);
-
-        if (dataweights != null) {
-          probs[c] *= dataweights[m];
-        }
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          double v = (values != null)? values[m][f]:1;
-          double delta = probs[c]*v;
-          x[i] -= delta*gain;
-        }
-      }
-
-      double dV = sums[labels[m]] - total;
-      if (dataweights != null) {
-        dV *= dataweights[m];
-      }
-      value -= dV;
-    }
     return value;
   }
 
-  protected void calculateStochasticAlgorithmicDifferentiation(double[] x, double[] v, int[] batch) {
+  protected void calculateStochasticAlgorithmicDifferentiation(double[] x, double[] v, int... batch) {
 
     System.err.print("*");
 
@@ -680,10 +660,10 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
 
 
       for (int c = 0; c < numClasses; c++) {
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          sums[c] = ADMath.plus(sums[c],xAD[i]);
-        }
+          for (int feature : features) {
+              int i = indexOf(feature, c);
+              sums[c] = ADMath.plus(sums[c], xAD[i]);
+          }
       }
 
       DoubleAD total = ADMath.logSum(sums);
@@ -693,11 +673,13 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
         if (dataweights != null) {
           probs[c] = ADMath.multConst(probs[c], dataweights[d]);
         }
-        for (int f = 0; f < features.length; f++) {
-          int i = indexOf(features[f], c);
-          if (c == labels[m]){derivativeAD[i].plusEqualsConst(-1.0);}
-          derivativeAD[i].plusEquals(probs[c]);
-        }
+          for (int feature : features) {
+              int i = indexOf(feature, c);
+              if (c == labels[m]) {
+                  derivativeAD[i].plusEqualsConst(-1.0);
+              }
+              derivativeAD[i].plusEquals(probs[c]);
+          }
       }
 
       double dV = sums[labels[m]].getval() - total.getval();
@@ -722,7 +704,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
       derivative[i] = derivativeAD[i].getval();
       HdotV[i] = derivativeAD[i].getdot();
     }
-    value += ((double) batch.length)/((double) data.length)*prior.compute(x, tmp);
+    value += (double) batch.length / (double) data.length *prior.compute(x, tmp);
 
     //System.err.print(System.currentTimeMillis() - curTime + " - ");
     //System.err.println("");
@@ -736,7 +718,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
    * TODO: sum-conditional obj. fun. with RVFs.
    *
    */
-  protected void rvfcalculate(double[] x) {
+  protected void rvfcalculate(double... x) {
     value = 0.0;
     if (derivativeNumerator == null) {
       derivativeNumerator = new double[x.length];
@@ -748,11 +730,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
         int[] features = data[d];
         for (int f = 0; f < features.length; f++) {
           int i = indexOf(features[f], labels[d]);
-          if (dataweights == null) {
-            derivativeNumerator[i] -= values[d][f];
-          } else {
-            derivativeNumerator[i] -= dataweights[d]*values[d][f];
-          }
+            derivativeNumerator[i] -= dataweights == null ? values[d][f] : dataweights[d] * values[d][f];
         }
       }
     }
@@ -828,7 +806,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
 
   public LogConditionalObjectiveFunction(GeneralDataset<L, F> dataset, LogPrior prior, boolean useSumCondObjFun) {
     setPrior(prior);
-    setUseSumCondObjFun(useSumCondObjFun);
+      useSummedConditionalLikelihood = useSumCondObjFun;
     this.numFeatures = dataset.numFeatures();
     this.numClasses = dataset.numClasses();
     this.data = dataset.getDataArray();
@@ -842,7 +820,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
   //TODO: test this
   public LogConditionalObjectiveFunction(Iterable<Datum<L, F>> dataIterable, LogPrior logPrior, Index<F> featureIndex, Index<L> labelIndex) {
     setPrior(logPrior);
-    setUseSumCondObjFun(false);
+      useSummedConditionalLikelihood = false;
     this.useIterable = true;
     this.numFeatures = featureIndex.size();
     this.numClasses = labelIndex.size();
@@ -861,7 +839,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
     this.useSummedConditionalLikelihood = useSumCondObjFun;
   }
 
-  public LogConditionalObjectiveFunction(int numFeatures, int numClasses, int[][] data, int[] labels) {
+  public LogConditionalObjectiveFunction(int numFeatures, int numClasses, int[][] data, int... labels) {
     this(numFeatures, numClasses, data, labels, new LogPrior(LogPrior.LogPriorType.QUADRATIC));
   }
 
@@ -869,7 +847,7 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
     this(numFeatures, numClasses, data, labels, null, prior);
   }
 
-  public LogConditionalObjectiveFunction(int numFeatures, int numClasses, int[][] data, int[] labels, float[] dataweights) {
+  public LogConditionalObjectiveFunction(int numFeatures, int numClasses, int[][] data, int[] labels, float... dataweights) {
     this(numFeatures, numClasses, data, labels, dataweights, new LogPrior(LogPrior.LogPriorType.QUADRATIC));
   }
 

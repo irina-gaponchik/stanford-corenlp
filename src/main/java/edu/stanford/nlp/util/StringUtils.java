@@ -28,7 +28,17 @@ import java.util.regex.Pattern;
  */
 public class StringUtils {
 
-  /**
+    private static final Pattern COMPILE = Pattern.compile("[,;]");
+    private static final Pattern PATTERN = Pattern.compile("[,;]");
+    private static final Pattern COMPILE1 = Pattern.compile(",\\s*");
+    private static final Pattern COMPILE2 = Pattern.compile("NN|NNP|NNS|NNPS");
+    private static final Pattern COMPILE3 = Pattern.compile("\\s+");
+    private static final Pattern COMPILE4 = Pattern.compile("/");
+    private static final Pattern COMPILE5 = Pattern.compile("VB|VBD|VBG|VBN|VBZ|VBP|MD");
+    private static final Pattern COMPILE6 = Pattern.compile("JJ|JJR|JJS|CD");
+    private static final Pattern COMPILE7 = Pattern.compile("RB|RBR|RBS|RP|WRB");
+
+    /**
    * Don't let anyone instantiate this class.
    */
   private StringUtils() {
@@ -93,7 +103,7 @@ public class StringUtils {
    * @return  A String[] s is returned such that s[yn]=xn
    */
   public static String[] mapStringToArray(String map) {
-    String[] m = map.split("[,;]");
+    String[] m = COMPILE.split(map);
     int maxIndex = 0;
     String[] keys = new String[m.length];
     int[] indices = new int[m.length];
@@ -120,7 +130,7 @@ public class StringUtils {
    * @return  A Map m is returned such that m.get(xn) = yn
    */
   public static Map<String, String> mapStringToMap(String map) {
-    String[] m = map.split("[,;]");
+    String[] m = PATTERN.split(map);
     Map<String, String> res = Generics.newHashMap();
     for (String str : m) {
       int index = str.lastIndexOf('=');
@@ -133,7 +143,7 @@ public class StringUtils {
 
   public static List<Pattern> regexesToPatterns(Iterable<String> regexes)
   {
-    List<Pattern> patterns = new ArrayList<Pattern>();
+    List<Pattern> patterns = new ArrayList<>();
     for (String regex:regexes) {
       patterns.add(Pattern.compile(regex));
     }
@@ -156,7 +166,7 @@ public class StringUtils {
       return null;
     }
 
-    List<String> groups = new ArrayList<String>();
+    List<String> groups = new ArrayList<>();
     for (int index = 1; index <= matcher.groupCount(); index++) {
       groups.add(matcher.group(index));
     }
@@ -236,7 +246,7 @@ public class StringUtils {
   /**
    * Joins all the tokens together (more or less) according to their original whitespace.
    * It assumes all whitespace was " "
-   * @param tokens list of tokens which implement {@link HasOffset} and {@link HasWord}
+   * @param tokens list of tokens which implement {@link edu.stanford.nlp.ling.HasOffset} and {@link edu.stanford.nlp.ling.HasWord}
    * @return a string of the tokens with the appropriate amount of spacing
    */
   public static String joinWithOriginalWhiteSpace(List<CoreLabel> tokens) {
@@ -301,10 +311,10 @@ public class StringUtils {
   /**
    * Joins each elem in the array with the given glue. For example, given a
    * list of ints, you can create a comma-separated list by calling
-   * <code>join(numbers, ", ")</code>.
+   * {@code join(numbers, ", ")}.
    */
   public static String join(Object[] elements, String glue) {
-    return (join(Arrays.asList(elements), glue));
+    return join(Arrays.asList(elements), glue);
   }
 
   /**
@@ -317,8 +327,8 @@ public class StringUtils {
   /**
    * Joins elements with a space.
    */
-  public static String join(Object[] elements) {
-    return (join(elements, " "));
+  public static String join(Object... elements) {
+    return join(elements, " ");
   }
 
 
@@ -343,7 +353,7 @@ public class StringUtils {
    * @return List of Strings resulting from splitting on the regex
    */
   public static List<String> split(String str, String regex) {
-    return (Arrays.asList(str.split(regex)));
+    return Arrays.asList(str.split(regex));
   }
 
 
@@ -368,8 +378,8 @@ public class StringUtils {
   public static List<String> valueSplit(String str, String valueRegex, String separatorRegex) {
     Pattern vPat = Pattern.compile(valueRegex);
     Pattern sPat = Pattern.compile(separatorRegex);
-    List<String> ret = new ArrayList<String>();
-    while (str.length() > 0) {
+    List<String> ret = new ArrayList<>();
+    while (!str.isEmpty()) {
       Matcher vm = vPat.matcher(str);
       if (vm.lookingAt()) {
         ret.add(vm.group());
@@ -379,7 +389,7 @@ public class StringUtils {
       } else {
         throw new IllegalArgumentException("valueSplit: " + valueRegex + " doesn't match " + str);
       }
-      if (str.length() > 0) {
+      if (!str.isEmpty()) {
         Matcher sm = sPat.matcher(str);
         if (sm.lookingAt()) {
           str = str.substring(sm.end());
@@ -437,11 +447,7 @@ public class StringUtils {
         sb.append(' ');
       }
       return sb.toString();
-    } else if (leng > num) {
-      return str.substring(0, num);
-    } else {
-      return str;
-    }
+    } else return leng > num ? str.substring(0, num) : str;
   }
 
   /**
@@ -462,11 +468,7 @@ public class StringUtils {
       }
       sb.append(str);
       return sb.toString();
-    } else if (leng > num) {
-      return str.substring(str.length() - num);
-    } else {
-      return str;
-    }
+    } else return leng > num ? str.substring(str.length() - num) : str;
   }
 
   /**
@@ -520,9 +522,9 @@ public class StringUtils {
    */
   public static String trim(String s, int maxWidth) {
     if (s.length() <= maxWidth) {
-      return (s);
+      return s;
     }
-    return (s.substring(0, maxWidth));
+    return s.substring(0, maxWidth);
   }
 
   public static String trim(Object obj, int maxWidth) {
@@ -559,7 +561,7 @@ public class StringUtils {
     char[] chars = s.toCharArray();
     StringBuilder sb = new StringBuilder();
     for (char c : chars) {
-      if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || (c == '_')) {
+      if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '_') {
         sb.append(c);
       } else {
         if (c == ' ' || c == '-') {
@@ -586,7 +588,7 @@ public class StringUtils {
       }
       index = s.indexOf(ch, index + 1);
       if (index == -1) {
-        return (-1);
+        return -1;
       }
     }
     return index;
@@ -620,16 +622,16 @@ public class StringUtils {
    * the hyphen) and its value will be a {@link String}[] containing
    * the optional arguments (if present).  The non-flag values not
    * captured as flag arguments are collected into a String[] array
-   * and returned as the value of <code>null</code> in the Map.  In
+   * and returned as the value of {@code null} in the Map.  In
    * this invocation, flags cannot take arguments, so all the {@link
-   * String} array values other than the value for <code>null</code>
+   * String} array values other than the value for {@code null}
    * will be zero-length.
    *
    * @param args A command-line arguments array
-   * @return a {@link Map} of flag names to flag argument {@link
+   * @return a {@link java.util.Map} of flag names to flag argument {@link
    *         String} arrays.
    */
-  public static Map<String, String[]> argsToMap(String[] args) {
+  public static Map<String, String[]> argsToMap(String... args) {
     return argsToMap(args, Collections.<String,Integer>emptyMap());
   }
 
@@ -642,42 +644,42 @@ public class StringUtils {
    * the hyphen) and its value will be a {@link String}[] containing
    * the optional arguments (if present).  The non-flag values not
    * captured as flag arguments are collected into a String[] array
-   * and returned as the value of <code>null</code> in the Map.  In
+   * and returned as the value of {@code null} in the Map.  In
    * this invocation, the maximum number of arguments for each flag
    * can be specified as an {@link Integer} value of the appropriate
-   * flag key in the <code>flagsToNumArgs</code> {@link Map}
+   * flag key in the {@code flagsToNumArgs} {@link java.util.Map}
    * argument. (By default, flags cannot take arguments.)
    * <p/>
    * Example of usage:
    * <p/>
-   * <code>
+   * {@code
    * Map flagsToNumArgs = new HashMap();
    * flagsToNumArgs.put("-x",new Integer(2));
    * flagsToNumArgs.put("-d",new Integer(1));
    * Map result = argsToMap(args,flagsToNumArgs);
-   * </code>
+   * }
    * <p/>
    * If a given flag appears more than once, the extra args are appended to
    * the String[] value for that flag.
    *
    * @param args           the argument array to be parsed
-   * @param flagsToNumArgs a {@link Map} of flag names to {@link Integer
+   * @param flagsToNumArgs a {@link java.util.Map} of flag names to {@link Integer
    *                       values specifying the number of arguments
    *                       for that flag (default min 0, max 1).
-   * @return a {@link Map} of flag names to flag argument {@link
+   * @return a {@link java.util.Map} of flag names to flag argument {@link
    *         String} arrays.
    */
   public static Map<String, String[]> argsToMap(String[] args, Map<String, Integer> flagsToNumArgs) {
     Map<String, String[]> result = Generics.newHashMap();
-    List<String> remainingArgs = new ArrayList<String>();
+    List<String> remainingArgs = new ArrayList<>();
     for (int i = 0; i < args.length; i++) {
       String key = args[i];
       if (key.charAt(0) == '-') { // found a flag
         Integer numFlagArgs = flagsToNumArgs.get(key);
-        int max = numFlagArgs == null ? 1 : numFlagArgs.intValue();
-        int min = numFlagArgs == null ? 0 : numFlagArgs.intValue();
-        List<String> flagArgs = new ArrayList<String>();
-        for (int j = 0; j < max && i + 1 < args.length && (j < min || args[i + 1].length() == 0 || args[i + 1].charAt(0) != '-'); i++, j++) {
+        int max = numFlagArgs == null ? 1 : numFlagArgs;
+        int min = numFlagArgs == null ? 0 : numFlagArgs;
+        List<String> flagArgs = new ArrayList<>();
+        for (int j = 0; j < max && i + 1 < args.length && (j < min || args[i + 1].isEmpty() || args[i + 1].charAt(0) != '-'); i++, j++) {
           flagArgs.add(args[i + 1]);
         }
         if (result.containsKey(key)) { // append the second specification into the args.
@@ -702,12 +704,12 @@ public class StringUtils {
   /**
    * In this version each flag has zero or one argument. It has one argument
    * if there is a thing following a flag that does not begin with '-'.  See
-   * {@link #argsToProperties(String[], Map)} for full documentation.
+   * {@link #argsToProperties(String[], java.util.Map)} for full documentation.
    *
    * @param args Command line arguments
    * @return A Properties object representing the arguments.
    */
-  public static Properties argsToProperties(String[] args) {
+  public static Properties argsToProperties(String... args) {
     return argsToProperties(args, Collections.<String,Integer>emptyMap());
   }
 
@@ -732,21 +734,18 @@ public class StringUtils {
    */
   public static Properties argsToProperties(String[] args, Map<String,Integer> flagsToNumArgs) {
     Properties result = new Properties();
-    List<String> remainingArgs = new ArrayList<String>();
+    List<String> remainingArgs = new ArrayList<>();
     for (int i = 0; i < args.length; i++) {
       String key = args[i];
-      if (key.length() > 0 && key.charAt(0) == '-') { // found a flag
-        if (key.length() > 1 && key.charAt(1) == '-')
-          key = key.substring(2); // strip off 2 hyphens
-        else
-          key = key.substring(1); // strip off the hyphen
+      if (!key.isEmpty() && key.charAt(0) == '-') { // found a flag
+          key = key.length() > 1 && key.charAt(1) == '-' ? key.substring(2) : key.substring(1);
 
         Integer maxFlagArgs = flagsToNumArgs.get(key);
         int max = maxFlagArgs == null ? 1 : maxFlagArgs;
         int min = maxFlagArgs == null ? 0 : maxFlagArgs;
-        List<String> flagArgs = new ArrayList<String>();
+        List<String> flagArgs = new ArrayList<>();
         // cdm oct 2007: add length check to allow for empty string argument!
-        for (int j = 0; j < max && i + 1 < args.length && (j < min || args[i + 1].length() == 0 || args[i + 1].charAt(0) != '-'); i++, j++) {
+        for (int j = 0; j < max && i + 1 < args.length && (j < min || args[i + 1].isEmpty() || args[i + 1].charAt(0) != '-'); i++, j++) {
           flagArgs.add(args[i + 1]);
         }
         if (flagArgs.isEmpty()) {
@@ -784,7 +783,7 @@ public class StringUtils {
     if (result.containsKey(PROP)) {
       String file = result.getProperty(PROP);
       result.remove(PROP);
-      Properties toAdd = argsToProperties(new String[]{"-prop", file});
+      Properties toAdd = argsToProperties("-prop", file);
       for (Enumeration<?> e = toAdd.propertyNames(); e.hasMoreElements(); ) {
         String key = (String) e.nextElement();
         String val = toAdd.getProperty(key);
@@ -800,8 +799,8 @@ public class StringUtils {
 
   /**
    * This method reads in properties listed in a file in the format prop=value, one property per line.
-   * Although <code>Properties.load(InputStream)</code> exists, I implemented this method to trim the lines,
-   * something not implemented in the <code>load()</code> method.
+   * Although {@code Properties.load(InputStream)} exists, I implemented this method to trim the lines,
+   * something not implemented in the {@code load()} method.
    * @param filename A properties file to read
    * @return The corresponding Properties object
    */
@@ -842,7 +841,7 @@ public class StringUtils {
    * for properties without an explicitly given value is set to "true".
    */
   public static Properties stringToProperties(String str, Properties props) {
-    String[] propsStr = str.trim().split(",\\s*");
+    String[] propsStr = COMPILE1.split(str.trim());
     for (String term : propsStr) {
       int divLoc = term.indexOf('=');
       String key;
@@ -876,19 +875,15 @@ public class StringUtils {
 
   /**
    * Prints to a file.  If the file already exists, appends if
-   * <code>append=true</code>, and overwrites if <code>append=false</code>.
+   * {@code append=true}, and overwrites if {@code append=false}.
    */
   public static void printToFile(File file, String message, boolean append,
                                  boolean printLn, String encoding) {
     PrintWriter pw = null;
     try {
       Writer fw;
-      if (encoding != null) {
-        fw = new OutputStreamWriter(new FileOutputStream(file, append),
-                                         encoding);
-      } else {
-        fw = new FileWriter(file, append);
-      }
+        fw = encoding != null ? new OutputStreamWriter(new FileOutputStream(file, append),
+                encoding) : new FileWriter(file, append);
       pw = new PrintWriter(fw);
       if (printLn) {
         pw.println(message);
@@ -909,7 +904,7 @@ public class StringUtils {
 
   /**
    * Prints to a file.  If the file already exists, appends if
-   * <code>append=true</code>, and overwrites if <code>append=false</code>.
+   * {@code append=true}, and overwrites if {@code append=false}.
    */
   public static void printToFileLn(File file, String message, boolean append) {
     PrintWriter pw = null;
@@ -930,7 +925,7 @@ public class StringUtils {
 
   /**
    * Prints to a file.  If the file already exists, appends if
-   * <code>append=true</code>, and overwrites if <code>append=false</code>.
+   * {@code append=true}, and overwrites if {@code append=false}.
    */
   public static void printToFile(File file, String message, boolean append) {
     PrintWriter pw = null;
@@ -960,7 +955,7 @@ public class StringUtils {
 
   /**
    * Prints to a file.  If the file already exists, appends if
-   * <code>append=true</code>, and overwrites if <code>append=false</code>
+   * {@code append=true}, and overwrites if {@code append=false}
    */
   public static void printToFile(String filename, String message, boolean append) {
     printToFile(new File(filename), message, append);
@@ -968,7 +963,7 @@ public class StringUtils {
 
   /**
    * Prints to a file.  If the file already exists, appends if
-   * <code>append=true</code>, and overwrites if <code>append=false</code>
+   * {@code append=true}, and overwrites if {@code append=false}
    */
   public static void printToFileLn(String filename, String message, boolean append) {
     printToFileLn(new File(filename), message, append);
@@ -996,7 +991,7 @@ public class StringUtils {
    * @return A Map from keys to possible values (String or null)
    */
   @SuppressWarnings("unchecked")
-  public static Map<String, String> parseCommandLineArguments(String[] args) {
+  public static Map<String, String> parseCommandLineArguments(String... args) {
     return (Map)parseCommandLineArguments(args, false);
   }
 
@@ -1049,7 +1044,7 @@ public class StringUtils {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < orig.length(); i++) {
       char c = orig.charAt(i);
-      if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')) {
+      if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9') {
         sb.append(c);
       }
     }
@@ -1102,7 +1097,7 @@ public class StringUtils {
    * @return An array of Strings that s is split into
    */
   public static String[] splitOnCharWithQuoting(String s, char splitChar, char quoteChar, char escapeChar) {
-    List<String> result = new ArrayList<String>();
+    List<String> result = new ArrayList<>();
     int i = 0;
     int length = s.length();
     StringBuilder b = new StringBuilder();
@@ -1122,7 +1117,7 @@ public class StringUtils {
           curr = s.charAt(i);
           // mrsmith: changed this condition from
           // if (curr == escapeChar) {
-          if ((curr == escapeChar) && (i+1 < length) && (s.charAt(i+1) == quoteChar)) {
+          if (curr == escapeChar && i+1 < length && s.charAt(i+1) == quoteChar) {
             b.append(s.charAt(i + 1));
             i += 2;
           } else if (curr == quoteChar) {
@@ -1185,11 +1180,7 @@ public class StringUtils {
 // Step 5
         // js: if the chars match, you can get an extra point
         // otherwise you have to skip an insertion or deletion (no subs)
-        if (s_i == t_j) {
-          d[i][j] = SloppyMath.max(d[i - 1][j], d[i][j - 1], d[i - 1][j - 1] + 1);
-        } else {
-          d[i][j] = Math.max(d[i - 1][j], d[i][j - 1]);
-        }
+          d[i][j] = s_i == t_j ? SloppyMath.max(d[i - 1][j], d[i][j - 1], d[i - 1][j - 1] + 1) : Math.max(d[i - 1][j], d[i][j - 1]);
       }
     }
     /* ----
@@ -1237,11 +1228,7 @@ public class StringUtils {
     int max = 0;
     for (int i = 1; i <= M; i++) {
       for (int j = 1; j <= N; j++) {
-        if (s.charAt(i - 1) == t.charAt(j - 1)) {
-          d[i][j] = d[i - 1][j - 1] + 1;
-        } else {
-          d[i][j] = 0;
-        }
+          d[i][j] = s.charAt(i - 1) == t.charAt(j - 1) ? d[i - 1][j - 1] + 1 : 0;
 
         if (d[i][j] > max) {
           max = d[i][j];
@@ -1283,11 +1270,7 @@ public class StringUtils {
         char t_j = t.charAt(j - 1); // jth character of t
         // Step 5
         int cost; // cost
-        if (s_i == t_j) {
-          cost = 0;
-        } else {
-          cost = 1;
-        }
+          cost = s_i == t_j ? 0 : 1;
         // Step 6
         d[i][j] = SloppyMath.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
       }
@@ -1304,16 +1287,16 @@ public class StringUtils {
    * @param s a Penn TreeBank POS tag.
    */
   public static String pennPOSToWordnetPOS(String s) {
-    if (s.matches("NN|NNP|NNS|NNPS")) {
+    if (COMPILE2.matcher(s).matches()) {
       return "noun";
     }
-    if (s.matches("VB|VBD|VBG|VBN|VBZ|VBP|MD")) {
+    if (COMPILE5.matcher(s).matches()) {
       return "verb";
     }
-    if (s.matches("JJ|JJR|JJS|CD")) {
+    if (COMPILE6.matcher(s).matches()) {
       return "adjective";
     }
-    if (s.matches("RB|RBR|RBS|RP|WRB")) {
+    if (COMPILE7.matcher(s).matches()) {
       return "adverb";
     }
     return null;
@@ -1324,7 +1307,7 @@ public class StringUtils {
    * This is the class name stripped of any package name.
    *
    * @return The name of the class minus a package name, for example
-   *         <code>ArrayList</code>
+   *         {@code ArrayList}
    */
   public static String getShortClassName(Object o) {
     if (o == null) {
@@ -1350,7 +1333,7 @@ public class StringUtils {
    * @param <T> type to return
    * @return Object created from string
    */
-  public static <T> T columnStringToObject(Class objClass, String str, String delimiterRegex, String[] fieldNames)
+  public static <T> T columnStringToObject(Class objClass, String str, String delimiterRegex, String... fieldNames)
           throws InstantiationException, IllegalAccessException, NoSuchFieldException, NoSuchMethodException, InvocationTargetException
   {
     Pattern delimiterPattern = Pattern.compile(delimiterRegex);
@@ -1368,7 +1351,7 @@ public class StringUtils {
    * @param <T> type to return
    * @return Object created from string
    */
-  public static <T> T columnStringToObject(Class<?> objClass, String str, Pattern delimiterPattern, String[] fieldNames)
+  public static <T> T columnStringToObject(Class<?> objClass, String str, Pattern delimiterPattern, String... fieldNames)
           throws InstantiationException, IllegalAccessException, NoSuchMethodException, NoSuchFieldException, InvocationTargetException
   {
     String[] fields = delimiterPattern.split(str);
@@ -1394,7 +1377,7 @@ public class StringUtils {
    * @param fieldNames fieldnames
    * @return String representing object
    */
-  public static String objectToColumnString(Object object, String delimiter, String[] fieldNames)
+  public static String objectToColumnString(Object object, String delimiter, String... fieldNames)
           throws IllegalAccessException, NoSuchFieldException, NoSuchMethodException, InvocationTargetException
   {
     StringBuilder sb = new StringBuilder();
@@ -1420,11 +1403,7 @@ public class StringUtils {
    * @return a capitalized version of the string
    */
   public static String capitalize(String s) {
-    if (Character.isLowerCase(s.charAt(0))) {
-      return Character.toUpperCase(s.charAt(0)) + s.substring(1);
-    } else {
-      return s;
-    }
+      return Character.isLowerCase(s.charAt(0)) ? Character.toUpperCase(s.charAt(0)) + s.substring(1) : s;
   }
 
   /**
@@ -1435,7 +1414,7 @@ public class StringUtils {
    *         false otherwise
    */
   public static boolean isCapitalized(String s) {
-    return (Character.isUpperCase(s.charAt(0)));
+    return Character.isUpperCase(s.charAt(0));
   }
 
   public static String searchAndReplace(String text, String from, String to) {
@@ -1450,7 +1429,7 @@ public class StringUtils {
    * The first dimension of the matrix should represent the rows, and the
    * second dimension the columns.
    */
-  public static String makeHTMLTable(String[][] table, String[] rowLabels, String[] colLabels) {
+  public static String makeHTMLTable(String[][] table, String[] rowLabels, String... colLabels) {
     StringBuilder buff = new StringBuilder();
     buff.append("<table class=\"auto\" border=\"1\" cellspacing=\"0\">\n");
     // top row
@@ -1467,7 +1446,7 @@ public class StringUtils {
       buff.append("<td class=\"label\">").append(rowLabels[i]).append("</td>\n");
       for (int j = 0; j < table[i].length; j++) {
         buff.append("<td class=\"data\">");
-        buff.append(((table[i][j] != null) ? table[i][j] : ""));
+        buff.append(table[i][j] != null ? table[i][j] : "");
         buff.append("</td>\n");
       }
       buff.append("</tr>\n");
@@ -1486,7 +1465,7 @@ public class StringUtils {
     // top row
     buff.append(makeAsciiTableCell("", padLeft, padRight, tsv)); // the top left cell
     for (int j = 0; j < table[0].length; j++) { // assume table is a rectangular matrix
-      buff.append(makeAsciiTableCell(colLabels[j], padLeft, padRight, (j != table[0].length - 1) && tsv));
+      buff.append(makeAsciiTableCell(colLabels[j], padLeft, padRight, j != table[0].length - 1 && tsv));
     }
     buff.append('\n');
     // all other rows
@@ -1494,7 +1473,7 @@ public class StringUtils {
       // one row
       buff.append(makeAsciiTableCell(rowLabels[i], padLeft, padRight, tsv));
       for (int j = 0; j < table[i].length; j++) {
-        buff.append(makeAsciiTableCell(table[i][j], padLeft, padRight, (j != table[0].length - 1) && tsv));
+        buff.append(makeAsciiTableCell(table[i][j], padLeft, padRight, j != table[0].length - 1 && tsv));
       }
       buff.append('\n');
     }
@@ -1523,7 +1502,7 @@ public class StringUtils {
   /**
    * Tests the string edit distance function.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
     String[] s = {"there once was a man", "this one is a manic", "hey there", "there once was a mane", "once in a manger.", "where is one match?", "Jo3seph Smarr!", "Joseph R Smarr"};
     for (int i = 0; i < 8; i++) {
@@ -1606,7 +1585,7 @@ public class StringUtils {
   }
 
 
-  public static String toCSVString(String[] fields) {
+  public static String toCSVString(String... fields) {
     StringBuilder b = new StringBuilder();
     for (String fld : fields) {
       if (b.length() > 0) {
@@ -1640,18 +1619,14 @@ public class StringUtils {
         sb.setCharAt(i, to.charAt(ind));
       }
     }
-    if (sb == null) {
-      return input;
-    } else {
-      return sb.toString();
-    }
+      return sb == null ? input : sb.toString();
   }
 
   /**
    * Returns the supplied string with any trailing '\n' removed.
    */
   public static String chomp(String s) {
-    if(s.length() == 0)
+    if(s.isEmpty())
       return s;
     int l_1 = s.length() - 1;
     if (s.charAt(l_1) == '\n') {
@@ -1669,12 +1644,12 @@ public class StringUtils {
   }
 
 
-  public static void printErrInvocationString(String cls, String[] args) {
+  public static void printErrInvocationString(String cls, String... args) {
     System.err.println(toInvocationString(cls, args));
   }
 
 
-  public static String toInvocationString(String cls, String[] args) {
+  public static String toInvocationString(String cls, String... args) {
     StringBuilder sb = new StringBuilder();
     sb.append(cls).append(" invoked on ").append(new Date());
     sb.append(" with arguments:\n  ");
@@ -1687,7 +1662,7 @@ public class StringUtils {
   /**
    * Strip directory from filename.  Like Unix 'basename'. <p/>
    *
-   * Example: <code>getBaseName("/u/wcmac/foo.txt") ==> "foo.txt"</code>
+   * Example: {@code getBaseName("/u/wcmac/foo.txt") ==> "foo.txt"}
    */
   public static String getBaseName(String fileName) {
     return getBaseName(fileName, "");
@@ -1696,12 +1671,12 @@ public class StringUtils {
   /**
    * Strip directory and suffix from filename.  Like Unix 'basename'. <p/>
    *
-   * Example: <code>getBaseName("/u/wcmac/foo.txt", "") ==> "foo.txt"</code><br/>
-   * Example: <code>getBaseName("/u/wcmac/foo.txt", ".txt") ==> "foo"</code><br/>
-   * Example: <code>getBaseName("/u/wcmac/foo.txt", ".pdf") ==> "foo.txt"</code><br/>
+   * Example: {@code getBaseName("/u/wcmac/foo.txt", "") ==> "foo.txt"}<br/>
+   * Example: {@code getBaseName("/u/wcmac/foo.txt", ".txt") ==> "foo"}<br/>
+   * Example: {@code getBaseName("/u/wcmac/foo.txt", ".pdf") ==> "foo.txt"}<br/>
    */
   public static String getBaseName(String fileName, String suffix) {
-    String[] elts = fileName.split("/");
+    String[] elts = COMPILE4.split(fileName);
     String lastElt = elts[elts.length - 1];
     if (lastElt.endsWith(suffix)) {
       lastElt = lastElt.substring(0, lastElt.length() - suffix.length());
@@ -1770,10 +1745,7 @@ public class StringUtils {
   }
 
   public static String getNotNullString(String s) {
-    if (s == null)
-      return "";
-    else
-      return s;
+      return s == null ? "" : s;
   }
 
   /**
@@ -1792,12 +1764,7 @@ public class StringUtils {
       String varName = null == m.group(1) ? m.group(2) : m.group(1);
       String vrValue;
       //either in the props file
-      if (props.containsKey(varName)) {
-        vrValue = (String) props.get(varName);
-      } else {
-        //or as the environment variable
-        vrValue = System.getenv(varName);
-      }
+        vrValue = props.containsKey(varName) ? (String) props.get(varName) : System.getenv(varName);
       m.appendReplacement(sb, null == vrValue ? "" : vrValue);
     }
     m.appendTail(sb);
@@ -1811,15 +1778,12 @@ public class StringUtils {
    * listed in the props file, and if not found then using the environment
    * variables. if the variable is not found then substitute it for empty string
    */
-  public static Properties argsToPropertiesWithResolve(String[] args) {
-    TreeMap<String, String> result = new TreeMap<String, String>();
+  public static Properties argsToPropertiesWithResolve(String... args) {
+    TreeMap<String, String> result = new TreeMap<>();
     for (int i = 0; i < args.length; i++) {
       String key = args[i];
-      if (key.length() > 0 && key.charAt(0) == '-') { // found a flag
-        if (key.length() > 1 && key.charAt(1) == '-')
-          key = key.substring(2); // strip off 2 hyphens
-        else
-          key = key.substring(1); // strip off the hyphen
+      if (!key.isEmpty() && key.charAt(0) == '-') { // found a flag
+          key = key.length() > 1 && key.charAt(1) == '-' ? key.substring(2) : key.substring(1);
         if (key.equalsIgnoreCase(PROP) || key.equalsIgnoreCase(PROPS) || key.equalsIgnoreCase(PROPERTIES) || key.equalsIgnoreCase(ARGUMENTS) || key.equalsIgnoreCase(ARGS)) {
           result.putAll(propFileToTreeMap(args[i + 1]));
           i++;
@@ -1846,10 +1810,10 @@ public class StringUtils {
    *         props file
    */
   public static TreeMap<String, String> propFileToTreeMap(String filename) {
-    TreeMap<String, String> result = new TreeMap<String, String>();
+    TreeMap<String, String> result = new TreeMap<>();
     for (String l : IOUtils.readLines(filename)) {
       l = l.trim();
-      if (l.isEmpty() || l.startsWith("#"))
+      if (l.isEmpty() || !l.isEmpty() && l.charAt(0) == '#')
         continue;
       int index = l.indexOf('=');
 
@@ -1870,7 +1834,7 @@ public class StringUtils {
    */
   public static Collection<String> getNgrams(List<String> words, int minSize, int maxSize){
     List<List<String>> ng = CollectionUtils.getNGrams(words, minSize, maxSize);
-    Collection<String> ngrams = new ArrayList<String>();
+    Collection<String> ngrams = new ArrayList<>();
     for(List<String> n: ng)
       ngrams.add(StringUtils.join(n," "));
   
@@ -1885,6 +1849,6 @@ public class StringUtils {
    * @return
    */
   public static Collection<String> getNgramsString(String s, int minSize, int maxSize){
-    return getNgrams(Arrays.asList(s.split("\\s+")), minSize, maxSize);
+    return getNgrams(Arrays.asList(COMPILE3.split(s)), minSize, maxSize);
   }
 }

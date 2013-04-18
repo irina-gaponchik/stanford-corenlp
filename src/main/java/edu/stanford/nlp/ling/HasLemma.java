@@ -3,7 +3,7 @@ package edu.stanford.nlp.ling;
 import java.io.Serializable;
 
 /**
- * Something that implements the <code>HasLemma</code> interface
+ * Something that implements the {@code HasLemma} interface
  * knows about lemmas.
  *
  * @author John Bauer

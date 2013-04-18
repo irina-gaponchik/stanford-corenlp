@@ -50,9 +50,9 @@ public class JollyDayHolidays implements Env.Binder {
 
   public void bind(Env env) {
     if (holidays != null) {
-      for (String s:holidays.keySet()) {
-        JollyHoliday jh = holidays.get(s);
-        env.bind(varPrefix + s, jh);
+      for (Map.Entry<String, JollyHoliday> stringJollyHolidayEntry : holidays.entrySet()) {
+        JollyHoliday jh = stringJollyHolidayEntry.getValue();
+        env.bind(varPrefix + stringJollyHolidayEntry.getKey(), jh);
       }
     }
   }
@@ -79,7 +79,7 @@ public class JollyDayHolidays implements Env.Binder {
 
   public CollectionValuedMap<String, JollyHoliday> getAllHolidaysCVMap(Set<de.jollyday.config.Holiday> allHolidays)
   {
-    CollectionValuedMap<String, JollyHoliday> map = new CollectionValuedMap<String, JollyHoliday>();
+    CollectionValuedMap<String, JollyHoliday> map = new CollectionValuedMap<>();
     for (de.jollyday.config.Holiday h:allHolidays) {
       String descKey = h.getDescriptionPropertiesKey();
       if (descKey != null) {
@@ -100,7 +100,7 @@ public class JollyDayHolidays implements Env.Binder {
   public static void getAllHolidays(Holidays holidays, Set<de.jollyday.config.Holiday> allHolidays)
   {
     for (Method m : holidays.getClass().getMethods()) {
-      if (isGetter(m) && m.getReturnType() == List.class) {
+      if (isGetter(m) && m.getReturnType().equals(List.class)) {
         try {
           List l = (List) m.invoke(holidays);
           allHolidays.addAll(l);
@@ -162,22 +162,14 @@ public class JollyDayHolidays implements Env.Binder {
       return label;
     }
 
-    public boolean isGrounded()  { return false; }
-    public SUTime.Time getTime() { return this; }
-    // TODO: compute duration/range => uncertainty of this time
-    public SUTime.Duration getDuration() { return SUTime.DURATION_NONE; }
-    public SUTime.Range getRange(int flags, SUTime.Duration granularity) { return new SUTime.Range(this,this); }
+      public SUTime.Range getRange(int flags, SUTime.Duration granularity) { return new SUTime.Range(this,this); }
     public String toISOString() { return base.toString(); }
     public SUTime.Time intersect(SUTime.Time t) {
       SUTime.Time resolved = resolve(t, 0);
-      if (resolved != this) {
-        return resolved.intersect(t);
-      } else {
-        return super.intersect(t);
-      }
+        return !resolved.equals(this) ? resolved.intersect(t) : super.intersect(t);
     }
     public SUTime.Time resolve(SUTime.Time t, int flags) {
-      Partial p = (t != null)? t.getJodaTimePartial():null;
+      Partial p = t != null ? t.getJodaTimePartial():null;
       if (p != null) {
         if (JodaTimeUtils.hasField(p, DateTimeFieldType.year())) {
           int year = p.get(DateTimeFieldType.year());

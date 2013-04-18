@@ -23,16 +23,16 @@ import java.util.Set;
  * complement of the copula is taken as the head.  That is, a sentence like
  * "Bill is big" will be analyzed as <p/>
  * <p/>
- * <code>nsubj</code>(big, Bill) <br/>
- * <code>cop</code>(big, is) <p/>
+ * {@code nsubj}(big, Bill) <br/>
+ * {@code cop}(big, is) <p/>
  * <p/>
  * This analysis is used for questions and declaratives for adjective
  * complements and declarative nominal complements.  However Wh-sentences
  * with nominal complements do not receive this treatment.
  * "Who is the president?" is analyzed with "the president" as nsubj and "who"
  * as "attr" of the copula:<p/><p>
- * <code>nsubj</code>(is, president)<br/>
- * <code>attr</code>(is, Who) <p/>
+ * {@code nsubj}(is, president)<br/>
+ * {@code attr}(is, Who) <p/>
  * <p/>
  * (Such nominal copula sentences are complex: arguably, depending on the
  * circumstances, several analyses are possible, with either the overt NP able
@@ -41,9 +41,9 @@ import java.util.Set;
  * <p/>
  * Existential sentences are treated as follows:  <br/>
  * "There is a man" <br/>
- * <code>expl</code>(is, There) <br/>
- * <code>det</code>(man-4, a-3) <br/>
- * <code>nsubj</code>(is-2, man-4)<br/>
+ * {@code expl}(is, There) <br/>
+ * {@code det}(man-4, a-3) <br/>
+ * {@code nsubj}(is-2, man-4)<br/>
  *
  * @author John Rappaport
  * @author Marie-Catherine de Marneffe
@@ -157,7 +157,7 @@ public class SemanticHeadFinder extends ModCollinsHeadFinder {
    * Overwrite the postOperationFix method.  For a, b and c: we want a to be the head
    */
   @Override
-  protected int postOperationFix(int headIdx, Tree[] daughterTrees) {
+  protected int postOperationFix(int headIdx, Tree... daughterTrees) {
     if (headIdx >= 2) {
       String prevLab = tlp.basicCategory(daughterTrees[headIdx - 1].value());
       if (prevLab.equals("CC") || prevLab.equals("CONJP")) {
@@ -196,7 +196,7 @@ public class SemanticHeadFinder extends ModCollinsHeadFinder {
     }
 
     // do VPs with auxiliary as special case
-    if ((motherCat.equals("VP") || motherCat.equals("SQ") || motherCat.equals("SINV"))) {
+    if (motherCat.equals("VP") || motherCat.equals("SQ") || motherCat.equals("SINV")) {
       Tree[] kids = t.children();
       // try to find if there is an auxiliary verb
 
@@ -231,11 +231,7 @@ public class SemanticHeadFinder extends ModCollinsHeadFinder {
       // looks for copular verbs
       if (hasVerbalAuxiliary(kids, copulars) && ! isExistential(t, parent) && ! isWHQ(t, parent)) {
         String[] how;
-        if (motherCat.equals("SQ")) {
-          how = new String[]{"right", "VP", "ADJP", "NP", "WHADJP", "WHNP"};
-        } else {
-          how = new String[]{"left", "VP", "ADJP", "NP", "WHADJP", "WHNP"};
-        }
+          how = motherCat.equals("SQ") ? new String[]{"right", "VP", "ADJP", "NP", "WHADJP", "WHNP"} : new String[]{"left", "VP", "ADJP", "NP", "WHADJP", "WHNP"};
         Tree pti = traverseLocate(kids, how, false);
         // don't allow a temporal to become head
         if (pti != null && pti.label() != null && pti.label().value().contains("-TMP")) {
@@ -245,7 +241,7 @@ public class SemanticHeadFinder extends ModCollinsHeadFinder {
         if (motherCat.equals("SQ") && pti != null && pti.label() != null && pti.label().value().startsWith("NP")) {
             boolean foundAnotherNp = false;
             for (Tree kid : kids) {
-              if (kid == pti) {
+              if (kid.equals(pti)) {
                 break;
               } else if (kid.label() != null && kid.label().value().startsWith("NP")) {
                 foundAnotherNp = true;

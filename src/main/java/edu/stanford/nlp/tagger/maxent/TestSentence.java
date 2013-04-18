@@ -71,8 +71,8 @@ public class TestSentence implements SequenceModel {
   protected final MaxentTagger maxentTagger;
 
   public TestSentence(MaxentTagger maxentTagger) {
-    assert(maxentTagger != null);
-    assert(maxentTagger.getLambdaSolve() != null);
+    assert maxentTagger != null;
+    assert maxentTagger.getLambdaSolve() != null;
     this.maxentTagger = maxentTagger;
     if (maxentTagger.config != null) {
       tagSeparator = maxentTagger.config.getTagSeparator();
@@ -102,26 +102,26 @@ public class TestSentence implements SequenceModel {
    */
   public ArrayList<TaggedWord> tagSentence(List<? extends HasWord> s,
                                            boolean reuseTags) {
-    this.origWords = new ArrayList<HasWord>(s);
+    this.origWords = new ArrayList<>(s);
     int sz = s.size();
-    this.sent = new ArrayList<String>(sz + 1);
-    for (int j = 0; j < sz; j++) {
-      if (maxentTagger.wordFunction != null) {
-        sent.add(maxentTagger.wordFunction.apply(s.get(j).word()));
-      } else {
-        sent.add(s.get(j).word());
+    this.sent = new ArrayList<>(sz + 1);
+      for (HasWord value1 : s) {
+          if (maxentTagger.wordFunction != null) {
+              sent.add(maxentTagger.wordFunction.apply(value1.word()));
+          } else {
+              sent.add(value1.word());
+          }
       }
-    }
     sent.add(TaggerConstants.EOS_WORD);
     if (reuseTags) {
-      this.originalTags = new ArrayList<String>(sz + 1);
-      for (int j = 0; j < sz; ++j) {
-        if (s.get(j) instanceof HasTag) {
-          originalTags.add(((HasTag) s.get(j)).tag());
-        } else {
-          originalTags.add(null);
+      this.originalTags = new ArrayList<>(sz + 1);
+        for (HasWord value : s) {
+            if (value instanceof HasTag) {
+                originalTags.add(((HasTag) value).tag());
+            } else {
+                originalTags.add(null);
+            }
         }
-      }
       originalTags.add(TaggerConstants.EOS_TAG);
     }
     size = sz + 1;
@@ -169,9 +169,9 @@ public class TestSentence implements SequenceModel {
 
 
   ArrayList<TaggedWord> getTaggedSentence() {
-    final boolean hasOffset;
-    hasOffset = origWords != null && (origWords.get(0) instanceof HasOffset);
-    ArrayList<TaggedWord> taggedSentence = new ArrayList<TaggedWord>();
+    boolean hasOffset;
+    hasOffset = origWords != null && origWords.get(0) instanceof HasOffset;
+    ArrayList<TaggedWord> taggedSentence = new ArrayList<>();
     for (int j = 0; j < size - 1; j++) {
       String tag = finalTags[j];
       TaggedWord w = new TaggedWord(sent.get(j), tag);
@@ -186,11 +186,7 @@ public class TestSentence implements SequenceModel {
   }
 
   static String toNice(String s) {
-    if (s == null) {
-      return naTag;
-    } else {
-      return s;
-    }
+      return s == null ? naTag : s;
   }
 
   /** calculateProbs puts log probs of taggings in the probabilities array.
@@ -258,7 +254,7 @@ public class TestSentence implements SequenceModel {
         pf.print(tagSeparator);
         pf.print(finalTags[i]);
       }
-      if ((correctTags[i]).equals(finalTags[i])) {
+      if (correctTags[i].equals(finalTags[i])) {
         numRight++;
       } else {
         numWrong++;
@@ -315,7 +311,7 @@ public class TestSentence implements SequenceModel {
 
   // This is used for Dan's tag inference methods.
   // current is the actual word number + leftW
-  private void setHistory(int current, History h, int[] tags) {
+  private void setHistory(int current, History h, int... tags) {
     //writes over the tags in the last thing in pairs
 
     int left = leftWindow();
@@ -383,7 +379,7 @@ public class TestSentence implements SequenceModel {
     double logScore = ArrayMath.logSum(scores);
     double logScoreInactiveTags = Math.log(nDefault*maxentTagger.defaultScore);
     double logTotal =
-      ArrayMath.logSum(new double[] {logScore, logScoreInactiveTags});
+      ArrayMath.logSum(logScore, logScoreInactiveTags);
     ArrayMath.addInPlace(scores, -logTotal);
 
     return scores;
@@ -600,7 +596,7 @@ public class TestSentence implements SequenceModel {
   /** probs and tags should be passed in as arrays of size 3!
    *  If probs[i] == Double.NEGATIVE_INFINITY, then the entry should be ignored.
    */
-  private void getTop3(double[][][] probabilities, int current, double[] probs, String[] tags) {
+  private void getTop3(double[][][] probabilities, int current, double[] probs, String... tags) {
     int[] topIds = new int[3];
     double[] probTags = probabilities[current][0];
     Arrays.fill(probs, Double.NEGATIVE_INFINITY);
@@ -672,7 +668,7 @@ public class TestSentence implements SequenceModel {
   }
 
   @Override
-  public double scoreOf(int[] sequence) {
+  public double scoreOf(int... sequence) {
     throw new UnsupportedOperationException();
   }
 
@@ -680,7 +676,7 @@ public class TestSentence implements SequenceModel {
   public double[] scoresOf(int[] tags, int pos) {
     if (DBG) {
       System.err.println("scoresOf(): length of tags is " + tags.length + "; position is " + pos + "; endSizePairs = " + endSizePairs + "; size is " + size + "; leftWindow is " + leftWindow());
-      System.err.println("  History h = new History(" + (endSizePairs - size) + ", " + (endSizePairs - 1) + ", " + (endSizePairs - size + pos - leftWindow()) + ")");
+      System.err.println("  History h = new History(" + (endSizePairs - size) + ", " + (endSizePairs - 1) + ", " + (endSizePairs - size + pos - leftWindow()) + ')');
     }
     history.init(endSizePairs - size, endSizePairs - 1, endSizePairs - size + pos - leftWindow());
     setHistory(pos, history, tags);
@@ -689,7 +685,7 @@ public class TestSentence implements SequenceModel {
 
   // todo [cdm 2013]: Tagging could be sped up quite a bit here if we cached int arrays of tags by index, not Strings
   protected String[] stringTagsAt(int pos) {
-    if ((pos < leftWindow()) || (pos >= size + leftWindow())) {
+    if (pos < leftWindow() || pos >= size + leftWindow()) {
       return naTagArr;
     }
 

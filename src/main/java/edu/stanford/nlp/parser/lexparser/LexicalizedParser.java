@@ -95,21 +95,21 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
   private Options op;
   public Options getOp() { return op; }
 
-  public Reranker reranker = null;
+  public Reranker reranker;
 
   public TreebankLangParserParams getTLPParams() { return op.tlpParams; }
 
   public TreebankLanguagePack treebankLanguagePack() { return getTLPParams().treebankLanguagePack(); }
 
   private static final String SERIALIZED_PARSER_PROPERTY = "edu.stanford.nlp.SerializedLexicalizedParser";
-  public static final String DEFAULT_PARSER_LOC = ((System.getenv("NLP_PARSER") != null) ?
+  public static final String DEFAULT_PARSER_LOC = System.getenv("NLP_PARSER") != null ?
                                                    System.getenv("NLP_PARSER") :
-                                                   "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz");
+                                                   "edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz";
 
   /**
    * Construct a new LexicalizedParser object from a previously
    * serialized grammar read from a System property
-   * <code>edu.stanford.nlp.SerializedLexicalizedParser</code>, or a
+   * {@code edu.stanford.nlp.SerializedLexicalizedParser}, or a
    * default classpath location
    * ({@code edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz}).
    */
@@ -120,7 +120,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
   /**
    * Construct a new LexicalizedParser object from a previously
    * serialized grammar read from a System property
-   * <code>edu.stanford.nlp.SerializedLexicalizedParser</code>, or a
+   * {@code edu.stanford.nlp.SerializedLexicalizedParser}, or a
    * default classpath location
    * ({@code edu/stanford/nlp/models/lexparser/englishPCFG.ser.gz}).
    *
@@ -266,7 +266,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
   }
 
   /**
-   * Will parse the text in <code>sentence</code> as if it represented
+   * Will parse the text in {@code sentence} as if it represented
    * a single sentence by first processing it with a tokenizer.
    */
   public Tree parse(String sentence) {
@@ -280,7 +280,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
    * the parse tree associated with that list.
    */
   public Tree parseStrings(List<String> lst) {
-    List<Word> words = new ArrayList<Word>();
+    List<Word> words = new ArrayList<>();
     for (String word : lst) {
       words.add(new Word(word));
     }
@@ -308,7 +308,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
     // if can't parse or exception, fall through
     // TODO: merge with ParserAnnotatorUtils
     TreeFactory lstf = new LabeledScoredTreeFactory();
-    List<Tree> lst2 = new ArrayList<Tree>();
+    List<Tree> lst2 = new ArrayList<>();
     for (HasWord obj : lst) {
       String s = obj.word();
       Tree t = lstf.newLeaf(s);
@@ -318,8 +318,8 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
     return lstf.newTreeNode("X", lst2);
   }
 
-  public List<Tree> parseMultiple(final List<? extends List<? extends HasWord>> sentences) {
-    List<Tree> trees = new ArrayList<Tree>();
+  public List<Tree> parseMultiple(List<? extends List<? extends HasWord>> sentences) {
+    List<Tree> trees = new ArrayList<>();
     for (List<? extends HasWord> sentence : sentences) {
       trees.add(parse(sentence));
     }
@@ -327,12 +327,12 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
   }
 
   /**
-   * Will launch multiple threads which calls <code>parse</code> on
-   * each of the <code>sentences</code> in order, returning the
+   * Will launch multiple threads which calls {@code parse} on
+   * each of the {@code sentences} in order, returning the
    * resulting parse trees in the same order.
    */
-  public List<Tree> parseMultiple(final List<? extends List<? extends HasWord>> sentences, final int nthreads) {
-    MulticoreWrapper<List<? extends HasWord>, Tree> wrapper = new MulticoreWrapper<List<? extends HasWord>, Tree>(nthreads, new ThreadsafeProcessor<List<? extends HasWord>, Tree>() {
+  public List<Tree> parseMultiple(List<? extends List<? extends HasWord>> sentences, int nthreads) {
+    MulticoreWrapper<List<? extends HasWord>, Tree> wrapper = new MulticoreWrapper<>(nthreads, new ThreadsafeProcessor<List<? extends HasWord>, Tree>() {
         public Tree process(List<? extends HasWord> sentence) {
           return parse(sentence);
         }
@@ -340,7 +340,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
           return this;
         }
       });
-    List<Tree> trees = new ArrayList<Tree>();
+    List<Tree> trees = new ArrayList<>();
     for (List<? extends HasWord> sentence : sentences) {
       wrapper.put(sentence);
       while (wrapper.peek()) {
@@ -366,19 +366,11 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
    */
   public Tree parseTree(List<? extends HasWord> sentence) {
     ParserQuery pq = parserQuery();
-    if (pq.parse(sentence)) {
-      return pq.getBestParse();
-    } else {
-      return null;
-    }
+      return pq.parse(sentence) ? pq.getBestParse() : null;
   }
 
   public ParserQuery parserQuery() {
-    if (reranker == null) {
-      return new LexicalizedParserQuery(this);
-    } else {
-      return new RerankingParserQuery(op, new LexicalizedParserQuery(this), reranker);
-    }
+      return reranker == null ? new LexicalizedParserQuery(this) : new RerankingParserQuery(op, new LexicalizedParserQuery(this), reranker);
   }
 
   public LexicalizedParserQuery lexicalizedParserQuery() {
@@ -451,12 +443,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
     try {
       System.err.print("Writing parser in text grammar format to file " + filename);
       OutputStream os;
-      if (filename.endsWith(".gz")) {
-        // it's faster to do the buffering _outside_ the gzipping as here
-        os = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename)));
-      } else {
-        os = new BufferedOutputStream(new FileOutputStream(filename));
-      }
+        os = filename.endsWith(".gz") ? new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename))) : new BufferedOutputStream(new FileOutputStream(filename));
       PrintWriter out = new PrintWriter(os);
       String prefix = "BEGIN ";
 
@@ -480,8 +467,8 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
       out.println();
       System.err.print(".");
 
-      String uwmClazz = ((lex.getUnknownWordModel() == null) ? "null" :
-                   lex.getUnknownWordModel().getClass().getCanonicalName());
+      String uwmClazz = lex.getUnknownWordModel() == null ? "null" :
+                   lex.getUnknownWordModel().getClass().getCanonicalName();
       out.println(prefix + "LEXICON " + uwmClazz);
       lex.writeData(out);
       out.println();
@@ -703,21 +690,17 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
       tagIndex = extractor.tagIndex;
       Timing.tick("done.");
     } else {
-      stateIndex = new HashIndex<String>();
-      wordIndex = new HashIndex<String>();
-      tagIndex = new HashIndex<String>();
+      stateIndex = new HashIndex<>();
+      wordIndex = new HashIndex<>();
+      tagIndex = new HashIndex<>();
 
       // extract grammars
       BinaryGrammarExtractor bgExtractor = new BinaryGrammarExtractor(op, stateIndex);
       // Extractor lexExtractor = new LexiconExtractor();
       //TreeExtractor uwmExtractor = new UnknownWordModelExtractor(trainTreebank.size());
       System.err.print("Extracting PCFG...");
-      if (secondaryTrainTreebank == null) {
-        bgug = bgExtractor.extract(trainTreebank);
-      } else {
-        bgug = bgExtractor.extract(trainTreebank, 1.0,
-                                   secondaryTrainTreebank, weight);
-      }
+        bgug = secondaryTrainTreebank == null ? bgExtractor.extract(trainTreebank) : bgExtractor.extract(trainTreebank, 1.0,
+                secondaryTrainTreebank, weight);
       Timing.tick("done.");
 
       System.err.print("Extracting Lexicon...");
@@ -725,7 +708,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
 
       double trainSize = trainTreebank.size();
       if (secondaryTrainTreebank != null) {
-        trainSize += (secondaryTrainTreebank.size() * weight);
+        trainSize += secondaryTrainTreebank.size() * weight;
       }
       if (extraTaggedWords != null) {
         trainSize += extraTaggedWords.size();
@@ -778,11 +761,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
     if (op.doDep) {
       System.err.print("Extracting Dependencies...");
       AbstractTreeExtractor<DependencyGrammar> dgExtractor = new MLEDependencyGrammarExtractor(op, wordIndex, tagIndex);
-      if (secondaryTrainTreebank == null) {
-        dg = dgExtractor.extract(trainTreebank);
-      } else {
-        dg = dgExtractor.extract(trainTreebank, 1.0, secondaryTrainTreebank, weight);
-      }
+        dg = secondaryTrainTreebank == null ? dgExtractor.extract(trainTreebank) : dgExtractor.extract(trainTreebank, 1.0, secondaryTrainTreebank, weight);
       //System.err.print("Extracting Unknown Word Model...");
       //UnknownWordModel uwm = (UnknownWordModel)uwmExtractor.extract(trainTreebank);
       //Timing.tick("done.");
@@ -825,7 +804,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
    * method, but you cannot pass in options that specify the treebank
    * or grammar to be loaded, the grammar to be written, trees or
    * files to be parsed or details of their encoding, nor the
-   * TreebankLangParserParams (<code>-tLPP</code>) to use. The
+   * TreebankLangParserParams ({@code -tLPP}) to use. The
    * TreebankLangParserParams should be set up on construction of a
    * LexicalizedParser, by constructing an Options that uses
    * the required TreebankLangParserParams, and passing that to a
@@ -855,49 +834,49 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
    * <ul>
    *   <li> <b>Train a parser (saved to <i>serializedGrammarFilename</i>)
    *      from a directory of trees (<i>trainFilesPath</i>, with an optional <i>fileRange</i>, e.g., 0-1000):</b>
-   *    <code>java -mx1500m edu.stanford.nlp.parser.lexparser.LexicalizedParser [-v] -train trainFilesPath [fileRange] -saveToSerializedFile serializedGrammarFilename</code>
+   *    {@code java -mx1500m edu.stanford.nlp.parser.lexparser.LexicalizedParser [-v] -train trainFilesPath [fileRange] -saveToSerializedFile serializedGrammarFilename}
    *   </li>
    *
    *   <li> <b>Train a parser (not saved) from a directory of trees, and test it (reporting scores) on a directory of trees</b>
-   *    <code> java -mx1500m edu.stanford.nlp.parser.lexparser.LexicalizedParser [-v] -train trainFilesPath [fileRange] -testTreebank testFilePath [fileRange] </code>
+   *    {@code java -mx1500m edu.stanford.nlp.parser.lexparser.LexicalizedParser [-v] -train trainFilesPath [fileRange] -testTreebank testFilePath [fileRange] }
    *   </li>
    *
    *   <li> <b>Parse one or more files, given a serialized grammar and a list of files</b>
-   *    <code>java -mx512m edu.stanford.nlp.parser.lexparser.LexicalizedParser [-v] serializedGrammarPath filename [filename] ...</code>
+   *    {@code java -mx512m edu.stanford.nlp.parser.lexparser.LexicalizedParser [-v] serializedGrammarPath filename [filename] ...}
    *   </li>
    *
    *   <li> <b>Test and report scores for a serialized grammar on trees in an output directory</b>
-   *    <code>java -mx512m edu.stanford.nlp.parser.lexparser.LexicalizedParser [-v] -loadFromSerializedFile serializedGrammarPath -testTreebank testFilePath [fileRange]</code>
+   *    {@code java -mx512m edu.stanford.nlp.parser.lexparser.LexicalizedParser [-v] -loadFromSerializedFile serializedGrammarPath -testTreebank testFilePath [fileRange]}
    *   </li>
    * </ul>
    *
    *<p>
-   * If the <code>serializedGrammarPath</code> ends in <code>.gz</code>,
+   * If the {@code serializedGrammarPath} ends in {@code .gz},
    * then the grammar is written and read as a compressed file (GZip).
-   * If the <code>serializedGrammarPath</code> is a URL, starting with
-   * <code>http://</code>, then the parser is read from the URL.
+   * If the {@code serializedGrammarPath} is a URL, starting with
+   * {@code http://}, then the parser is read from the URL.
    * A fileRange specifies a numeric value that must be included within a
    * filename for it to be used in training or testing (this works well with
    * most current treebanks).  It can be specified like a range of pages to be
-   * printed, for instance as <code>200-2199</code> or
-   * <code>1-300,500-725,9000</code> or just as <code>1</code> (if all your
+   * printed, for instance as {@code 200-2199} or
+   * {@code 1-300,500-725,9000} or just as {@code 1} (if all your
    * trees are in a single file, just give a dummy argument such as
-   * <code>0</code> or <code>1</code>).
+   * {@code 0} or {@code 1}).
    * The parser can write a grammar as either a serialized Java object file
    * or in a text format (or as both), specified with the following options:
    *
    * <p>
-   * <code>java edu.stanford.nlp.parser.lexparser.LexicalizedParser
+   * {@code java edu.stanford.nlp.parser.lexparser.LexicalizedParser
    * [-v] -train
    * trainFilesPath [fileRange] [-saveToSerializedFile grammarPath]
-   * [-saveToTextFile grammarPath]</code><p>
+   * [-saveToTextFile grammarPath]}<p>
    * If no files are supplied to parse, then a hardwired sentence
    * is parsed. <p>
    *
-   * In the same position as the verbose flag (<code>-v</code>), many other
+   * In the same position as the verbose flag ({@code -v}), many other
    * options can be specified.  The most useful to an end user are:
    * <UL>
-   * <LI><code>-tLPP class</code> Specify a different
+   * <LI>{@code -tLPP class} Specify a different
    * TreebankLangParserParams, for when using a different language or
    * treebank (the default is English Penn Treebank). <i>This option MUST occur
    * before any other language-specific options that are used (or else they
@@ -906,39 +885,39 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
    * serialized grammar; it is necessary if the language pack specifies a
    * needed character encoding or you wish to specify language-specific
    * options on the command line.)</LI>
-   * <LI><code>-encoding charset</code> Specify the character encoding of the
+   * <LI>{@code -encoding charset} Specify the character encoding of the
    * input and output files.  This will override the value in the
-   * <code>TreebankLangParserParams</code>, provided this option appears
-   * <i>after</i> any <code>-tLPP</code> option.</LI>
-   * <LI><code>-tokenized</code> Says that the input is already separated
+   * {@code TreebankLangParserParams}, provided this option appears
+   * <i>after</i> any {@code -tLPP} option.</LI>
+   * <LI>{@code -tokenized} Says that the input is already separated
    * into whitespace-delimited tokens.  If this option is specified, any
    * tokenizer specified for the language is ignored, and a universal (Unicode)
    * tokenizer, which divides only on whitespace, is used.
    * Unless you also specify
-   * <code>-escaper</code>, the tokens <i>must</i> all be correctly
+   * {@code -escaper}, the tokens <i>must</i> all be correctly
    * tokenized tokens of the appropriate treebank for the parser to work
    * well (for instance, if using the Penn English Treebank, you must have
    * coded "(" as "-LRB-", "3/4" as "3\/4", etc.)</LI>
-   * <li><code>-escaper class</code> Specify a class of type
+   * <li>{@code -escaper class} Specify a class of type
    * {@link Function}&lt;List&lt;HasWord&gt;,List&lt;HasWord&gt;&gt; to do
    * customized escaping of tokenized text.  This class will be run over the
    * tokenized text and can fix the representation of tokens. For instance,
    * it could change "(" to "-LRB-" for the Penn English Treebank.  A
    * provided escaper that does such things for the Penn English Treebank is
-   * <code>edu.stanford.nlp.process.PTBEscapingProcessor</code>
-   * <li><code>-tokenizerFactory class</code> Specifies a
+   * {@code edu.stanford.nlp.process.PTBEscapingProcessor}
+   * <li>{@code -tokenizerFactory class} Specifies a
    * TokenizerFactory class to be used for tokenization</li>
-   * <li><code>-tokenizerOptions options</code> Specifies options to a
+   * <li>{@code -tokenizerOptions options} Specifies options to a
    * TokenizerFactory class to be used for tokenization.   A comma-separated
    * list. For PTBTokenizer, options of interest include
-   * <code>americanize=false</code> and <code>asciiQuotes</code> (for German).
+   * {@code americanize=false} and {@code asciiQuotes} (for German).
    * Note that any choice of tokenizer options that conflicts with the
    * tokenization used in the parser training data will likely degrade parser
    * performance. </li>
-   * <li><code>-sentences token </code> Specifies a token that marks sentence
-   * boundaries.  A value of <code>newline</code> causes sentence breaking on
-   * newlines.  A value of <code>onePerElement</code> causes each element
-   * (using the XML <code>-parseInside</code> option) to be treated as a
+   * <li>{@code -sentences token } Specifies a token that marks sentence
+   * boundaries.  A value of {@code newline} causes sentence breaking on
+   * newlines.  A value of {@code onePerElement} causes each element
+   * (using the XML {@code -parseInside} option) to be treated as a
    * sentence. All other tokens will be interpreted literally, and must be
    * exactly the same as tokens returned by the tokenizer.  For example,
    * you might specify "|||" and put that symbol sequence as a token between
@@ -946,26 +925,26 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
    * If no explicit sentence breaking option is chosen, sentence breaking
    * is done based on a set of language-particular sentence-ending patterns.
    * </li>
-   * <LI><code>-parseInside element</code> Specifies that parsing should only
+   * <LI>{@code -parseInside element} Specifies that parsing should only
    * be done for tokens inside the indicated XML-style
    * elements (done as simple pattern matching, rather than XML parsing).
-   * For example, if this is specified as <code>sentence</code>, then
-   * the text inside the <code>sentence</code> element
+   * For example, if this is specified as {@code sentence}, then
+   * the text inside the {@code sentence} element
    * would be parsed.
    * Using "-parseInside s" gives you support for the input format of
    * Charniak's parser. Sentences cannot span elements. Whether the
    * contents of the element are treated as one sentence or potentially
-   * multiple sentences is controlled by the <code>-sentences</code> flag.
+   * multiple sentences is controlled by the {@code -sentences} flag.
    * The default is potentially multiple sentences.
    * This option gives support for extracting and parsing
    * text from very simple SGML and XML documents, and is provided as a
    * user convenience for that purpose. If you want to really parse XML
    * documents before NLP parsing them, you should use an XML parser, and then
    * call to a LexicalizedParser on appropriate CDATA.
-   * <LI><code>-tagSeparator char</code> Specifies to look for tags on words
+   * <LI>{@code -tagSeparator char} Specifies to look for tags on words
    * following the word and separated from it by a special character
-   * <code>char</code>.  For instance, many tagged corpora have the
-   * representation "house/NN" and you would use <code>-tagSeparator /</code>.
+   * {@code char}.  For instance, many tagged corpora have the
+   * representation "house/NN" and you would use {@code -tagSeparator /}.
    * Notes: This option requires that the input be pretokenized.
    * The separator has to be only a single character, and there is no
    * escaping mechanism. However, splitting is done on the <i>last</i>
@@ -976,38 +955,38 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
    * is not one that it regards as a possible tagging for the word.
    * The parser supports a format where only some of the words in a sentence
    * have a tag (if you are calling the parser programmatically, you indicate
-   * them by having them implement the <code>HasTag</code> interface).
+   * them by having them implement the {@code HasTag} interface).
    * You can do this at the command-line by only having tags after some words,
    * but you are limited by the fact that there is no way to escape the
    * tagSeparator character.</LI>
-   * <LI><code>-maxLength leng</code> Specify the longest sentence that
+   * <LI>{@code -maxLength leng} Specify the longest sentence that
    * will be parsed (and hence indirectly the amount of memory
    * needed for the parser). If this is not specified, the parser will
    * try to dynamically grow its parse chart when long sentence are
    * encountered, but may run out of memory trying to do so.</LI>
-   * <LI><code>-outputFormat styles</code> Choose the style(s) of output
-   * sentences: <code>penn</code> for prettyprinting as in the Penn
-   * treebank files, or <code>oneline</code> for printing sentences one
-   * per line, <code>words</code>, <code>wordsAndTags</code>,
-   * <code>dependencies</code>, <code>typedDependencies</code>,
-   * or <code>typedDependenciesCollapsed</code>.
+   * <LI>{@code -outputFormat styles} Choose the style(s) of output
+   * sentences: {@code penn} for prettyprinting as in the Penn
+   * treebank files, or {@code oneline} for printing sentences one
+   * per line, {@code words}, {@code wordsAndTags},
+   * {@code dependencies}, {@code typedDependencies},
+   * or {@code typedDependenciesCollapsed}.
    * Multiple options may be specified as a comma-separated
    * list.  See TreePrint class for further documentation.</LI>
-   * <LI><code>-outputFormatOptions</code> Provide options that control the
-   * behavior of various <code>-outputFormat</code> choices, such as
-   * <code>lexicalize</code>, <code>stem</code>, <code>markHeadNodes</code>,
-   * or <code>xml</code>.
+   * <LI>{@code -outputFormatOptions} Provide options that control the
+   * behavior of various {@code -outputFormat} choices, such as
+   * {@code lexicalize}, {@code stem}, {@code markHeadNodes},
+   * or {@code xml}.
    * Options are specified as a comma-separated list.</LI>
-   * <LI><code>-writeOutputFiles</code> Write output files corresponding
-   * to the input files, with the same name but a <code>".stp"</code>
+   * <LI>{@code -writeOutputFiles} Write output files corresponding
+   * to the input files, with the same name but a {@code ".stp"}
    * file extension.  The format of these files depends on the
-   * <code>outputFormat</code> option.  (If not specified, output is sent
+   * {@code outputFormat} option.  (If not specified, output is sent
    * to stdout.)</LI>
-   * <LI><code>-outputFilesExtension</code> The extension that is appended to
+   * <LI>{@code -outputFilesExtension} The extension that is appended to
    * the filename that is being parsed to produce an output file name (with the
-   * -writeOutputFiles option). The default is <code>stp</code>.  Don't
+   * -writeOutputFiles option). The default is {@code stp}.  Don't
    * include the period.
-   * <LI><code>-outputFilesDirectory</code> The directory in which output
+   * <LI>{@code -outputFilesDirectory} The directory in which output
    * files are written (when the -writeOutputFiles option is specified).
    * If not specified, output files are written in the same directory as the
    * input files.
@@ -1016,7 +995,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
    *
    * @param args Command line arguments, as above
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     boolean train = false;
     boolean saveToSerializedFile = false;
     boolean saveToTextFile = false;
@@ -1053,7 +1032,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
     }
 
     Options op = new Options();
-    List<String> optionArgs = new ArrayList<String>();
+    List<String> optionArgs = new ArrayList<>();
     String encoding = null;
     // while loop through option arguments
     while (argIndex < args.length && args[argIndex].charAt(0) == '-') {
@@ -1075,9 +1054,9 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
           throw new RuntimeException("Error: -train2 <treebankPath> [<ranges>] <weight>.");
         }
         secondaryTreebankPath = args[argIndex++];
-        secondaryTrainFilter = (numSubArgs == 3) ? new NumberRangesFileFilter(args[argIndex++], true) : null;
+        secondaryTrainFilter = numSubArgs == 3 ? new NumberRangesFileFilter(args[argIndex++], true) : null;
         secondaryTreebankWeight = Double.parseDouble(args[argIndex++]);
-      } else if (args[argIndex].equalsIgnoreCase("-tLPP") && (argIndex + 1 < args.length)) {
+      } else if (args[argIndex].equalsIgnoreCase("-tLPP") && argIndex + 1 < args.length) {
         try {
           op.tlpParams = (TreebankLangParserParams) Class.forName(args[argIndex + 1]).newInstance();
         } catch (ClassNotFoundException e) {
@@ -1172,9 +1151,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
       } else {
         int oldIndex = argIndex;
         argIndex = op.setOptionOrWarn(args, argIndex);
-        for (int i = oldIndex; i < argIndex; i++) {
-          optionArgs.add(args[i]);
-        }
+          optionArgs.addAll(Arrays.asList(args).subList(oldIndex, argIndex));
       }
     } // end while loop through arguments
 
@@ -1195,16 +1172,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
           // have options but no tokenizer factory; default to PTB
           tokenizerFactory = PTBTokenizer.PTBTokenizerFactory.newWordTokenizerFactory(tokenizerOptions);
         }
-      } catch (IllegalAccessException e) {
-        System.err.println("Couldn't instantiate TokenizerFactory " + tokenizerFactoryClass + " with options " + tokenizerOptions);
-        throw new RuntimeException(e);
-      } catch (NoSuchMethodException e) {
-        System.err.println("Couldn't instantiate TokenizerFactory " + tokenizerFactoryClass + " with options " + tokenizerOptions);
-        throw new RuntimeException(e);
-      } catch (ClassNotFoundException e) {
-        System.err.println("Couldn't instantiate TokenizerFactory " + tokenizerFactoryClass + " with options " + tokenizerOptions);
-        throw new RuntimeException(e);
-      } catch (InvocationTargetException e) {
+      } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException | NoSuchMethodException e) {
         System.err.println("Couldn't instantiate TokenizerFactory " + tokenizerFactoryClass + " with options " + tokenizerOptions);
         throw new RuntimeException(e);
       }
@@ -1248,7 +1216,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
 
       List<List<TaggedWord>> extraTaggedWords = null;
       if (op.trainOptions.taggedFiles != null) {
-        extraTaggedWords = new ArrayList<List<TaggedWord>>();
+        extraTaggedWords = new ArrayList<>();
         List<TaggedFileRecord> fileRecords = TaggedFileRecord.createRecords(new Properties(), op.trainOptions.taggedFiles);
         for (TaggedFileRecord record : fileRecords) {
           for (List<TaggedWord> sentence : record.reader()) {

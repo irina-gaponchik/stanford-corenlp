@@ -19,11 +19,7 @@ public class UTF8EquivalenceFunction implements Function<String, String>, Serial
     if (input == null) {
       return null;
     }
-    if (input.equals(".$.") || input.equals(".$$.")) {
-      return input;
-    } else {
-      return replaceAscii(input);
-    }
+      return input.equals(".$.") || input.equals(".$$.") ? input : replaceAscii(input);
   }
 
   private static final long serialVersionUID = 1L;    

@@ -5,6 +5,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.logging.Redwood.Record;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 import java.util.List;
 
@@ -16,19 +17,17 @@ import java.util.List;
  * @author Gabor Angeli (angeli at cs.stanford)
  */
 public class VisibilityHandler extends LogRecordHandler {
-  private static enum State { SHOW_ALL, HIDE_ALL }
+  private enum State { SHOW_ALL, HIDE_ALL }
 
   private VisibilityHandler.State defaultState = State.SHOW_ALL;
   private final Set<Object> deltaPool = Generics.newHashSet();
 
   public VisibilityHandler() { }
 
-  public VisibilityHandler(Object[] channels) {
+  public VisibilityHandler(Object... channels) {
     if (channels.length > 0) {
       defaultState = State.HIDE_ALL;
-      for (Object channel : channels) {
-        deltaPool.add(channel);
-      }
+        Collections.addAll(deltaPool, channels);
     }
   }
 
@@ -114,7 +113,7 @@ public class VisibilityHandler extends LogRecordHandler {
     }
     //--Return
     if(isPrinting){
-      ArrayList<Record> retVal = new ArrayList<Record>();
+      ArrayList<Record> retVal = new ArrayList<>();
       retVal.add(record);
       return retVal;
     } else {

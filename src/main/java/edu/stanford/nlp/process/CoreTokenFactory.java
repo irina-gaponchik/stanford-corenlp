@@ -14,7 +14,7 @@ import edu.stanford.nlp.util.CoreMap;
 public interface CoreTokenFactory<IN extends CoreMap> {
   public IN makeToken();
 
-  public IN makeToken(String[] keys, String[] values);
+  public IN makeToken(String[] keys, String... values);
 
   public IN makeToken(IN tokenToBeCopied);
 

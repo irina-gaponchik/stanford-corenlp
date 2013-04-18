@@ -110,10 +110,10 @@ public class NegraLabel extends StringLabel {
   public String toString() {
     String str = value();
     if (edge != null) {
-      str += "->" + getEdge();
+      str += "->" + edge;
     }
     if ( ! features.isEmpty()) {
-      str += "." + features.toString();
+      str += '.' + features.toString();
     }
     return str;
   }

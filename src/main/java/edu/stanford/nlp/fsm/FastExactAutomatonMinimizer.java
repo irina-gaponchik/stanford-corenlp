@@ -11,9 +11,9 @@ import java.util.*;
  * @author Dan Klein (klein@cs.stanford.edu)
  */
 public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
-  TransducerGraph unminimizedFA = null;
-  Map memberToBlock = null;
-  LinkedList splits = null;
+  TransducerGraph unminimizedFA;
+  Map memberToBlock;
+  LinkedList splits;
 
   boolean sparseMode = true;
 
@@ -60,7 +60,7 @@ public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
   }
 
   protected Collection getSymbols() {
-    return getUnminimizedFA().getInputs();
+    return unminimizedFA.getInputs();
   }
 
   public TransducerGraph minimizeFA(TransducerGraph unminimizedFA) {
@@ -74,24 +74,22 @@ public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
 
   protected TransducerGraph buildMinimizedFA() {
     TransducerGraph minimizedFA = new TransducerGraph();
-    TransducerGraph unminimizedFA = getUnminimizedFA();
-    for (Iterator arcI = unminimizedFA.getArcs().iterator(); arcI.hasNext();) {
-      TransducerGraph.Arc arc = (TransducerGraph.Arc) arcI.next();
-      Object source = projectNode(arc.getSourceNode());
-      Object target = projectNode(arc.getTargetNode());
-      try {
-        if (minimizedFA.canAddArc(source, target, arc.getInput(), arc.getOutput())) {
-          minimizedFA.addArc(source, target, arc.getInput(), arc.getOutput());
-        }
-      } catch (Exception e) {
-        //throw new IllegalArgumentException();
+    TransducerGraph unminimizedFA = this.unminimizedFA;
+      for (TransducerGraph.Arc arc : unminimizedFA.getArcs()) {
+          Object source = projectNode(arc.getSourceNode());
+          Object target = projectNode(arc.getTargetNode());
+          try {
+              if (minimizedFA.canAddArc(source, target, arc.getInput(), arc.getOutput())) {
+                  minimizedFA.addArc(source, target, arc.getInput(), arc.getOutput());
+              }
+          } catch (Exception e) {
+              //throw new IllegalArgumentException();
+          }
       }
-    }
     minimizedFA.setStartNode(projectNode(unminimizedFA.getStartNode()));
-    for (Iterator endIter = unminimizedFA.getEndNodes().iterator(); endIter.hasNext();) {
-      Object o = endIter.next();
-      minimizedFA.setEndNode(projectNode(o));
-    }
+      for (Object o : unminimizedFA.getEndNodes()) {
+          minimizedFA.setEndNode(projectNode(o));
+      }
 
     return minimizedFA;
   }
@@ -103,7 +101,7 @@ public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
 
 
   protected boolean hasSplit() {
-    return splits.size() > 0;
+    return !splits.isEmpty();
   }
 
   protected Split getSplit() {
@@ -125,59 +123,53 @@ public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
 
   protected Map sortIntoBlocks(Collection nodes) {
     Map blockToMembers = new IdentityHashMap();
-    for (Iterator nodeI = nodes.iterator(); nodeI.hasNext();) {
-      Object o = nodeI.next();
-      Block block = getBlock(o);
-      Maps.putIntoValueHashSet(blockToMembers, block, o);
-    }
+      for (Object o : nodes) {
+          Block block = getBlock(o);
+          Maps.putIntoValueHashSet(blockToMembers, block, o);
+      }
     return blockToMembers;
   }
 
   protected void makeBlock(Collection members) {
     Block block = new Block(new HashSet(members));
-    for (Iterator memberI = block.getMembers().iterator(); memberI.hasNext();) {
-      Object member = memberI.next();
-      if (member != SINK_NODE) {
-        //        System.out.println("putting in memberToBlock: " + member + " " + block);
-        memberToBlock.put(member, block);
+      for (Object member : block.getMembers()) {
+          if (!member.equals(SINK_NODE)) {
+              //        System.out.println("putting in memberToBlock: " + member + " " + block);
+              memberToBlock.put(member, block);
+          }
       }
-    }
     addSplits(block);
   }
 
   protected void addSplits(Block block) {
     Map symbolToTarget = new HashMap();
-    for (Iterator memberI = block.getMembers().iterator(); memberI.hasNext();) {
-      Object member = memberI.next();
-      for (Iterator symbolI = getInverseArcs(member).iterator(); symbolI.hasNext();) {
-        TransducerGraph.Arc arc = (TransducerGraph.Arc) symbolI.next();
-        Object symbol = arc.getInput();
-        Object target = arc.getTargetNode();
-        Maps.putIntoValueArrayList(symbolToTarget, symbol, target);
+      for (Object member : block.getMembers()) {
+          for (Object o : getInverseArcs(member)) {
+              TransducerGraph.Arc arc = (TransducerGraph.Arc) o;
+              Object symbol = arc.getInput();
+              Object target = arc.getTargetNode();
+              Maps.putIntoValueArrayList(symbolToTarget, symbol, target);
+          }
       }
-    }
-    for (Iterator symbolI = symbolToTarget.keySet().iterator(); symbolI.hasNext();) {
-      Object symbol = symbolI.next();
-      addSplit(new Split((List) symbolToTarget.get(symbol), symbol, block));
-    }
+      for (Object symbol : symbolToTarget.keySet()) {
+          addSplit(new Split((List) symbolToTarget.get(symbol), symbol, block));
+      }
   }
 
   protected void removeAll(Collection block, Collection members) {
     // this is because AbstractCollection/Set.removeAll() isn't always linear in members.size()
-    for (Iterator memberI = members.iterator(); memberI.hasNext();) {
-      Object member = memberI.next();
-      block.remove(member);
-    }
+      for (Object member : members) {
+          block.remove(member);
+      }
   }
 
   protected Collection difference(Collection block, Collection members) {
     Set difference = new HashSet();
-    for (Iterator memberI = block.iterator(); memberI.hasNext();) {
-      Object member = memberI.next();
-      if (!members.contains(member)) {
-        difference.add(member);
+      for (Object member : block) {
+          if (!members.contains(member)) {
+              difference.add(member);
+          }
       }
-    }
     return difference;
   }
 
@@ -186,9 +178,9 @@ public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
     if (result == null) {
       System.out.println("No block found for: " + o); // debug
       System.out.println("But I do have blocks for: ");
-      for (Iterator i = memberToBlock.keySet().iterator(); i.hasNext();) {
-        System.out.println(i.next());
-      }
+        for (Object o1 : memberToBlock.keySet()) {
+            System.out.println(o1);
+        }
       throw new RuntimeException("FastExactAutomatonMinimizer: no block found");
     }
     return result;
@@ -198,43 +190,42 @@ public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
     List inverseImages = new ArrayList();
     Object symbol = split.getSymbol();
     Block block = split.getBlock();
-    for (Iterator memberI = split.getMembers().iterator(); memberI.hasNext();) {
-      Object member = memberI.next();
-      if (!block.getMembers().contains(member)) {
-        continue;
+      for (Object member : split.getMembers()) {
+          if (!block.getMembers().contains(member)) {
+              continue;
+          }
+          Collection arcs = getInverseArcs(member, symbol);
+          for (Object arc1 : arcs) {
+              TransducerGraph.Arc arc = (TransducerGraph.Arc) arc1;
+              Object source = arc.getSourceNode();
+              inverseImages.add(source);
+          }
       }
-      Collection arcs = getInverseArcs(member, symbol);
-      for (Iterator arcI = arcs.iterator(); arcI.hasNext();) {
-        TransducerGraph.Arc arc = (TransducerGraph.Arc) arcI.next();
-        Object source = arc.getSourceNode();
-        inverseImages.add(source);
-      }
-    }
     return inverseImages;
   }
 
   protected Collection getInverseArcs(Object member, Object symbol) {
-    if (member != SINK_NODE) {
-      return getUnminimizedFA().getArcsByTargetAndInput(member, symbol);
+    if (!member.equals(SINK_NODE)) {
+      return unminimizedFA.getArcsByTargetAndInput(member, symbol);
     }
-    return getUnminimizedFA().getArcsByInput(symbol);
+    return unminimizedFA.getArcsByInput(symbol);
   }
 
   protected Collection getInverseArcs(Object member) {
-    if (member != SINK_NODE) {
-      return getUnminimizedFA().getArcsByTarget(member);
+    if (!member.equals(SINK_NODE)) {
+      return unminimizedFA.getArcsByTarget(member);
     }
-    return getUnminimizedFA().getArcs();
+    return unminimizedFA.getArcs();
   }
 
   protected void makeInitialBlocks() {
     // sink block (for if the automaton isn't complete
     makeBlock(Collections.singleton(SINK_NODE));
     // accepting block
-    Set endNodes = getUnminimizedFA().getEndNodes();
+    Set endNodes = unminimizedFA.getEndNodes();
     makeBlock(endNodes);
     // main block
-    Collection nonFinalNodes = new HashSet(getUnminimizedFA().getNodes());
+    Collection nonFinalNodes = new HashSet(unminimizedFA.getNodes());
     nonFinalNodes.removeAll(endNodes);
     makeBlock(nonFinalNodes);
   }
@@ -245,22 +236,22 @@ public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
       Split split = getSplit();
       Collection inverseImages = getInverseImages(split);
       Map inverseImagesByBlock = sortIntoBlocks(inverseImages);
-      for (Iterator blockI = inverseImagesByBlock.keySet().iterator(); blockI.hasNext();) {
-        Block block = (Block) blockI.next();
-        Collection members = (Collection) inverseImagesByBlock.get(block);
-        if (members.size() == 0 || members.size() == block.getMembers().size()) {
-          continue;
+        for (Object o : inverseImagesByBlock.keySet()) {
+            Block block = (Block) o;
+            Collection members = (Collection) inverseImagesByBlock.get(block);
+            if (members.isEmpty() || members.size() == block.getMembers().size()) {
+                continue;
+            }
+            if (members.size() > block.getMembers().size() - members.size()) {
+                members = difference(block.getMembers(), members);
+            }
+            removeAll(block.getMembers(), members);
+            makeBlock(members);
         }
-        if (members.size() > block.getMembers().size() - members.size()) {
-          members = difference(block.getMembers(), members);
-        }
-        removeAll(block.getMembers(), members);
-        makeBlock(members);
-      }
     }
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     /*
     TransducerGraph fa = new TransducerGraph();
     fa.addArc(fa.getStartNode(),"1","a","");

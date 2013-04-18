@@ -7,7 +7,7 @@ import java.util.List;
  * An interface for things that operate on a List.  This is seen as
  * a lighter weight and more general interface than the Processor interface
  * for documents.  IN and OUT are the type of the objects in the List.
- * The <code>process</code> method acts on a List of IN and produces a List
+ * The {@code process} method acts on a List of IN and produces a List
  * of OUT.
  *
  * @author Teg Grenager

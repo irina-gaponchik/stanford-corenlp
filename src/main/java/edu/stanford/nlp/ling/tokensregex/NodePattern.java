@@ -14,8 +14,7 @@ public abstract class NodePattern<T> {
 
   public abstract boolean match(T node);
   public Object matchWithResult(T node) {
-    if (match(node)) return Boolean.TRUE;
-    else return null;
+      return match(node) ? Boolean.TRUE : null;
   }
 
   public static class AnyNodePattern<T> extends NodePattern<T> {

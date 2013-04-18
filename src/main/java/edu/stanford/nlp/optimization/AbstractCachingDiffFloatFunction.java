@@ -8,10 +8,10 @@ import java.util.Arrays;
 
 public abstract class AbstractCachingDiffFloatFunction implements DiffFloatFunction, HasFloatInitial {
 
-  float[] lastX = null;
+  float[] lastX;
 
-  protected float[] derivative = null;
-  protected float value = 0.0f;
+  protected float[] derivative;
+  protected float value;
 
 
   abstract public int domainDimension();
@@ -20,7 +20,7 @@ public abstract class AbstractCachingDiffFloatFunction implements DiffFloatFunct
    * Calculate the value at x and the derivative and save them in the respective fields
    *
    */
-  abstract protected void calculate(float[] x);
+  abstract protected void calculate(float... x);
 
   public float[] initial() {
     float[] initial = new float[domainDimension()];
@@ -28,11 +28,11 @@ public abstract class AbstractCachingDiffFloatFunction implements DiffFloatFunct
     return initial;
   }
 
-  protected void copy(float[] y, float[] x) {
+  protected static void copy(float[] y, float... x) {
     System.arraycopy(x, 0, y, 0, x.length);
   }
 
-  void ensure(float[] x) {
+  void ensure(float... x) {
     if (Arrays.equals(x, lastX)) {
       return;
     }
@@ -46,20 +46,20 @@ public abstract class AbstractCachingDiffFloatFunction implements DiffFloatFunct
     calculate(x);
   }
 
-  public float valueAt(float[] x) {
+  public float valueAt(float... x) {
     ensure(x);
     return value;
   }
 
-  float norm2(float[] x) {
+  static float norm2(float... x) {
     float sum = 0.0f;
-    for (int i = 0; i < x.length; i++) {
-      sum += x[i] * x[i];
-    }
+      for (float aX : x) {
+          sum += aX * aX;
+      }
     return (float) Math.sqrt(sum);
   }
 
-  public float[] derivativeAt(float[] x) {
+  public float[] derivativeAt(float... x) {
     ensure(x);
     return derivative;
   }

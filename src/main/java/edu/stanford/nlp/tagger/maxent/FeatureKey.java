@@ -81,7 +81,7 @@ public class FeatureKey {
 
   ---------- */
 
-  private int hashCode = 0;
+  private int hashCode;
   @Override
   public int hashCode() {
     /* I'm not sure why this is happening, and i really don't want to
@@ -98,9 +98,9 @@ public class FeatureKey {
 
   @Override
   public boolean equals(Object o) {
-    assert(o instanceof FeatureKey);
+    assert o instanceof FeatureKey;
     FeatureKey f1 = (FeatureKey) o;
-    return (num == f1.num) && (tag.equals(f1.tag)) && (val.equals(f1.val));
+    return num == f1.num && tag.equals(f1.tag) && val.equals(f1.val);
   }
 
 }

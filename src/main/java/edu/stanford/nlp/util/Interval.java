@@ -20,7 +20,7 @@ import java.io.Serializable;
  *
  * @author Angel Chang
  */
-public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasInterval<E>, Serializable {
+public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasInterval<E> {
   /**
    * Flag indicating that an interval's begin point is not inclusive
    * (by default, begin points are inclusive)
@@ -72,9 +72,9 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
   protected static final int REL_FLAGS_AFTER = 0x0004;
   protected static final int REL_FLAGS_UNKNOWN = 0x0007;
   protected static final int REL_FLAGS_SS_SHIFT = 0;
-  protected static final int REL_FLAGS_SE_SHIFT = 1*4;
-  protected static final int REL_FLAGS_ES_SHIFT = 2*4;
-  protected static final int REL_FLAGS_EE_SHIFT = 3*4;
+  protected static final int REL_FLAGS_SE_SHIFT = 4;
+  protected static final int REL_FLAGS_ES_SHIFT = 2 << 2;
+  protected static final int REL_FLAGS_EE_SHIFT = 3 << 2;
 
 
   // Flags indicating how the endpoints of two intervals
@@ -325,7 +325,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
     this.flags = flags;
     int comp = a.compareTo(b);
     if (comp > 0) {
-      throw new IllegalArgumentException("Invalid interval: " + a + "," + b);
+      throw new IllegalArgumentException("Invalid interval: " + a + ',' + b);
     }
   }
 
@@ -353,11 +353,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
    */
   public static <E extends Comparable<E>> Interval<E> toInterval(E a, E b, int flags) {
     int comp = a.compareTo(b);
-    if (comp <= 0) {
-      return new Interval<E>(a,b, flags);
-    } else {
-      return null;
-    }
+      return comp <= 0 ? new Interval<>(a, b, flags) : null;
   }
 
   /**
@@ -382,11 +378,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
    */
   public static <E extends Comparable<E>> Interval<E> toValidInterval(E a, E b, int flags) {
     int comp = a.compareTo(b);
-    if (comp <= 0) {
-      return new Interval<E>(a,b,flags);
-    } else {
-      return new Interval<E>(b,a,flags);
-    }
+      return comp <= 0 ? new Interval<>(a, b, flags) : new Interval<>(b, a, flags);
   }
 
   /**
@@ -418,13 +410,13 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
   protected static <E extends Comparable<E>> E max(E a, E b)
   {
     int comp = a.compareTo(b);
-    return (comp > 0)? a:b;
+    return comp > 0 ? a:b;
   }
 
   protected static <E extends Comparable<E>> E min(E a, E b)
   {
     int comp = a.compareTo(b);
-    return (comp < 0)? a:b;
+    return comp < 0 ? a:b;
   }
 
   /**
@@ -435,10 +427,10 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
   public boolean contains(E p)
   {
     // Check that the start point is before p
-    boolean check1 = (includesBegin())? (first.compareTo(p) <= 0):(first.compareTo(p) < 0);
+    boolean check1 = includesBegin() ? first.compareTo(p) <= 0 : first.compareTo(p) < 0;
     // Check that the end point is after p
-    boolean check2 = (includesEnd())? (second.compareTo(p) >= 0):(second.compareTo(p) > 0);
-    return (check1 && check2);
+    boolean check2 = includesEnd() ? second.compareTo(p) >= 0 : second.compareTo(p) > 0;
+    return check1 && check2;
   }
 
   public boolean containsOpen(E p)
@@ -447,14 +439,14 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
     boolean check1 = first.compareTo(p) <= 0;
     // Check that the end point is after p
     boolean check2 = second.compareTo(p) >= 0;
-    return (check1 && check2);
+    return check1 && check2;
   }
 
   public boolean contains(Interval<E> other)
   {
-    boolean containsOtherBegin = (other.includesBegin())? contains(other.getBegin()): containsOpen(other.getBegin());
-    boolean containsOtherEnd = (other.includesEnd())? contains(other.getEnd()): containsOpen(other.getEnd());
-    return (containsOtherBegin && containsOtherEnd);
+    boolean containsOtherBegin = other.includesBegin() ? contains(other.getBegin()): containsOpen(other.getBegin());
+    boolean containsOtherEnd = other.includesEnd() ? contains(other.getEnd()): containsOpen(other.getEnd());
+    return containsOtherBegin && containsOtherEnd;
   }
 
     /**
@@ -518,7 +510,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
    */
   public boolean includesBegin()
   {
-    return ((flags & INTERVAL_OPEN_BEGIN) == 0);
+    return (flags & INTERVAL_OPEN_BEGIN) == 0;
   }
 
   /**
@@ -527,7 +519,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
    */
   public boolean includesEnd()
   {
-    return ((flags & INTERVAL_OPEN_END) == 0);
+    return (flags & INTERVAL_OPEN_END) == 0;
   }
 
 /*  // Returns true if end before (start of other)
@@ -602,10 +594,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
   public boolean isIntervalComparable(Interval<E> other)
   {
     int flags = getRelationFlags(other);
-    if (checkMultipleBitSet(flags & REL_FLAGS_INTERVAL_UNKNOWN)) {
-      return false;
-    }
-    return checkFlagSet(flags, REL_FLAGS_INTERVAL_BEFORE) || checkFlagSet(flags, REL_FLAGS_INTERVAL_AFTER);
+      return !checkMultipleBitSet(flags & REL_FLAGS_INTERVAL_UNKNOWN) && (checkFlagSet(flags, REL_FLAGS_INTERVAL_BEFORE) || checkFlagSet(flags, REL_FLAGS_INTERVAL_AFTER));
   }
 
   /**
@@ -619,23 +608,15 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
     int flags = getRelationFlags(other);
     if (checkFlagExclusiveSet(flags, REL_FLAGS_INTERVAL_BEFORE, REL_FLAGS_INTERVAL_UNKNOWN)) {
       return -1;
-    } else if (checkFlagExclusiveSet(flags, REL_FLAGS_INTERVAL_AFTER, REL_FLAGS_INTERVAL_UNKNOWN)) {
-      return 1;
-    } else {
-      return 0;
-    }
+    } else return checkFlagExclusiveSet(flags, REL_FLAGS_INTERVAL_AFTER, REL_FLAGS_INTERVAL_UNKNOWN) ? 1 : 0;
   }
 
-  protected int toRelFlags(int comp, int shift)
+  protected static int toRelFlags(int comp, int shift)
   {
     int flags = 0;
     if (comp == 0) {
       flags = REL_FLAGS_SAME;
-    } else if (comp > 0) {
-      flags = REL_FLAGS_AFTER;
-    } else {
-      flags = REL_FLAGS_BEFORE;
-    }
+    } else flags = comp > 0 ? REL_FLAGS_AFTER : REL_FLAGS_BEFORE;
     flags = flags << shift;
     return flags;
   }
@@ -663,7 +644,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
     return flags;
   }
 
-  protected int addIntervalRelationFlags(int flags, boolean checkFuzzy) {
+  protected static int addIntervalRelationFlags(int flags, boolean checkFuzzy) {
     int f11 = extractRelationSubflags(flags, REL_FLAGS_SS_SHIFT);
     int f22 = extractRelationSubflags(flags, REL_FLAGS_EE_SHIFT);
     int f12 = extractRelationSubflags(flags, REL_FLAGS_SE_SHIFT);
@@ -674,37 +655,37 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
         flags |= REL_FLAGS_INTERVAL_FUZZY;
       }
     }
-    if (((f11 & REL_FLAGS_SAME) != 0) && ((f22 & REL_FLAGS_SAME) != 0)) {
+    if ((f11 & REL_FLAGS_SAME) != 0 && (f22 & REL_FLAGS_SAME) != 0) {
       // SS,EE SAME
       flags |= REL_FLAGS_INTERVAL_SAME;  // Possible
     }
-    if (((f21 & REL_FLAGS_BEFORE) != 0)) {
+    if ((f21 & REL_FLAGS_BEFORE) != 0) {
       // ES BEFORE => SS, SE, EE BEFORE
       flags |= REL_FLAGS_INTERVAL_BEFORE;  // Possible
     }
-    if (((f12 & REL_FLAGS_AFTER) != 0)) {
+    if ((f12 & REL_FLAGS_AFTER) != 0) {
       // SE AFTER => SS, ES, EE AFTER
       flags |= REL_FLAGS_INTERVAL_AFTER;  // Possible
     }
-    if (((f11 & (REL_FLAGS_SAME | REL_FLAGS_AFTER)) != 0) && ((f12 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE)) != 0)) {
+    if ((f11 & (REL_FLAGS_SAME | REL_FLAGS_AFTER)) != 0 && (f12 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE)) != 0) {
       // SS SAME or AFTER, SE SAME or BEFORE
       //     |-----|
       // |------|
       flags |= REL_FLAGS_INTERVAL_OVERLAP;  // Possible
     }
-    if (((f11 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE)) != 0) && ((f21 & (REL_FLAGS_SAME | REL_FLAGS_AFTER)) != 0)) {
+    if ((f11 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE)) != 0 && (f21 & (REL_FLAGS_SAME | REL_FLAGS_AFTER)) != 0) {
       // SS SAME or BEFORE, ES SAME or AFTER
       // |------|
       //     |-----|
       flags |= REL_FLAGS_INTERVAL_OVERLAP;  // Possible
     }
-    if (((f11 & (REL_FLAGS_SAME | REL_FLAGS_AFTER)) != 0) && ((f22 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE)) != 0)) {
+    if ((f11 & (REL_FLAGS_SAME | REL_FLAGS_AFTER)) != 0 && (f22 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE)) != 0) {
       // SS SAME or AFTER, EE SAME or BEFORE
       //     |------|
       // |---------------|
       flags |= REL_FLAGS_INTERVAL_INSIDE;  // Possible
     }
-    if (((f11 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE)) != 0) && ((f22 & (REL_FLAGS_SAME | REL_FLAGS_AFTER)) != 0)) {
+    if ((f11 & (REL_FLAGS_SAME | REL_FLAGS_BEFORE)) != 0 && (f22 & (REL_FLAGS_SAME | REL_FLAGS_AFTER)) != 0) {
       // SS SAME or BEFORE, EE SAME or AFTER
       flags |= REL_FLAGS_INTERVAL_CONTAIN;  // Possible
       // |---------------|
@@ -715,7 +696,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
 
   public static int extractRelationSubflags(int flags, int shift)
   {
-    return (flags >> shift) & 0xf;
+    return flags >> shift & 0xf;
   }
 
   /**
@@ -744,7 +725,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
    */
   public static boolean checkFlagSet(int flags, int flag)
   {
-    return ((flags & flag) != 0);
+    return (flags & flag) != 0;
   }
 
   /**
@@ -758,11 +739,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
   public static boolean checkFlagExclusiveSet(int flags, int flag, int mask)
   {
     int f = flags & flag;
-    if (f != 0) {
-      return (flags & mask & ~flag) == 0;
-    } else {
-      return false;
-    }
+      return f != 0 ? (flags & mask & ~flag) == 0 : false;
   }
 
   /**
@@ -796,29 +773,10 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
         // |---|  this
         // |---|   other
         return RelType.EQUAL;
-      } if (comp22 < 0) {
-        // SAME START - this finishes before other
-        // |---|  this
-        // |------|   other
-        return RelType.INSIDE;
-      } else {
-        // SAME START - this finishes after other
-        // |------|  this
-        // |---|   other
-        return RelType.CONTAIN;
       }
+        return comp22 < 0 ? RelType.INSIDE : RelType.CONTAIN;
     } else if (comp22 == 0) {
-      if (comp11 < 0) {
-        // SAME FINISH - this start before other
-        // |------|  this
-        //    |---|   other
-        return RelType.CONTAIN;
-      } else /*if (comp11 > 0) */ {
-        // SAME FINISH - this starts after other
-        //    |---|  this
-        // |------|   other
-        return RelType.INSIDE;
-      }
+        return comp11 < 0 ? RelType.CONTAIN : RelType.INSIDE;
     } else if (comp11 > 0 && comp22 < 0) {
       //    |---|  this
       // |---------|   other
@@ -842,13 +800,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
         //     |---|  this
         // |---|   other
         return RelType.BEGIN_MEET_END;
-      } else if (comp21 == 0) {
-        // |---|  this
-        //     |---|   other
-        return RelType.END_MEET_BEGIN;
-      } else {
-        return RelType.OVERLAP;
-      }
+      } else return comp21 == 0 ? RelType.END_MEET_BEGIN : RelType.OVERLAP;
     }
   }
 
@@ -866,11 +818,8 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
 
     Interval interval = (Interval) o;
 
-    if (flags != interval.flags) {
-      return false;
-    }
+      return flags == interval.flags;
 
-    return true;
   }
 
   @Override

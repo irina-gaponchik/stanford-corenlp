@@ -27,7 +27,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
   protected int t0;  // Initial stochastic iteration count
   protected final double sigma;
   protected double lambda;
-  protected boolean quiet = false;
+  protected boolean quiet;
   private static final int DEFAULT_NUM_PASSES = 50;
   protected final int numPasses; //-1;
   protected int bSize = 1;  // NOTE: If bSize does not divide evenly into total number of samples,
@@ -38,7 +38,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
   protected Random gen = new Random(1);
   protected long maxTime = Long.MAX_VALUE;
 
-  private int evaluateIters = 0;    // Evaluate every x iterations (0 = no evaluation)
+  private int evaluateIters;    // Evaluate every x iterations (0 = no evaluation)
   private Evaluator[] evaluators;  // separate set of evaluators to check how optimization is going
 
 
@@ -102,7 +102,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
   }
 
   @Override
-  public void setEvaluators(int iters, Evaluator[] evaluators)
+  public void setEvaluators(int iters, Evaluator... evaluators)
   {
     this.evaluateIters = iters;
     this.evaluators = evaluators;
@@ -113,7 +113,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
   protected void init(AbstractStochasticCachingDiffUpdateFunction func) {
   }
 
-  public double getObjective(AbstractStochasticCachingDiffUpdateFunction function, double[] w, double wscale, int[] sample)
+  public double getObjective(AbstractStochasticCachingDiffUpdateFunction function, double[] w, double wscale, int... sample)
   {
     double wnorm = getNorm(w) * wscale*wscale;
     double obj = function.valueAt(w,wscale,sample);
@@ -136,7 +136,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
       sampleIndex += bSize;
       double gain = eta/wscale;
       function.calculateStochasticUpdate(w, wscale, sampleBatch, gain);
-      wscale *= (1 - eta * lambda*bSize);
+      wscale *= 1 - eta * lambda*bSize;
     }
     double obj = getObjective(function, w, wscale, sample);
     return obj;
@@ -164,8 +164,8 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
     while (totest > 0 || !phase2)
     {
       double obj = tryEta(function, initial, sample, eta);
-      boolean okay = (obj < sobj);
-      sayln("  Trying eta=" + eta + "  obj=" + obj + ((okay)? "(possible)":"(too large)"));
+      boolean okay = obj < sobj;
+      sayln("  Trying eta=" + eta + "  obj=" + obj + (okay ? "(possible)":"(too large)"));
       if (okay)
       {
         totest -= 1;
@@ -197,12 +197,12 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
   }
 
   // really this is the square of the L2 norm....
-  private static double getNorm(double[] w)
+  private static double getNorm(double... w)
   {
     double norm = 0;
-    for (int i = 0; i < w.length; i++) {
-      norm += w[i]*w[i];
-    }
+      for (double aW : w) {
+          norm += aW * aW;
+      }
     return norm;
   }
 
@@ -215,7 +215,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
     xscale = 1;
   }
 
-  private void doEvaluation(double[] x) {
+  private void doEvaluation(double... x) {
     // Evaluate solution
     if (evaluators == null) return;
     for (Evaluator eval:evaluators) {
@@ -225,7 +225,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
   }
 
   @Override
-  public double[] minimize(Function function, double functionTolerance, double[] initial) {
+  public double[] minimize(Function function, double functionTolerance, double... initial) {
     return minimize(function, functionTolerance, initial, -1);
   }
 
@@ -253,7 +253,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
 
     init(function);
 
-    boolean have_max = (maxIterations > 0 || numPasses > 0);
+    boolean have_max = maxIterations > 0 || numPasses > 0;
 
     if (!have_max){
       throw new UnsupportedOperationException("No maximum number of iterations has been specified.");
@@ -280,7 +280,7 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
     int t=t0;
     int iters = 0;
     for (int pass = 0; pass < numPasses; pass++)  {
-      boolean doEval = (pass > 0 && evaluateIters > 0 && pass % evaluateIters == 0);
+      boolean doEval = pass > 0 && evaluateIters > 0 && pass % evaluateIters == 0;
       if (doEval) {
         rescale();
         doEvaluation(x);
@@ -298,10 +298,10 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
         lastValue = function.calculateStochasticUpdate(x, xscale, bSize, gain);
         totalValue += lastValue;
         // weight decay (for L2 regularization)
-        xscale *= (1 - eta * lambda*bSize);
+        xscale *= 1 - eta * lambda*bSize;
         t+=bSize;
       }
-      if (xscale < 1e-6) {
+      if (xscale < 1.0e-6) {
         rescale();
       }
       try {
@@ -315,9 +315,9 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
       // Calculate loss based on L2 regularization
       double loss = totalValue + 0.5 * xnorm * lambda * totalSamples;
       say(String.valueOf(numBatches));
-      say("[" + ( total.report() )/1000.0 + " s " );
-      say("{" + (current.restart()/1000.0) + " s}] ");
-      sayln(" "+lastValue + " " + totalValue + " " + loss);
+      say("[" + total.report() /1000.0 + " s " );
+      say("{" + current.restart()/1000.0 + " s}] ");
+      sayln(" "+lastValue + ' ' + totalValue + ' ' + loss);
 
       if (iters >= maxIterations) {
         sayln("Stochastic Optimization complete.  Stopped after max iterations");

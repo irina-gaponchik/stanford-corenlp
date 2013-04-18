@@ -7,6 +7,7 @@
 
 package edu.stanford.nlp.ie.machinereading.domains.ace.reader;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -22,8 +23,9 @@ import edu.stanford.nlp.process.AbstractTokenizer;
 import edu.stanford.nlp.util.Generics;
 
 public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
-  
-  /** Buffer to tokenize */
+
+    private static final Pattern COMPILE = Pattern.compile("\\s\\s+");
+    /** Buffer to tokenize */
   String buffer;
 
   /** The set of known abbreviations */
@@ -107,7 +109,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
 
   // this matches acronyms AFTER abbreviation merging
   public final static String LOOSE_ACRONYM = 
-    block(oneOrMore((oneOrMore(LETTER) + DOT)) + zeroOrMore(LETTER));
+    block(oneOrMore(oneOrMore(LETTER) + DOT) + zeroOrMore(LETTER));
 
   // other possible constructs
   public final static String PAREN      = or(LRB, RRB, LCB, RCB);
@@ -171,21 +173,21 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
 
   // the complete pattern
   public final static String RECOGNISED_PATTERN 
-  = block(block(TIME) + "|" +
-      block(DOMAIN_EMAIL) + "|" +
-      block(EMAIL) + "|" +
-      block(URL) + "|" +
+  = block(block(TIME) + '|' +
+      block(DOMAIN_EMAIL) + '|' +
+      block(EMAIL) + '|' +
+      block(URL) + '|' +
       // block(SMALL_URL) + "|" +
-      block(ACRONYM) + "|" + 
-      block(DATE) + "|" + 
-      block(PHONE_PART) + "|" + // must be before WORD, otherwise it's broken into multiple tokens
-      block(WORD) + "|" +
-      block(PUNC) + "|" + 
-      block(LIST_BULLET) + "|" + 
-      block(PAREN) + "|" + 
-      block(SGML) + "|" + 
-      block(HTMLCODE) + "|" + 
-      block(UNDERSCORESEQ) + "|" + 
+      block(ACRONYM) + '|' +
+      block(DATE) + '|' +
+      block(PHONE_PART) + '|' + // must be before WORD, otherwise it's broken into multiple tokens
+      block(WORD) + '|' +
+      block(PUNC) + '|' +
+      block(LIST_BULLET) + '|' +
+      block(PAREN) + '|' +
+      block(SGML) + '|' +
+      block(HTMLCODE) + '|' +
+      block(UNDERSCORESEQ) + '|' +
       block(ANY));
 
   /** The overall token pattern */
@@ -234,111 +236,111 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
 
   /** any in the set */ 
   public static String range(String s){
-    return block("[" + s + "]");
+    return block('[' + s + ']');
   }
 
 
   /** zero or one */
   public static String zeroOrOne(String s){
-    return block(block(s) + "?");
+    return block(block(s) + '?');
   }
 
   /** zero or more */
   public static String zeroOrMore(String s){
-    return block(block(s) + "*");
+    return block(block(s) + '*');
   }
 
   /** one or more */
   public static String oneOrMore(String s){
-    return block(block(s) + "+");
+    return block(block(s) + '+');
   }
 
   /** parens */
   public static String block(String s){
-    return "(" + s + ")";
+    return '(' + s + ')';
   }
 
   /** any of the two */
   public static String or(String s1, String s2){
-    return block(block(s1) + "|" + block(s2));
+    return block(block(s1) + '|' + block(s2));
   }
 
   /** any of the three */
   public static String or(String s1, String s2, String s3){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3));
   }
 
   /** any of the four */
   public static String or(String s1, String s2, String s3, String s4){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + block(s4));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' + block(s4));
   }
 
   /** any of the five */
   public static String or(String s1, String s2, String s3, String s4, String s5){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + 
-        block(s4) + "|" + block(s5));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' +
+        block(s4) + '|' + block(s5));
   }
 
   /** any of the six */
   public static String or(String s1, String s2, String s3, 
       String s4, String s5, String s6){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + 
-        block(s4) + "|" + block(s5) + "|" + block(s6));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' +
+        block(s4) + '|' + block(s5) + '|' + block(s6));
   }
 
   /** any of the seven */
   public static String or(String s1, String s2, String s3, 
       String s4, String s5, String s6, String s7){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + 
-        block(s4) + "|" + block(s5) + "|" + block(s6) + "|" + block(s7));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' +
+        block(s4) + '|' + block(s5) + '|' + block(s6) + '|' + block(s7));
   }
 
   /** any of the eight */
   public static String or(String s1, String s2, String s3, String s4, 
       String s5, String s6, String s7, String s8){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + 
-        block(s4) + "|" + block(s5) + "|" + block(s6) + "|" + 
-        block(s7) + "|" + block(s8));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' +
+        block(s4) + '|' + block(s5) + '|' + block(s6) + '|' +
+        block(s7) + '|' + block(s8));
   }
 
   /** any of the nine */
   public static String or(String s1, String s2, String s3, String s4, 
       String s5, String s6, String s7, String s8, String s9){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + 
-        block(s4) + "|" + block(s5) + "|" + block(s6) + "|" + 
-        block(s7) + "|" + block(s8) + "|" + block(s9));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' +
+        block(s4) + '|' + block(s5) + '|' + block(s6) + '|' +
+        block(s7) + '|' + block(s8) + '|' + block(s9));
   }
 
   public static String or(String s1, String s2, String s3, String s4, 
       String s5, String s6, String s7, String s8, 
       String s9, String s10){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + 
-        block(s4) + "|" + block(s5) + "|" + block(s6) + "|" + 
-        block(s7) + "|" + block(s8) + "|" + block(s9) + "|" +
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' +
+        block(s4) + '|' + block(s5) + '|' + block(s6) + '|' +
+        block(s7) + '|' + block(s8) + '|' + block(s9) + '|' +
         block(s10));
   }
 
   public static String or(String s1, String s2, String s3, String s4, 
       String s5, String s6, String s7, String s8, 
       String s9, String s10, String s11){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + 
-        block(s4) + "|" + block(s5) + "|" + block(s6) + "|" + 
-        block(s7) + "|" + block(s8) + "|" + block(s9) + "|" +
-        block(s10) + "|" + block(s11));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' +
+        block(s4) + '|' + block(s5) + '|' + block(s6) + '|' +
+        block(s7) + '|' + block(s8) + '|' + block(s9) + '|' +
+        block(s10) + '|' + block(s11));
   }
 
   public static String or(String s1, String s2, String s3, String s4, 
       String s5, String s6, String s7, String s8, 
       String s9, String s10, String s11, String s12){
-    return block(block(s1) + "|" + block(s2) + "|" + block(s3) + "|" + 
-        block(s4) + "|" + block(s5) + "|" + block(s6) + "|" + 
-        block(s7) + "|" + block(s8) + "|" + block(s9) + "|" +
-        block(s10) + "|" + block(s11) + "|" + block(s12));
+    return block(block(s1) + '|' + block(s2) + '|' + block(s3) + '|' +
+        block(s4) + '|' + block(s5) + '|' + block(s6) + '|' +
+        block(s7) + '|' + block(s8) + '|' + block(s9) + '|' +
+        block(s10) + '|' + block(s11) + '|' + block(s12));
   }
 
   /** not */
   public static String rangeNot(String s){
-    return range(block("^" + s));
+    return range(block('^' + s));
   }
 
   private static int hasApostropheBlock(String s) {
@@ -358,7 +360,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
   private static <T extends WordToken> String concatenate(List<T> tokens,
       int start,
       int end) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
 
     for(; start < end; start ++){
       buffer.append(((WordToken) tokens.get(start)).getWord());
@@ -406,7 +408,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
     return match.find(0);
   }
 
-  public int countNewLines(String s, int start, int end) {
+  public static int countNewLines(String s, int start, int end) {
     int count = 0;
     for(int i = start; i < end; i ++) {
       if(s.charAt(i) == '\n') count ++;
@@ -437,7 +439,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
    * @return List of WordTokens
    */
   public List<WordToken> tokenizeToWordTokens() {
-    List<WordToken> result = new ArrayList<WordToken>();
+    List<WordToken> result = new ArrayList<>();
 
     //
     // replace illegal characters with SPACE
@@ -521,7 +523,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
     //
     // Merge known abreviations
     //
-    List<WordToken> resultWithAbs = new ArrayList<WordToken>();
+    List<WordToken> resultWithAbs = new ArrayList<>();
     for(int i = 0; i < result.size(); i ++){
       // where the mw ends
       int end = result.size();
@@ -538,7 +540,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
           found = false;
 
           // found a multiword
-          if((mAbbreviations.contains(conc) == true)){
+          if(mAbbreviations.contains(conc)){
             found = true;
             WordToken token = new WordToken(conc, 
                 startToken.getStart(), 
@@ -566,23 +568,23 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
    * Redefine this method to implement additional domain-specific tokenization rules
    * @param tokens
    */
-  protected List<WordToken> postprocess(List<WordToken> tokens) { return tokens; };
+  protected static List<WordToken> postprocess(List<WordToken> tokens) { return tokens; }
 
-  /** 
+    /**
    * Tokenizes and adds blank spaces were needed between each token 
    */
-  public String tokenizeText() throws java.io.IOException{
+  public String tokenizeText() throws IOException{
     List<WordToken> tokenList = tokenizeToWordTokens();
-    StringBuffer strBuffer = new StringBuffer();
+    StringBuilder strBuffer = new StringBuilder();
     Iterator<WordToken> iter = tokenList.iterator();
     if (iter.hasNext()){
       strBuffer.append(iter.next());
     }
     while(iter.hasNext()){
-      strBuffer.append(" ");
+      strBuffer.append(' ');
       strBuffer.append(iter.next());
     }
-    return strBuffer.toString().replaceAll("\\s\\s+", " ");                
+    return COMPILE.matcher(strBuffer.toString()).replaceAll(" ");
   }
 
   public static class AbbreviationMap {
@@ -591,449 +593,447 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
 
     private static List<String> normalizeCase(boolean caseInsensitive, List<String> words) {
       if(! caseInsensitive) return words;
-      List<String> normWords = new ArrayList<String>();
+      List<String> normWords = new ArrayList<>();
       for(String word: words) normWords.add(word.toLowerCase());
       return normWords;
     }
 
     /** Creates a new instance of AbreviationMap with some know abbreviations */
     public AbbreviationMap(boolean caseInsensitive)  {
-      mAbbrevSet = Generics.newHashSet(normalizeCase(caseInsensitive, Arrays.asList(new String[]{
-          "1.",
-          "10.",
-          "11.",
-          "12.",
-          "13.",
-          "14.",
-          "15.",
-          "16.",
-          "17.",
-          "18.",
-          "19.",
-          "2.",
-          "20.",
-          "21.",
-          "22.",
-          "23.",
-          "24.",
-          "25.",
-          "26.",
-          "27.",
-          "28.",
-          "29.",
-          "3.",
-          "30.",
-          "31.",
-          "32.",
-          "33.",
-          "34.",
-          "35.",
-          "36.",
-          "37.",
-          "38.",
-          "39.",
-          "4.",
-          "40.",
-          "41.",
-          "42.",
-          "43.",
-          "44.",
-          "45.",
-          "46.",
-          "47.",
-          "48.",
-          "49.",
-          "5.",
-          "50.",
-          "6.",
-          "7.",
-          "8.",
-          "9.",
-          "A.",
-          "A.C.",
-          "A.D.",
-          "A.D.L.",
-          "A.F.",
-          "A.G.",
-          "A.H.",
-          "A.J.C.",
-          "A.L.",
-          "A.M",
-          "A.M.",
-          "A.P.",
-          "A.T.B.",
-          "AUG.",
-          "Act.",
-          "Adm.",
-          "Ala.",
-          "Ariz.",
-          "Ark.",
-          "Assn.",
-          "Ass'n.",
-          "Ass'n",
-          "Aug.",
-          "B.",
-          "B.A.T",
-          "B.B.",
-          "B.F.",
-          "B.J.",
-          "B.V.",
-          "Bancorp.",
-          "Bhd.",
-          "Blvd.",
-          "Br.",
-          "Brig.",
-          "Bros.",
-          "C.",
-          "C.B.",
-          "C.D.s",
-          "C.J.",
-          "C.O.",
-          "C.R.",
-          "C.W.",
-          "CEO.",
-          "CO.",
-          "CORP.",
-          "COS.",
-          "Cal.",
-          "Calif.",
-          "Capt.",
-          "Cie.",
-          "Cir.",
-          "Cmdr.",
-          "Co.",
-          "Col.",
-          "Colo.",
-          "Comdr.",
-          "Conn.",
-          "Corp.",
-          "Cos.",
-          "D.",
-          "D.B.",
-          "D.C",
-          "D.C.",
-          "D.H.",
-          "D.M.",
-          "D.N.",
-          "D.S.",
-          "D.T",
-          "D.T.",
-          "D.s",
-          "Dec.",
-          "Del.",
-          "Dept.",
-          "Dev.",
-          "Dr.",
-          "Ds.",
-          "E.",
-          "E.E.",
-          "E.F.",
-          "E.I.",
-          "E.M.",
-          "E.R.",
-          "E.W.",
-          "Etc.",
-          "F.",
-          "F.A.",
-          "F.A.O.",
-          "F.C",
-          "F.E.",
-          "F.J.",
-          "F.S.B.",
-          "F.W.",
-          "FEB.",
-          "FL.",
-          "Feb.",
-          "Fed.",
-          "Fla.",
-          "Fran.",
-          "French.",
-          "Freon.",
-          "Ft.",
-          "G.",
-          "G.D.",
-          "G.L.",
-          "G.O.",
-          "G.S.",
-          "G.m.b",
-          "G.m.b.H.",
-          "GP.",
-          "GPO.",
-          "Ga.",
-          "Gen.",
-          "Gov.",
-          "H.",
-          "H.F.",
-          "H.G.",
-          "H.H.",
-          "H.J.",
-          "H.L.",
-          "H.R.",
-          "Hon.",
-          "I.",
-          "I.B.M.",
-          "I.C.H.",
-          "I.E.P.",
-          "I.M.",
-          "I.V.",
-          "I.W.",
-          "II.",
-          "III.",
-          "INC.",
-          "Intl.",
-          "Int'l",
-          "IV.",
-          "IX.",
-          "Ill.",
-          "Inc.",
-          "Ind.",
-          "J.",
-          "J.C.",
-          "J.D.",
-          "J.E.",
-          "J.F.",
-          "J.F.K.",
-          "J.H.",
-          "J.L.",
-          "J.M.",
-          "JohnQ.Public",
-          "J.P.",
-          "J.R.",
-          "J.V",
-          "J.V.",
-          "J.X.",
-          "Jan.",
-          "Jansz.",
-          "Je.",
-          "Jos.",
-          "Jr.",
-          "K.",
-          "K.C.",
-          "Kan.",
-          "Ky.",
-          "L.",
-          "L.A.",
-          "L.H.",
-          "L.J.",
-          "L.L.",
-          "L.M.",
-          "L.P",
-          "L.P.",
-          "La.",
-          "Lt.",
-          "Ltd.",
-          "M.",
-          "M.A.",
-          "M.B.A.",
-          "M.D",
-          "M.D.",
-          "M.D.C.",
-          "M.E.",
-          "M.J.",
-          "M.R.",
-          "M.S.",
-          "M.W.",
-          "M8.7sp",
-          "Maj.",
-          "Mar.",
-          "Mass.",
-          "Md.",
-          "Med.",
-          "Messrs.",
-          "Mfg.",
-          "Mich.",
-          "Minn.",
-          "Mir.",
-          "Miss.",
-          "Mo.",
-          "Mr.",
-          "Mrs.",
-          "Ms.",
-          "Mt.",
-          "N.",
-          "N.A.",
-          "N.C",
-          "N.C.",
-          "N.D",
-          "N.D.",
-          "N.H",
-          "N.H.",
-          "N.J",
-          "N.J.",
-          "N.M",
-          "N.M.",
-          "N.V",
-          "N.V.",
-          "N.Y",
-          "N.Y.",
-          "NOV.",
-          "Neb.",
-          "Nev.",
-          "No.",
-          "no.", 
-          "Nos.",
-          "Nov.",
-          "O.",
-          "O.P.",
-          "OK.",
-          "Oct.",
-          "Okla.",
-          "Ore.",
-          "P.",
-          "P.J.",
-          "P.M",
-          "P.M.",
-          "P.R.",
-          "Pa.",
-          "Penn.",
-          "Pfc.",
-          "Ph.",
-          "Ph.D.",
-          "pro-U.N.",
-          "Prof.",
-          "Prop.",
-          "Pty.",
-          "Q.",
-          "R.",
-          "R.D.",
-          "Ret.",
-          "R.H.",
-          "R.I",
-          "R.I.",
-          "R.L.",
-          "R.P.",
-          "R.R.",
-          "R.W.",
-          "RLV.",
-          "Rd.",
-          "Rep.",
-          "Reps.",
-          "Rev.",
-          "S.",
-          "S.A",
-          "S.A.",
-          "S.C",
-          "S.C.",
-          "S.D.",
-          "S.G.",
-          "S.I.",
-          "S.P.",
-          "S.S.",
-          "S.p",
-          "S.p.A",
-          "S.p.A.",
-          "SKr1.5",
-          "Sen.",
-          "Sens.",
-          "Sept.",
-          "Sgt.",
-          "Snr.",
-          "Spc.",
-          "Sr.",
-          "St.",
-          "Sys.",
-          "T.",
-          "T.D.",
-          "T.F.",
-          "T.T.",
-          "T.V.",
-          "TEL.",
-          "Tech.",
-          "Tenn.",
-          "Tex.",
-          "Tx.",
-          "U.",
-          "U.Cal-Davis",
-          "U.K",
-          "U.K.",
-          "U.N.",
-          "U.S.",
-          "U.S.A",
-          "U.S.A.",
-          "U.S.C.",
-          "U.S.C..",
-          "U.S.S.R",
-          "U.S.S.R.",
-          "UK.",
-          "US116.7",
-          "V.",
-          "V.H.",
-          "VI.",
-          "VII.",
-          "VIII.",
-          "VS.",
-          "Va.",
-          "Vs.",
-          "Vt.",
-          "W.",
-          "W.A.",
-          "W.G.",
-          "W.I.",
-          "W.J.",
-          "W.R.",
-          "W.T.",
-          "W.Va",
-          "W.Va.",
-          "Wash.",
-          "Wis.",
-          "Wyo.",
-          "X.",
-          "Y.",
-          "Y.J.",
-          "Z.",
-          "a.",
-          "a.d.",
-          "a.k.a",
-          "a.m",
-          "a.m.",
-          "al.",
-          "b.",
-          "c.",
-          "c.i.f",
-          "cf.",
-          "cnsl.",
-          "cnsls.",
-          "cont'd.",
-          "d.",
-          "deft.",
-          "defts.",
-          "e.",
-          "et.",
-          "etc.",
-          "etseq.",
-          "f.",
-          "f.o.b",
-          "ft.",
-          "g.",
-          "h.",
-          "i.",
-          "i.e.",
-          "j.",
-          "k.",
-          "l.",
-          "m.",
-          "mots.",
-          "n.",
-          "o.",
-          "p.",
-          "p.m",
-          "p.m.",
-          "pltf.",
-          "pltfs.",
-          "prelim.",
-          "r.",
-          "s.",
-          "seq.",
-          "supp.",
-          "sq.",
-          "t.",
-          "u.",
-          "v.",
-          "vs.",
-          "x.",
-          "y.",
-          "z.",
-      })));
+      mAbbrevSet = Generics.newHashSet(normalizeCase(caseInsensitive, Arrays.asList("1.",
+              "10.",
+              "11.",
+              "12.",
+              "13.",
+              "14.",
+              "15.",
+              "16.",
+              "17.",
+              "18.",
+              "19.",
+              "2.",
+              "20.",
+              "21.",
+              "22.",
+              "23.",
+              "24.",
+              "25.",
+              "26.",
+              "27.",
+              "28.",
+              "29.",
+              "3.",
+              "30.",
+              "31.",
+              "32.",
+              "33.",
+              "34.",
+              "35.",
+              "36.",
+              "37.",
+              "38.",
+              "39.",
+              "4.",
+              "40.",
+              "41.",
+              "42.",
+              "43.",
+              "44.",
+              "45.",
+              "46.",
+              "47.",
+              "48.",
+              "49.",
+              "5.",
+              "50.",
+              "6.",
+              "7.",
+              "8.",
+              "9.",
+              "A.",
+              "A.C.",
+              "A.D.",
+              "A.D.L.",
+              "A.F.",
+              "A.G.",
+              "A.H.",
+              "A.J.C.",
+              "A.L.",
+              "A.M",
+              "A.M.",
+              "A.P.",
+              "A.T.B.",
+              "AUG.",
+              "Act.",
+              "Adm.",
+              "Ala.",
+              "Ariz.",
+              "Ark.",
+              "Assn.",
+              "Ass'n.",
+              "Ass'n",
+              "Aug.",
+              "B.",
+              "B.A.T",
+              "B.B.",
+              "B.F.",
+              "B.J.",
+              "B.V.",
+              "Bancorp.",
+              "Bhd.",
+              "Blvd.",
+              "Br.",
+              "Brig.",
+              "Bros.",
+              "C.",
+              "C.B.",
+              "C.D.s",
+              "C.J.",
+              "C.O.",
+              "C.R.",
+              "C.W.",
+              "CEO.",
+              "CO.",
+              "CORP.",
+              "COS.",
+              "Cal.",
+              "Calif.",
+              "Capt.",
+              "Cie.",
+              "Cir.",
+              "Cmdr.",
+              "Co.",
+              "Col.",
+              "Colo.",
+              "Comdr.",
+              "Conn.",
+              "Corp.",
+              "Cos.",
+              "D.",
+              "D.B.",
+              "D.C",
+              "D.C.",
+              "D.H.",
+              "D.M.",
+              "D.N.",
+              "D.S.",
+              "D.T",
+              "D.T.",
+              "D.s",
+              "Dec.",
+              "Del.",
+              "Dept.",
+              "Dev.",
+              "Dr.",
+              "Ds.",
+              "E.",
+              "E.E.",
+              "E.F.",
+              "E.I.",
+              "E.M.",
+              "E.R.",
+              "E.W.",
+              "Etc.",
+              "F.",
+              "F.A.",
+              "F.A.O.",
+              "F.C",
+              "F.E.",
+              "F.J.",
+              "F.S.B.",
+              "F.W.",
+              "FEB.",
+              "FL.",
+              "Feb.",
+              "Fed.",
+              "Fla.",
+              "Fran.",
+              "French.",
+              "Freon.",
+              "Ft.",
+              "G.",
+              "G.D.",
+              "G.L.",
+              "G.O.",
+              "G.S.",
+              "G.m.b",
+              "G.m.b.H.",
+              "GP.",
+              "GPO.",
+              "Ga.",
+              "Gen.",
+              "Gov.",
+              "H.",
+              "H.F.",
+              "H.G.",
+              "H.H.",
+              "H.J.",
+              "H.L.",
+              "H.R.",
+              "Hon.",
+              "I.",
+              "I.B.M.",
+              "I.C.H.",
+              "I.E.P.",
+              "I.M.",
+              "I.V.",
+              "I.W.",
+              "II.",
+              "III.",
+              "INC.",
+              "Intl.",
+              "Int'l",
+              "IV.",
+              "IX.",
+              "Ill.",
+              "Inc.",
+              "Ind.",
+              "J.",
+              "J.C.",
+              "J.D.",
+              "J.E.",
+              "J.F.",
+              "J.F.K.",
+              "J.H.",
+              "J.L.",
+              "J.M.",
+              "JohnQ.Public",
+              "J.P.",
+              "J.R.",
+              "J.V",
+              "J.V.",
+              "J.X.",
+              "Jan.",
+              "Jansz.",
+              "Je.",
+              "Jos.",
+              "Jr.",
+              "K.",
+              "K.C.",
+              "Kan.",
+              "Ky.",
+              "L.",
+              "L.A.",
+              "L.H.",
+              "L.J.",
+              "L.L.",
+              "L.M.",
+              "L.P",
+              "L.P.",
+              "La.",
+              "Lt.",
+              "Ltd.",
+              "M.",
+              "M.A.",
+              "M.B.A.",
+              "M.D",
+              "M.D.",
+              "M.D.C.",
+              "M.E.",
+              "M.J.",
+              "M.R.",
+              "M.S.",
+              "M.W.",
+              "M8.7sp",
+              "Maj.",
+              "Mar.",
+              "Mass.",
+              "Md.",
+              "Med.",
+              "Messrs.",
+              "Mfg.",
+              "Mich.",
+              "Minn.",
+              "Mir.",
+              "Miss.",
+              "Mo.",
+              "Mr.",
+              "Mrs.",
+              "Ms.",
+              "Mt.",
+              "N.",
+              "N.A.",
+              "N.C",
+              "N.C.",
+              "N.D",
+              "N.D.",
+              "N.H",
+              "N.H.",
+              "N.J",
+              "N.J.",
+              "N.M",
+              "N.M.",
+              "N.V",
+              "N.V.",
+              "N.Y",
+              "N.Y.",
+              "NOV.",
+              "Neb.",
+              "Nev.",
+              "No.",
+              "no.",
+              "Nos.",
+              "Nov.",
+              "O.",
+              "O.P.",
+              "OK.",
+              "Oct.",
+              "Okla.",
+              "Ore.",
+              "P.",
+              "P.J.",
+              "P.M",
+              "P.M.",
+              "P.R.",
+              "Pa.",
+              "Penn.",
+              "Pfc.",
+              "Ph.",
+              "Ph.D.",
+              "pro-U.N.",
+              "Prof.",
+              "Prop.",
+              "Pty.",
+              "Q.",
+              "R.",
+              "R.D.",
+              "Ret.",
+              "R.H.",
+              "R.I",
+              "R.I.",
+              "R.L.",
+              "R.P.",
+              "R.R.",
+              "R.W.",
+              "RLV.",
+              "Rd.",
+              "Rep.",
+              "Reps.",
+              "Rev.",
+              "S.",
+              "S.A",
+              "S.A.",
+              "S.C",
+              "S.C.",
+              "S.D.",
+              "S.G.",
+              "S.I.",
+              "S.P.",
+              "S.S.",
+              "S.p",
+              "S.p.A",
+              "S.p.A.",
+              "SKr1.5",
+              "Sen.",
+              "Sens.",
+              "Sept.",
+              "Sgt.",
+              "Snr.",
+              "Spc.",
+              "Sr.",
+              "St.",
+              "Sys.",
+              "T.",
+              "T.D.",
+              "T.F.",
+              "T.T.",
+              "T.V.",
+              "TEL.",
+              "Tech.",
+              "Tenn.",
+              "Tex.",
+              "Tx.",
+              "U.",
+              "U.Cal-Davis",
+              "U.K",
+              "U.K.",
+              "U.N.",
+              "U.S.",
+              "U.S.A",
+              "U.S.A.",
+              "U.S.C.",
+              "U.S.C..",
+              "U.S.S.R",
+              "U.S.S.R.",
+              "UK.",
+              "US116.7",
+              "V.",
+              "V.H.",
+              "VI.",
+              "VII.",
+              "VIII.",
+              "VS.",
+              "Va.",
+              "Vs.",
+              "Vt.",
+              "W.",
+              "W.A.",
+              "W.G.",
+              "W.I.",
+              "W.J.",
+              "W.R.",
+              "W.T.",
+              "W.Va",
+              "W.Va.",
+              "Wash.",
+              "Wis.",
+              "Wyo.",
+              "X.",
+              "Y.",
+              "Y.J.",
+              "Z.",
+              "a.",
+              "a.d.",
+              "a.k.a",
+              "a.m",
+              "a.m.",
+              "al.",
+              "b.",
+              "c.",
+              "c.i.f",
+              "cf.",
+              "cnsl.",
+              "cnsls.",
+              "cont'd.",
+              "d.",
+              "deft.",
+              "defts.",
+              "e.",
+              "et.",
+              "etc.",
+              "etseq.",
+              "f.",
+              "f.o.b",
+              "ft.",
+              "g.",
+              "h.",
+              "i.",
+              "i.e.",
+              "j.",
+              "k.",
+              "l.",
+              "m.",
+              "mots.",
+              "n.",
+              "o.",
+              "p.",
+              "p.m",
+              "p.m.",
+              "pltf.",
+              "pltfs.",
+              "prelim.",
+              "r.",
+              "s.",
+              "seq.",
+              "supp.",
+              "sq.",
+              "t.",
+              "u.",
+              "v.",
+              "vs.",
+              "x.",
+              "y.",
+              "z.")));
 
     }
 
@@ -1072,14 +1072,14 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
     }
 
     public String toString() {
-      StringBuffer buffer = new StringBuffer();
-      buffer.append("[");
+      StringBuilder buffer = new StringBuilder();
+      buffer.append('[');
       buffer.append(mWord);
       buffer.append(", ");
       buffer.append(mStart);
       buffer.append(", ");
       buffer.append(mEnd);
-      buffer.append("]");
+      buffer.append(']');
       return buffer.toString();
     }
 
@@ -1119,7 +1119,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
     return token;
   }
 
-  public static void main(String argv[]) throws Exception {
+  public static void main(String... argv) throws Exception {
     if(argv.length != 1){
       System.err.println("Usage: java edu.stanford.nlp.ie.machinereading.common.RobustTokenizer <file to tokenize>");
       System.exit(1);
@@ -1132,15 +1132,15 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
     // read the whole file in a buffer
     // XXX: for sure there are more efficient ways of reading a file...
     int ch;
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     while((ch = is.read()) != -1) buffer.append((char) ch);
     
     // create the tokenizer object
-    RobustTokenizer<Word> t = new RobustTokenizer<Word>(buffer.toString());
+    RobustTokenizer<Word> t = new RobustTokenizer<>(buffer.toString());
 
     List<Word> tokens = t.tokenize();
-    for(int i = 0; i < tokens.size(); i ++){
-      System.out.println(tokens.get(i));
-    }
+      for (Word token : tokens) {
+          System.out.println(token);
+      }
   }
 }

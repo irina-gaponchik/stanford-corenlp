@@ -23,7 +23,7 @@ public class FilteringTreebank extends Treebank {
   }
 
   /**
-   * Empty a <code>Treebank</code>.
+   * Empty a {@code Treebank}.
    */
   @Override
   public void clear() {
@@ -86,7 +86,7 @@ public class FilteringTreebank extends Treebank {
     }
 
     public boolean hasNext() {
-      return (next != null);
+      return next != null;
     }
 
     public Tree next() {

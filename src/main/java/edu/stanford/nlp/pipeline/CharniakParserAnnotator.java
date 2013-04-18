@@ -53,12 +53,7 @@ public class CharniakParserAnnotator implements Annotator {
         }
         int maxSentenceLength = parser.getMaxSentenceLength();
         // generate the constituent tree
-        if (maxSentenceLength <= 0 || words.size() < maxSentenceLength) {
-          tree = parser.getBestParse(words);
-        }
-        else {
-          tree = ParserAnnotatorUtils.xTree(words);
-        }
+          tree = maxSentenceLength <= 0 || words.size() < maxSentenceLength ? parser.getBestParse(words) : ParserAnnotatorUtils.xTree(words);
 
         ParserAnnotatorUtils.fillInParseAnnotations(VERBOSE, BUILD_GRAPHS, gsf, sentence, tree);
       }

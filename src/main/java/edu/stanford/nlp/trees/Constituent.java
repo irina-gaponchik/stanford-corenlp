@@ -8,23 +8,23 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * A <code>Constituent</code> object defines a generic edge in a graph.
- * The <code>Constituent</code> class is designed to be extended.  It
- * implements the <code>Comparable</code> interface in order to allow
- * graphs to be topologically sorted by the ordinary <code>Collection</code>
- * library in <code>java.util</code>, keying primarily on right-hand
- * node ID number.  The <code>Constituent</code> class implements most
- * of the functionality of the the <code>Label</code>
- * interface by passing all requests down to the <code>Label</code> which
- * might be contained in the <code>Constituent</code>.  This allows one
- * to put a <code>Constituent</code> anywhere that a <code>Label</code> is
- * required.  A <code>Constituent</code> is always <code>Scored</code>.
+ * A {@code Constituent} object defines a generic edge in a graph.
+ * The {@code Constituent} class is designed to be extended.  It
+ * implements the {@code Comparable} interface in order to allow
+ * graphs to be topologically sorted by the ordinary {@code Collection}
+ * library in {@code java.util}, keying primarily on right-hand
+ * node ID number.  The {@code Constituent} class implements most
+ * of the functionality of the the {@code Label}
+ * interface by passing all requests down to the {@code Label} which
+ * might be contained in the {@code Constituent}.  This allows one
+ * to put a {@code Constituent} anywhere that a {@code Label} is
+ * required.  A {@code Constituent} is always {@code Scored}.
  *
  * @author Christopher Manning
  */
 public abstract class Constituent implements Labeled, Scored, Label {
 
-  public Constituent() {}
+  protected Constituent() {}
 
   /**
    * access start node.
@@ -96,7 +96,7 @@ public abstract class Constituent implements Labeled, Scored, Label {
 
 
   /**
-   * Return a string representation of a <code>Constituent</code>.
+   * Return a string representation of a {@code Constituent}.
    *
    * @return The full string representation.
    */
@@ -104,18 +104,14 @@ public abstract class Constituent implements Labeled, Scored, Label {
   public String toString() {
     StringBuffer sb;
     Label lab = label();
-    if (lab != null) {
-      sb = new StringBuffer(lab.toString());
-    } else {
-      sb = new StringBuffer();
-    }
-    sb.append("(").append(start()).append(",").append(end()).append(")");
+      sb = lab != null ? new StringBuffer(lab.toString()) : new StringBuffer();
+    sb.append('(').append(start()).append(',').append(end()).append(')');
     return sb.toString();
   }
 
 
   /**
-   * Return the length of a <code>Constituent</code>
+   * Return the length of a {@code Constituent}
    */
   public int size() {
     return end() - start();
@@ -132,7 +128,7 @@ public abstract class Constituent implements Labeled, Scored, Label {
    * necessary to relax a constituent if one with a better score is found.
    * (Note, however, that if you do want to compare Constituent scores for
    * equality, then you have to be careful,
-   * because two <code>double</code> NaN values are considered unequal in
+   * because two {@code double} NaN values are considered unequal in
    * Java.)
    * The general contract of equals() implies that one can't have a
    * subclass of a concrete [non-abstract] class redefine equals() to use
@@ -152,7 +148,7 @@ public abstract class Constituent implements Labeled, Scored, Label {
       // System.out.println("Comparing " + this + " to " + c + "\n  " +
       //	"start: " + (start() == c.start()) + " end: " +
       //	(end() == c.end()) + " score: " + (score() == c.score()));
-      if ((start() == c.start()) && (end() == c.end())) {
+      if (start() == c.start() && end() == c.end()) {
         Label lab1 = label();
         Label lab2 = c.label();
         if (lab1 == null) {
@@ -183,9 +179,9 @@ public abstract class Constituent implements Labeled, Scored, Label {
    */
   @Override
   public int hashCode() {
-    int hash = (start() << 16) | end();
+    int hash = start() << 16 | end();
     Label lab = label();
-    return (lab == null || lab.value() == null) ? hash : hash ^ lab.value().hashCode();
+    return lab == null || lab.value() == null ? hash : hash ^ lab.value().hashCode();
   }
 
 
@@ -197,7 +193,7 @@ public abstract class Constituent implements Labeled, Scored, Label {
    * @return True if the two constituents cross
    */
   public boolean crosses(Constituent c) {
-    return (start() < c.start() && c.start() < end() && end() < c.end()) || (c.start() < start() && start() < c.end() && c.end() < end());
+    return start() < c.start() && c.start() < end() && end() < c.end() || c.start() < start() && start() < c.end() && c.end() < end();
   }
 
 
@@ -265,7 +261,7 @@ public abstract class Constituent implements Labeled, Scored, Label {
 
 
   /**
-   * Make a new label with this <code>String</code> as the "name", perhaps
+   * Make a new label with this {@code String} as the "name", perhaps
    * by doing some appropriate decoding of the string.
    *
    * @param labelStr the String that translates into the content of the
@@ -281,7 +277,7 @@ public abstract class Constituent implements Labeled, Scored, Label {
 
   /**
    * Print out as a string the subpart of a sentence covered
-   * by this <code>Constituent</code>.
+   * by this {@code Constituent}.
    *
    * @return The subpart of the sentence
    */
@@ -291,7 +287,7 @@ public abstract class Constituent implements Labeled, Scored, Label {
     for (int wordNum = start(), end = end(); wordNum <= end; wordNum++) {
       sb.append(s.get(wordNum));
       if (wordNum != end) {
-        sb.append(" ");
+        sb.append(' ');
       }
     }
     return sb.toString();

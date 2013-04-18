@@ -43,12 +43,12 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
 
   /** When mention boundaries are given */
   public List<List<Mention>> filterPredictedMentions(List<List<Mention>> allGoldMentions, Annotation doc, Dictionaries dict){
-    List<List<Mention>> predictedMentions = new ArrayList<List<Mention>>();
+    List<List<Mention>> predictedMentions = new ArrayList<>();
 
     for(int i = 0 ; i < allGoldMentions.size(); i++){
       CoreMap s = doc.get(CoreAnnotations.SentencesAnnotation.class).get(i);
       List<Mention> goldMentions = allGoldMentions.get(i);
-      List<Mention> mentions = new ArrayList<Mention>();
+      List<Mention> mentions = new ArrayList<>();
       predictedMentions.add(mentions);
       mentions.addAll(goldMentions);
       findHead(s, mentions);
@@ -75,10 +75,10 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
   @Override
   public List<List<Mention>> extractPredictedMentions(Annotation doc, int _maxID, Dictionaries dict){
     this.maxID = _maxID;
-    List<List<Mention>> predictedMentions = new ArrayList<List<Mention>>();
+    List<List<Mention>> predictedMentions = new ArrayList<>();
     for(CoreMap s : doc.get(CoreAnnotations.SentencesAnnotation.class)) {
 
-      List<Mention> mentions = new ArrayList<Mention>();
+      List<Mention> mentions = new ArrayList<>();
       predictedMentions.add(mentions);
       Set<IntPair> mentionSpanSet = Generics.newHashSet();
       Set<IntPair> namedEntitySpanSet = Generics.newHashSet();
@@ -117,7 +117,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
           // attached to the previous NER by the earlier heuristic
           if(beginIndex < endIndex && !mentionSpanSet.contains(mSpan)) {
             int mentionId = assignIds? ++maxID:-1;
-            Mention m = new Mention(mentionId, beginIndex, endIndex, dependency, new ArrayList<CoreLabel>(sent.subList(beginIndex, endIndex)));
+            Mention m = new Mention(mentionId, beginIndex, endIndex, dependency, new ArrayList<>(sent.subList(beginIndex, endIndex)));
             mentions.add(m);
             mentionSpanSet.add(mSpan);
             namedEntitySpanSet.add(mSpan);
@@ -132,7 +132,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
       IntPair mSpan = new IntPair(beginIndex, sent.size());
       if(!mentionSpanSet.contains(mSpan)) {
         int mentionId = assignIds? ++maxID:-1;
-        Mention m = new Mention(mentionId, beginIndex, sent.size(), dependency, new ArrayList<CoreLabel>(sent.subList(beginIndex, sent.size())));
+        Mention m = new Mention(mentionId, beginIndex, sent.size(), dependency, new ArrayList<>(sent.subList(beginIndex, sent.size())));
         mentions.add(m);
         mentionSpanSet.add(mSpan);
         namedEntitySpanSet.add(mSpan);
@@ -146,7 +146,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
     tree.indexLeaves();
     SemanticGraph dependency = s.get(SemanticGraphCoreAnnotations.CollapsedDependenciesAnnotation.class);
 
-    final String mentionPattern = "/^(?:NP|PRP)/";
+    String mentionPattern = "/^(?:NP|PRP)/";
     TregexPattern tgrepPattern = TregexPattern.compile(mentionPattern);
     TregexMatcher matcher = tgrepPattern.matcher(tree);
     while (matcher.find()) {
@@ -157,7 +157,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
       IntPair mSpan = new IntPair(beginIdx, endIdx);
       if(!mentionSpanSet.contains(mSpan) && !insideNE(mSpan, namedEntitySpanSet)) {
         int mentionID = assignIds? ++maxID:-1;
-        Mention m = new Mention(mentionID, beginIdx, endIdx, dependency, new ArrayList<CoreLabel>(sent.subList(beginIdx, endIdx)), t);
+        Mention m = new Mention(mentionID, beginIdx, endIdx, dependency, new ArrayList<>(sent.subList(beginIdx, endIdx)), t);
         mentions.add(m);
         mentionSpanSet.add(mSpan);
       }
@@ -169,7 +169,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
     Tree tree = s.get(TreeCoreAnnotations.TreeAnnotation.class);
     SemanticGraph dependency = s.get(SemanticGraphCoreAnnotations.CollapsedDependenciesAnnotation.class);
 
-    final String mentionPattern = "NP < (/^(?:NP|NNP|NML)/=m1 $.. (/^CC|,/ $.. /^(?:NP|NNP|NML)/=m2))";
+    String mentionPattern = "NP < (/^(?:NP|NNP|NML)/=m1 $.. (/^CC|,/ $.. /^(?:NP|NNP|NML)/=m2))";
     TregexPattern tgrepPattern = TregexPattern.compile(mentionPattern);
     TregexMatcher matcher = tgrepPattern.matcher(tree);
     Map<IntPair, Tree> spanToMentionSubTree = Generics.newHashMap();
@@ -189,13 +189,13 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
       spanToMentionSubTree.put(new IntPair(beginIdx, endIdx), m2);
     }
 
-    for(IntPair mSpan : spanToMentionSubTree.keySet()){
-      if(!mentionSpanSet.contains(mSpan) && !insideNE(mSpan, namedEntitySpanSet)) {
+    for(Map.Entry<IntPair, Tree> intPairTreeEntry : spanToMentionSubTree.entrySet()){
+      if(!mentionSpanSet.contains(intPairTreeEntry.getKey()) && !insideNE(intPairTreeEntry.getKey(), namedEntitySpanSet)) {
         int mentionID = assignIds? ++maxID:-1;
-        Mention m = new Mention(mentionID, mSpan.get(0), mSpan.get(1), dependency,
-                                new ArrayList<CoreLabel>(sent.subList(mSpan.get(0), mSpan.get(1))), spanToMentionSubTree.get(mSpan));
+        Mention m = new Mention(mentionID, intPairTreeEntry.getKey().get(0), intPairTreeEntry.getKey().get(1), dependency,
+                                new ArrayList<>(sent.subList(intPairTreeEntry.getKey().get(0), intPairTreeEntry.getKey().get(1))), intPairTreeEntry.getValue());
         mentions.add(m);
-        mentionSpanSet.add(mSpan);
+        mentionSpanSet.add(intPairTreeEntry.getKey());
       }
     }
   }
@@ -219,7 +219,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
       m.headString = m.headWord.get(CoreAnnotations.TextAnnotation.class).toLowerCase();
       int start = m.headIndex - m.startIndex;
       if (start < 0 || start >= m.originalSpan.size()) {
-        SieveCoreferenceSystem.logger.warning("Invalid index for head " + start + "=" + m.headIndex + "-" + m.startIndex
+        SieveCoreferenceSystem.logger.warning("Invalid index for head " + start + '=' + m.headIndex + '-' + m.startIndex
                 + ": originalSpan=[" + StringUtils.joinWords(m.originalSpan, " ") + "], head=" + m.headWord);
         SieveCoreferenceSystem.logger.warning("Setting head string to entire mention");
         m.headIndex = m.startIndex;
@@ -249,10 +249,10 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
     // context, so as to make the parser work better :-)
 
     int approximateness = 0;
-    List<CoreLabel> extentTokens = new ArrayList<CoreLabel>();
+    List<CoreLabel> extentTokens = new ArrayList<>();
     extentTokens.add(initCoreLabel("It"));
     extentTokens.add(initCoreLabel("was"));
-    final int ADDED_WORDS = 2;
+    int ADDED_WORDS = 2;
     for (int i = m.startIndex; i < endIdx; i++) {
       // Add everything except separated dashes! The separated dashes mess with the parser too badly.
       CoreLabel label = tokens.get(i);
@@ -276,30 +276,35 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
     tree.indexSpans(m.startIndex - ADDED_WORDS);  // remember it has ADDED_WORDS extra words at the beginning
     Tree subtree = findPartialSpan(tree, m.startIndex);
     Tree extentHead = safeHead(subtree);
-    assert(extentHead != null);
+    assert extentHead != null;
     // extentHead is a child in the local extent parse tree. we need to find the corresponding node in the main tree
     // Because we deleted dashes, it's index will be >= the index in the extent parse tree
     CoreLabel l = (CoreLabel) extentHead.label();
     Tree realHead = funkyFindLeafWithApproximateSpan(root, l.value(), l.get(CoreAnnotations.BeginIndexAnnotation.class), approximateness);
-    assert(realHead != null);
+    assert realHead != null;
     return realHead;
   }
-  private static Tree findPartialSpan(final Tree root, final int start) {
-    CoreLabel label = (CoreLabel) root.label();
-    int startIndex = label.get(CoreAnnotations.BeginIndexAnnotation.class);
-    if (startIndex == start) {
-      return root;
+
+    private static Tree findPartialSpan(Tree root, int start) {
+        findPartialSpan:
+        while (true) {
+            CoreLabel label = (CoreLabel) root.label();
+            int startIndex = label.get(CoreAnnotations.BeginIndexAnnotation.class);
+            if (startIndex == start) {
+                return root;
+            }
+            for (Tree kid : root.children()) {
+                CoreLabel kidLabel = (CoreLabel) kid.label();
+                int kidStart = kidLabel.get(CoreAnnotations.BeginIndexAnnotation.class);
+                int kidEnd = kidLabel.get(CoreAnnotations.EndIndexAnnotation.class);
+                if (kidStart <= start && kidEnd > start) {
+                    root = kid;
+                    continue findPartialSpan;
+                }
+            }
+            throw new RuntimeException("Shouldn't happen: " + start + ' ' + root);
+        }
     }
-    for (Tree kid : root.children()) {
-      CoreLabel kidLabel = (CoreLabel) kid.label();
-      int kidStart = kidLabel.get(CoreAnnotations.BeginIndexAnnotation.class);
-      int kidEnd = kidLabel.get(CoreAnnotations.EndIndexAnnotation.class);
-      if (kidStart <= start && kidEnd > start) {
-        return findPartialSpan(kid, start);
-      }
-    }
-    throw new RuntimeException("Shouldn't happen: " + start + " " + root);
-  }
 
   private static Tree funkyFindLeafWithApproximateSpan(Tree root, String token, int index, int approximateness) {
     List<Tree> leaves = root.getLeaves();
@@ -333,7 +338,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
     sent.set(CoreAnnotations.TokensAnnotation.class, tokens);
     sent.set(ParserAnnotations.ConstraintAnnotation.class, constraints);
     Annotation doc = new Annotation("");
-    List<CoreMap> sents = new ArrayList<CoreMap>();
+    List<CoreMap> sents = new ArrayList<>();
     sents.add(sent);
     doc.set(CoreAnnotations.SentencesAnnotation.class, sents);
     getParser().annotate(doc);
@@ -343,7 +348,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
   private Annotator getParser() {
     if(parserProcessor == null){
       parserProcessor = StanfordCoreNLP.getExistingAnnotator("parse");
-      assert(parserProcessor != null);
+      assert parserProcessor != null;
     }
     return parserProcessor;
   }
@@ -364,7 +369,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
     if (head != null) return head;
     // if no head found return the right-most leaf
     List<Tree> leaves = top.getLeaves();
-    if(leaves.size() > 0) return leaves.get(leaves.size() - 1);
+    if(!leaves.isEmpty()) return leaves.get(leaves.size() - 1);
     // fallback: return top
     return top;
   }
@@ -459,9 +464,8 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
     if(mentionSpan.equals("there") || mentionSpan.startsWith("etc.")
         || mentionSpan.equals("ltd.")) return true;
     if(mentionSpan.startsWith("'s ")) return true;
-    if(mentionSpan.endsWith("etc.")) return true;
+      return mentionSpan.endsWith("etc.");
 
-    return false;
   }
 
   private static boolean partitiveRule(Mention m, List<CoreLabel> sent, Dictionaries dict) {
@@ -473,7 +477,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
   /** Check whether pleonastic 'it'. E.g., It is possible that ... */
   private static boolean isPleonastic(Mention m, Tree tree) {
     if ( ! m.spanToString().equalsIgnoreCase("it")) return false;
-    final String[] patterns = {
+    String[] patterns = {
         // cdm 2013: I spent a while on these patterns. I fixed a syntax error in five patterns ($.. split with space), so it now shouldn't exception in checkPleonastic. This gave 0.02% on CoNLL11 dev
         // I tried some more precise paterns but they didn't help. Indeed, they tended to hurt vs. the higher recall patterns.
 

@@ -143,11 +143,7 @@ public class IOUtils {
    */
   public static void writeStringToFile(String contents, String path, String encoding) throws IOException {
     OutputStream writer;
-    if (path.endsWith(".gz")) {
-      writer = new GZIPOutputStream(new FileOutputStream(path));
-    } else {
-      writer = new BufferedOutputStream(new FileOutputStream(path));
-    }
+      writer = path.endsWith(".gz") ? new GZIPOutputStream(new FileOutputStream(path)) : new BufferedOutputStream(new FileOutputStream(path));
     writer.write(contents.getBytes(encoding));
     writer.close();
   }
@@ -170,11 +166,7 @@ public class IOUtils {
   public static void writeStringToFileNoExceptions(String contents, String path, String encoding) {
     OutputStream writer = null;
     try{
-      if (path.endsWith(".gz")) {
-        writer = new GZIPOutputStream(new FileOutputStream(path));
-      } else {
-        writer = new BufferedOutputStream(new FileOutputStream(path));
-      }
+        writer = path.endsWith(".gz") ? new GZIPOutputStream(new FileOutputStream(path)) : new BufferedOutputStream(new FileOutputStream(path));
       writer.write(contents.getBytes(encoding));
     } catch (Exception e) {
       e.printStackTrace();
@@ -195,11 +187,7 @@ public class IOUtils {
   public static File writeStringToTempFile(String contents, String path, String encoding) throws IOException {
     OutputStream writer;
     File tmp = File.createTempFile(path,".tmp");
-    if (path.endsWith(".gz")) {
-      writer = new GZIPOutputStream(new FileOutputStream(tmp));
-    } else {
-      writer = new BufferedOutputStream(new FileOutputStream(tmp));
-    }
+      writer = path.endsWith(".gz") ? new GZIPOutputStream(new FileOutputStream(tmp)) : new BufferedOutputStream(new FileOutputStream(tmp));
     writer.write(contents.getBytes(encoding));
     return tmp;
   }
@@ -228,11 +216,7 @@ public class IOUtils {
     File tmp = null;
     try {
       tmp = File.createTempFile(path,".tmp");
-      if (path.endsWith(".gz")) {
-        writer = new GZIPOutputStream(new FileOutputStream(tmp));
-      } else {
-        writer = new BufferedOutputStream(new FileOutputStream(tmp));
-      }
+        writer = path.endsWith(".gz") ? new GZIPOutputStream(new FileOutputStream(tmp)) : new BufferedOutputStream(new FileOutputStream(tmp));
       writer.write(contents.getBytes(encoding));
     } catch (Exception e) {
       e.printStackTrace();
@@ -320,12 +304,10 @@ public class IOUtils {
               new GZIPInputStream(new FileInputStream(file))));
       o = ois.readObject();
       ois.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    } catch (ClassNotFoundException e) {
+    } catch (IOException | ClassNotFoundException e) {
       e.printStackTrace();
     }
-    return ErasureUtils.uncheckedCast(o);
+      return ErasureUtils.uncheckedCast(o);
   }
 
   public static int lineCount(File textFile) throws IOException {
@@ -340,13 +322,9 @@ public class IOUtils {
   public static ObjectOutputStream writeStreamFromString(String serializePath)
           throws IOException {
     ObjectOutputStream oos;
-    if (serializePath.endsWith(".gz")) {
-      oos = new ObjectOutputStream(new BufferedOutputStream(
-              new GZIPOutputStream(new FileOutputStream(serializePath))));
-    } else {
-      oos = new ObjectOutputStream(new BufferedOutputStream(
+      oos = serializePath.endsWith(".gz") ? new ObjectOutputStream(new BufferedOutputStream(
+              new GZIPOutputStream(new FileOutputStream(serializePath)))) : new ObjectOutputStream(new BufferedOutputStream(
               new FileOutputStream(serializePath)));
-    }
 
     return oos;
   }
@@ -498,7 +476,7 @@ public class IOUtils {
    * @param file The file whose lines are to be read.
    * @return An Iterable containing the lines from the file.
    */
-  public static Iterable<String> readLines(final File file) {
+  public static Iterable<String> readLines(File file) {
     return readLines(file, null, null);
   }
 
@@ -514,8 +492,8 @@ public class IOUtils {
    *          InputStream.
    * @return An Iterable containing the lines from the file.
    */
-  public static Iterable<String> readLines(final File file,
-                                           final Class<? extends InputStream> fileInputStreamWrapper) {
+  public static Iterable<String> readLines(File file,
+                                           Class<? extends InputStream> fileInputStreamWrapper) {
     return readLines(file, fileInputStreamWrapper, null);
   }
 
@@ -575,11 +553,7 @@ public class IOUtils {
                 stream = fileInputStreamWrapper.getConstructor(
                         InputStream.class).newInstance(stream);
               }
-              if (encoding == null) {
-                return new BufferedReader(new InputStreamReader(stream));
-              } else {
-                return new BufferedReader(new InputStreamReader(stream, encoding));
-              }
+                return encoding == null ? new BufferedReader(new InputStreamReader(stream)) : new BufferedReader(new InputStreamReader(stream, encoding));
             } catch (Exception e) {
               throw new RuntimeIOException(e);
             }
@@ -634,7 +608,7 @@ public class IOUtils {
    *          The root directory.
    * @return All files within the directory.
    */
-  public static Iterable<File> iterFilesRecursive(final File dir) {
+  public static Iterable<File> iterFilesRecursive(File dir) {
     return iterFilesRecursive(dir, (Pattern) null);
   }
 
@@ -647,9 +621,9 @@ public class IOUtils {
    *          A string that must be at the end of all files (e.g. ".txt")
    * @return All files within the directory ending in the given extension.
    */
-  public static Iterable<File> iterFilesRecursive(final File dir,
-                                                  final String ext) {
-    return iterFilesRecursive(dir, Pattern.compile(Pattern.quote(ext) + "$"));
+  public static Iterable<File> iterFilesRecursive(File dir,
+                                                  String ext) {
+    return iterFilesRecursive(dir, Pattern.compile(Pattern.quote(ext) + '$'));
   }
 
   /**
@@ -667,7 +641,7 @@ public class IOUtils {
     return new Iterable<File>() {
       public Iterator<File> iterator() {
         return new AbstractIterator<File>() {
-          private final Queue<File> files = new LinkedList<File>(Collections
+          private final Queue<File> files = new LinkedList<>(Collections
                   .singleton(dir));
           private File file = this.findNext();
 
@@ -760,7 +734,7 @@ public class IOUtils {
   /**
    * Returns all the text in the given file with the given encoding. If the file
    * cannot be read (non-existent, etc.), then and only then the method returns
-   * <code>null</code>.
+   * {@code null}.
    */
   public static String slurpFileNoExceptions(String filename, String encoding) {
     try {
@@ -880,7 +854,7 @@ public class IOUtils {
   /**
    * Returns all the text at the given URL. If the file cannot be read
    * (non-existent, etc.), then and only then the method returns
-   * <code>null</code>.
+   * {@code null}.
    */
   public static String slurpURLNoExceptions(String path) {
     try {
@@ -896,7 +870,7 @@ public class IOUtils {
    *
    * @return The text in the file. May be an empty string if the file is empty.
    *         If the file cannot be read (non-existent, etc.), then and only then
-   *         the method returns <code>null</code>.
+   *         the method returns {@code null}.
    */
   public static String slurpFileNoExceptions(File file) {
     try {
@@ -912,7 +886,7 @@ public class IOUtils {
    *
    * @return The text in the file. May be an empty string if the file is empty.
    *         If the file cannot be read (non-existent, etc.), then and only then
-   *         the method returns <code>null</code>.
+   *         the method returns {@code null}.
    */
   public static String slurpFileNoExceptions(String filename) {
     try {
@@ -985,7 +959,7 @@ public class IOUtils {
         labels = StringUtils.splitOnCharWithQuoting(line,',','"',escapeChar);
       } else {
         String[] cells = StringUtils.splitOnCharWithQuoting(line,',',quoteChar,escapeChar);
-        assert(cells.length == labels.length);
+        assert cells.length == labels.length;
         Map<String,String> cellMap = Generics.newHashMap();
         for (int i=0; i<labels.length; i++) cellMap.put(labels[i],cells[i]);
         rows.add(cellMap);
@@ -1008,7 +982,7 @@ public class IOUtils {
     //--Variables
     StringBuilder[] buffer = new StringBuilder[numColumns];
     buffer[0] = new StringBuilder();
-    LinkedList<String[]> lines = new LinkedList<String[]>();
+    LinkedList<String[]> lines = new LinkedList<>();
     //--State
     boolean inQuotes = false;
     boolean nextIsEscaped = false;
@@ -1031,7 +1005,7 @@ public class IOUtils {
             } else {
               columnI += 1;
               if(columnI >= numColumns){
-                throw new IllegalArgumentException("Too many columns: "+columnI+"/"+numColumns+" (offset: " + offset + ")");
+                throw new IllegalArgumentException("Too many columns: "+columnI+ '/' +numColumns+" (offset: " + offset + ')');
               }
               buffer[columnI] = new StringBuilder();
             }
@@ -1043,7 +1017,7 @@ public class IOUtils {
             } else {
               //((error checks))
               if(columnI != numColumns-1){
-                throw new IllegalArgumentException("Too few columns: "+columnI+"/"+numColumns+" (offset: " + offset + ")");
+                throw new IllegalArgumentException("Too few columns: "+columnI+ '/' +numColumns+" (offset: " + offset + ')');
               }
               //((create line))
               String[] rtn = new String[buffer.length];
@@ -1158,7 +1132,7 @@ public class IOUtils {
   {
     String bzcat = System.getProperty("bzcat", "bzcat");
     Runtime rt = Runtime.getRuntime();
-    String cmd = bzcat + " " + filename;
+    String cmd = bzcat + ' ' + filename;
     //System.err.println("getBZip2PipedInputStream: Running command: "+cmd);
     Process p = rt.exec(cmd);
     Writer errWriter = new BufferedWriter(new OutputStreamWriter(System.err));
@@ -1187,7 +1161,7 @@ public class IOUtils {
     Set<String> set = Generics.newHashSet();
     while ((line = br.readLine()) != null) {
       line = line.trim();
-      if (line.length() > 0) {
+      if (!line.isEmpty()) {
         if (field < 0) {
           set.add(line);
         } else {
@@ -1207,12 +1181,12 @@ public class IOUtils {
           NoSuchFieldException, NoSuchMethodException, InvocationTargetException
   {
     Pattern delimiterPattern = Pattern.compile(delimiter);
-    List<C> list = new ArrayList<C>();
+    List<C> list = new ArrayList<>();
     BufferedReader br = IOUtils.getBufferedFileReader(filename);
     String line;
     while ((line = br.readLine()) != null) {
       line = line.trim();
-      if (line.length() > 0) {
+      if (!line.isEmpty()) {
         C item = StringUtils.columnStringToObject(objClass, line, delimiterPattern, fieldNames);
         list.add(item);
       }
@@ -1288,7 +1262,7 @@ public class IOUtils {
    */
   public static List<String> linesFromFile(String filename,String encoding) {
     try {
-      List<String> lines = new ArrayList<String>();
+      List<String> lines = new ArrayList<>();
       BufferedReader in = new BufferedReader(new EncodingFileReader(filename,encoding));
       String line;
       while ((line = in.readLine()) != null) {
@@ -1310,7 +1284,7 @@ public class IOUtils {
   public static File backupFile(File file) {
     int max = 1000;
     String filename = file.toString();
-    File backup = new File(filename + "~");
+    File backup = new File(filename + '~');
     if (!backup.exists()) { return backup; }
     for (int i = 1; i <= max; i++) {
       backup = new File(filename + ".~" + i + ".~");
@@ -1332,7 +1306,7 @@ public class IOUtils {
     try {
       String machineName = InetAddress.getLocalHost().getHostName().split("\\.")[0];
       String username = System.getProperty("user.name");
-      return new File("/"+machineName+"/scr1/"+username);
+      return new File('/' +machineName+"/scr1/"+username);
     } catch (Exception e) {
       return new File("./scr/"); // default scratch
     }
@@ -1360,7 +1334,7 @@ public class IOUtils {
     }
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     System.out.println(backupName(args[0]));
   }
 
@@ -1383,11 +1357,7 @@ public class IOUtils {
    */
   public static Reader encodedInputStreamReader(InputStream stream, String encoding) throws IOException {
     // InputStreamReader doesn't allow encoding to be null;
-    if (encoding == null) {
-      return new InputStreamReader(stream);
-    } else {
-      return new InputStreamReader(stream, encoding);
-    }
+      return encoding == null ? new InputStreamReader(stream) : new InputStreamReader(stream, encoding);
   }
 
 
@@ -1402,11 +1372,7 @@ public class IOUtils {
    */
   public static Writer encodedOutputStreamWriter(OutputStream stream, String encoding) throws IOException {
     // OutputStreamWriter doesn't allow encoding to be null;
-    if (encoding == null) {
-      return new OutputStreamWriter(stream);
-    } else {
-      return new OutputStreamWriter(stream, encoding);
-    }
+      return encoding == null ? new OutputStreamWriter(stream) : new OutputStreamWriter(stream, encoding);
   }
 
 
@@ -1423,11 +1389,7 @@ public class IOUtils {
   public static PrintWriter encodedOutputStreamPrintWriter(OutputStream stream,
                                                            String encoding, boolean autoFlush) throws IOException {
     // PrintWriter doesn't allow encoding to be null; or to have charset and flush
-    if (encoding == null) {
-      return new PrintWriter(stream, autoFlush);
-    } else {
-      return new PrintWriter(new OutputStreamWriter(stream, encoding), autoFlush);
-    }
+      return encoding == null ? new PrintWriter(stream, autoFlush) : new PrintWriter(new OutputStreamWriter(stream, encoding), autoFlush);
   }
 
 

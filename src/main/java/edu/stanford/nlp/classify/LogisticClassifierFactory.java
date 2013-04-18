@@ -26,7 +26,7 @@ public class LogisticClassifierFactory<L,F> implements ClassifierFactory<L, F, L
   private L[] classes = ErasureUtils.<L>mkTArray(Object.class,2);
 
 
-  public LogisticClassifier<L,F> trainWeightedData(GeneralDataset<L,F> data, float[] dataWeights){
+  public LogisticClassifier<L,F> trainWeightedData(GeneralDataset<L,F> data, float... dataWeights){
     if(data instanceof RVFDataset)
       ((RVFDataset<L,F>)data).ensureRealValues();
     if (data.labelIndex.size() != 2) {
@@ -40,12 +40,12 @@ public class LogisticClassifierFactory<L,F> implements ClassifierFactory<L, F, L
     else if(data instanceof RVFDataset<?,?>)
       lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getValuesArray(), data.getLabelsArray(), new LogPrior(LogPrior.LogPriorType.QUADRATIC),dataWeights);
     minim = new QNMinimizer(lof);
-    weights = minim.minimize(lof, 1e-4, new double[data.numFeatureTypes()]);
+    weights = minim.minimize(lof, 1.0e-4, new double[data.numFeatureTypes()]);
 
     featureIndex = data.featureIndex;
     classes[0] = data.labelIndex.get(0);
     classes[1] = data.labelIndex.get(1);
-    return new LogisticClassifier<L,F>(weights,featureIndex,classes);
+    return new LogisticClassifier<>(weights,featureIndex,classes);
   }
 
   public LogisticClassifier<L,F> trainClassifier(GeneralDataset<L, F> data) {
@@ -53,11 +53,11 @@ public class LogisticClassifierFactory<L,F> implements ClassifierFactory<L, F, L
   }
 
   public LogisticClassifier<L,F> trainClassifier(GeneralDataset<L, F> data, LogPrior prior, boolean biased) {
-    return trainClassifier(data, 0.0, 1e-4, prior, biased);
+    return trainClassifier(data, 0.0, 1.0e-4, prior, biased);
   }
 
   public LogisticClassifier<L,F> trainClassifier(GeneralDataset<L, F> data, double l1reg) {
-    return trainClassifier(data, l1reg, 1e-4);
+    return trainClassifier(data, l1reg, 1.0e-4);
   }
 
   public LogisticClassifier<L,F> trainClassifier(GeneralDataset<L, F> data, double l1reg, double tol) {
@@ -86,26 +86,18 @@ public class LogisticClassifierFactory<L,F> implements ClassifierFactory<L, F, L
         lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getLabelsArray(), prior);
       else if(data instanceof RVFDataset<?,?>)
         lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getValuesArray(), data.getLabelsArray(), prior);
-      if (l1reg > 0.0) {
-        minim = ReflectionLoading.loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg);
-      } else {
-        minim = new QNMinimizer(lof);
-      }
+        minim = l1reg > 0.0 ? (Minimizer<DiffFunction>) ReflectionLoading.loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg) : new QNMinimizer(lof);
       weights = minim.minimize(lof, tol, new double[data.numFeatureTypes()]);
     } else {
       BiasedLogisticObjectiveFunction lof = new BiasedLogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getLabelsArray(), prior);
-      if (l1reg > 0.0) {
-        minim = ReflectionLoading.loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg);
-      } else {
-        minim = new QNMinimizer(lof);
-      }
+        minim = l1reg > 0.0 ? (Minimizer<DiffFunction>) ReflectionLoading.loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg) : new QNMinimizer(lof);
       weights = minim.minimize(lof, tol, new double[data.numFeatureTypes()]);
     }
 
     featureIndex = data.featureIndex;
     classes[0] = data.labelIndex.get(0);
     classes[1] = data.labelIndex.get(1);
-    return new LogisticClassifier<L,F>(weights,featureIndex,classes);
+    return new LogisticClassifier<>(weights,featureIndex,classes);
   }
 
   @Deprecated //this method no longer required by the ClassifierFactory Interface.

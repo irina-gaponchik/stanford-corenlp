@@ -121,11 +121,7 @@ public class NERCombinerAnnotator implements Annotator {
   public Set<Requirement> requires() {
     // TODO: we could check the models to see which ones use lemmas
     // and which ones use pos tags
-    if (ner.usesSUTime() || ner.appliesNumericClassifiers()) {
-      return TOKENIZE_SSPLIT_POS_LEMMA;
-    } else {
-      return TOKENIZE_AND_SSPLIT;
-    }
+      return ner.usesSUTime() || ner.appliesNumericClassifiers() ? TOKENIZE_SSPLIT_POS_LEMMA : TOKENIZE_AND_SSPLIT;
   }
 
   @Override

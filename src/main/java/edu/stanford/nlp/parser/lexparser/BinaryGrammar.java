@@ -61,7 +61,7 @@ public class BinaryGrammar implements Serializable, Iterable<BinaryRule> {
     for (int s = 0; s < numStates; s++) {
       try {
         //System.out.println(((String)index.get(s))); // debugging
-        synthetic[s] = (index.get(s).charAt(0) == '@');
+        synthetic[s] = index.get(s).charAt(0) == '@';
       } catch (NullPointerException e) {
         synthetic[s] = true;
       }
@@ -83,7 +83,7 @@ public class BinaryGrammar implements Serializable, Iterable<BinaryRule> {
       } else {
         // if state is not synthetic, we add rule to splitRules only if both children are not synthetic
         // do left
-        List<BinaryRule> ruleList = new ArrayList<BinaryRule>();
+        List<BinaryRule> ruleList = new ArrayList<>();
         for (BinaryRule br : rulesWithLC[state]) {
           if ( ! isSynthetic(br.rightChild)) {
             ruleList.add(br);
@@ -128,7 +128,7 @@ public class BinaryGrammar implements Serializable, Iterable<BinaryRule> {
 
   public double scoreRule(BinaryRule br) {
     BinaryRule rule = ruleMap.get(br);
-    return (rule != null ? rule.score : Double.NEGATIVE_INFINITY);
+    return rule != null ? rule.score : Double.NEGATIVE_INFINITY;
   }
 
   public void addRule(BinaryRule br) {
@@ -228,9 +228,9 @@ public class BinaryGrammar implements Serializable, Iterable<BinaryRule> {
     ruleSetWithLC = new Set[numStates];
     ruleSetWithRC = new Set[numStates];
     for (int s = 0; s < numStates; s++) {
-      rulesWithParent[s] = new ArrayList<BinaryRule>();
-      rulesWithLC[s] = new ArrayList<BinaryRule>();
-      rulesWithRC[s] = new ArrayList<BinaryRule>();
+      rulesWithParent[s] = new ArrayList<>();
+      rulesWithLC[s] = new ArrayList<>();
+      rulesWithRC[s] = new ArrayList<>();
       ruleSetWithLC[s] = Generics.newHashSet();
       ruleSetWithRC[s] = Generics.newHashSet();
     }
@@ -238,7 +238,7 @@ public class BinaryGrammar implements Serializable, Iterable<BinaryRule> {
 
   public BinaryGrammar(Index<String> stateIndex) {
     this.index = stateIndex;
-    allRules = new ArrayList<BinaryRule>();
+    allRules = new ArrayList<>();
     init();
   }
 
@@ -254,7 +254,7 @@ public class BinaryGrammar implements Serializable, Iterable<BinaryRule> {
     String line;
     int lineNum = 1;
     line = in.readLine();
-    while (line != null && line.length() > 0) {
+    while (line != null && !line.isEmpty()) {
       try {
         addRule(new BinaryRule(line, index));
       } catch (Exception e) {

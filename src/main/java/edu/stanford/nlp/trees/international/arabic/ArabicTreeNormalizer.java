@@ -40,7 +40,8 @@ import edu.stanford.nlp.util.Pair;
  */
 public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
 
-  private final boolean retainNPTmp;
+    private static final Pattern COMPILE = Pattern.compile(MorphoFeatureSpecification.MORPHO_MARK);
+    private final boolean retainNPTmp;
   private final boolean retainNPSbj;
   private final boolean markPRDverb;
   private final boolean changeNoLabels;
@@ -102,12 +103,8 @@ public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
       normalizedString = "NP-SBJ";
     } else if (retainPPClr && category != null && category.startsWith("PP-CLR")) {
       normalizedString = "PP-CLR";
-    } else if (markPRDverb && category != null && prdPattern.matcher(category).matches()) {
-      normalizedString = category;
-    } else {
-      // otherwise, return the basicCategory (and turn null to ROOT)
-      normalizedString = super.normalizeNonterminal(category);
-    }
+    } else
+        normalizedString = markPRDverb && category != null && prdPattern.matcher(category).matches() ? category : super.normalizeNonterminal(category);
 
     return normalizedString.intern();
   }
@@ -122,7 +119,7 @@ public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
         //Strip off morphological analyses and place them in the OriginalTextAnnotation, which is
         //specified by HasContext.
         if(t.value().contains(MorphoFeatureSpecification.MORPHO_MARK)) {
-          String[] toks = t.value().split(MorphoFeatureSpecification.MORPHO_MARK);
+          String[] toks = COMPILE.split(t.value());
           if(toks.length != 2)
             System.err.printf("%s: Word contains malformed morph annotation: %s%n",this.getClass().getName(),t.value());
 
@@ -138,7 +135,7 @@ public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
             } else {
               // TODO(speneg): Does this help?
               String newLemma = lexMapper.map(null, lemma);
-              if (newLemma == null || newLemma.trim().length() == 0) {
+              if (newLemma == null || newLemma.trim().isEmpty()) {
                 newLemma = lemma;
               }
               String newMorphAnalysis = newLemma + MorphoFeatureSpecification.LEMMA_MARK + morphAnalysis;
@@ -152,7 +149,7 @@ public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
 
       } else if (t.isPreTerminal()) {
 
-        if (t.value() == null || t.value().equals("")) {
+        if (t.value() == null || t.value().isEmpty()) {
           System.err.printf("%s: missing tag for\n%s\n",this.getClass().getName(),t.pennString());
         } else if(t.label() instanceof HasTag) {
           ((HasTag) t.label()).setTag(t.value());
@@ -162,7 +159,7 @@ public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
 
         // there are some nodes "/" missing preterminals.  We'll splice in a tag for these.
         int nk = t.numChildren();
-        List<Tree> newKids = new ArrayList<Tree>(nk);
+        List<Tree> newKids = new ArrayList<>(nk);
         for (int j = 0; j < nk; j++) {
           Tree child = t.getChild(j);
           if (child.isLeaf()) {
@@ -186,7 +183,7 @@ public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
       TregexMatcher m = prdVerbPattern.matcher(tree);
       Tree match = null;
       while (m.find()) {
-        if (m.getMatch() != match) {
+        if (!m.getMatch().equals(match)) {
           match = m.getMatch();
           match.label().setValue(match.label().value() + "-PRDverb");
           Tree prd = m.getNode("prd");
@@ -218,7 +215,7 @@ public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
     //Add start symbol so that the root has only one sub-state. Escape any enclosing brackets.
     //If the "tree" consists entirely of enclosing brackets e.g. ((())) then this method
     //will return null. In this case, readers e.g. PennTreeReader will try to read the next tree.
-    while(tree != null && (tree.value() == null || tree.value().equals("")) && tree.numChildren() <= 1)
+    while(tree != null && (tree.value() == null || tree.value().isEmpty()) && tree.numChildren() <= 1)
       tree = tree.firstChild();
 
     if(tree != null && !tree.value().equals(rootLabel))

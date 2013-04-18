@@ -33,7 +33,7 @@ class PTB2TextLexer {
    *                  at the beginning of a line
    * l is of the form l = 2*k, k a non negative integer
    */
-  private static final int ZZ_LEXSTATE[] = { 
+  private static final int[] ZZ_LEXSTATE = {
      0,  0,  1, 1
   };
 
@@ -144,7 +144,7 @@ class PTB2TextLexer {
     return result;
   }
 
-  private static int zzUnpackAction(String packed, int offset, int [] result) {
+  private static int zzUnpackAction(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -210,13 +210,13 @@ class PTB2TextLexer {
     return result;
   }
 
-  private static int zzUnpackRowMap(String packed, int offset, int [] result) {
+  private static int zzUnpackRowMap(String packed, int offset, int... result) {
     int i = 0;  /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
     while (i < l) {
-      int high = packed.charAt(i++) << 16;
-      result[j++] = high | packed.charAt(i++);
+      int high = (int) packed.charAt(i++) << 16;
+      result[j++] = high | (int) packed.charAt(i++);
     }
     return j;
   }
@@ -727,7 +727,7 @@ class PTB2TextLexer {
     return result;
   }
 
-  private static int zzUnpackTrans(String packed, int offset, int [] result) {
+  private static int zzUnpackTrans(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -747,14 +747,14 @@ class PTB2TextLexer {
   private static final int ZZ_PUSHBACK_2BIG = 2;
 
   /* error messages for the codes above */
-  private static final String ZZ_ERROR_MSG[] = {
+  private static final String[] ZZ_ERROR_MSG = {
     "Unkown internal scanner error",
     "Error: could not match input",
     "Error: pushback value was too large"
   };
 
   /**
-   * ZZ_ATTRIBUTE[aState] contains the attributes of state <code>aState</code>
+   * ZZ_ATTRIBUTE[aState] contains the attributes of state {@code aState}
    */
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
@@ -780,7 +780,7 @@ class PTB2TextLexer {
     return result;
   }
 
-  private static int zzUnpackAttribute(String packed, int offset, int [] result) {
+  private static int zzUnpackAttribute(String packed, int offset, int... result) {
     int i = 0;       /* index in packed string  */
     int j = offset;  /* index in unpacked array */
     int l = packed.length();
@@ -799,11 +799,11 @@ class PTB2TextLexer {
   private int zzState;
 
   /** the current lexical state */
-  private int zzLexicalState = YYINITIAL;
+  private int zzLexicalState;
 
   /** this buffer contains the current text to be matched and is
       the source of the yytext() string */
-  private char zzBuffer[] = new char[ZZ_BUFFERSIZE];
+  private char[] zzBuffer = new char[ZZ_BUFFERSIZE];
 
   /** the textposition at the last accepting state */
   private int zzMarkedPos;
@@ -913,9 +913,9 @@ class PTB2TextLexer {
   /**
    * Refills the input buffer.
    *
-   * @return      <code>false</code>, iff there was new input.
-   * 
-   * @exception   java.io.IOException  if any I/O-Error occurs
+   * @return      {@code false}, iff there was new input.
+   *
+   * @exception java.io.IOException  if any I/O-Error occurs
    */
   private boolean zzRefill() throws java.io.IOException {
 
@@ -935,7 +935,7 @@ class PTB2TextLexer {
     /* is the buffer big enough? */
     if (zzCurrentPos >= zzBuffer.length) {
       /* if not: blow it up */
-      char newBuffer[] = new char[zzCurrentPos*2];
+      char[] newBuffer = new char[(zzCurrentPos << 1)];
       System.arraycopy(zzBuffer, 0, newBuffer, 0, zzBuffer.length);
       zzBuffer = newBuffer;
     }
@@ -1062,7 +1062,7 @@ class PTB2TextLexer {
    *
    * @param   errorCode  the code of the errormessage to display
    */
-  private void zzScanError(int errorCode) {
+  private static void zzScanError(int errorCode) {
     String message;
     try {
       message = ZZ_ERROR_MSG[errorCode];
@@ -1150,7 +1150,7 @@ class PTB2TextLexer {
               zzInput = zzBufferL[zzCurrentPosL++];
             }
           }
-          int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput] ];
+          int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
           if (zzNext == -1) break zzForAction;
           zzState = zzNext;
 
@@ -1168,149 +1168,122 @@ class PTB2TextLexer {
       zzMarkedPos = zzMarkedPosL;
 
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
-        case 21: 
-          { return("n't");
-          }
-        case 31: break;
+        case 21:
+            return "n't";
+          case 31: break;
         case 28: 
           // lookahead expression with fixed lookahead length
           yypushback(2);
-          { return yytext();
-          }
-        case 32: break;
+            return yytext();
+          case 32: break;
         case 27: 
           // lookahead expression with fixed lookahead length
           yypushback(1);
-          { return yytext();
-          }
-        case 33: break;
+            return yytext();
+          case 33: break;
         case 26: 
           // lookahead expression with fixed lookahead length
           yypushback(1);
-          { return yytext();
-          }
-        case 34: break;
-        case 12: 
-          { return "/";
-          }
-        case 35: break;
-        case 5: 
-          { return yytext();
-          }
-        case 36: break;
-        case 3: 
-          { return "&";
-          }
-        case 37: break;
-        case 6: 
-          { yybegin(YYINITIAL); return "\"";
-          }
-        case 38: break;
-        case 13: 
-          { return "(";
-          }
-        case 39: break;
-        case 8: 
-          { return(")");
-          }
-        case 40: break;
-        case 22: 
-          { return "<";
-          }
-        case 41: break;
-        case 23: 
-          { return ">";
-          }
-        case 42: break;
-        case 29: 
-          { return "cannot";
-          }
-        case 43: break;
-        case 1: 
-          { return(yytext());
-          }
-        case 44: break;
+            return yytext();
+          case 34: break;
+        case 12:
+            return "/";
+          case 35: break;
+        case 5:
+            return yytext();
+          case 36: break;
+        case 3:
+            return "&";
+          case 37: break;
+        case 6:
+            yybegin(YYINITIAL);
+            return "\"";
+          case 38: break;
+        case 13:
+            return "(";
+          case 39: break;
+        case 8:
+            return ")";
+          case 40: break;
+        case 22:
+            return "<";
+          case 41: break;
+        case 23:
+            return ">";
+          case 42: break;
+        case 29:
+            return "cannot";
+          case 43: break;
+        case 1:
+            return yytext();
+          case 44: break;
         case 20: 
           // lookahead expression with fixed lookahead length
           yypushback(2);
-          { return "\"";
-          }
-        case 45: break;
+            return "\"";
+          case 45: break;
         case 16: 
           // lookahead expression with fixed lookahead length
           yypushback(1);
-          { return "\"";
-          }
-        case 46: break;
-        case 17: 
-          { return "\"";
-          }
-        case 47: break;
-        case 11: 
-          { return("`");
-          }
-        case 48: break;
-        case 14: 
-          { return("{");
-          }
-        case 49: break;
-        case 19: 
-          { return("\"");
-          }
-        case 50: break;
-        case 15: 
-          { return("$");
-          }
-        case 51: break;
-        case 7: 
-          { return(yytext().substring(1, yytext().length()));
-          }
-        case 52: break;
+            return "\"";
+          case 46: break;
+        case 17:
+            return "\"";
+          case 47: break;
+        case 11:
+            return "`";
+          case 48: break;
+        case 14:
+            return "{";
+          case 49: break;
+        case 19:
+            return "\"";
+          case 50: break;
+        case 15:
+            return "$";
+          case 51: break;
+        case 7:
+            return yytext().substring(1, yytext().length());
+          case 52: break;
         case 24: 
           // lookahead expression with fixed lookahead length
           yypushback(1);
-          { yybegin(INQUOTE); return "\" \"";
-          }
-        case 53: break;
-        case 10: 
-          { return("%");
-          }
-        case 54: break;
-        case 4: 
-          { yybegin(YYINITIAL); return(yytext());
-          }
-        case 55: break;
-        case 9: 
-          { return("}");
-          }
-        case 56: break;
+            yybegin(INQUOTE);
+            return "\" \"";
+          case 53: break;
+        case 10:
+            return "%";
+          case 54: break;
+        case 4:
+            yybegin(YYINITIAL);
+            return yytext();
+          case 55: break;
+        case 9:
+            return "}";
+          case 56: break;
         case 30: 
           // lookahead expression with fixed lookahead length
           yypushback(1);
-          { return removeWhite(yytext());
-          }
-        case 57: break;
-        case 25: 
-          { return removeWhite(yytext());
-          }
-        case 58: break;
+            return removeWhite(yytext());
+          case 57: break;
+        case 25:
+            return removeWhite(yytext());
+          case 58: break;
         case 18: 
           // lookahead expression with fixed lookahead length
           yypushback(1);
-          { yybegin(INQUOTE); return "\"";
-          }
-        case 59: break;
-        case 2: 
-          { yybegin(INQUOTE); return "\"";
-          }
-        case 60: break;
+            yybegin(INQUOTE);
+            return "\"";
+          case 59: break;
+        case 2:
+            yybegin(INQUOTE);
+            return "\"";
+          case 60: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {
             zzAtEOF = true;
-              {
-                return null;
-              }
-          } 
+              return null;
+          }
           else {
             zzScanError(ZZ_NO_MATCH);
           }

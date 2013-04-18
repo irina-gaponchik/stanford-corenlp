@@ -80,11 +80,11 @@ import edu.stanford.nlp.util.Timing;
  * <li>Add code to NERFeatureFactory for this feature. First decide which
  *     classes (hidden states) are involved in the feature.  If only the
  *     current class, you add the feature extractor to the
- *     <code>featuresC</code> code, if both the current and previous class,
- *     then <code>featuresCpC</code>, etc.</li>
+ *     {@code featuresC} code, if both the current and previous class,
+ *     then {@code featuresCpC}, etc.</li>
  * </ol>
  * <p> Parameters can be defined using a Properties file
- * (specified on the command-line with <code>-prop</code> <i>propFile</i>),
+ * (specified on the command-line with {@code -prop} <i>propFile</i>),
  * or directly on the command line. The following properties are recognized:
  * </p>
  * <table border="1">
@@ -344,7 +344,7 @@ import edu.stanford.nlp.util.Timing;
  * <p/>
  * c                          - useClassFeature
  * <p/>
-  * p,s,c                      - useShapeConjunctions
+ * p,s,c                      - useShapeConjunctions
  * t,s,c                      - useShapeConjunctions
  * <p/>
  * w,t,c                      + useWordTag                      ?
@@ -368,11 +368,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
 
   private static final long serialVersionUID = -2329726064739185544L;
 
-  public NERFeatureFactory() {
-    super();
-  }
-
-  public void init(SeqClassifierFlags flags) {
+    public void init(SeqClassifierFlags flags) {
     super.init(flags);
     initGazette();
     if (flags.useDistSim) {
@@ -391,18 +387,18 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     Collection<String> features = Generics.newHashSet();
 
     boolean doFE = cInfo.get(0).containsKey(CoreAnnotations.DomainAnnotation.class);
-    String domain = (doFE ? cInfo.get(0).get(CoreAnnotations.DomainAnnotation.class) : null);
+    String domain = doFE ? cInfo.get(0).get(CoreAnnotations.DomainAnnotation.class) : null;
 
 //    System.err.println(doFE+"\t"+domain);
 
-    if (clique == cliqueC) {
+    if (clique.equals(cliqueC)) {
       //200710: tried making this clique null; didn't improve performance (rafferty)
       Collection<String> c = featuresC(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "C");
       if (doFE) {
         addAllInterningAndSuffixing(features, c, domain+"-C");
       }
-    } else if (clique == cliqueCpC) {
+    } else if (clique.equals(cliqueCpC)) {
       Collection<String> c = featuresCpC(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "CpC");
       if (doFE) {
@@ -414,31 +410,31 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       if (doFE) {
         addAllInterningAndSuffixing(features, c, domain+"-CnC");
       }
-    } else if (clique == cliqueCp2C) {
+    } else if (clique.equals(cliqueCp2C)) {
       Collection<String> c = featuresCp2C(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "Cp2C");
       if (doFE) {
         addAllInterningAndSuffixing(features, c, domain+"-Cp2C");
       }
-    } else if (clique == cliqueCp3C) {
+    } else if (clique.equals(cliqueCp3C)) {
       Collection<String> c = featuresCp3C(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "Cp3C");
       if (doFE) {
         addAllInterningAndSuffixing(features, c, domain+"-Cp3C");
       }
-    } else if (clique == cliqueCp4C) {
+    } else if (clique.equals(cliqueCp4C)) {
       Collection<String> c = featuresCp4C(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "Cp4C");
       if (doFE) {
         addAllInterningAndSuffixing(features, c, domain+"-Cp4C");
       }
-    } else if (clique == cliqueCp5C) {
+    } else if (clique.equals(cliqueCp5C)) {
       Collection<String> c = featuresCp5C(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "Cp5C");
       if (doFE) {
         addAllInterningAndSuffixing(features, c, domain+"-Cp5C");
       }
-    } else if (clique == cliqueCpCp2C) {
+    } else if (clique.equals(cliqueCpCp2C)) {
       Collection<String> c = featuresCpCp2C(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "CpCp2C");
       if (doFE) {
@@ -450,13 +446,13 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       if (doFE) {
         addAllInterningAndSuffixing(features, c, domain+"-CpCnC");
       }
-    } else if (clique == cliqueCpCp2Cp3C) {
+    } else if (clique.equals(cliqueCpCp2Cp3C)) {
       Collection<String> c = featuresCpCp2Cp3C(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "CpCp2Cp3C");
       if (doFE) {
         addAllInterningAndSuffixing(features, c, domain+"-CpCp2Cp3C");
       }
-    } else if (clique == cliqueCpCp2Cp3Cp4C) {
+    } else if (clique.equals(cliqueCpCp2Cp3Cp4C)) {
       Collection<String> c = featuresCpCp2Cp3Cp4C(cInfo, loc);
       addAllInterningAndSuffixing(features, c, "CpCp2Cp3Cp4C");
       if (doFE) {
@@ -682,7 +678,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     final int loc;
     final String[] words;
     private static final long serialVersionUID = -5903728481621584810L;
-    public GazetteInfo(String feature, int loc, String[] words) {
+    private GazetteInfo(String feature, int loc, String... words) {
       this.feature = feature;
       this.loc = loc;
       this.words = words;
@@ -772,7 +768,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     String pShape = p.getString(CoreAnnotations.ShapeAnnotation.class);
     String nShape = n.getString(CoreAnnotations.ShapeAnnotation.class);
 
-    Collection<String> featuresC = new ArrayList<String>();
+    Collection<String> featuresC = new ArrayList<>();
 
     if (flags.useDistSim) {
       distSimAnnotate(cInfo);
@@ -827,17 +823,17 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
 
       if (flags.useLemmas) {
         String lem = c.getString(CoreAnnotations.LemmaAnnotation.class);
-        if (! "".equals(lem)) {
+        if (lem != null && !lem.isEmpty()) {
           featuresC.add(lem + "-LEM");
         }
       }
       if (flags.usePrevNextLemmas) {
         String plem = p.getString(CoreAnnotations.LemmaAnnotation.class);
         String nlem = n.getString(CoreAnnotations.LemmaAnnotation.class);
-        if (! "".equals(plem)) {
+        if (plem != null && !plem.isEmpty()) {
           featuresC.add(plem + "-PLEM");
         }
-        if (! "".equals(nlem)) {
+        if (nlem != null && !nlem.isEmpty()) {
           featuresC.add(nlem + "-NLEM");
         }
       }
@@ -892,7 +888,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
           if (i == flags.binnedLengths.length) {
             featureName = "Len-" + flags.binnedLengths[flags.binnedLengths.length - 1] + "-Inf";
           } else if (len <= flags.binnedLengths[i]) {
-            featureName = "Len-" + ((i == 0) ? 1 : flags.binnedLengths[i - 1]) + '-' + flags.binnedLengths[i];
+            featureName = "Len-" + (i == 0 ? 1 : flags.binnedLengths[i - 1]) + '-' + flags.binnedLengths[i];
             break;
           }
         }
@@ -1124,7 +1120,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       if (flags.usePrevVB) {
         for (int j = loc - 1; ; j--) {
           CoreLabel wi = cInfo.get(j);
-          if (wi == cInfo.getPad()) {
+          if (wi.equals(cInfo.getPad())) {
             prevVB = "X";
             featuresC.add("X-PVB");
             break;
@@ -1139,7 +1135,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       if (flags.useNextVB) {
         for (int j = loc + 1; ; j++) {
           CoreLabel wi = cInfo.get(j);
-          if (wi == cInfo.getPad()) {
+          if (wi.equals(cInfo.getPad())) {
             featuresC.add("X-NVB");
             nextVB = "X";
             break;
@@ -1211,7 +1207,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
           subs = wordToSubstrings.get(cWord);
         }
         if (subs == null) {
-          subs = new ArrayList<String>();
+          subs = new ArrayList<>();
           String word = '<' + cWord + '>';
           if (flags.lowercaseNGrams) {
             word = word.toLowerCase();
@@ -1282,7 +1278,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
         }
       }
 
-      if ((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) || (flags.useShapeStrings)) {
+      if (flags.wordShape > WordShapeClassifier.NOWORDSHAPE || flags.useShapeStrings) {
         featuresC.add(cShape + "-TYPE");
         if (flags.useTypeSeqs) {
           featuresC.add(pShape + "-PTYPE");
@@ -1378,7 +1374,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       if (flags.useNGrams) {
         Collection<String> subs = wordToSubstrings.get(cWord);
         if (subs == null) {
-          subs = new ArrayList<String>();
+          subs = new ArrayList<>();
           String word = '<' + cWord + '>';
           if (flags.lowercaseNGrams) {
             word = word.toLowerCase();
@@ -1415,7 +1411,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
         }
       }
 
-      if ((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) || (flags.useShapeStrings)) {
+      if (flags.wordShape > WordShapeClassifier.NOWORDSHAPE || flags.useShapeStrings) {
         featuresC.add(cShape + "-TYPE");
       }
 
@@ -1442,7 +1438,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
         featuresC.add(pWord + '-' + nWord + "-SWORDS");
       }
 
-      if ((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) || (flags.useShapeStrings)) {
+      if (flags.wordShape > WordShapeClassifier.NOWORDSHAPE || flags.useShapeStrings) {
         if (flags.useTypeSeqs) {
           featuresC.add(pShape + "-PTYPE");
           featuresC.add(nShape + "-NTYPE");
@@ -1552,11 +1548,11 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     // NER tag annotations from a previous NER system
     if (c.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) != null) {
       featuresC.add(c.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class)+ "-CStackedNERTag");
-      featuresC.add(cWord + "-" + c.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class)+ "-WCStackedNERTag");
+      featuresC.add(cWord + '-' + c.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class)+ "-WCStackedNERTag");
 
       if (flags.useNext) {
         featuresC.add(c.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + '-' + n.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + "-CNStackedNERTag");
-        featuresC.add(cWord + "-" + c.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + '-' + n.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + "-WCNStackedNERTag");
+        featuresC.add(cWord + '-' + c.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + '-' + n.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + "-WCNStackedNERTag");
 
         if (flags.usePrev) {
           featuresC.add(p.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + '-' + c.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + '-' + n.get(CoreAnnotations.StackedNamedEntityTagAnnotation.class) + "-PCNStackedNERTag");
@@ -1582,7 +1578,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     if(flags.useCommonWordsFeature)
       featuresC.add(c.get(CoreAnnotations.CommonWordsAnnotation.class));
 
-    if (flags.useRadical && cWord.length() > 0) {
+    if (flags.useRadical && !cWord.isEmpty()) {
       if (cWord.length() == 1) {
         featuresC.add(RadicalMap.getRadical(cWord.charAt(0)) +
                       "-SINGLE-CHAR-RADICAL");
@@ -1641,7 +1637,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     String pDS = p.getString(CoreAnnotations.DistSimAnnotation.class);
     String cShape = c.getString(CoreAnnotations.ShapeAnnotation.class);
     String pShape = p.getString(CoreAnnotations.ShapeAnnotation.class);
-    Collection<String> featuresCpC = new ArrayList<String>();
+    Collection<String> featuresCpC = new ArrayList<>();
 
     if (flags.noEdgeFeature)
       return featuresCpC;
@@ -1717,7 +1713,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
           featuresCpC.add(cDS + "-PSEQcDS");
           featuresCpC.add(pDS+ '-' +cDS + "-PSEQpcDS");
 
-          if (((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) || flags.useShapeStrings)) {
+          if (flags.wordShape > WordShapeClassifier.NOWORDSHAPE || flags.useShapeStrings) {
             featuresCpC.add(pShape + "-PSEQpS");
             featuresCpC.add(cShape + "-PSEQcS");
             featuresCpC.add(pShape+ '-' +cShape + "-PSEQpcS");
@@ -1725,7 +1721,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
         }
       }
 
-      if (((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) ||
+      if ((flags.wordShape > WordShapeClassifier.NOWORDSHAPE ||
            flags.useShapeStrings)
           && flags.useTypeSeqs && (flags.useTypeSeqs2 || flags.useTypeSeqs3)) {
         if (flags.useTypeSeqs3) {
@@ -1738,7 +1734,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
         if (flags.useYetMoreCpCShapes) {
           String p2Shape = cInfo.get(loc - 2).getString(CoreAnnotations.ShapeAnnotation.class);
           featuresCpC.add(p2Shape + '-' + pShape + '-' + cShape + "-YMS");
-          featuresCpC.add(pShape + '-' + cShape + "-" + n.getString(CoreAnnotations.ShapeAnnotation.class) + "-YMSPCN");
+          featuresCpC.add(pShape + '-' + cShape + '-' + n.getString(CoreAnnotations.ShapeAnnotation.class) + "-YMSPCN");
         }
       }
 
@@ -1791,7 +1787,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
 
     } else if (flags.useExternal) {
 
-      if( ((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) ||
+      if( (flags.wordShape > WordShapeClassifier.NOWORDSHAPE ||
            flags.useShapeStrings)
           && flags.useTypeSeqs && (flags.useTypeSeqs2 || flags.useTypeSeqs3)) {
         if (flags.useTypeSeqs3) {
@@ -1819,7 +1815,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     String cWord = getWord(c);
     String pWord = getWord(p);
     String p2Word = getWord(p2);
-    Collection<String> featuresCp2C = new ArrayList<String>();
+    Collection<String> featuresCp2C = new ArrayList<>();
 
     if (flags.useMoreAbbr) {
       featuresCp2C.add(p2.get(CoreAnnotations.AbbrAnnotation.class) + '-' + c.get(CoreAnnotations.AbbrAnnotation.class) + "-P2ABBRANS");
@@ -1864,18 +1860,18 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     String pWord = getWord(p);
     String p2Word = getWord(p2);
     String p3Word = getWord(p3);
-    Collection<String> featuresCp3C = new ArrayList<String>();
+    Collection<String> featuresCp3C = new ArrayList<>();
 
     if (flags.useParenMatching) {
       if (flags.useReverse) {
         if (cWord.equals("(") || cWord.equals("[")) {
-          if ((flags.maxLeft >= 3) && (p3Word.equals(")") || p3Word.equals("]")) && !(p2Word.equals(")") || p2Word.equals("]") || pWord.equals(")") || pWord.equals("]"))) {
+          if (flags.maxLeft >= 3 && (p3Word.equals(")") || p3Word.equals("]")) && !(p2Word.equals(")") || p2Word.equals("]") || pWord.equals(")") || pWord.equals("]"))) {
             featuresCp3C.add("PAREN-MATCH");
           }
         }
       } else {
         if (cWord.equals(")") || cWord.equals("]")) {
-          if ((flags.maxLeft >= 3) && (p3Word.equals("(") || p3Word.equals("[")) && !(p2Word.equals("(") || p2Word.equals("[") || pWord.equals("(") || pWord.equals("["))) {
+          if (flags.maxLeft >= 3 && (p3Word.equals("(") || p3Word.equals("[")) && !(p2Word.equals("(") || p2Word.equals("[") || pWord.equals("(") || pWord.equals("["))) {
             featuresCp3C.add("PAREN-MATCH");
           }
         }
@@ -1898,18 +1894,18 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     String p3Word = getWord(p3);
     String p4Word = getWord(p4);
 
-    Collection<String> featuresCp4C = new ArrayList<String>();
+    Collection<String> featuresCp4C = new ArrayList<>();
 
     if (flags.useParenMatching) {
       if (flags.useReverse) {
         if (cWord.equals("(") || cWord.equals("[")) {
-          if ((flags.maxLeft >= 4) && (p4Word.equals(")") || p4Word.equals("]")) && !(p3Word.equals(")") || p3Word.equals("]") || p2Word.equals(")") || p2Word.equals("]") || pWord.equals(")") || pWord.equals("]"))) {
+          if (flags.maxLeft >= 4 && (p4Word.equals(")") || p4Word.equals("]")) && !(p3Word.equals(")") || p3Word.equals("]") || p2Word.equals(")") || p2Word.equals("]") || pWord.equals(")") || pWord.equals("]"))) {
             featuresCp4C.add("PAREN-MATCH");
           }
         }
       } else {
         if (cWord.equals(")") || cWord.equals("]")) {
-          if ((flags.maxLeft >= 4) && (p4Word.equals("(") || p4Word.equals("[")) && !(p3Word.equals("(") || p3Word.equals("[") || p2Word.equals("(") || p2Word.equals("[") || pWord.equals("(") || pWord.equals("["))) {
+          if (flags.maxLeft >= 4 && (p4Word.equals("(") || p4Word.equals("[")) && !(p3Word.equals("(") || p3Word.equals("[") || p2Word.equals("(") || p2Word.equals("[") || pWord.equals("(") || pWord.equals("["))) {
             featuresCp4C.add("PAREN-MATCH");
           }
         }
@@ -1933,18 +1929,18 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     String p3Word = getWord(p3);
     String p4Word = getWord(p4);
     String p5Word = getWord(p5);
-    Collection<String> featuresCp5C = new ArrayList<String>();
+    Collection<String> featuresCp5C = new ArrayList<>();
 
     if (flags.useParenMatching) {
       if (flags.useReverse) {
         if (cWord.equals("(") || cWord.equals("[")) {
-          if ((flags.maxLeft >= 5) && (p5Word.equals(")") || p5Word.equals("]")) && !(p4Word.equals(")") || p4Word.equals("]") || p3Word.equals(")") || p3Word.equals("]") || p2Word.equals(")") || p2Word.equals("]") || pWord.equals(")") || pWord.equals("]"))) {
+          if (flags.maxLeft >= 5 && (p5Word.equals(")") || p5Word.equals("]")) && !(p4Word.equals(")") || p4Word.equals("]") || p3Word.equals(")") || p3Word.equals("]") || p2Word.equals(")") || p2Word.equals("]") || pWord.equals(")") || pWord.equals("]"))) {
             featuresCp5C.add("PAREN-MATCH");
           }
         }
       } else {
         if (cWord.equals(")") || cWord.equals("]")) {
-          if ((flags.maxLeft >= 5) && (p5Word.equals("(") || p5Word.equals("[")) && !(p4Word.equals("(") || p4Word.equals("[") || p3Word.equals("(") || p3Word.equals("[") || p2Word.equals("(") || p2Word.equals("[") || pWord.equals("(") || pWord.equals("["))) {
+          if (flags.maxLeft >= 5 && (p5Word.equals("(") || p5Word.equals("[")) && !(p4Word.equals("(") || p4Word.equals("[") || p3Word.equals("(") || p3Word.equals("[") || p2Word.equals("(") || p2Word.equals("[") || pWord.equals("(") || pWord.equals("["))) {
             featuresCp5C.add("PAREN-MATCH");
           }
         }
@@ -1962,11 +1958,11 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     String pWord = getWord(p);
     String p2Word = getWord(p2);
 
-    Collection<String> featuresCpCp2C = new ArrayList<String>();
+    Collection<String> featuresCpCp2C = new ArrayList<>();
 
     if (flags.useInternal && flags.useExternal) {
 
-      if (false && flags.useTypeySequences && flags.maxLeft >= 2) {  // this feature duplicates -TYPETYPES one below, so don't include it (hurts to duplicate)!!!
+      if (false) {  // this feature duplicates -TYPETYPES one below, so don't include it (hurts to duplicate)!!!
         featuresCpCp2C.add(p2.get(CoreAnnotations.ShapeAnnotation.class) + '-' + p.get(CoreAnnotations.ShapeAnnotation.class) + '-' + c.get(CoreAnnotations.ShapeAnnotation.class) + "-TTPS");
       }
 
@@ -2008,7 +2004,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
         }
       }
 
-      if (((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) ||
+      if ((flags.wordShape > WordShapeClassifier.NOWORDSHAPE ||
            flags.useShapeStrings)
           && flags.useTypeSeqs && flags.useTypeSeqs2 && flags.maxLeft >= 2) {
         String cShape = c.get(CoreAnnotations.ShapeAnnotation.class);
@@ -2027,7 +2023,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
         featuresCpCp2C.add("PPSEQ");
       }
 
-      if (((flags.wordShape > WordShapeClassifier.NOWORDSHAPE) ||
+      if ((flags.wordShape > WordShapeClassifier.NOWORDSHAPE ||
            flags.useShapeStrings)
           && flags.useTypeSeqs && flags.useTypeSeqs2 && flags.maxLeft >= 2) {
         String cShape = c.get(CoreAnnotations.ShapeAnnotation.class);
@@ -2047,7 +2043,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     CoreLabel p2 = cInfo.get(loc - 2);
     CoreLabel p3 = cInfo.get(loc - 3);
 
-    Collection<String> featuresCpCp2Cp3C = new ArrayList<String>();
+    Collection<String> featuresCpCp2Cp3C = new ArrayList<>();
 
     if (flags.useTaggySequences) {
       if (flags.useTags) {
@@ -2081,7 +2077,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   }
 
   protected Collection<String> featuresCpCp2Cp3Cp4C(PaddedList<IN> cInfo, int loc) {
-    Collection<String> featuresCpCp2Cp3Cp4C = new ArrayList<String>();
+    Collection<String> featuresCpCp2Cp3Cp4C = new ArrayList<>();
 
     CoreLabel p = cInfo.get(loc - 1);
 
@@ -2101,7 +2097,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   protected Collection<String> featuresCnC(PaddedList<IN> cInfo, int loc) {
     CoreLabel c = cInfo.get(loc);
 
-    Collection<String> featuresCnC = new ArrayList<String>();
+    Collection<String> featuresCnC = new ArrayList<>();
 
     if (flags.useNext) {
       if (flags.useSequences && flags.useNextSequences) {
@@ -2117,7 +2113,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   protected Collection<String> featuresCpCnC(PaddedList<IN> cInfo, int loc) {
     CoreLabel c = cInfo.get(loc);
 
-    Collection<String> featuresCpCnC = new ArrayList<String>();
+    Collection<String> featuresCpCnC = new ArrayList<>();
 
     if (flags.useNext && flags.usePrev) {
       if (flags.useSequences && flags.usePrevSequences && flags.useNextSequences) {
@@ -2131,7 +2127,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
 
 
   int reverse(int i) {
-    return (flags.useReverse ? -1 * i : i);
+    return flags.useReverse ? -1 * i : i;
   }
 
   private Collection<String> occurrencePatterns(PaddedList<IN> cInfo, int loc) {
@@ -2141,7 +2137,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     CoreLabel p = cInfo.get(loc - reverse(1));
     String pWord = getWord(p);
     // System.err.println(word+" "+nWord);
-    if (!(isNameCase(word) && noUpperCase(nWord) && hasLetter(nWord) && hasLetter(pWord) && p != cInfo.getPad())) {
+    if (!(isNameCase(word) && noUpperCase(nWord) && hasLetter(nWord) && hasLetter(pWord) && !p.equals(cInfo.getPad()))) {
       return Collections.singletonList("NO-OCCURRENCE-PATTERN");
     }
     // System.err.println("LOOKING");
@@ -2168,10 +2164,10 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     } else {
       for (int jump = 3; jump < 150; jump++) {
         if (getWord(cInfo.get(loc + reverse(jump))).equals(word)) {
-          if (isNameCase(getWord(cInfo.get(loc + reverse(jump - 1)))) && (cInfo.get(loc + reverse(jump - 1))).getString(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP")) {
+          if (isNameCase(getWord(cInfo.get(loc + reverse(jump - 1)))) && cInfo.get(loc + reverse(jump - 1)).getString(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP")) {
             l.add("X-NEXT-OCCURRENCE-YX");
             // System.err.println(getWord(cInfo.get(loc+reverse(jump-1))));
-          } else if (isNameCase(getWord(cInfo.get(loc + reverse(jump + 1)))) && (cInfo.get(loc + reverse(jump + 1))).getString(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP")) {
+          } else if (isNameCase(getWord(cInfo.get(loc + reverse(jump + 1)))) && cInfo.get(loc + reverse(jump + 1)).getString(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP")) {
             // System.err.println(getWord(cInfo.get(loc+reverse(jump+1))));
             l.add("X-NEXT-OCCURRENCE-XY");
           } else {
@@ -2181,7 +2177,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       }
       for (int jump = -3; jump > -150; jump--) {
         if (getWord(cInfo.get(loc + jump)) != null && getWord(cInfo.get(loc + jump)).equals(word)) {
-          if (isNameCase(getWord(cInfo.get(loc + reverse(jump + 1)))) && (cInfo.get(loc + reverse(jump + 1))).getString(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP")) {
+          if (isNameCase(getWord(cInfo.get(loc + reverse(jump + 1)))) && cInfo.get(loc + reverse(jump + 1)).getString(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP")) {
             l.add("X-PREV-OCCURRENCE-YX");
             // System.err.println(getWord(cInfo.get(loc+reverse(jump+1))));
           } else if (isNameCase(getWord(cInfo.get(loc + reverse(jump - 1)))) && cInfo.get(loc + reverse(jump - 1)).getString(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP")) {
@@ -2202,17 +2198,13 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   }
 
   String intern(String s) {
-    if (flags.intern) {
-      return s.intern();
-    } else {
-      return s;
-    }
+      return flags.intern ? s.intern() : s;
   }
 
   public void initGazette() {
     try {
       // read in gazettes
-      if (flags.gazettes == null) { flags.gazettes = new ArrayList<String>(); }
+      if (flags.gazettes == null) { flags.gazettes = new ArrayList<>(); }
       List<String> gazettes = flags.gazettes;
       for (String gazetteFile : gazettes) {
         BufferedReader r = IOUtils.readerFromString(gazetteFile, flags.inputEncoding);

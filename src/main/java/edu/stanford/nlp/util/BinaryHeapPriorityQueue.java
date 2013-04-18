@@ -14,7 +14,7 @@ import java.util.*;
 public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements PriorityQueue<E>, Iterator<E> {
 
   /**
-   * An <code>Entry</code> stores an object in the queue along with
+   * An {@code Entry} stores an object in the queue along with
    * its current location (array position) and priority.
    * uses ~ 8 (self) + 4 (key ptr) + 4 (index) + 8 (priority) = 24 bytes?
    */
@@ -25,7 +25,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
 
     @Override
     public String toString() {
-      return key + " at " + index + " (" + priority + ")";
+      return key + " at " + index + " (" + priority + ')';
     }
   }
 
@@ -42,31 +42,31 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   }
 
   /**
-   * <code>indexToEntry</code> maps linear array locations (not
+   * {@code indexToEntry} maps linear array locations (not
    * priorities) to heap entries.
    */
   private List<Entry<E>> indexToEntry;
 
   /**
-   * <code>keyToEntry</code> maps heap objects to their heap
+   * {@code keyToEntry} maps heap objects to their heap
    * entries.
    */
   private Map<E,Entry<E>> keyToEntry;
 
   private Entry<E> parent(Entry<E> entry) {
     int index = entry.index;
-    return (index > 0 ? getEntry((index - 1) / 2) : null);
+    return index > 0 ? getEntry((index - 1) / 2) : null;
   }
 
   private Entry<E> leftChild(Entry<E> entry) {
-    int leftIndex = entry.index * 2 + 1;
-    return (leftIndex < size() ? getEntry(leftIndex) : null);
+    int leftIndex = (entry.index << 1) + 1;
+    return leftIndex < size() ? getEntry(leftIndex) : null;
   }
 
   private Entry<E> rightChild(Entry<E> entry) {
     int index = entry.index;
-    int rightIndex = index * 2 + 2;
-    return (rightIndex < size() ? getEntry(rightIndex) : null);
+    int rightIndex = (index << 1) + 2;
+    return rightIndex < size() ? getEntry(rightIndex) : null;
   }
 
   private int compare(Entry<E> entryA, Entry<E> entryB) {
@@ -121,7 +121,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   }
 
   private Entry<E> makeEntry(E key) {
-    Entry<E> entry = new Entry<E>();
+    Entry<E> entry = new Entry<>();
     entry.index = size();
     entry.key = key;
     entry.priority = Double.NEGATIVE_INFINITY;
@@ -174,13 +174,13 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
         }
       }
 
-      if (bestEntry != currentEntry) {
+      if (!bestEntry.equals(currentEntry)) {
         // Swap min and current
         swap(bestEntry, currentEntry);
         // at start of next loop, we set currentIndex to largestIndex
         // this indexation now holds current, so it is unchanged
       }
-    } while (bestEntry != currentEntry);
+    } while (!bestEntry.equals(currentEntry));
     // System.err.println("Done with heapify down");
     // verify();
   }
@@ -259,7 +259,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
    * already present, with better priority, it will NOT cause an
    * a decreasePriority.
    *
-   * @param key an <code>Object</code> value
+   * @param key an {@code Object} value
    * @return whether the key was present before
    */
   @Override
@@ -298,7 +298,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
 
   private void removeEntry(Entry<E> entry) {
     Entry<E> lastEntry = getLastEntry();
-    if (entry != lastEntry) {
+    if (!entry.equals(lastEntry)) {
       swap(entry, lastEntry);
       removeLastEntry();
       heapify(lastEntry);
@@ -314,7 +314,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   /**
    * Promotes a key in the queue, adding it if it wasn't there already.  If the specified priority is worse than the current priority, nothing happens.  Faster than add if you don't care about whether the key is new.
    *
-   * @param key an <code>Object</code> value
+   * @param key an {@code Object} value
    * @return whether the priority actually improved.
    */
   public boolean relaxPriority(E key, double priority) {
@@ -333,7 +333,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   /**
    * Demotes a key in the queue, adding it if it wasn't there already.  If the specified priority is better than the current priority, nothing happens.  If you decrease the priority on a non-present key, it will get added, but at it's old implicit priority of Double.NEGATIVE_INFINITY.
    *
-   * @param key an <code>Object</code> value
+   * @param key an {@code Object} value
    * @return whether the priority actually improved.
    */
   public boolean decreasePriority(E key, double priority) {
@@ -352,7 +352,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   /**
    * Changes a priority, either up or down, adding the key it if it wasn't there already.
    *
-   * @param key an <code>Object</code> value
+   * @param key an {@code Object} value
    * @return whether the priority actually changed.
    */
   public boolean changePriority(E key, double priority) {
@@ -371,7 +371,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   /**
    * Checks if the queue is empty.
    *
-   * @return a <code>boolean</code> value
+   * @return a {@code boolean} value
    */
   @Override
   public boolean isEmpty() {
@@ -397,7 +397,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   }
 
   public List<E> toSortedList() {
-    List<E> sortedList = new ArrayList<E>(size());
+    List<E> sortedList = new ArrayList<>(size());
     BinaryHeapPriorityQueue<E> queue = this.deepCopy();
     while (!queue.isEmpty()) {
       sortedList.add(queue.removeFirst());
@@ -407,7 +407,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
 
   public BinaryHeapPriorityQueue<E> deepCopy(MapFactory<E, Entry<E>> mapFactory) {
     BinaryHeapPriorityQueue<E> queue =
-      new BinaryHeapPriorityQueue<E>(mapFactory);
+      new BinaryHeapPriorityQueue<>(mapFactory);
     for (Entry<E> entry : keyToEntry.values()) {
       queue.relaxPriority(entry.key, entry.priority);
     }
@@ -459,12 +459,12 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
     StringBuilder sb = new StringBuilder("[");
     for (int i = 0; i < maxKeysToPrint && i < sortedKeys.size(); i++) {
       E key = sortedKeys.get(i);
-      sb.append(key).append("=").append(getPriority(key));
+      sb.append(key).append('=').append(getPriority(key));
       if (i < maxKeysToPrint - 1 && i < sortedKeys.size() - 1) {
         sb.append(", ");
       }
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 
@@ -474,10 +474,10 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
     for (Iterator<E> keyI = sortedKeys.iterator(); keyI.hasNext();) {
       E key = keyI.next();
       sb.append(key);
-      sb.append("\t");
+      sb.append('\t');
       sb.append(getPriority(key));
       if (keyI.hasNext()) {
-        sb.append("\n");
+        sb.append('\n');
       }
     }
     return sb.toString();
@@ -493,18 +493,18 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   }
 
   public BinaryHeapPriorityQueue(MapFactory<E, Entry<E>> mapFactory) {
-    indexToEntry = new ArrayList<Entry<E>>();
+    indexToEntry = new ArrayList<>();
     keyToEntry = mapFactory.newMap();
   }
 
   public BinaryHeapPriorityQueue(MapFactory<E, Entry<E>> mapFactory, int initCapacity) {
-	indexToEntry = new ArrayList<Entry<E>>(initCapacity);
+	indexToEntry = new ArrayList<>(initCapacity);
 	keyToEntry = mapFactory.newMap(initCapacity);
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     BinaryHeapPriorityQueue<String> queue =
-      new BinaryHeapPriorityQueue<String>();
+      new BinaryHeapPriorityQueue<>();
     queue.add("a", 1.0);
     System.out.println("Added a:1 " + queue);
     queue.add("b", 2.0);

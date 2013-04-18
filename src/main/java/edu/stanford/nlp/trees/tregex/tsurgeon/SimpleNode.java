@@ -30,7 +30,7 @@ class SimpleNode implements Node {
     if (children == null) {
       children = new Node[i + 1];
     } else if (i >= children.length) {
-      Node c[] = new Node[i + 1];
+      Node[] c = new Node[i + 1];
       System.arraycopy(children, 0, c, 0, children.length);
       children = c;
     }
@@ -42,7 +42,7 @@ class SimpleNode implements Node {
   }
 
   public int jjtGetNumChildren() {
-    return (children == null) ? 0 : children.length;
+    return children == null ? 0 : children.length;
   }
 
   /* You can override these two methods in subclasses of SimpleNode to
@@ -61,12 +61,12 @@ class SimpleNode implements Node {
   public void dump(String prefix) {
     System.out.println(toString(prefix));
     if (children != null) {
-      for (int i = 0; i < children.length; ++i) {
-	SimpleNode n = (SimpleNode)children[i];
-	if (n != null) {
-	  n.dump(prefix + " ");
-	}
-      }
+        for (Node aChildren : children) {
+            SimpleNode n = (SimpleNode) aChildren;
+            if (n != null) {
+                n.dump(prefix + ' ');
+            }
+        }
     }
   }
 }

@@ -42,13 +42,13 @@ public class LeafAncestorEval {
   private static final boolean DEBUG = false;
 
   //Corpus level (macro-averaged)
-  private double sentAvg = 0.0;
-  private double sentNum = 0.0;
-  private int sentExact = 0;
+  private double sentAvg;
+  private double sentNum;
+  private int sentExact;
 
   //Sentence level (micro-averaged)
-  private double corpusAvg = 0.0;
-  private double corpusNum = 0.0;
+  private double corpusAvg;
+  private double corpusNum;
 
   //Category level
   private final Map<List<CoreLabel>,Double> catAvg;
@@ -71,20 +71,20 @@ public class LeafAncestorEval {
    * @param t The tree
    * @return A list of lineages
    */
-  private List<List<CoreLabel>> makeLineages(final Tree t) {
+  private static List<List<CoreLabel>> makeLineages(Tree t) {
     if(t == null) return null;
 
     ((HasIndex) t.label()).setIndex(0);
 
-    final Stack<Tree> treeStack = new Stack<Tree>();
+    Stack<Tree> treeStack = new Stack<>();
     treeStack.push(t);
 
-    final Stack<CoreLabel> labelStack = new Stack<CoreLabel>();
+    Stack<CoreLabel> labelStack = new Stack<>();
     CoreLabel rootLabel = new CoreLabel(t.label());
     rootLabel.setIndex(0);
     labelStack.push(rootLabel);
 
-    final List<List<CoreLabel>> lineages = new ArrayList<List<CoreLabel>>();
+    List<List<CoreLabel>> lineages = new ArrayList<>();
 
     while(!treeStack.isEmpty()) {
       Tree node = treeStack.pop();
@@ -93,7 +93,7 @@ public class LeafAncestorEval {
         labelStack.pop();
 
       if(node.isPreTerminal()) {
-        List<CoreLabel> lin = new ArrayList<CoreLabel>(labelStack);
+        List<CoreLabel> lin = new ArrayList<>(labelStack);
         lineages.add(lin);
 
       } else {
@@ -119,7 +119,7 @@ public class LeafAncestorEval {
     return lineages;
   }
 
-  private void updateCatAverages(final List<CoreLabel> lineage, double score) {
+  private void updateCatAverages(List<CoreLabel> lineage, double score) {
     if(catAvg.get(lineage) == null) {
       catAvg.put(lineage, score);
       catNum.put(lineage, 1.0);
@@ -138,8 +138,8 @@ public class LeafAncestorEval {
       return;
     }
 
-    final List<List<CoreLabel>> guessLineages = makeLineages(guess);
-    final List<List<CoreLabel>> goldLineages = makeLineages(gold);
+    List<List<CoreLabel>> guessLineages = makeLineages(guess);
+    List<List<CoreLabel>> goldLineages = makeLineages(gold);
 
     if(guessLineages.size() == goldLineages.size()) {
 
@@ -149,7 +149,7 @@ public class LeafAncestorEval {
         List<CoreLabel> goldLin = goldLineages.get(i);
 
         double levDist = editDistance(guessLin, goldLin);
-        double la = 1.0 - (levDist / (double) (guessLin.size() + goldLin.size()));
+        double la = 1.0 - levDist / (double) (guessLin.size() + goldLin.size());
 
         localScores += la;
 
@@ -178,7 +178,7 @@ public class LeafAncestorEval {
    * @param l1
    * @param l2
    */
-  private int editDistance(final List<CoreLabel> l1, final List<CoreLabel> l2) {
+  private static int editDistance(List<CoreLabel> l1, List<CoreLabel> l2) {
     int[][] m = new int[l1.size()+1][l2.size()+1];
     for(int i = 1; i <= l1.size(); i++)
       m[i][0] = i;
@@ -187,7 +187,7 @@ public class LeafAncestorEval {
 
     for(int i = 1; i <= l1.size(); i++) {
       for(int j = 1; j <= l2.size(); j++) {
-        m[i][j] = Math.min(m[i-1][j-1] + ((l1.get(i-1).equals(l2.get(j-1))) ? 0 : 1), m[i-1][j] + 1);
+        m[i][j] = Math.min(m[i-1][j-1] + (l1.get(i-1).equals(l2.get(j-1)) ? 0 : 1), m[i-1][j] + 1);
         m[i][j] = Math.min(m[i][j], m[i][j-1] + 1);
       }
     }
@@ -195,7 +195,7 @@ public class LeafAncestorEval {
     return m[l1.size()][l2.size()];
   }
 
-  private String toString(final List<CoreLabel> lineage) {
+  private static String toString(List<CoreLabel> lineage) {
     StringBuilder sb = new StringBuilder();
     for(CoreLabel cl : lineage) {
       sb.append(cl.value());
@@ -206,25 +206,25 @@ public class LeafAncestorEval {
   }
 
   public void display(boolean verbose, PrintWriter pw) {
-    final Random rand = new Random();
+    Random rand = new Random();
 
     double corpusLevel = corpusAvg / corpusNum;
     double sentLevel = sentAvg / sentNum;
     double sentEx = 100.0 * sentExact / sentNum;
     
     if(verbose) {
-      Map<Double,List<CoreLabel>> avgMap = new TreeMap<Double,List<CoreLabel>>();
-      for (List<CoreLabel> lineage : catAvg.keySet()) {
-        double avg = catAvg.get(lineage) / catNum.get(lineage);
+      Map<Double,List<CoreLabel>> avgMap = new TreeMap<>();
+      for (Map.Entry<List<CoreLabel>, Double> listDoubleEntry : catAvg.entrySet()) {
+        double avg = listDoubleEntry.getValue() / catNum.get(listDoubleEntry.getKey());
         if(new Double(avg).equals(Double.NaN)) avg = -1.0;
         if(avgMap.containsKey(avg))
-          avgMap.put(avg + (rand.nextDouble()/10000.0), lineage);
+          avgMap.put(avg + rand.nextDouble()/10000.0, listDoubleEntry.getKey());
         else
-          avgMap.put(avg, lineage);
+          avgMap.put(avg, listDoubleEntry.getKey());
       }
 
       pw.println("============================================================");
-      pw.println("Leaf Ancestor Metric" + "(" + name + ") -- final statistics");
+      pw.println("Leaf Ancestor Metric" + '(' + name + ") -- final statistics");
       pw.println("============================================================");
       pw.println("#Sentences: " + (int) sentNum);
       pw.println();
@@ -239,7 +239,7 @@ public class LeafAncestorEval {
       for (List<CoreLabel> lineage : avgMap.values()) {
         if(catNum.get(lineage) < 30.0) continue;
         double avg = catAvg.get(lineage) / catNum.get(lineage);
-        pw.printf(" %.3f\t%d\t%s\n",avg, (int) ((double)catNum.get(lineage)),toString(lineage));
+        pw.printf(" %.3f\t%d\t%s\n",avg, (int) (double)catNum.get(lineage),toString(lineage));
       }
 
       pw.println("============================================================");
@@ -254,7 +254,7 @@ public class LeafAncestorEval {
   static {
     usage.append(String.format("Usage: java %s [OPTS] goldFile guessFile\n\n",LeafAncestorEval.class.getName()));
     usage.append("Options:\n");
-    usage.append("  -l lang   : Language name " + Languages.listOfLanguages() + "\n");
+    usage.append("  -l lang   : Language name ").append(Languages.listOfLanguages()).append('\n');
     usage.append("  -y num    : Skip gold trees with yields longer than num.\n");
     usage.append("  -v        : Verbose output\n");
   }
@@ -262,12 +262,12 @@ public class LeafAncestorEval {
   private final static int MIN_ARGS = 2;
 
   //Command line options
-  private static boolean VERBOSE = false;
+  private static boolean VERBOSE;
   private static Language LANGUAGE = Language.English;
   private static int MAX_GOLD_YIELD = Integer.MAX_VALUE;
 
-  private static File guessFile = null;
-  private static File goldFile = null;
+  private static File guessFile;
+  private static File goldFile;
 
   public static final Map<String,Integer> optionArgDefs = Generics.newHashMap();
   static {
@@ -276,14 +276,13 @@ public class LeafAncestorEval {
     optionArgDefs.put("-v", 0);
   }
   
-  private static boolean validateCommandLine(String[] args) {
+  private static boolean validateCommandLine(String... args) {
     Map<String, String[]> argsMap = StringUtils.argsToMap(args,optionArgDefs);
     
     for(Map.Entry<String, String[]> opt : argsMap.entrySet()) {
       String key = opt.getKey();
       if(key == null) {
-        continue;
-      
+
       } else if(key.equals("-y")) {
         MAX_GOLD_YIELD = Integer.valueOf(opt.getValue()[0]);
       
@@ -314,29 +313,29 @@ public class LeafAncestorEval {
   /**
    * Execute with no arguments for usage.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
     if(!validateCommandLine(args)) {
       System.err.println(usage);
       System.exit(-1);
     }
 
-    final TreebankLangParserParams tlpp = Languages.getLanguageParams(LANGUAGE);
-    final PrintWriter pwOut = tlpp.pw();
+    TreebankLangParserParams tlpp = Languages.getLanguageParams(LANGUAGE);
+    PrintWriter pwOut = tlpp.pw();
 
-    final Treebank guessTreebank = tlpp.diskTreebank();
+    Treebank guessTreebank = tlpp.diskTreebank();
     guessTreebank.loadPath(guessFile);
     pwOut.println("GUESS TREEBANK:");
     pwOut.println(guessTreebank.textualSummary());
 
-    final Treebank goldTreebank = tlpp.diskTreebank();
+    Treebank goldTreebank = tlpp.diskTreebank();
     goldTreebank.loadPath(goldFile);
     pwOut.println("GOLD TREEBANK:");
     pwOut.println(goldTreebank.textualSummary());
 
-    final LeafAncestorEval metric = new LeafAncestorEval("LeafAncestor");
+    LeafAncestorEval metric = new LeafAncestorEval("LeafAncestor");
 
-    final TreeTransformer tc = tlpp.collinizer();
+    TreeTransformer tc = tlpp.collinizer();
 
     //The evalb ref implementation assigns status for each tree pair as follows:
     //
@@ -345,8 +344,8 @@ public class LeafAncestorEval {
     //   2 - null parse e.g. (()).
     //
     //In the cases of 1,2, evalb does not include the tree pair in the LP/LR computation.
-    final Iterator<Tree> goldItr = goldTreebank.iterator();
-    final Iterator<Tree> guessItr = guessTreebank.iterator();
+    Iterator<Tree> goldItr = goldTreebank.iterator();
+    Iterator<Tree> guessItr = guessTreebank.iterator();
     int goldLineId = 0;
     int guessLineId = 0;
     int skippedGuessTrees = 0;
@@ -372,10 +371,10 @@ public class LeafAncestorEval {
         continue;
       }
       
-      final Tree evalGuess = tc.transformTree(guessTree);
-      final Tree evalGold = tc.transformTree(goldTree);
+      Tree evalGuess = tc.transformTree(guessTree);
+      Tree evalGold = tc.transformTree(goldTree);
 
-      metric.evaluate(evalGuess, evalGold, ((VERBOSE) ? pwOut : null));
+      metric.evaluate(evalGuess, evalGold, VERBOSE ? pwOut : null);
     }
     
     if(guessItr.hasNext() || goldItr.hasNext()) {

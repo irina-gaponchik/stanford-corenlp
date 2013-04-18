@@ -42,8 +42,8 @@ public class TextOutputter {
     String docId =  annotation.get(CoreAnnotations.DocIDAnnotation.class);
     if (docId != null) {
       List<CoreLabel> tokens = annotation.get(CoreAnnotations.TokensAnnotation.class);
-      int nSentences = (sentences != null)? sentences.size():0;
-      int nTokens = (tokens != null)? tokens.size():0;
+      int nSentences = sentences != null ? sentences.size():0;
+      int nTokens = tokens != null ? tokens.size():0;
       os.printf("Document: ID=%s (%d sentences, %d tokens)\n", docId, nSentences, nTokens);
     }
 
@@ -52,7 +52,7 @@ public class TextOutputter {
       for(int i = 0, sz = sentences.size(); i < sz; i ++) {
         CoreMap sentence = sentences.get(i);
         List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
-        os.printf("Sentence #%d (%d tokens):\n", (i + 1), tokens.size());
+        os.printf("Sentence #%d (%d tokens):\n", i + 1, tokens.size());
 
         String text = sentence.get(CoreAnnotations.TextAnnotation.class);
         os.println(text);
@@ -108,7 +108,7 @@ public class TextOutputter {
     Map<Integer, CorefChain> corefChains =
       annotation.get(CorefCoreAnnotations.CorefChainAnnotation.class);
     if (corefChains != null && sentences != null) {
-      List<List<CoreLabel>> sents = new ArrayList<List<CoreLabel>>();
+      List<List<CoreLabel>> sents = new ArrayList<>();
       for (CoreMap sentence : sentences) {
         List<CoreLabel> tokens =
           sentence.get(CoreAnnotations.TokensAnnotation.class);
@@ -127,16 +127,16 @@ public class TextOutputter {
             os.println("Coreference set:");
           }
           // all offsets start at 1!
-          os.println("\t(" + mention.sentNum + "," +
+          os.println("\t(" + mention.sentNum + ',' +
               mention.headIndex + ",[" +
-              mention.startIndex + "," +
+              mention.startIndex + ',' +
               mention.endIndex + ")) -> (" +
-              representative.sentNum + "," +
+              representative.sentNum + ',' +
               representative.headIndex + ",[" +
-              representative.startIndex + "," +
+              representative.startIndex + ',' +
               representative.endIndex + ")), that is: \"" +
               mention.mentionSpan + "\" -> \"" +
-              representative.mentionSpan + "\"");
+              representative.mentionSpan + '"');
         }
       }
     }

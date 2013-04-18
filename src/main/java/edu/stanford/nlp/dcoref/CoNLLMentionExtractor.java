@@ -68,9 +68,9 @@ public class CoNLLMentionExtractor extends MentionExtractor {
 
     CoNLL2011DocumentReader.Options options = new CoNLL2011DocumentReader.Options();
     options.annotateTokenCoref = false;
-    options.annotateTokenSpeaker = Constants.USE_GOLD_SPEAKER_TAGS || replicateCoNLL;
-    options.annotateTokenNer = Constants.USE_GOLD_NE || replicateCoNLL;
-    options.annotateTokenPos = Constants.USE_GOLD_POS || replicateCoNLL;
+    options.annotateTokenSpeaker = replicateCoNLL;
+    options.annotateTokenNer = replicateCoNLL;
+    options.annotateTokenPos = replicateCoNLL;
     if (Constants.USE_CONLL_AUTO) options.setFilter(".*_auto_conll$");
     reader = new CoNLL2011DocumentReader(corpusPath, options);
 
@@ -83,11 +83,11 @@ public class CoNLLMentionExtractor extends MentionExtractor {
     singletonPredictor = singletonModel;
   }
 
-  private final boolean collapse = true;
-  private final boolean ccProcess = false;
-  private final boolean includeExtras = false;
-  private final boolean lemmatize = true;
-  private final boolean threadSafe = true;
+  private static final boolean collapse = true;
+  private static final boolean ccProcess = false;
+  private static final boolean includeExtras = false;
+  private static final boolean lemmatize = true;
+  private static final boolean threadSafe = true;
 
 
   public void resetDocs() {
@@ -97,8 +97,8 @@ public class CoNLLMentionExtractor extends MentionExtractor {
 
   @Override
   public Document nextDoc() throws Exception {
-    List<List<CoreLabel>> allWords = new ArrayList<List<CoreLabel>>();
-    List<Tree> allTrees = new ArrayList<Tree>();
+    List<List<CoreLabel>> allWords = new ArrayList<>();
+    List<Tree> allTrees = new ArrayList<>();
 
     CoNLL2011DocumentReader.Document conllDoc = reader.getNextDocument();
     if (conllDoc == null) {
@@ -108,7 +108,7 @@ public class CoNLLMentionExtractor extends MentionExtractor {
     Annotation anno = conllDoc.getAnnotation();
     List<CoreMap> sentences = anno.get(CoreAnnotations.SentencesAnnotation.class);
     for (CoreMap sentence:sentences) {
-      if (!Constants.USE_GOLD_PARSES && !replicateCoNLL) {
+      if (!replicateCoNLL) {
         // Remove tree from annotation and replace with parse using stanford parser
         sentence.remove(TreeCoreAnnotations.TreeAnnotation.class);
       } else {
@@ -118,7 +118,7 @@ public class CoNLLMentionExtractor extends MentionExtractor {
           SemanticGraph deps = SemanticGraphFactory.makeFromTree(tree,
               collapse, ccProcess, includeExtras, lemmatize, threadSafe);
           SemanticGraph basicDeps = SemanticGraphFactory.makeFromTree(tree,
-              !collapse, ccProcess, includeExtras, lemmatize, threadSafe);
+                  false, ccProcess, includeExtras, lemmatize, threadSafe);
           sentence.set(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class, basicDeps);
           sentence.set(SemanticGraphCoreAnnotations.CollapsedDependenciesAnnotation.class, deps);
         } catch(Exception e) {
@@ -158,11 +158,8 @@ public class CoNLLMentionExtractor extends MentionExtractor {
       //allPredictedMentions = allGoldMentions;
       // Make copy of gold mentions since mentions may be later merged, mentionID's changed and stuff
       allPredictedMentions = makeCopy(allGoldMentions);
-    } else if (Constants.USE_GOLD_MENTION_BOUNDARIES) {
-      allPredictedMentions = ((RuleBasedCorefMentionFinder) mentionFinder).filterPredictedMentions(allGoldMentions, anno, dictionaries);
-    } else {
-      allPredictedMentions = mentionFinder.extractPredictedMentions(anno, maxID, dictionaries);
-    }
+    } else
+        allPredictedMentions = Constants.USE_GOLD_MENTION_BOUNDARIES ? ((RuleBasedCorefMentionFinder) mentionFinder).filterPredictedMentions(allGoldMentions, anno, dictionaries) : mentionFinder.extractPredictedMentions(anno, maxID, dictionaries);
 
     try {
       recallErrors(allGoldMentions,allPredictedMentions,anno);
@@ -174,10 +171,10 @@ public class CoNLLMentionExtractor extends MentionExtractor {
     return doc;
   }
 
-  public List<List<Mention>> makeCopy(List<List<Mention>> mentions) {
-    List<List<Mention>> copy = new ArrayList<List<Mention>>(mentions.size());
+  public static List<List<Mention>> makeCopy(List<List<Mention>> mentions) {
+    List<List<Mention>> copy = new ArrayList<>(mentions.size());
     for (List<Mention> sm:mentions) {
-      List<Mention> sm2 = new ArrayList<Mention>(sm.size());
+      List<Mention> sm2 = new ArrayList<>(sm.size());
       for (Mention m:sm) {
         Mention m2 = new Mention();
         m2.goldCorefClusterID = m.goldCorefClusterID;
@@ -207,17 +204,17 @@ public class CoNLLMentionExtractor extends MentionExtractor {
         logger.finer("RECALL ERROR\n");
         logger.finer(coreMap + "\n");
         for (int x=mentionSpan.first;x<mentionSpan.second;x++){
-          logger.finer(words.get(x).value() + " ");
+          logger.finer(words.get(x).value() + ' ');
         }
-        logger.finer("\n"+tree + "\n");
+        logger.finer("\n"+tree + '\n');
       }
     }
   }
 
   private static List<Pair<Integer,Integer>> extractSpans(List<Mention> listOfMentions) {
-    List<Pair<Integer,Integer>> mentionSpans = new ArrayList<Pair<Integer,Integer>>();
+    List<Pair<Integer,Integer>> mentionSpans = new ArrayList<>();
     for (Mention mention: listOfMentions){
-      Pair<Integer,Integer> mentionSpan = new Pair<Integer,Integer>(mention.startIndex,mention.endIndex);
+      Pair<Integer,Integer> mentionSpan = new Pair<>(mention.startIndex,mention.endIndex);
       mentionSpans.add(mentionSpan);
     }
     return mentionSpans;
@@ -225,11 +222,11 @@ public class CoNLLMentionExtractor extends MentionExtractor {
 
   public List<List<Mention>> extractGoldMentions(CoNLL2011DocumentReader.Document conllDoc) {
     List<CoreMap> sentences = conllDoc.getAnnotation().get(CoreAnnotations.SentencesAnnotation.class);
-    List<List<Mention>> allGoldMentions = new ArrayList<List<Mention>>();
+    List<List<Mention>> allGoldMentions = new ArrayList<>();
     CollectionValuedMap<String,CoreMap> corefChainMap = conllDoc.getCorefChainMap();
-    for (int i = 0; i < sentences.size(); i++) {
-      allGoldMentions.add(new ArrayList<Mention>());
-    }
+      for (CoreMap sentence : sentences) {
+          allGoldMentions.add(new ArrayList<Mention>());
+      }
     int maxCorefClusterId = -1;
     for (String corefIdStr:corefChainMap.keySet()) {
       int id = Integer.parseInt(corefIdStr);

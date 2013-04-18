@@ -75,22 +75,15 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
   }
 
   private static final Pattern sgml = Pattern.compile("<[^>]*>");
-  private final WordToSentenceProcessor<IN> wts = new WordToSentenceProcessor<IN>();
+  private final WordToSentenceProcessor<IN> wts = new WordToSentenceProcessor<>();
 
   private SeqClassifierFlags flags; // = null;
   private TokenizerFactory<IN> tokenizerFactory;
 
-  /**
-   * Construct a PlainTextDocumentReaderAndWriter. You should call init() after
-   * using the constructor.
-   */
-  public PlainTextDocumentReaderAndWriter() {
-  }
-
-  public void init(SeqClassifierFlags flags) {
+    public void init(SeqClassifierFlags flags) {
     String options = "tokenizeNLs=false,invertible=true";
     if (flags.tokenizerOptions != null) {
-      options = options + "," + flags.tokenizerOptions;
+      options = options + ',' + flags.tokenizerOptions;
     }
     TokenizerFactory<IN> factory;
     if (flags.tokenizerFactory != null) {
@@ -117,7 +110,7 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
   public Iterator<List<IN>> getIterator(Reader r) {
     Tokenizer<IN> tokenizer = tokenizerFactory.getTokenizer(r);
     // PTBTokenizer.newPTBTokenizer(r, false, true);
-    List<IN> words = new ArrayList<IN>();
+    List<IN> words = new ArrayList<>();
     IN previous = null;
     StringBuilder prepend = new StringBuilder();
 
@@ -144,7 +137,7 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
         String before = StringUtils.getNotNullString(w.get(CoreAnnotations.BeforeAnnotation.class));
         if (prepend.length() > 0) {
           // todo: change to prepend.append(before); w.set(CoreAnnotations.BeforeAnnotation.class, prepend.toString());
-          w.set(CoreAnnotations.BeforeAnnotation.class, prepend.toString() + before);
+          w.set(CoreAnnotations.BeforeAnnotation.class, prepend + before);
           // w.prependBefore(prepend.toString());
           prepend = new StringBuilder();
         }
@@ -175,7 +168,7 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
 
   /**
    * Print the classifications for the document to the given Writer. This method
-   * now checks the <code>outputFormat</code> property, and can print in
+   * now checks the {@code outputFormat} property, and can print in
    * slashTags, inlineXML, or xml (stand-Off XML). For both the XML output
    * formats, it preserves spacing, while for the slashTags format, it prints
    * tokenized (since preserveSpacing output is somewhat dysfunctional with the
@@ -192,7 +185,7 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
     if (flags != null) {
       style = flags.outputFormat;
     }
-    if (style == null || "".equals(style)) {
+    if (style == null || style != null && style.isEmpty()) {
       style = "slashTags";
     }
     OutputStyle outputStyle = OutputStyle.fromShortName(style);
@@ -291,7 +284,7 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
   }
 
   private void printAnswersInlineXML(List<IN> doc, PrintWriter out) {
-    final String background = flags.backgroundSymbol;
+    String background = flags.backgroundSymbol;
     String prevTag = background;
     for (Iterator<IN> wordIter = doc.iterator(); wordIter.hasNext();) {
       IN wi = wordIter.next();
@@ -339,7 +332,7 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
   }
 
   private void printAnswersTokenizedInlineXML(List<IN> doc, PrintWriter out) {
-    final String background = flags.backgroundSymbol;
+    String background = flags.backgroundSymbol;
     String prevTag = background;
     boolean first = true;
     for (Iterator<IN> wordIter = doc.iterator(); wordIter.hasNext();) {

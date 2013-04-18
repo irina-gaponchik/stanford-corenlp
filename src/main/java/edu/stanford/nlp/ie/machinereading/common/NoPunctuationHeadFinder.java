@@ -27,12 +27,12 @@ public class NoPunctuationHeadFinder extends ModCollinsHeadFinder {
    *          part of speech tag
    * @return whether the tag is (typically) assigned to punctuation
    */
-  private boolean isPunctuationLabel(String label) {
+  private static boolean isPunctuationLabel(String label) {
     return !Character.isLetter(label.charAt(0))
         && !(label.equals("$") || label.equals("%"));
   }
 
-  protected int postOperationFix(int headIdx, Tree[] daughterTrees) {
+  protected int postOperationFix(int headIdx, Tree... daughterTrees) {
     int index = super.postOperationFix(headIdx, daughterTrees);
     // if the current index is a punctuation mark, we search left until we
     // find a non-punctuation mark tag or hit the left end of the sentence
@@ -48,7 +48,7 @@ public class NoPunctuationHeadFinder extends ModCollinsHeadFinder {
     return index;
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     // simple testing code
     Treebank treebank = new DiskTreebank();
     CategoryWordTag.suppressTerminalDetails = true;

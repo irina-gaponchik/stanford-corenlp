@@ -58,7 +58,7 @@ public class CrossValidator<L, F> {
 
   class CrossValidationIterator implements Iterator<Triple<GeneralDataset<L, F>,GeneralDataset<L, F>,SavedState>>
   {
-    int iter = 0;
+    int iter;
     public boolean hasNext() { return iter < kFold; }
 
     public void remove()
@@ -74,7 +74,7 @@ public class CrossValidator<L, F> {
       //System.err.println("##train data size: " +  originalTrainData.size() + " start " + start + " end " + end);
       Pair<GeneralDataset<L, F>, GeneralDataset<L, F>> split = originalTrainData.split(start, end);
 
-      return new Triple<GeneralDataset<L, F>,GeneralDataset<L, F>,SavedState>(split.first(),split.second(),savedStates[iter++]);
+      return new Triple<>(split.first(),split.second(),savedStates[iter++]);
     }
   }
 
@@ -82,9 +82,9 @@ public class CrossValidator<L, F> {
     public Object state;
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     Dataset<String, String> d = Dataset.readSVMLightFormat(args[0]);
-    Iterator<Triple<GeneralDataset<String, String>,GeneralDataset<String, String>,SavedState>> it = (new CrossValidator<String, String>(d)).iterator();
+    Iterator<Triple<GeneralDataset<String, String>,GeneralDataset<String, String>,SavedState>> it = new CrossValidator<>(d).iterator();
     while (it.hasNext())
     {
       it.next();

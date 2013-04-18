@@ -15,7 +15,7 @@ import static edu.stanford.nlp.trees.GrammaticalRelation.GOVERNOR;
 import edu.stanford.nlp.trees.GrammaticalRelation.GrammaticalRelationAnnotation;
 
 /**
- * <code>ChineseGrammaticalRelations</code> is a
+ * {@code ChineseGrammaticalRelations} is a
  * set of {@link GrammaticalRelation} objects for the Chinese language.
  * Examples are from CTB_001.fid
  * @author Galen Andrew
@@ -74,7 +74,7 @@ public class ChineseGrammaticalRelations {
   /**
    * The "conjunct" grammatical relation.
    * Example:
-   * <code>
+   * {@code
    * <pre>
    * (ROOT
    *   (IP
@@ -90,51 +90,49 @@ public class ChineseGrammaticalRelations {
    *
    * conj(建设, 开发)
    * </pre>
-   * </code>
+   * }
    */
 
   public static final GrammaticalRelation CONJUNCT =
     new GrammaticalRelation(Language.Chinese,
       "conj", "conjunct",
       PreconjunctGRAnnotation.class, DEPENDENT, "VP|NP|ADJP|PP|ADVP|UCP", tregexCompiler,
-      new String[]{
-        "NP|ADJP|PP|ADVP|UCP < (!PU=target $+ CC)",
-        // Split the first rule to the second rule to avoid the duplication:
-        // ccomp(前来-12, 投资-13)
-        // conj(前来-12, 投资-13)
-        //
-        //      (IP
-        //        (VP
-        //          (VP (VV 前来))
-        //          (VP
-        //            (VCD (VV 投资) (VV 办厂)))
-        //          (CC 和)
-        //          (VP (VV 洽谈)
-        //            (NP (NN 生意))))))
-        "VP < (!PU=target !$- VP $+ CC)",
-        // TODO: this following line has to be fixed.
-        //       I think for now it just doesn't match anything.
-        "VP|NP|ADJP|PP|ADVP|UCP < ( __=target $+ PU $+ CC)",
-        //"VP|NP|ADJP|PP|ADVP|UCP < ( __=target $+ (PU < 、) )",
-        // Consider changing the rule ABOVE to these rules.
-          "VP   < ( /^V/=target  $+ ((PU < 、) $+ /^V/))",
-          "NP   < ( /^N/=target  $+ ((PU < 、) $+ /^N/))",
-          "ADJP < ( JJ|ADJP=target  $+ ((PU < 、) $+ JJ|ADJP))",
-          "PP   < ( /^P/=target  $+ ((PU < 、) $+ /^P/))",
-        //"ADVP < ( /^AD/=target $+ ((PU < 、) $+ /^AD/))",
-          "ADVP < ( /^AD/ $+ ((PU < 、) $+ /^AD/=target))",
-          "UCP  < ( __=target    $+ (PU < 、) )",
-        // This is for the 'conj's separated by commas.
-        // For now this creates too much duplicates with 'ccomp'.
-        // Need to look at more examples.
+            "NP|ADJP|PP|ADVP|UCP < (!PU=target $+ CC)",
+            // Split the first rule to the second rule to avoid the duplication:
+            // ccomp(前来-12, 投资-13)
+            // conj(前来-12, 投资-13)
+            //
+            //      (IP
+            //        (VP
+            //          (VP (VV 前来))
+            //          (VP
+            //            (VCD (VV 投资) (VV 办厂)))
+            //          (CC 和)
+            //          (VP (VV 洽谈)
+            //            (NP (NN 生意))))))
+            "VP < (!PU=target !$- VP $+ CC)",
+            // TODO: this following line has to be fixed.
+            //       I think for now it just doesn't match anything.
+            "VP|NP|ADJP|PP|ADVP|UCP < ( __=target $+ PU $+ CC)",
+            //"VP|NP|ADJP|PP|ADVP|UCP < ( __=target $+ (PU < 、) )",
+            // Consider changing the rule ABOVE to these rules.
+            "VP   < ( /^V/=target  $+ ((PU < 、) $+ /^V/))",
+            "NP   < ( /^N/=target  $+ ((PU < 、) $+ /^N/))",
+            "ADJP < ( JJ|ADJP=target  $+ ((PU < 、) $+ JJ|ADJP))",
+            "PP   < ( /^P/=target  $+ ((PU < 、) $+ /^P/))",
+            //"ADVP < ( /^AD/=target $+ ((PU < 、) $+ /^AD/))",
+            "ADVP < ( /^AD/ $+ ((PU < 、) $+ /^AD/=target))",
+            "UCP  < ( __=target    $+ (PU < 、) )",
+            // This is for the 'conj's separated by commas.
+            // For now this creates too much duplicates with 'ccomp'.
+            // Need to look at more examples.
 
-        "PP < (PP $+ PP=target )",
-        "NP <( NP=target $+ ((PU < 、) $+ NP) )",
-        "NP <( NN|NR|NT|PN=target $+ ((PU < ，|、) $+ NN|NR|NT|PN) )",
-        "VP < (CC $+ VV=target)",
-        "  VP  < VV|VC|VRD|VCD|VE|VA < NP|QP|LCP  $ IP|VP|VRD|VCD|VE|VC|VA=target  ",
-         "IP|VP < ( IP|VP < NP|QP|LCP $ IP|VP=target )",
-      });
+            "PP < (PP $+ PP=target )",
+            "NP <( NP=target $+ ((PU < 、) $+ NP) )",
+            "NP <( NN|NR|NT|PN=target $+ ((PU < ，|、) $+ NN|NR|NT|PN) )",
+            "VP < (CC $+ VV=target)",
+            "  VP  < VV|VC|VRD|VCD|VE|VA < NP|QP|LCP  $ IP|VP|VRD|VCD|VE|VC|VA=target  ",
+            "IP|VP < ( IP|VP < NP|QP|LCP $ IP|VP=target )");
   public static class PreconjunctGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -145,9 +143,7 @@ public class ChineseGrammaticalRelations {
   public static final GrammaticalRelation AUX_MODIFIER =
     new GrammaticalRelation(Language.Chinese, "cop", "copula",
                             AuxModifierGRAnnotation.class, DEPENDENT, "VP", tregexCompiler,
-                            new String[]{
-                              " VP < VC=target"
-                            });
+            " VP < VC=target");
   public static class AuxModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -158,7 +154,7 @@ public class ChineseGrammaticalRelations {
    * an element and a conjunction.<p>
    * <p/>
    * Example:
-   * <code>
+   * {@code
    * <pre>
    * (ROOT
    *   (IP
@@ -171,16 +167,14 @@ public class ChineseGrammaticalRelations {
    *
    * cc(建设, 与)
    * </pre>
-   * </code>
+   * }
    */
 
   public static final GrammaticalRelation COORDINATION =
     new GrammaticalRelation(Language.Chinese,
       "cc", "coordination", CoordinationGRAnnotation.class, DEPENDENT,
       "VP|NP|ADJP|PP|ADVP|UCP|IP|QP", tregexCompiler,
-      new String[]{
-        "VP|NP|ADJP|PP|ADVP|UCP|IP|QP < (CC=target)"
-      });
+            "VP|NP|ADJP|PP|ADVP|UCP|IP|QP < (CC=target)");
   public static class CoordinationGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -193,9 +187,7 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese,
       "punct", "punctuation",
       PunctuationGRAnnotation.class, DEPENDENT, ".*", tregexCompiler,
-      new String[]{
-        "__ < PU=target"
-      });
+            "__ < PU=target");
   public static class PunctuationGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -214,7 +206,7 @@ public class ChineseGrammaticalRelations {
    * a subject which is an noun phrase.<p>
    * <p/>
    * Example:
-   * <code>
+   * {@code
    * <pre>
    * (ROOT
    *   (IP
@@ -227,16 +219,14 @@ public class ChineseGrammaticalRelations {
    *
    * nsubj(同步, 建设)
    * </pre>
-   * </code>
+   * }
    */
  public static final GrammaticalRelation NOMINAL_SUBJECT =
    new GrammaticalRelation(Language.Chinese,
      "nsubj", "nominal subject",
      NominalSubjectGRAnnotation.class, SUBJECT, "IP|VP", tregexCompiler,
-     new String[]{
-       " IP <( ( NP|QP=target!< NT ) $++ ( /^VP|VCD|IP/  !< VE !<VC !<SB !<LB  ))",
-       " NP !$+ VP < ( (  NP|DP|QP=target !< NT ) $+ ( /^VP|VCD/ !<VE !< VC !<SB !<LB))"
-     });
+           " IP <( ( NP|QP=target!< NT ) $++ ( /^VP|VCD|IP/  !< VE !<VC !<SB !<LB  ))",
+           " NP !$+ VP < ( (  NP|DP|QP=target !< NT ) $+ ( /^VP|VCD/ !<VE !< VC !<SB !<LB))");
   public static class NominalSubjectGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -244,7 +234,7 @@ public class ChineseGrammaticalRelations {
   /**
    * The "topic" grammatical relation.
    * Example:
-   * <code>
+   * {@code
    * <pre>
    * (IP
    *   (NP (NN 建筑))
@@ -262,16 +252,14 @@ public class ChineseGrammaticalRelations {
    *
    * top(是, 建筑)
    * </pre>
-   * </code>
+   * }
    */
 
   public static final GrammaticalRelation TOP_SUBJECT =
     new GrammaticalRelation(Language.Chinese,
       "top", "topic", TopicGRAnnotation.class, SUBJECT, "IP|VP", tregexCompiler,
-      new String[]{
-        "IP|VP < ( NP|DP=target $+ ( VP < VC|VE ) )",
-        "IP < (IP=target $+ ( VP < VC|VE))"
-      });
+            "IP|VP < ( NP|DP=target $+ ( VP < VC|VE ) )",
+            "IP < (IP=target $+ ( VP < VC|VE))");
   public static class TopicGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -280,7 +268,7 @@ public class ChineseGrammaticalRelations {
    * The noun is the subject of a passive sentence.
    * The passive marker in Chinese is "被".
    * <p>Example:
-   * <code>
+   * {@code
    * <pre>
    * (IP
    *   (NP (NN 镍))
@@ -297,16 +285,14 @@ public class ChineseGrammaticalRelations {
    *
    * nsubjpass(称作-3, 镍-1)
    * </pre>
-   * </code>
+   * }
    */
 
   public static final GrammaticalRelation NOMINAL_PASSIVE_SUBJECT =
     new GrammaticalRelation(Language.Chinese,
       "nsubjpass", "nominal passive subject",
       NominalPassiveSubjectGRAnnotation.class, NOMINAL_SUBJECT, "IP", tregexCompiler,
-      new String[]{
-        "IP < (NP=target $+ (VP|IP < SB|LB))"
-      });
+            "IP < (NP=target $+ (VP|IP < SB|LB))");
   public static class NominalPassiveSubjectGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -314,23 +300,18 @@ public class ChineseGrammaticalRelations {
    * The "clausal subject" grammatical relation.  A clausal subject is
    * a subject which is a clause.
    * <p /> Examples:
-   * <code>
+   * {@code
    * <pre>
    * </pre>
-   * </code>
+   * }
    * <p />
    * Note: This one might not exist in Chinese, or very rare.
    */
   public static final GrammaticalRelation CLAUSAL_SUBJECT =
     new GrammaticalRelation(Language.Chinese,
       "csubj", "clausal subject",
-      ClausalSubjectGRAnnotation.class, SUBJECT, "IP", tregexCompiler,
-      new String[]{
-        // This following rule is too general and collide with 'ccomp'.
-        // Delete it for now.
-        // TODO: come up with a new rule. Does this exist in Chinese?
-        //"IP < (IP=target $+ ( VP !< VC))",
-      });
+      ClausalSubjectGRAnnotation.class, SUBJECT, "IP", tregexCompiler
+    );
   public static class ClausalSubjectGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -356,7 +337,7 @@ public class ChineseGrammaticalRelations {
   /**
    * The "direct object" grammatical relation.
    * <p />Examples:
-   * <code>
+   * {@code
    * <pre>
    *(IP
    *   (NP (NR 上海) (NR 浦东))
@@ -372,19 +353,16 @@ public class ChineseGrammaticalRelations {
    *
    * dobj(颁布, 文件)
    * </pre>
-   * </code>
+   * }
    */
 
   public static final GrammaticalRelation DIRECT_OBJECT =
     new GrammaticalRelation(Language.Chinese,
       "dobj", "direct object",
       DirectObjectGRAnnotation.class, OBJECT, "CP|VP", tregexCompiler,
-      new String[]{
-        "VP < ( /^V*/ $+ NP $+ NP|DP=target ) !< VC ",
-        " VP < ( /^V*/ $+ NP|DP=target ! $+ NP|DP) !< VC ",
-        "CP < (IP $++ NP=target ) !<< VC",
-          }
-      );
+            "VP < ( /^V*/ $+ NP $+ NP|DP=target ) !< VC ",
+            " VP < ( /^V*/ $+ NP|DP=target ! $+ NP|DP) !< VC ",
+            "CP < (IP $++ NP=target ) !<< VC");
   public static class DirectObjectGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -412,16 +390,14 @@ public class ChineseGrammaticalRelations {
    *         (NP (NN 药品))
    *         (QP (CD 一亿多)
    *           (CLP (M 元))))
-   * <code>range </code>(成交, 元)
+   * {@code range }(成交, 元)
    */
   public static final GrammaticalRelation RANGE =
     new GrammaticalRelation(Language.Chinese,
       "range", "range",
       RangeGRAnnotation.class,  OBJECT, "VP", tregexCompiler,
-      new String[]{
-        " VP < ( NP|DP|QP $+ NP|DP|QP=target)" ,
-        "VP < ( VV $+ QP=target )"
-      });
+            " VP < ( NP|DP|QP $+ NP|DP|QP=target)",
+            "VP < ( VV $+ QP=target )");
   public static class RangeGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -445,9 +421,7 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese,
       "pobj", "prepositional object",
       PrepositionalObjectGRAnnotation.class, OBJECT, "^PP", tregexCompiler,
-      new String[]{
-        "/^PP/ < /^P/ < /^NP|^DP|QP/=target"
-      });
+            "/^PP/ < /^P/ < /^NP|^DP|QP/=target");
   public static class PrepositionalObjectGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -461,9 +435,7 @@ public class ChineseGrammaticalRelations {
   public static final GrammaticalRelation TIME_POSTPOSITION =
     new GrammaticalRelation(Language.Chinese, "lobj", "localizer object",
                             TimePostpositionGRAnnotation.class, OBJECT, "LCP", tregexCompiler,
-                            new String[]{
-                              "LCP < ( NP|QP|DP=target $+ LC)"
-                            });
+            "LCP < ( NP|QP|DP=target $+ LC)");
   public static class TimePostpositionGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -474,14 +446,12 @@ public class ChineseGrammaticalRelations {
    *        (NP (NR 浦东))
    *      (VP (VC 是)
    *          (NP (NN 工程)))))
-   * <code> attr </code> (是, 工程)
+   * {@code attr } (是, 工程)
    */
   public static final GrammaticalRelation ATTRIBUTIVE =
     new GrammaticalRelation(Language.Chinese, "attr", "attributive",
                             AttributiveGRAnnotation.class, COMPLEMENT, "VP", tregexCompiler,
-                            new String[]{
-                              "VP < /^VC$/ < NP|QP=target"
-                            });
+            "VP < /^VC$/ < NP|QP=target");
   public static class AttributiveGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -497,15 +467,13 @@ public class ChineseGrammaticalRelations {
    *                 (VP (SB 被)
    *                   (VP (VV 纳入)
    *                     (NP (NN 法制) (NN 轨道)))))))))))
-   * <code> ccomp </code> (出现, 纳入)
+   * {@code ccomp } (出现, 纳入)
    */
   public static final GrammaticalRelation CLAUSAL_COMPLEMENT =
     new GrammaticalRelation(Language.Chinese,
       "ccomp", "clausal complement",
       ClausalComplementGRAnnotation.class, COMPLEMENT, "VP|ADJP|IP", tregexCompiler,
-      new String[]{
-        "  VP  < VV|VC|VRD|VCD  !< NP|QP|LCP  < IP|VP|VRD|VCD=target > IP|VP "
-      });
+            "  VP  < VV|VC|VRD|VCD  !< NP|QP|LCP  < IP|VP|VRD|VCD=target > IP|VP ");
         //        "  VP|IP <  ( VV|VC|VRD|VCD !$+  NP|QP|LCP ) > (IP   < IP|VP|VRD|VCD=target)   "
        //          "VP < (S=target < (VP !<, TO|VBG) !$-- NP)",
 
@@ -522,15 +490,8 @@ public class ChineseGrammaticalRelations {
   public static final GrammaticalRelation XCLAUSAL_COMPLEMENT =
     new GrammaticalRelation(Language.Chinese,
       "xcomp", "xclausal complement",
-      XClausalComplementGRAnnotation.class, COMPLEMENT, "VP|ADJP", tregexCompiler,
-      new String[]{
-        // TODO: these rules seem to always collide with ccomp.
-        // Is this really desirable behavior?
-        //"VP !> (/^VP/ < /^VC$/ ) < (IP=target < (VP < P))",
-        //"ADJP < (IP=target <, (VP <, P))",
-        //"VP < (IP=target < (NP $+ NP|ADJP))",
-        //"VP < (/^VC/ $+ (VP=target < VC < NP))"
-      });
+      XClausalComplementGRAnnotation.class, COMPLEMENT, "VP|ADJP", tregexCompiler
+    );
   public static class XClausalComplementGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -549,16 +510,14 @@ public class ChineseGrammaticalRelations {
    *                 (NP (NN 中心))))))
    *         (DEC 的))
    * Example:
-   *<code> cpm </code> (振兴, 的)
+   *{@code cpm } (振兴, 的)
    */
 
   public static final GrammaticalRelation COMPLEMENTIZER =
     new GrammaticalRelation(Language.Chinese, "cpm", "complementizer",
                             ComplementizerGRAnnotation.class,
                             COMPLEMENT, "^CP", tregexCompiler,
-                            new String[]{
-                              "/^CP/ < (__  $++ DEC=target)"
-                            });
+            "/^CP/ < (__  $++ DEC=target)");
   public static class ComplementizerGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -589,15 +548,13 @@ public class ChineseGrammaticalRelations {
    *   (VP (VV 达)
    *     (QP (CD 四百三十八点八亿)
    *       (CLP (M 美元))))
-   * <code> loc </code> (占-11, 以上-13)
+   * {@code loc } (占-11, 以上-13)
    */
   public static final GrammaticalRelation LC_COMPLEMENT =
     new GrammaticalRelation(Language.Chinese,
       "loc", "localizer complement",
       LocalizerComplementGRAnnotation.class, COMPLEMENT, "VP|IP", tregexCompiler,
-      new String[]{
-        "VP|IP < LCP=target "
-      });
+            "VP|IP < LCP=target ");
   public static class LocalizerComplementGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -608,9 +565,7 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese,
       "rcomp", "result verb",
       ResultativeComplementGRAnnotation.class, COMPLEMENT, "VRD", tregexCompiler,
-      new String[]{
-        "VRD < ( /V*/ $+ /V*/=target )"
-      });
+            "VRD < ( /V*/ $+ /V*/=target )");
   public static class ResultativeComplementGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -631,9 +586,7 @@ public class ChineseGrammaticalRelations {
   public static final GrammaticalRelation VERB_COMPOUND =
     new GrammaticalRelation(Language.Chinese, "comod", "coordinated verb compound",
                             VerbCompoundGRAnnotation.class, MODIFIER, "VCD", tregexCompiler,
-                            new String[]{
-                              "VCD < ( VV|VA $+  VV|VA=target)"
-                            });
+            "VCD < ( VV|VA $+  VV|VA=target)");
   public static class VerbCompoundGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -644,14 +597,12 @@ public class ChineseGrammaticalRelations {
    *           (VP (VV 能)
    *             (VP (VV 得到)
    *               (NP (NN 保障)))))))))
-   * <code> mmod </code> (得到-64, 能-63)
+   * {@code mmod } (得到-64, 能-63)
    */
   public static final GrammaticalRelation MODAL_VERB =
     new GrammaticalRelation(Language.Chinese, "mmod", "modal verb",
                             ModalGRAnnotation.class, MODIFIER, "VP", tregexCompiler,
-                            new String[]{
-                              "VP < ( VV=target $+ VP|VRD )"
-                            });
+            "VP < ( VV=target $+ VP|VRD )");
   public static class ModalGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -661,9 +612,7 @@ public class ChineseGrammaticalRelations {
   public static final GrammaticalRelation AUX_PASSIVE_MODIFIER
   = new GrammaticalRelation(Language.Chinese, "pass", "passive",
                             AuxPassiveGRAnnotation.class, MODIFIER, "VP", tregexCompiler,
-                            new String[]{
-                              "VP < SB|LB=target"
-                            });
+          "VP < SB|LB=target");
   public static class AuxPassiveGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -673,9 +622,7 @@ public class ChineseGrammaticalRelations {
  public static final GrammaticalRelation BA =
    new GrammaticalRelation(Language.Chinese, "ba", "ba",
                            BaGRAnnotation.class, DEPENDENT, "VP|IP", tregexCompiler,
-                           new String[]{
-                             "VP|IP < BA=target "
-                           });
+           "VP|IP < BA=target ");
   public static class BaGRAnnotation extends GrammaticalRelationAnnotation { }
 
   /**
@@ -692,15 +639,13 @@ public class ChineseGrammaticalRelations {
    *       (LC 来))
    *     (VP
    *       (VCD (VV 颁布) (VV 实行))
-   * <code> tmod </code> (遇到, 以前)
+   * {@code tmod } (遇到, 以前)
    */
   public static final GrammaticalRelation TEMPORAL_MODIFIER =
     new GrammaticalRelation(Language.Chinese,
       "tmod", "temporal modifier",
       TemporalGRAnnotation.class, MODIFIER, "VP|IP", tregexCompiler,
-      new String[]{
-        "VP|IP < (NP=target < NT !.. /^VC$/ $++  VP)"
-      });
+            "VP|IP < (NP=target < NT !.. /^VC$/ $++  VP)");
   public static class TemporalGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -732,15 +677,13 @@ public class ChineseGrammaticalRelations {
    *                  (PU ”)))
    *               (DEC 的))
    *             (NP (NN 做法)))))))
-   * <code> lccomp </code> (以后, 积累)
+   * {@code lccomp } (以后, 积累)
    */
   // pichuan: previously "tclaus"
   public static final GrammaticalRelation TIME =
     new GrammaticalRelation(Language.Chinese, "lccomp", "clausal complement of localizer",
                             TemporalClauseGRAnnotation.class, MODIFIER, "LCP", tregexCompiler,
-                            new String[]{
-                              "/LCP/ < ( IP=target $+ LC )"
-                            });
+            "/LCP/ < ( IP=target $+ LC )");
   public static class TemporalClauseGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -761,18 +704,16 @@ public class ChineseGrammaticalRelations {
    *           (NP (NN 问题)))))))
    * (PU 。)))
    * the new problem that has not been encountered.
-   * <code> rcmod </code> (问题, 遇到)
+   * {@code rcmod } (问题, 遇到)
    */
   public static final GrammaticalRelation RELATIVE_CLAUSE_MODIFIER =
     new GrammaticalRelation(Language.Chinese, "rcmod", "relative clause modifier",
                             RelativeClauseModifierGRAnnotation.class,
                             MODIFIER, "NP", tregexCompiler,
-                            new String[]{
-                              "NP  $++ (CP=target ) > NP ",
-                              "NP  $++ (CP=target <: IP) > NP  ",
-                              "NP  $++ (CP=target)",
-                              " NP  << ( CP=target $++ NP  )"
-                            });
+            "NP  $++ (CP=target ) > NP ",
+            "NP  $++ (CP=target <: IP) > NP  ",
+            "NP  $++ (CP=target)",
+            " NP  << ( CP=target $++ NP  )");
   public static class RelativeClauseModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -789,10 +730,8 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese, "nummod", "numeric modifier",
                             NumericModifierGRAnnotation.class, MODIFIER,
                             "QP|NP", tregexCompiler,
-                            new String[]{
-                              "QP < CD=target",
-                              "NP < ( QP=target !<< CLP )"
-                            });
+            "QP < CD=target",
+            "NP < ( QP=target !<< CLP )");
    public static class NumericModifierGRAnnotation
      extends GrammaticalRelationAnnotation { }
 
@@ -803,10 +742,8 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese, "ordmod", "numeric modifier",
                             OrdNumberGRAnnotation.class, MODIFIER,
                             "NP|QP", tregexCompiler,
-                            new String[]{
-                              "NP < QP=target < ( OD !$+ CLP )",
-                              "QP < (OD=target $+ CLP)"
-                            });
+            "NP < QP=target < ( OD !$+ CLP )",
+            "QP < (OD=target $+ CLP)");
   public static class OrdNumberGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -815,16 +752,14 @@ public class ChineseGrammaticalRelations {
    * (QP (CD 七十一)
    *           (CLP (M 件)))
    *         (NP (NN 法规性) (NN 文件)))))
-   * <code> clf </code> (文件-26, 件-24)
+   * {@code clf } (文件-26, 件-24)
    */
   public static final GrammaticalRelation NUMBER_MODIFIER =
     new GrammaticalRelation(Language.Chinese,
       "clf", "classifier modifier",
       NumberModifierGRAnnotation.class, MODIFIER, "^NP|DP|QP", tregexCompiler,
-      new String[]{
-        "NP|QP < ( QP  =target << M $++ NN|NP|QP)",
-        "DP < ( DT $+ CLP=target )"
-      });
+            "NP|QP < ( QP  =target << M $++ NN|NP|QP)",
+            "DP < ( DT $+ CLP=target )");
   public static class NumberModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -839,17 +774,15 @@ public class ChineseGrammaticalRelations {
    *         (CC 与)
    *         (NN 法制) (NN 建设)))
    *     (VP (VV 同步))))
-   * <code> nn </code> (浦东, 上海)
+   * {@code nn } (浦东, 上海)
    */
   public static final GrammaticalRelation NOUN_COMPOUND_MODIFIER =
     new GrammaticalRelation(Language.Chinese,
       "nn", "nn modifier",
       NounCompoundModifierGRAnnotation.class, MODIFIER, "^NP", tregexCompiler,
-      new String[]{
-        "NP < (NN|NR|NT=target $+ NN|NR|NT)",
-        "NP < (NN|NR|NT $+ FW=target)",
-        " NP <  (NP=target !$+ PU|CC $++ NP|PRN )"
-      });
+            "NP < (NN|NR|NT=target $+ NN|NR|NT)",
+            "NP < (NN|NR|NT $+ FW=target)",
+            " NP <  (NP=target !$+ PU|CC $++ NP|PRN )");
   public static class NounCompoundModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -862,15 +795,13 @@ public class ChineseGrammaticalRelations {
    *         (NP
    *           (ADJP (JJ 新))
    *           (NP (NN 问题)))))))
-   * <code> amod </code> (情况-34, 新-33)
+   * {@code amod } (情况-34, 新-33)
    */
   public static final GrammaticalRelation ADJECTIVAL_MODIFIER =
     new GrammaticalRelation(Language.Chinese,
       "amod", "adjectival modifier",
       AdjectivalModifierGRAnnotation.class, MODIFIER, "NP|CLP|QP", tregexCompiler,
-      new String[]{
-        "NP|CLP|QP < (ADJP=target $++ NP|CLP|QP ) "
-      });
+            "NP|CLP|QP < (ADJP=target $++ NP|CLP|QP ) ");
   public static class AdjectivalModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -886,12 +817,10 @@ public class ChineseGrammaticalRelations {
       "advmod", "adverbial modifier",
       AdverbialModifierGRAnnotation.class, MODIFIER,
       "VP|ADJP|IP|CP|PP|NP|QP", tregexCompiler,
-      new String[]{
-        "VP|ADJP|IP|CP|PP|NP < ADVP=target",
-        "VP|ADJP < AD|CS=target",
-        "QP < (ADVP=target $+ QP)",
-        "QP < ( QP $+ ADVP=target)"
-      });
+            "VP|ADJP|IP|CP|PP|NP < ADVP=target",
+            "VP|ADJP < AD|CS=target",
+            "QP < (ADVP=target $+ QP)",
+            "QP < ( QP $+ ADVP=target)");
   public static class AdverbialModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -902,9 +831,7 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese,
       "vmod", "participle modifier",
       VerbModifierGRAnnotation.class, MODIFIER, "NP", tregexCompiler,
-      new String[]{
-        "NP < IP=target "
-      });
+            "NP < IP=target ");
   public static class VerbModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -914,9 +841,7 @@ public class ChineseGrammaticalRelations {
   public static final GrammaticalRelation PRN_MODIFIER =
     new GrammaticalRelation(Language.Chinese, "prnmod", "prn odifier",
                             ParentheticalGRAnnotation.class, MODIFIER, "NP", tregexCompiler,
-                            new String[]{
-                              "NP < PRN=target "
-                            });
+            "NP < PRN=target ");
   public static class ParentheticalGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -933,10 +858,8 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese,
       "neg", "negation modifier",
       NegationModifierGRAnnotation.class, ADVERBIAL_MODIFIER, "VP|ADJP|IP", tregexCompiler,
-      new String[]{
-        "VP|ADJP|IP < (AD=target < /\\u4e0d/)",
-        "VP|ADJP|IP < (ADVP=target < (AD < /\\u4e0d/))"
-      });
+            "VP|ADJP|IP < (AD=target < /\\u4e0d/)",
+            "VP|ADJP|IP < (ADVP=target < (AD < /\\u4e0d/))");
   public static class NegationModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -950,10 +873,9 @@ public class ChineseGrammaticalRelations {
   public static final GrammaticalRelation DETERMINER =
     new GrammaticalRelation(Language.Chinese, "det", "determiner",
                             DeterminerGRAnnotation.class, MODIFIER, "^NP|DP", tregexCompiler,
-                            new String[]{
-                              "/^NP/ < (DP=target $++ NP )"
-                              //"DP < DT < QP=target"
-                            });
+            "/^NP/ < (DP=target $++ NP )"
+            //"DP < DT < QP=target"
+    );
   public static class DeterminerGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1005,15 +927,13 @@ public class ChineseGrammaticalRelations {
    public static final GrammaticalRelation DVP_MODIFIER =
      new GrammaticalRelation(Language.Chinese, "dvpm", "dvp marker",
                              DvpMarkerGRAnnotation.class, MODIFIER, "DVP", tregexCompiler,
-                             new String[]{
-                               " DVP < (__ $+ DEV=target ) "
-                             });
+             " DVP < (__ $+ DEV=target ) ");
   public static class DvpMarkerGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
   /**
    * The "dvp modifier" grammatical relation.
-   * <code>
+   * {@code
    * <pre>
    * (ADVP (AD 不))
    *    (VP (VC 是)
@@ -1025,20 +945,18 @@ public class ChineseGrammaticalRelations {
    *
    * dvpmod(采取-9, 简单-7)
    * </pre>
-   * </code>
+   * }
    */
   public static final GrammaticalRelation DVPM_MODIFIER =
     new GrammaticalRelation(Language.Chinese, "dvpmod", "dvp modifier",
                             DvpModifierGRAnnotation.class, MODIFIER, "VP", tregexCompiler,
-                            new String[]{
-                              " VP < ( DVP=target $+ VP) "
-                            });
+            " VP < ( DVP=target $+ VP) ");
   public static class DvpModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
   /**
    * The "associative marker" grammatical relation.
-   * <code>
+   * {@code
    * <pre>
    *       (NP (DNP
    *             (NP (NP (NR 浦东))
@@ -1049,15 +967,13 @@ public class ChineseGrammaticalRelations {
    *
    * assm(开发-31, 的-32)
    * </pre>
-   * </code>
+   * }
    */
   public static final GrammaticalRelation ASSOCIATIVE_MODIFIER =
     new GrammaticalRelation(Language.Chinese,
       "assm", "associative marker",
       AssociativeMarkerGRAnnotation.class, MODIFIER, "DNP", tregexCompiler,
-      new String[]{
-        " DNP < ( __ $+ DEG=target ) "
-      });
+            " DNP < ( __ $+ DEG=target ) ");
   public static class AssociativeMarkerGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1074,9 +990,7 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese,
       "assmod", "associative modifier",
       AssociativeModifierGRAnnotation.class, MODIFIER, "NP|QP", tregexCompiler,
-      new String[]{
-        "NP|QP < ( DNP =target $++ NP|QP ) "
-      });
+            "NP|QP < ( DNP =target $++ NP|QP ) ");
   public static class AssociativeModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1096,18 +1010,16 @@ public class ChineseGrammaticalRelations {
    *           (VP (VA 简单))
    *           (DEV 的))
    *         (VP (VV 采取)
-   * <code> prep </code> (采取-9, 对-1)
+   * {@code prep } (采取-9, 对-1)
    */
   public static final GrammaticalRelation PREPOSITIONAL_MODIFIER =
     new GrammaticalRelation(Language.Chinese,
       "prep", "prepositional modifier",
       PrepositionalModifierGRAnnotation.class,
       MODIFIER, "^NP|VP|IP", tregexCompiler,
-      new String[]{
-        "/^NP/ < /^PP/=target",
-        "VP < /^PP/=target",
-        "IP < /^PP/=target "
-      });
+            "/^NP/ < /^PP/=target",
+            "VP < /^PP/=target",
+            "IP < /^PP/=target ");
   public static class PrepositionalModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1123,17 +1035,15 @@ public class ChineseGrammaticalRelations {
    *             (ADVP (AD 就))
    *             (ADVP (AD 比较))
    *             (VP (VA 规范)))))))
-   * <code> pccomp </code> (因为-18, 开始-20)
+   * {@code pccomp } (因为-18, 开始-20)
    */
   // pichuan: previously "clmpd"
   public static final GrammaticalRelation CL_MODIFIER =
     new GrammaticalRelation(Language.Chinese,
       "pccomp", "clause complement of a preposition",
       ClauseModifierGRAnnotation.class, MODIFIER, "^PP|IP", tregexCompiler,
-      new String[]{
-        "PP < (P $+ IP|VP =target)",
-        "IP < (CP=target $++ VP)"
-      });
+            "PP < (P $+ IP|VP =target)",
+            "IP < (CP=target $++ VP)");
   public static class ClauseModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1152,9 +1062,7 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese,
       "plmod", "prepositional localizer modifier",
       PrepositionalLocalizerModifierGRAnnotation.class, MODIFIER, "PP", tregexCompiler,
-      new String[]{
-        "PP < ( P $++ LCP=target )"
-      });
+            "PP < ( P $++ LCP=target )");
   public static class PrepositionalLocalizerModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1163,14 +1071,12 @@ public class ChineseGrammaticalRelations {
    * (VP
    *     (ADVP (AD 基本))
    *     (VP (VV 做到) (AS 了)
-   * <code> asp </code> (做到,了)
+   * {@code asp } (做到,了)
    */
   public static final GrammaticalRelation PREDICATE_ASPECT =
     new GrammaticalRelation(Language.Chinese, "asp", "aspect",
                             AspectMarkerGRAnnotation.class, MODIFIER, "VP", tregexCompiler,
-                            new String[]{
-                              "VP < ( /^V*/ $+ AS=target)"
-                            });
+            "VP < ( /^V*/ $+ AS=target)");
   public static class AspectMarkerGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1181,9 +1087,7 @@ public class ChineseGrammaticalRelations {
     new GrammaticalRelation(Language.Chinese,
       "prtmod", "particle verb",
       ParticipialModifierGRAnnotation.class, MODIFIER, "VP|IP", tregexCompiler,
-      new String[]{
-        "VP|IP < ( MSP=target )"
-      });
+            "VP|IP < ( MSP=target )");
   public static class ParticipialModifierGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1192,15 +1096,13 @@ public class ChineseGrammaticalRelations {
    *(NP
    *                 (NP (NN 经济) (PU 、) (NN 贸易) (PU 、) (NN 建设) (PU 、) (NN 规划) (PU 、) (NN 科技) (PU 、) (NN 文教) (ETC 等))
    *                 (NP (NN 领域)))))
-   * <code> etc </code> (办法-70, 等-71)
+   * {@code etc } (办法-70, 等-71)
    */
 
   public static final GrammaticalRelation ETC =
     new GrammaticalRelation(Language.Chinese, "etc", "ETC",
                             EtcGRAnnotation.class, MODIFIER, "^NP", tregexCompiler,
-                            new String[]{
-                              "/^NP/ < (NN|NR . ETC=target)"
-                            });
+            "/^NP/ < (NN|NR . ETC=target)");
   public static class EtcGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1235,15 +1137,13 @@ public class ChineseGrammaticalRelations {
    *                       (LC 中)))
    *                   (ADVP (AD 逐步))
    *                   (VP (VV 完善))))))))))
-   * <code> xsubj </code> (完善-26, 有些-14)
+   * {@code xsubj } (完善-26, 有些-14)
    */
   public static final GrammaticalRelation CONTROLLED_SUBJECT =
     new GrammaticalRelation(Language.Chinese,
       "xsubj", "controlled subject",
       ControllingSubjectGRAnnotation.class, SEMANTIC_DEPENDENT, "VP", tregexCompiler,
-      new String[] {
-        "VP !< NP < VP > (IP !$- NP !< NP !>> (VP < VC ) >+(VP) (VP $-- NP=target))"
-      });
+            "VP !< NP < VP > (IP !$- NP !< NP !>> (VP < VC ) >+(VP) (VP $-- NP=target))");
   public static class ControllingSubjectGRAnnotation
     extends GrammaticalRelationAnnotation { }
 
@@ -1311,7 +1211,7 @@ public class ChineseGrammaticalRelations {
   
   // Map from Chinese GrammaticalRelation short names to their corresponding
   // GrammaticalRelation objects
-  public static final Map<String, GrammaticalRelation> shortNameToGRel = new ConcurrentHashMap<String, GrammaticalRelation>();
+  public static final Map<String, GrammaticalRelation> shortNameToGRel = new ConcurrentHashMap<>();
   static {
     for (GrammaticalRelation gr : ChineseGrammaticalRelations.values()) {
       shortNameToGRel.put(gr.getShortName(), gr);

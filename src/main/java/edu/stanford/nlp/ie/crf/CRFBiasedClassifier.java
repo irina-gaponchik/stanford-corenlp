@@ -25,9 +25,9 @@ import java.util.*;
  * with {@link CRFClassifier} and supports most command-line parameters
  * available in {@link CRFClassifier}.  In addition to this,
  * CRFBiasedClassifier also interprets the parameter -classBias, as in:
- * <p/><code>
+ * <p/>{@code
  * java -server -mx500m edu.stanford.nlp.ie.crf.CRFBiasedClassifier -loadClassifier model.gz -testFile test.txt -classBias A:0.5,B:1.5
- * </code>
+ * }
  * <p/>The command above sets a bias of 0.5 towards class A and a bias of
  * 1.5 towards class B. These biases (which internally are treated as
  * feature weights in the log-linear model underpinning the CRF
@@ -42,7 +42,7 @@ import java.util.*;
 public class CRFBiasedClassifier<IN extends CoreMap> extends CRFClassifier<IN> {
 
   private static final String BIAS = "@@@DECODING_CLASS_BIAS@@@";
-  private boolean testTime = false;
+  private boolean testTime;
 
 
   public CRFBiasedClassifier(Properties props) {
@@ -53,13 +53,13 @@ public class CRFBiasedClassifier<IN extends CoreMap> extends CRFClassifier<IN> {
   public CRFDatum<List<String>, CRFLabel> makeDatum(List<IN> info, int loc, FeatureFactory<IN> featureFactory) {
 
     pad.set(CoreAnnotations.AnswerAnnotation.class, flags.backgroundSymbol);
-    PaddedList<IN> pInfo = new PaddedList<IN>(info, pad);
+    PaddedList<IN> pInfo = new PaddedList<>(info, pad);
 
-    List<List<String>> features = new ArrayList<List<String>>();
+    List<List<String>> features = new ArrayList<>();
     Collection<Clique> done = Generics.newHashSet();
     for (int i = 0; i < windowSize; i++) {
-      List<String> featuresC = new ArrayList<String>();
-      List<Clique> windowCliques = featureFactory.getCliques(i, 0);
+      List<String> featuresC = new ArrayList<>();
+      List<Clique> windowCliques = FeatureFactory.getCliques(i, 0);
       windowCliques.removeAll(done);
       done.addAll(windowCliques);
       for (Clique c : windowCliques) {
@@ -78,7 +78,7 @@ public class CRFBiasedClassifier<IN extends CoreMap> extends CRFClassifier<IN> {
       labels[i] = classIndex.indexOf(answer);
     }
 
-    return new CRFDatum<List<String>, CRFLabel>(features, new CRFLabel(labels), null);
+    return new CRFDatum<>(features, new CRFLabel(labels), null);
   }
 
   void addBiasFeature() {
@@ -119,6 +119,7 @@ public class CRFBiasedClassifier<IN extends CoreMap> extends CRFClassifier<IN> {
       evalFunction = e;
     }
 
+    @Override
     public Double apply(Double w) {
       crf.setBiasWeight(0,w);
       return evalFunction.apply(w);
@@ -132,7 +133,7 @@ public class CRFBiasedClassifier<IN extends CoreMap> extends CRFClassifier<IN> {
    * problems.
    */
   public void adjustBias(List<List<IN>> develData, Function<Double,Double> evalFunction, double low, double high) {
-    LineSearcher ls = new GoldenSectionLineSearch(true,1e-2,low,high);
+    LineSearcher ls = new GoldenSectionLineSearch(true, 1.0e-2,low,high);
     CRFBiasedClassifierOptimizer optimizer = new CRFBiasedClassifierOptimizer(this, evalFunction);
     double optVal = ls.minimize(optimizer);
     int bi = featureIndex.indexOf(BIAS);
@@ -140,16 +141,16 @@ public class CRFBiasedClassifier<IN extends CoreMap> extends CRFClassifier<IN> {
   }
 
   /** The main method, which is essentially the same as in CRFClassifier. See the class documentation. */
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     System.err.println("CRFBiasedClassifier invoked at " + new Date()
             + " with arguments:");
     for (String arg : args) {
-      System.err.print(" " + arg);
+      System.err.print(' ' + arg);
     }
     System.err.println();
 
     Properties props = StringUtils.argsToProperties(args);
-    CRFBiasedClassifier<CoreLabel> crf = new CRFBiasedClassifier<CoreLabel>(props);
+    CRFBiasedClassifier<CoreLabel> crf = new CRFBiasedClassifier<>(props);
     String testFile = crf.flags.testFile;
     String loadPath = crf.flags.loadClassifier;
 

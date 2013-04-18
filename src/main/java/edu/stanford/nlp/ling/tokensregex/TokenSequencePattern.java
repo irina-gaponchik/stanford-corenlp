@@ -9,87 +9,87 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Token Sequence Pattern for regular expressions for sequences over tokens (as the more general <code>CoreMap</code>)
+ * Token Sequence Pattern for regular expressions for sequences over tokens (as the more general {@code CoreMap})
  * Sequences over tokens can be matched like strings.
  * <p>
  * To use
- * <pre><code>
+ * <pre>{@code
  *   TokenSequencePattern p = TokenSequencePattern.compile("....");
  *   TokenSequenceMatcher m = p.getMatcher(tokens);
  *   while (m.find()) ....
- * </code></pre>
+ * }</pre>
  * </p>
  *
  * <p>
  * Supports the following:
  * <ul>
- *  <li>Concatenation: <code>X Y</code></li>
- *  <li>Or: <code>X | Y</code></li>
- *  <li>And: <code>X & Y</code></li>
+ *  <li>Concatenation: {@code X Y}</li>
+ *  <li>Or: {@code X | Y}</li>
+ *  <li>And: {@code X & Y}</li>
  *  <li>Groups:
  *     <ul>
- *     <li>capturing: <code>(X)</code> (with numeric group id)</li>
- *     <li>capturing: <code>(?$var X)</code> (with group name "$var")</li>
- *     <li>noncapturing: <code>(?:X)</code></li>
+ *     <li>capturing: {@code (X)} (with numeric group id)</li>
+ *     <li>capturing: {@code (?$var X)} (with group name "$var")</li>
+ *     <li>noncapturing: {@code (?:X)}</li>
  *     </ul>
  *  Capturing groups can be retrieved with group id or group variable, as matched string
- *     (<code>m.group()</code>) or list of tokens (<code>m.groupNodes()</code>).
+ *     ({@code m.group()}) or list of tokens ({@code m.groupNodes()}).
  *  <ul>
- *     <li>To retrieve group using id: <code>m.group(id)</code> or <code>m.groupNodes(id)</code>
+ *     <li>To retrieve group using id: {@code m.group(id)} or {@code m.groupNodes(id)}
  *     <br> NOTE: Capturing groups are indexed from left to right, starting at one.  Group zero is the entire matched sequence.
  *     </li>
- *     <li>To retrieve group using bind variable name: <code>m.group("$var")</code> or <code>m.groupNodes("$var")</code>
+ *     <li>To retrieve group using bind variable name: {@code m.group("$var")} or {@code m.groupNodes("$var")}
  *     </li>
  *  </ul>
  *  See {@link SequenceMatchResult} for more accessor functions to retrieve matches.
  * </li>
- * <li>Greedy Quantifiers:  <code>X+, X?, X*, X{n,m}, X{n}, X{n,}</code></li>
- * <li>Reluctant Quantifiers: <code>X+?, X??, X*?, X{n,m}?, X{n}?, X{n,}?</code></li>
- * <li>Back references: <code>\captureid</code> </li>
- * <li>Value binding for groups: <code>[pattern] => [value]</code>.
- *   Value for matched expression can be accessed using <code>m.groupValue()</code>
+ * <li>Greedy Quantifiers:  {@code X+, X?, X*, X{n,m}, X{n}, X{n,}}</li>
+ * <li>Reluctant Quantifiers: {@code X+?, X??, X*?, X{n,m}?, X{n}?, X{n,}?}</li>
+ * <li>Back references: {@code \captureid} </li>
+ * <li>Value binding for groups: {@code [pattern] => [value]}.
+ *   Value for matched expression can be accessed using {@code m.groupValue()}
  *   <br></br>Example: <pre>( one => 1 | two => 2 | three => 3 | ...)</pre>
  * </li>
  * </ul>
  *
  * <p>
- * Individual tokens are marked by <code>"[" TOKEN_EXPR "]" </code>
- * <br>Possible <code>TOKEN_EXPR</code>:
+ * Individual tokens are marked by {@code "[" TOKEN_EXPR "]" }
+ * <br>Possible {@code TOKEN_EXPR}:
  * <ul>
  * <li> All specified token attributes match:
  * <br> For Strings:
- *     <code> { lemma:/.../; tag:"NNP" } </code> = attributes that need to all match
- * <br> NOTE: <code>/.../</code> used for regular expressions,
- *            <code>"..."</code> for exact string matches
+ *     {@code  { lemma:/.../; tag:"NNP" } } = attributes that need to all match
+ * <br> NOTE: {@code /.../} used for regular expressions,
+ *            {@code "..."} for exact string matches
  * <br> For Numbers:
- *      <code>{ word>=2 }</code>
- * <br> NOTE: Relation can be <code>">=", "<=", ">", "<",</code> or <code>"=="</code>
+ *      {@code { word>=2 }}
+ * <br> NOTE: Relation can be {@code ">=", "<=", ">", "<",} or {@code "=="}
  * <br> Others:
- *      <code>{ word::IS_NUM } , { word::IS_NIL } </code> or
- *      <code>{ word::NOT_EXISTS }, { word::NOT_NIL } </code> or <code> { word::EXISTS } </code>
+ *      {@code { word::IS_NUM } , { word::IS_NIL } } or
+ *      {@code { word::NOT_EXISTS }, { word::NOT_NIL } } or {@code  { word::EXISTS } }
  * </li>
  * <li>Short hand for just word/text match:
- *     <code> /.../ </code>  or  <code>"..." </code>
+ *     {@code  /.../ }  or  {@code "..." }
  * </li>
  * <li>
  *  Negation:
- *     <code> !{...} </code>
+ *     {@code  !{...} }
  * </li>
  * <li>
  *  Conjunction or Disjunction:
- *     <code> {...} & {...} </code>   or  <code> {...} | {...} </code>
+ *     {@code  {...} & {...} }   or  {@code  {...} | {...} }
  * </li>
  * </ui>
  * </p>
  *
  * <p>
  * Special tokens:
- *   Any token: <code>[]</code>
+ *   Any token: {@code []}
  * </p>
  *
  * <p>
  * String pattern match across multiple tokens:
- *   <code>(?m){min,max} /pattern/</code>
+ *   {@code (?m){min,max} /pattern/}
  * </p>
  *
  * <p>
@@ -100,19 +100,19 @@ import java.util.List;
  *    env.bind("numtype", CoreAnnotations.NumericTypeAnnotation.class);
  * </li>
  * <li> Bind patterns / strings for compiling patterns
- *    <pre><code>
+ *    <pre>{@code
  *    // Bind string for later compilation using: compile("/it/ /was/ $RELDAY");
  *    env.bind("$RELDAY", "/today|yesterday|tomorrow|tonight|tonite/");
  *    // Bind pre-compiled patter for later compilation using: compile("/it/ /was/ $RELDAY");
  *    env.bind("$RELDAY", TokenSequencePattern.compile(env, "/today|yesterday|tomorrow|tonight|tonite/"));
- *    </code></pre>
+ *    }</pre>
  * </li>
  * <li> Bind custom node pattern functions (currently no arguments are supported)
- *    <pre><code>
+ *    <pre>{@code
  *    // Bind node pattern so we can do patterns like: compile("... temporal::IS_TIMEX_DATE ...");
  *    //   (TimexTypeMatchNodePattern is a NodePattern that implements some custom logic)
  *    env.bind("::IS_TIMEX_DATE", new TimexTypeMatchNodePattern(SUTime.TimexType.DATE));
- *   </code></pre>
+ *   }</pre>
  * </li>
  * </ol>
  * </p>
@@ -120,11 +120,11 @@ import java.util.List;
  * <p>
  * Actions (partially implemented)
  * <ul>
- * <li> <code>pattern ==> action</code> </li>
+ * <li> {@code pattern ==> action} </li>
  * <li> Supported action:
- *    <code>&annotate( { ner="DATE" } )</code> </li>
+ *    {@code &annotate( { ner="DATE" } )} </li>
  * <li> Not applied automatically, associated with a pattern.</li>
- * <li> To apply, call <code>pattern.getAction().apply(match, groupid)</code></li>
+ * <li> To apply, call {@code pattern.getAction().apply(match, groupid)}</li>
  * </ul>
  * </p>
  *
@@ -200,7 +200,7 @@ public class TokenSequencePattern extends SequencePattern<CoreMap> {
   public static TokenSequencePattern compile(Env env, String... strings)
   {
     try {
-      List<SequencePattern.PatternExpr> patterns = new ArrayList<SequencePattern.PatternExpr>();
+      List<SequencePattern.PatternExpr> patterns = new ArrayList<>();
       for (String string:strings) {
         // TODO: Check token sequence parser?
         SequencePattern.PatternExpr pattern = env.parser.parseSequence(env, string);

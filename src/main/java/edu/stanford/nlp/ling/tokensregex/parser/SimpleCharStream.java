@@ -16,20 +16,20 @@ class SimpleCharStream
   int tokenBegin;
 /** Position in buffer. */
   public int bufpos = -1;
-  protected int bufline[];
-  protected int bufcolumn[];
+  protected int[] bufline;
+  protected int[] bufcolumn;
 
-  protected int column = 0;
+  protected int column;
   protected int line = 1;
 
-  protected boolean prevCharIsCR = false;
-  protected boolean prevCharIsLF = false;
+  protected boolean prevCharIsCR;
+  protected boolean prevCharIsLF;
 
   protected java.io.Reader inputStream;
 
   protected char[] buffer;
-  protected int maxNextCharInd = 0;
-  protected int inBuf = 0;
+  protected int maxNextCharInd;
+  protected int inBuf;
   protected int tabSize = 8;
 
   protected void setTabSize(int i) { tabSize = i; }
@@ -39,8 +39,8 @@ class SimpleCharStream
   protected void ExpandBuff(boolean wrapAround)
   {
     char[] newbuffer = new char[bufsize + 2048];
-    int newbufline[] = new int[bufsize + 2048];
-    int newbufcolumn[] = new int[bufsize + 2048];
+    int[] newbufline = new int[bufsize + 2048];
+    int[] newbufcolumn = new int[bufsize + 2048];
 
     try
     {
@@ -58,7 +58,7 @@ class SimpleCharStream
         System.arraycopy(bufcolumn, 0, newbufcolumn, bufsize - tokenBegin, bufpos);
         bufcolumn = newbufcolumn;
 
-        maxNextCharInd = (bufpos += (bufsize - tokenBegin));
+        maxNextCharInd = bufpos += bufsize - tokenBegin;
       }
       else
       {
@@ -71,7 +71,7 @@ class SimpleCharStream
         System.arraycopy(bufcolumn, tokenBegin, newbufcolumn, 0, bufsize - tokenBegin);
         bufcolumn = newbufcolumn;
 
-        maxNextCharInd = (bufpos -= tokenBegin);
+        maxNextCharInd = bufpos -= tokenBegin;
       }
     }
     catch (Throwable t)
@@ -103,7 +103,7 @@ class SimpleCharStream
       }
       else if (available > tokenBegin)
         available = bufsize;
-      else if ((tokenBegin - available) < 2048)
+      else if (tokenBegin - available < 2048)
         ExpandBuff(true);
       else
         available = tokenBegin;
@@ -118,7 +118,6 @@ class SimpleCharStream
       }
       else
         maxNextCharInd += i;
-      return;
     }
     catch(java.io.IOException e) {
       --bufpos;
@@ -146,7 +145,7 @@ class SimpleCharStream
     if (prevCharIsLF)
     {
       prevCharIsLF = false;
-      line += (column = 1);
+      line += column = 1;
     }
     else if (prevCharIsCR)
     {
@@ -156,7 +155,7 @@ class SimpleCharStream
         prevCharIsLF = true;
       }
       else
-        line += (column = 1);
+        line += column = 1;
     }
 
     switch (c)
@@ -169,7 +168,7 @@ class SimpleCharStream
         break;
       case '\t' :
         column--;
-        column += (tabSize - (column % tabSize));
+        column += tabSize - column % tabSize;
         break;
       default :
         break;
@@ -388,11 +387,8 @@ class SimpleCharStream
   /** Get token literal value. */
   public String GetImage()
   {
-    if (bufpos >= tokenBegin)
-      return new String(buffer, tokenBegin, bufpos - tokenBegin + 1);
-    else
-      return new String(buffer, tokenBegin, bufsize - tokenBegin) +
-                            new String(buffer, 0, bufpos + 1);
+      return bufpos >= tokenBegin ? new String(buffer, tokenBegin, bufpos - tokenBegin + 1) : new String(buffer, tokenBegin, bufsize - tokenBegin) +
+              new String(buffer, 0, bufpos + 1);
   }
 
   /** Get the suffix. */
@@ -400,7 +396,7 @@ class SimpleCharStream
   {
     char[] ret = new char[len];
 
-    if ((bufpos + 1) >= len)
+    if (bufpos + 1 >= len)
       System.arraycopy(buffer, bufpos - len + 1, ret, 0, len);
     else
     {
@@ -428,14 +424,7 @@ class SimpleCharStream
     int start = tokenBegin;
     int len;
 
-    if (bufpos >= tokenBegin)
-    {
-      len = bufpos - tokenBegin + inBuf + 1;
-    }
-    else
-    {
-      len = bufsize - tokenBegin + bufpos + 1 + inBuf;
-    }
+      len = bufpos >= tokenBegin ? bufpos - tokenBegin + inBuf + 1 : bufsize - tokenBegin + bufpos + 1 + inBuf;
 
     int i = 0, j = 0, k = 0;
     int nextColDiff = 0, columnDiff = 0;
@@ -456,10 +445,7 @@ class SimpleCharStream
 
       while (i++ < len)
       {
-        if (bufline[j = start % bufsize] != bufline[++start % bufsize])
-          bufline[j] = newLine++;
-        else
-          bufline[j] = newLine;
+          bufline[j] = bufline[j = start % bufsize] != bufline[++start % bufsize] ? newLine++ : newLine;
       }
     }
 

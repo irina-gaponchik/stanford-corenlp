@@ -35,7 +35,7 @@ public class DateTreeTransformer implements TreeTransformer {
       Tree root = matcher.getNode("root");
       Tree month = matcher.getNode("month");
       Tree year = matcher.getNode("year");
-      Tree[] children = new Tree[] {month, year};
+      Tree[] children = {month, year};
       root.setChildren(children);
       matcher = tregexMonthYear.matcher(t);
     }
@@ -46,7 +46,7 @@ public class DateTreeTransformer implements TreeTransformer {
       Tree day = matcher.getNode("day");
       Tree comma = matcher.getNode("comma");
       Tree year = matcher.getNode("year");
-      Tree[] children = new Tree[] {month, day, comma, year};
+      Tree[] children = {month, day, comma, year};
       root.setChildren(children);
       matcher = tregexMonthDayYear.matcher(t);
     }

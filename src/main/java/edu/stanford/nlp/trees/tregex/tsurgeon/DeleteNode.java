@@ -10,7 +10,7 @@ import edu.stanford.nlp.trees.tregex.TregexMatcher;
  */
 class DeleteNode extends TsurgeonPattern {
 
-  public DeleteNode(TsurgeonPattern[] children) {
+  public DeleteNode(TsurgeonPattern... children) {
     super("delete", children);
   }
 
@@ -24,7 +24,7 @@ class DeleteNode extends TsurgeonPattern {
     Tree result = t;
     for (TsurgeonPattern child : children) {
       Tree nodeToDelete = child.evaluate(t, m);
-      if (nodeToDelete == t) {
+      if (nodeToDelete.equals(t)) {
         result = null;
       }
       Tree parent = nodeToDelete.parent(t);

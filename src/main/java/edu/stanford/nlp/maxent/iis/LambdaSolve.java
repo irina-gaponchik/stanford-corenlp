@@ -67,19 +67,19 @@ public class LambdaSolve {
    * This is an array of empirical expectations for the features
    */
   protected double[] ftildeArr;
-  private static boolean smooth = false;
-  private static boolean VERBOSE = false;
+  private static boolean smooth;
+  private static boolean VERBOSE;
 
   /**
    * If this is true, assume that active features are binary, and one
    * does not have to multiply in a feature value.
    */
-  private static boolean ASSUME_BINARY = false;
+  private static boolean ASSUME_BINARY;
   private double[] aux;  // auxillary array to be used by some procedures for computing objective functions and their derivatives
   private double[][] sum;// auxillary array
   private double[][] sub;// auxillary array
-  public boolean weightRanks = false;
-  public boolean convertValues = false;
+  public boolean weightRanks;
+  public boolean convertValues;
 
 
   public LambdaSolve(Problem p1, double eps1, double nerr1) {
@@ -119,11 +119,11 @@ public class LambdaSolve {
   public LambdaSolve() {
   }
 
-  public void setNonBinary() {
+  public static void setNonBinary() {
     ASSUME_BINARY = false;
   }
 
-  public void setBinary() {
+  public static void setBinary() {
     ASSUME_BINARY = true;
   }
 
@@ -161,11 +161,7 @@ public class LambdaSolve {
 
       //now change them
       for (int y = 0; y < p.data.values[x].length; y++) {
-        if (p.data.values[x][y] == highest) {
-          p.data.values[x][y] = .7 * highest / sumhighest;
-        } else {
-          p.data.values[x][y] = .3 * p.data.values[x][y] / sumrest;
-        }
+          p.data.values[x][y] = p.data.values[x][y] == highest ? 0.7 * highest / sumhighest : 0.3 * p.data.values[x][y] / sumrest;
       }
     }
   }
@@ -207,7 +203,7 @@ public class LambdaSolve {
 
       //dumb smoothing that is not sound and doesn't seem to work
       if (smooth) {
-        double alfa = .015;
+        double alfa = 0.015;
         for (int j = 0; j < p.fSize; j++) {
           ftildeArr[j] = (ftildeArr[j] * p.data.xSize + alfa) / p.data.xSize;
         }
@@ -266,7 +262,7 @@ public class LambdaSolve {
           numNConverged--;
         }
       }
-    } while ((flag) && (iterations < 1000));
+    } while (flag && iterations < 1000);
   }
 
 
@@ -332,11 +328,7 @@ public class LambdaSolve {
     //System.out.println("delta is "+deltaL+" feature "+index+" expectation "+ftildeArr[index]);
 
     if (Math.abs(deltaL + lambda[index]) > 200) {
-      if ((deltaL + lambda[index]) > 200) {
-        deltaL = 200 - lambda[index];
-      } else {
-        deltaL = -lambda[index] - 200;
-      }
+        deltaL = deltaL + lambda[index] > 200 ? 200 - lambda[index] : -lambda[index] - 200;
 
       System.err.println("set delta to smth " + deltaL);
     }
@@ -345,7 +337,7 @@ public class LambdaSolve {
       System.err.println(" NaN " + index + ' ' + deltaL);
     }
     ret.set(deltaL);
-    return (Math.abs(deltaL) >= eps);
+    return Math.abs(deltaL) >= eps;
   }
 
 
@@ -360,14 +352,14 @@ public class LambdaSolve {
     int i = 0;
     if (fixedFnumXY) {
       double plambda = fExpected(p.functions.get(index));
-      return (1 / (double) fnumArr[0][0]) * (Math.log(this.ftildeArr[index]) - Math.log(plambda));
+      return 1 / (double) fnumArr[0][0] * (Math.log(this.ftildeArr[index]) - Math.log(plambda));
     }
     do {
       i++;
       lambdaP = lambdaN;
       double gPrimeVal = gprime(lambdaP, index);
       if (Double.isNaN(gPrimeVal)) {
-        System.err.println("gPrime of " + lambdaP + " " + index + " is NaN " + gPrimeVal);
+        System.err.println("gPrime of " + lambdaP + ' ' + index + " is NaN " + gPrimeVal);
         //lambda_converged[index]=true;
         //   System.exit(1);
       }
@@ -377,7 +369,7 @@ public class LambdaSolve {
       }
       lambdaN = lambdaP - gVal / gPrimeVal;
       if (Double.isNaN(lambdaN)) {
-        System.err.println("the division of " + gVal + " " + gPrimeVal + " " + index + " is NaN " + lambdaN);
+        System.err.println("the division of " + gVal + ' ' + gPrimeVal + ' ' + index + " is NaN " + lambdaN);
         //lambda_converged[index]=true;
         return 0;
       }
@@ -410,7 +402,7 @@ public class LambdaSolve {
       double val = p.functions.get(index).getVal(i);
       double zlambdaX = zlambda[x] + pcond(y, x) * zlambda[x] * (Math.exp(deltaL * val) - 1);
       for (int y1 = 0; y1 < probConds[x].length; y1++) {
-        probConds[x][y1] = (probConds[x][y1] * zlambda[x]) / zlambdaX;
+        probConds[x][y1] = probConds[x][y1] * zlambda[x] / zlambdaX;
         s = s + probConds[x][y1];
       }
       s = s - probConds[x][y];
@@ -453,7 +445,7 @@ public class LambdaSolve {
     double s = 0.0;
 
     for (int i = 0; i < p.functions.get(index).len(); i++) {
-      int y = ((p.functions.get(index))).getY(i);
+      int y = p.functions.get(index).getY(i);
       int x = p.functions.get(index).getX(i);
       s = s + p.data.ptildeX(x) * pcond(y, x) * p.functions.get(index).getVal(i) * Math.exp(lambdaP * fnum(x, y)) * fnum(x, y);
     }
@@ -490,7 +482,7 @@ public class LambdaSolve {
         System.out.println(" empirical " + ftildeArr[f] + " expeced " + fExpected(p.functions.get(f)));
       }
     }
-    System.out.println(" x size" + p.data.xSize + " " + " ysize " + p.data.ySize);
+    System.out.println(" x size" + p.data.xSize + ' ' + " ysize " + p.data.ySize);
     double summAllExp = 0;
     for (int i = 0; i < ftildeArr.length; i++) {
       double exp = Math.abs(ftildeArr[i] - fExpected(p.functions.get(i)));
@@ -499,7 +491,7 @@ public class LambdaSolve {
       //if(true)
       {
         flag = false;
-        System.out.println("Constraint not satisfied  " + i + " " + fExpected(p.functions.get(i)) + " " + ftildeArr[i] + " lambda " + lambda[i]);
+        System.out.println("Constraint not satisfied  " + i + ' ' + fExpected(p.functions.get(i)) + ' ' + ftildeArr[i] + " lambda " + lambda[i]);
       }
     }
 
@@ -513,7 +505,7 @@ public class LambdaSolve {
         for (int y = 0; y < probConds[x].length; y++)
             //System.out.println(y+" : "+ probConds[x][y]);
         {
-          System.out.println("probabilities do not sum to one " + x + " " + (float) s);
+          System.out.println("probabilities do not sum to one " + x + ' ' + (float) s);
         }
       }
     }
@@ -554,7 +546,7 @@ public class LambdaSolve {
 
   double pcondFAlfa(double alfa, int x, int y, Feature f) {
     double s;
-    s = (1 / ZAlfa(alfa, f, x)) * pcond(y, x) * Math.exp(alfa * f.getVal(x, y));
+    s = 1 / ZAlfa(alfa, f, x) * pcond(y, x) * Math.exp(alfa * f.getVal(x, y));
     return s;
   }
 
@@ -610,13 +602,13 @@ public class LambdaSolve {
    */
 
   public double GainCompute(Feature f, double errorGain) {
-    double r = (f.ftilde() > fExpected(f) ? 1.0 : -1.0);
+    double r = f.ftilde() > fExpected(f) ? 1.0 : -1.0;
     f.initHashVals();
     int iterations = 0;
     double alfa = 0.0;
     GSF(alfa, f);
     double gsfValNew = 0.0;
-    while (true && (iterations < 30)) {
+    while (iterations < 30) {
       iterations++;
       double alfanext = alfa + r * Math.log(1 - r * GSFPrime(alfa, f) / GSFSecond(alfa, f));
       gsfValNew = GSF(alfanext, f);
@@ -662,7 +654,7 @@ public class LambdaSolve {
   /**
    * Writes the lambdas to a stream.
    */
-  public static void save_lambdas(DataOutputStream rf, double[] lambdas) {
+  public static void save_lambdas(DataOutputStream rf, double... lambdas) {
     try {
       ObjectOutputStream oos = new ObjectOutputStream(rf);
       oos.writeObject(lambdas);
@@ -729,9 +721,7 @@ public class LambdaSolve {
         return (double[]) o;
       }
       throw new RuntimeIOException("Failed to read lambdas from given input stream");
-    } catch (IOException e) {
-      throw new RuntimeIOException(e);
-    } catch (ClassNotFoundException e) {
+    } catch (IOException | ClassNotFoundException e) {
       throw new RuntimeIOException(e);
     }
   }
@@ -767,13 +757,13 @@ public class LambdaSolve {
       // for each feature , save its row
       for (int i = 0; i < p.fSize; i++) {
         int[] values = p.functions.get(i).indexedValues;
-        for (int k = 0; k < values.length; k++) {
-          pf.print(i + 1);
-          pf.print(". ");
-          pf.print(values[k]);
-          pf.print(" ");
-          pf.println(1);
-        }// k
+          for (int value : values) {
+              pf.print(i + 1);
+              pf.print(". ");
+              pf.print(value);
+              pf.print(" ");
+              pf.println(1);
+          }// k
 
       }// i
 
@@ -826,7 +816,7 @@ public class LambdaSolve {
    *
    * @param args command line arguments
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     if (args.length > 0) {
       NumberFormat nf = NumberFormat.getNumberInstance();
       nf.setMaximumFractionDigits(6);
@@ -897,7 +887,7 @@ public class LambdaSolve {
           probConds[x][y] += fLambda;
         } else {
           double val = f.getVal(i);
-          probConds[x][y] += (val * fLambda);
+          probConds[x][y] += val * fLambda;
         }
       } //for
 
@@ -966,7 +956,7 @@ public class LambdaSolve {
           probConds[x][y] += fLambda;
         } else {
           double val = f.getVal(i);
-          probConds[x][y] += (val * fLambda);
+          probConds[x][y] += val * fLambda;
         }
       } //for
 
@@ -1090,7 +1080,7 @@ public class LambdaSolve {
           probConds[x][y] += fLambda;
         } else {
           double val = f.getVal(i);
-          probConds[x][y] += (val * fLambda);
+          probConds[x][y] += val * fLambda;
         }
       } //for
 
@@ -1182,7 +1172,7 @@ public class LambdaSolve {
           probConds[x][y] += fLambda;
         } else {
           double val = f.getVal(i);
-          probConds[x][y] += (val * fLambda);
+          probConds[x][y] += val * fLambda;
         }
       } //for
 
@@ -1276,7 +1266,7 @@ public class LambdaSolve {
         if (zlambda[x] == 0) {
           continue;
         }
-        double mult = val * p.data.ptildeX(x) * p.data.getNumber() * (1 / zlambda[x]);
+        double mult = val * p.data.ptildeX(x) * p.data.getNumber() * 1 / zlambda[x];
         double weight = 1;
         if (weightRanks) {
           weight = p.data.values[x][y];

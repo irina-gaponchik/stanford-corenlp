@@ -56,7 +56,7 @@ public class RedirectOutputHandler<LoggerClass, ChannelEquivalent> extends Outpu
 
   @Override
   public void print(Object[] channels, String line) {
-    if (line.endsWith("\n")) {
+    if (!line.isEmpty() && line.charAt(line.length() - 1) == '\n') {
       line = line.substring(0, line.length() - 1);
     }
     if (shouldLogChannels()) {
@@ -117,7 +117,7 @@ public class RedirectOutputHandler<LoggerClass, ChannelEquivalent> extends Outpu
     channelMapping.put(Redwood.DBG, Level.FINE);
     channelMapping.put(Redwood.ERR, Level.SEVERE);
     try {
-      return new RedirectOutputHandler<Logger, Level>(
+      return new RedirectOutputHandler<>(
           logger,
           Logger.class.getMethod("log", Level.class, String.class),
           channelMapping,

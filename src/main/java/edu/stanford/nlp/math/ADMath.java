@@ -34,7 +34,7 @@ public class ADMath {
   public static DoubleAD divide(DoubleAD a, DoubleAD b){
     DoubleAD c = new DoubleAD();
     c.setval(a.getval()/b.getval());
-    c.setdot( (a.getdot()/b.getval()) - a.getval()*b.getdot() / (b.getval()*b.getval()) );
+    c.setdot( a.getdot()/b.getval() - a.getval()*b.getdot() / (b.getval()*b.getval()) );
     return c;
   }
 
@@ -90,7 +90,7 @@ public class ADMath {
   }
 
 
-  public static DoubleAD logSum(DoubleAD[] logInputs) {
+  public static DoubleAD logSum(DoubleAD... logInputs) {
     return logSum(logInputs,0,logInputs.length);
   }
 

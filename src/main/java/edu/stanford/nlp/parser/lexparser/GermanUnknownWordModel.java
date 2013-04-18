@@ -63,12 +63,7 @@ public class GermanUnknownWordModel extends BaseUnknownWordModel {
 
     if (word.matches(numberMatch)) {
       //EncodingPrintWriter.out.println("Number match for " + word,encoding);
-      if (tag.equals("CARD")) {
-        return 0.0f;
-      } else {
-        //EncodingPrintWriter.out.println("Unknown word estimate for " + word + " as " + tag + ": " + logProb,encoding); //debugging
-        return Float.NEGATIVE_INFINITY;
-      }
+        return tag.equals("CARD") ? 0.0f : Float.NEGATIVE_INFINITY;
     } else {
       return super.score(itw, word);
     }

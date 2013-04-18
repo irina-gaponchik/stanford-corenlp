@@ -31,7 +31,7 @@ public class SieveOptions {
   
   public String toString() {
     StringBuilder os = new StringBuilder();
-    os.append("{");
+    os.append('{');
     if(DO_PRONOUN) os.append("DO_PRONOUN");
     if(USE_iwithini) os.append(", USE_iwithini");
     if(USE_APPOSITION) os.append(", USE_APPOSITION");
@@ -59,7 +59,7 @@ public class SieveOptions {
     if(USE_DISTANCE) os.append(", USE_DISTANCE");
     if(USE_NUMBER_ANIMACY_NE_AGREE) os.append(", USE_NUMBER_ANIMACY_NE_AGREE");
     if(USE_COREF_DICT) os.append(", USE_COREF_DICT");
-    os.append("}");
+    os.append('}');
     return os.toString();
   }
   

@@ -26,7 +26,7 @@ public class NonLinearCliquePotentialFunction implements CliquePotentialFunction
     this.flags = flags;
   }
 
-  public static double[] hiddenLayerOutput(double[][] inputLayerWeights, int[] nodeCliqueFeatures, SeqClassifierFlags aFlag, double[] featureVal) {
+  public static double[] hiddenLayerOutput(double[][] inputLayerWeights, int[] nodeCliqueFeatures, SeqClassifierFlags aFlag, double... featureVal) {
     int layerOneSize = inputLayerWeights.length;
     double[] layerOne = new double[layerOneSize];
     for (int i = 0; i < layerOneSize; i++) {
@@ -45,11 +45,7 @@ public class NonLinearCliquePotentialFunction implements CliquePotentialFunction
     double[] hiddenLayer = new double[layerOneSize];
     for (int i = 0; i < layerOneSize; i++) {
       if (aFlag.useHiddenLayer) {
-        if (aFlag.useSigmoid) {
-          hiddenLayer[i] = sigmoid(layerOne[i]);
-        } else {
-          hiddenLayer[i] = Math.tanh(layerOne[i]);
-        }
+          hiddenLayer[i] = aFlag.useSigmoid ? sigmoid(layerOne[i]) : Math.tanh(layerOne[i]);
       } else {
         hiddenLayer[i] = layerOne[i];
       }
@@ -58,12 +54,12 @@ public class NonLinearCliquePotentialFunction implements CliquePotentialFunction
   }
 
   @Override
-  public double computeCliquePotential(int cliqueSize, int labelIndex, int[] cliqueFeatures, double[] featureVal) {
+  public double computeCliquePotential(int cliqueSize, int labelIndex, int[] cliqueFeatures, double... featureVal) {
     double output = 0.0;
     if (cliqueSize > 1) { // linear potential for edge cliques
-      for (int m = 0; m < cliqueFeatures.length; m++) {
-        output += linearWeights[cliqueFeatures[m]][labelIndex];
-      }
+        for (int cliqueFeature : cliqueFeatures) {
+            output += linearWeights[cliqueFeature][labelIndex];
+        }
     } else { // non-linear potential for node cliques
       double[] hiddenLayer = hiddenLayerOutput(inputLayerWeights, cliqueFeatures, flags, featureVal);
       int outputLayerSize = inputLayerWeights.length / outputLayerWeights[0].length;
@@ -71,11 +67,7 @@ public class NonLinearCliquePotentialFunction implements CliquePotentialFunction
       // transform the hidden layer to output layer through linear transformation
       if (flags.useOutputLayer) {
         double[] outputWs = null;
-        if (flags.tieOutputLayer) {
-          outputWs = outputLayerWeights[0];
-        } else {
-          outputWs = outputLayerWeights[labelIndex];
-        }
+          outputWs = flags.tieOutputLayer ? outputLayerWeights[0] : outputLayerWeights[labelIndex];
         if (flags.softmaxOutputLayer) {
           outputWs = ArrayMath.softmax(outputWs);
         }

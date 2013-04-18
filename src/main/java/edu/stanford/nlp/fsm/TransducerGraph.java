@@ -45,7 +45,7 @@ public class TransducerGraph implements Cloneable {
   private Map<Object, Set<Arc>> arcsByTargetAndInput;
   private Object startNode;
   private Set endNodes;
-  private boolean checkDeterminism = false;
+  private boolean checkDeterminism;
 
   public void setDeterminism(boolean checkDeterminism) {
     this.checkDeterminism = checkDeterminism;
@@ -59,7 +59,7 @@ public class TransducerGraph implements Cloneable {
     arcsBySourceAndInput = Generics.newHashMap();
     arcsByTargetAndInput = Generics.newHashMap();
     endNodes = Generics.newHashSet();
-    setStartNode(DEFAULT_START_NODE);
+      startNode = DEFAULT_START_NODE;
   }
 
   public TransducerGraph(TransducerGraph other) {
@@ -67,11 +67,11 @@ public class TransducerGraph implements Cloneable {
   }
 
   public TransducerGraph(TransducerGraph other, ArcProcessor arcProcessor) {
-    this(other.getArcs(), other.getStartNode(), other.getEndNodes(), arcProcessor, null);
+    this(other.arcs, other.startNode, other.endNodes, arcProcessor, null);
   }
 
   public TransducerGraph(TransducerGraph other, NodeProcessor nodeProcessor) {
-    this(other.getArcs(), other.getStartNode(), other.getEndNodes(), null, nodeProcessor);
+    this(other.arcs, other.startNode, other.endNodes, null, nodeProcessor);
   }
 
   public TransducerGraph(Set<Arc> newArcs, Object startNode, Set endNodes, ArcProcessor arcProcessor, NodeProcessor nodeProcessor) {
@@ -90,17 +90,12 @@ public class TransducerGraph implements Cloneable {
       }
       addArc(a);
     }
-    if (nodeProcessor != null) {
-      this.startNode = nodeProcessor.processNode(startNode);
-    } else {
-      this.startNode = startNode;
-    }
+      this.startNode = nodeProcessor != null ? nodeProcessor.processNode(startNode) : startNode;
     if (nodeProcessor != null) {
       if (endNodes != null) {
-        for (Iterator endIter = endNodes.iterator(); endIter.hasNext();) {
-          Object o = endIter.next();
-          this.endNodes.add(nodeProcessor.processNode(o));
-        }
+          for (Object o : endNodes) {
+              this.endNodes.add(nodeProcessor.processNode(o));
+          }
       }
     } else {
       if (endNodes != null) {
@@ -172,7 +167,7 @@ public class TransducerGraph implements Cloneable {
     return ensure(arcsBySource.get(node));
   }
 
-  protected Set<Arc> ensure(Set<Arc> s) {
+  protected static Set<Arc> ensure(Set<Arc> s) {
     if (s == null) {
       return Collections.emptySet();
     }
@@ -300,10 +295,7 @@ public class TransducerGraph implements Cloneable {
     if (s == null) {
       return false;
     }
-    if (!s.remove(a)) {
-      return false;
-    }
-    return true;
+      return s.remove(a);
   }
 
   public boolean canAddArc(Object source, Object target, Object input, Object output) {
@@ -358,7 +350,7 @@ public class TransducerGraph implements Cloneable {
 
     @Override
     public int hashCode() {
-      return sourceNode.hashCode() ^ (targetNode.hashCode() << 16) ^ (input.hashCode() << 16);
+      return sourceNode.hashCode() ^ targetNode.hashCode() << 16 ^ input.hashCode() << 16;
     }
 
     @Override
@@ -370,12 +362,12 @@ public class TransducerGraph implements Cloneable {
         return false;
       }
       Arc a = (Arc) o;
-      return ((sourceNode == null ? a.sourceNode == null : sourceNode.equals(a.sourceNode)) && (targetNode == null ? a.targetNode == null : targetNode.equals(a.targetNode)) && (input == null ? a.input == null : input.equals(a.input)));
+      return (sourceNode == null ? a.sourceNode == null : sourceNode.equals(a.sourceNode)) && (targetNode == null ? a.targetNode == null : targetNode.equals(a.targetNode)) && (input == null ? a.input == null : input.equals(a.input));
     }
 
     // makes a copy of Arc a
     protected Arc(Arc<NODE,IN,OUT> a) {
-      this(a.getSourceNode(), a.getTargetNode(), a.getInput(), a.getOutput());
+      this(a.sourceNode, a.targetNode, a.input, a.output);
     }
 
     protected Arc(NODE sourceNode, NODE targetNode) {
@@ -395,7 +387,7 @@ public class TransducerGraph implements Cloneable {
 
     @Override
     public String toString() {
-      return sourceNode + " --> " + targetNode + " (" + input + " : " + output + ")";
+      return sourceNode + " --> " + targetNode + " (" + input + " : " + output + ')';
     }
 
   } // end static class Arc
@@ -467,18 +459,14 @@ public class TransducerGraph implements Cloneable {
       }
       Object sampleNode = s.iterator().next();
       if (s.size() == 1) {
-        if (sampleNode instanceof Block) {
-          return processNode(sampleNode);
-        } else {
-          return sampleNode;
-        }
+          return sampleNode instanceof Block ? processNode(sampleNode) : sampleNode;
       }
       // nope there's a set of things
       if (sampleNode instanceof String) {
         String str = (String) sampleNode;
         if (str.charAt(0) != '@') {
           // passive category...
-          return tlp.basicCategory(str) + "-" + s.hashCode(); // TODO remove b/c there could be collisions
+          return tlp.basicCategory(str) + '-' + s.hashCode(); // TODO remove b/c there could be collisions
           //          return tlp.basicCategory(str) + "-" + System.identityHashCode(s);
         }
       }
@@ -510,19 +498,15 @@ public class TransducerGraph implements Cloneable {
       Set nodes = g.getNodes();
       for (Object node : nodes) {
         Set<Arc> myArcs = null;
-        if (forward) {
-          myArcs = g.getArcsBySource(node);
-        } else {
-          myArcs = g.getArcsByTarget(node);
-        }
+          myArcs = forward ? g.getArcsBySource(node) : g.getArcsByTarget(node);
         // compute a total
         double total = 0.0;
         for (Arc a : myArcs) {
-          total += ((Double) a.getOutput()).doubleValue();
+          total += (Double) a.getOutput();
         }
         // divide each by total
         for (Arc a : myArcs) {
-          a.setOutput(new Double(Math.log(((Double) a.getOutput()).doubleValue() / total)));
+          a.setOutput(Math.log((Double) a.getOutput() / total));
         }
       }
       return g;
@@ -537,7 +521,7 @@ public class TransducerGraph implements Cloneable {
   }
 
 
-  private boolean dotWeightInverted = false;
+  private boolean dotWeightInverted;
 
   public void setDotWeightingInverted(boolean inverted) {
     dotWeightInverted = true;
@@ -547,7 +531,7 @@ public class TransducerGraph implements Cloneable {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setMaximumFractionDigits(3);
     nf.setMinimumFractionDigits(1);
-    StringBuffer result = new StringBuffer();
+    StringBuilder result = new StringBuilder();
     Set nodes = getNodes();
     result.append("digraph G {\n");
     //    result.append("page = \"8.5,11\";\n");
@@ -558,16 +542,16 @@ public class TransducerGraph implements Cloneable {
     int mag = 250;
     while (sz > mag) {
       ht += 105;
-      mag *= 2;
+        mag <<= 1;
     }
     int wd = 8;
     mag = 500;
     while (sz > mag) {
       wd += 8;
-      mag *= 4;
+        mag <<= 2;
     }
     double htd = ht / 10.0;
-    result.append("size = \"" + wd + "," + htd + "\";\n");
+    result.append("size = \"").append(wd).append(',').append(htd).append("\";\n");
     result.append("graph [rankdir = \"LR\"];\n");
     result.append("graph [ranksep = \"0.2\"];\n");
     for (Object node : nodes) {
@@ -577,7 +561,7 @@ public class TransducerGraph implements Cloneable {
       //      if (getEndNodes().contains(node)) {
       //        result.append("label=\"" + node.toString() + "\", style=filled, ");
       //      } else
-      result.append("label=\"" + node.toString() + "\"");
+      result.append("label=\"").append(node.toString()).append('"');
       result.append("height=\"0.3\", width=\"0.3\"");
       result.append(" ];\n");
       for (Arc arc : getArcsBySource(node)) {
@@ -599,21 +583,17 @@ public class TransducerGraph implements Cloneable {
             result.append(nf.format(output));
           }
           int weight;
-          if (dotWeightInverted) {
-            weight = (int) (20.0 - dd);
-          } else {
-            weight = (int) dd;
-          }
+            weight = dotWeightInverted ? (int) (20.0 - dd) : (int) dd;
           if (weight > 0) {
-            wt = ", weight = \"" + weight + "\"";
+            wt = ", weight = \"" + weight + '"';
           }
-          if (dotWeightInverted && dd <= 2.0 || (!dotWeightInverted) && dd >= 20.0) {
+          if (dotWeightInverted && dd <= 2.0 || !dotWeightInverted && dd >= 20.0) {
             wt += ", style=bold";
           }
         } else {
           result.append(output);
         }
-        result.append("\"");
+        result.append('"');
         result.append(wt);
         // result.append("fontsize = 14 ");
         if (arc.getInput().toString().equals("EPSILON")) {
@@ -639,10 +619,10 @@ public class TransducerGraph implements Cloneable {
     return sumOutputs(arcs);
   }
 
-  private double sumOutputs(Set<Arc> arcs) {
+  private static double sumOutputs(Set<Arc> arcs) {
     double sum = 0.0;
     for (Arc arc : arcs) {
-      sum += ((Double) arc.getOutput()).doubleValue();
+      sum += (Double) arc.getOutput();
     }
     return sum;
   }
@@ -650,12 +630,12 @@ public class TransducerGraph implements Cloneable {
   public double getSourceTotal(Object node) {
     double result = 0.0;
     Set<Arc> arcs = getArcsBySource(node);
-    if (arcs.size() == 0) {
+    if (arcs.isEmpty()) {
       System.err.println("No outbound arcs from node.");
       return result;
     }
     for (Arc arc : arcs) {
-      result += ((Double) arc.getOutput()).doubleValue();
+      result += (Double) arc.getOutput();
     }
     return result;
   }
@@ -665,14 +645,14 @@ public class TransducerGraph implements Cloneable {
    */
   public double getOutputOfPathInGraph(List path) {
     double score = 0.0;
-    Object node = getStartNode();
+    Object node = startNode;
     for (Object input : path) {
       Arc arc = getArcBySourceAndInput(node, input); // next input in path
       if (arc == null) {
         System.out.println(" NOT ACCEPTED :" + path);
         return Double.NEGATIVE_INFINITY;
       }
-      score += ((Double) arc.getOutput()).doubleValue();
+      score += (Double) arc.getOutput();
       node = arc.getTargetNode();
     }
     return score;
@@ -683,10 +663,10 @@ public class TransducerGraph implements Cloneable {
    */
   public List sampleUniformPathFromGraph() {
     List list = new ArrayList();
-    Object node = this.getStartNode();
-    Set endNodes = this.getEndNodes();
+    Object node = this.startNode;
+    Set endNodes = this.endNodes;
     while (!endNodes.contains(node)) {
-      List<Arc> arcs = new ArrayList<Arc>(this.getArcsBySource(node));
+      List<Arc> arcs = new ArrayList<>(this.getArcsBySource(node));
       TransducerGraph.Arc arc = arcs.get(r.nextInt(arcs.size()));
       list.add(arc.getInput());
       node = arc.getTargetNode();
@@ -698,7 +678,7 @@ public class TransducerGraph implements Cloneable {
     Map<List, Double> result = Generics.newHashMap();
     for (int i = 0; i < numPaths; i++) {
       List l = sampleUniformPathFromGraph();
-      result.put(l, new Double(getOutputOfPathInGraph(l)));
+      result.put(l, getOutputOfPathInGraph(l));
     }
     return result;
   }
@@ -708,29 +688,27 @@ public class TransducerGraph implements Cloneable {
    */
   public static void printPathOutputs(List<List> pathList, TransducerGraph graph, boolean printPaths) {
     int i = 0;
-    for (Iterator<List> iter = pathList.iterator(); iter.hasNext();) {
-      List path = iter.next();
-      if (printPaths) {
-        for (Iterator j = path.iterator(); j.hasNext();) {
-          System.out.print(j.next() + " ");
-        }
-      } else {
-        System.out.print(i++ + " ");
+      for (List path : pathList) {
+          if (printPaths) {
+              for (Object aPath : path) {
+                  System.out.print(aPath + " ");
+              }
+          } else {
+              System.out.print(i++ + " ");
+          }
+          System.out.print("output: " + graph.getOutputOfPathInGraph(path));
+          System.out.println();
       }
-      System.out.print("output: " + graph.getOutputOfPathInGraph(path));
-      System.out.println();
-    }
   }
 
   /**
    * For testing only.
    */
   public List<Double> getPathOutputs(List<List> pathList) {
-    List<Double> outputList = new ArrayList<Double>();
-    for (Iterator<List> iter = pathList.iterator(); iter.hasNext();) {
-      List path = iter.next();
-      outputList.add(new Double(getOutputOfPathInGraph(path)));
-    }
+    List<Double> outputList = new ArrayList<>();
+      for (List path : pathList) {
+          outputList.add(getOutputOfPathInGraph(path));
+      }
     return outputList;
   }
 
@@ -739,7 +717,7 @@ public class TransducerGraph implements Cloneable {
       List path = sourceGraph.sampleUniformPathFromGraph();
       double score = sourceGraph.getOutputOfPathInGraph(path);
       double newScore = testGraph.getOutputOfPathInGraph(path);
-      if ((score - newScore) / (score + newScore) > 1e-10) {
+      if ((score - newScore) / (score + newScore) > 1.0e-10) {
         System.out.println("Problem: " + score + " vs. " + newScore + " on " + path);
         return false;
       }
@@ -752,7 +730,7 @@ public class TransducerGraph implements Cloneable {
    * For testing only.  Doubles combined by multiplication.
    */
   public boolean canAddPath(List path) {
-    Object node = this.getStartNode();
+    Object node = this.startNode;
     for (int j = 0; j < path.size() - 1; j++) {
       Object input = path.get(j);
       Arc arc = this.getArcBySourceAndInput(node, input); // next input in path
@@ -763,15 +741,7 @@ public class TransducerGraph implements Cloneable {
     }
     Object input = path.get(path.size() - 1); // last element
     Arc arc = this.getArcBySourceAndInput(node, input); // next input in path
-    if (arc == null) {
-      return true;
-    } else {
-      if (getEndNodes().contains(arc.getTargetNode())) {
-        return true;
-      } else {
-        return false;
-      }
-    }
+      return arc == null || (endNodes.contains(arc.getTargetNode()));
   }
 
   /**
@@ -788,38 +758,32 @@ public class TransducerGraph implements Cloneable {
 
   public static <T> TransducerGraph createGraphFromPaths(ClassicCounter<List<T>> pathCounter, int markovOrder) {
     TransducerGraph graph = new TransducerGraph(); // empty
-    for (Iterator<List<T>> pathIter = pathCounter.keySet().iterator(); pathIter.hasNext();) {
-      List<T> path = pathIter.next();
-      double count = pathCounter.getCount(path);
-      addOnePathToGraph(path, count, markovOrder, graph);
-    }
+      for (List<T> path : pathCounter.keySet()) {
+          double count = pathCounter.getCount(path);
+          addOnePathToGraph(path, count, markovOrder, graph);
+      }
     return graph;
   }
 
   // assumes that the path already has EPSILON as the last element.
   public static void addOnePathToGraph(List path, double count, int markovOrder, TransducerGraph graph) {
-    Object source = graph.getStartNode();
+    Object source = graph.startNode;
     Object input, target;
     for (int j = 0; j < path.size(); j++) {
       input = path.get(j);
       Arc a = graph.getArcBySourceAndInput(source, input);
       if (a != null) {
         // increment the arc weight
-        a.output = new Double(((Double) a.output).doubleValue() + count);
+        a.output = (Double) a.output + count;
       } else {
         if (input.equals(TransducerGraph.EPSILON_INPUT)) {
           target = "END"; // to ensure they all share the same end node
         } else if (markovOrder == 0) {
           // we all transition back to the same state
           target = source;
-        } else if (markovOrder > 0) {
-          // the state is described by the partial history
-          target = path.subList((j < markovOrder ? 0 : j - markovOrder + 1), j + 1);
-        } else {
-          // the state is described by the full history
-          target = path.subList(0, j + 1);
-        }
-        Double output = new Double(count);
+        } else
+            target = markovOrder > 0 ? path.subList(j < markovOrder ? 0 : j - markovOrder + 1, j + 1) : path.subList(0, j + 1);
+        Double output = count;
         a = new Arc(source, target, input, output);
         graph.addArc(a);
       }
@@ -863,7 +827,7 @@ public class TransducerGraph implements Cloneable {
     List<String> path;
     for (int i = 0; i < numPaths; i++) {
       // make a path
-      path = new ArrayList<String>();
+      path = new ArrayList<>();
       for (int j = 0; j < pathLength; j++) {
         input = Integer.toString(r.nextInt(numInputs));
         path.add(input);
@@ -878,12 +842,11 @@ public class TransducerGraph implements Cloneable {
 
   public void depthFirstSearch(boolean forward, StringBuffer b) {
     if (forward) {
-      depthFirstSearchHelper(getStartNode(), new HashSet(), 0, true, b);
+      depthFirstSearchHelper(startNode, new HashSet(), 0, true, b);
     } else {
-      for (Iterator endIter = getEndNodes().iterator(); endIter.hasNext();) {
-        Object o = endIter.next();
-        depthFirstSearchHelper(o, new HashSet(), 0, false, b);
-      }
+        for (Object o : endNodes) {
+            depthFirstSearchHelper(o, new HashSet(), 0, false, b);
+        }
     }
   }
 
@@ -896,37 +859,33 @@ public class TransducerGraph implements Cloneable {
     }
     marked.add(node);
     Set arcs;
-    if (forward) {
-      arcs = this.getArcsBySource(node);
-    } else {
-      arcs = this.getArcsByTarget(node);
-    }
+      arcs = forward ? this.getArcsBySource(node) : this.getArcsByTarget(node);
     if (arcs == null) {
       return;
     }
-    for (Iterator iter = arcs.iterator(); iter.hasNext();) {
-      Arc newArc = (Arc) iter.next();
-      // print it out
-      for (int i = 0; i < level; i++) {
-        b.append("  ");
+      for (Object arc : arcs) {
+          Arc newArc = (Arc) arc;
+          // print it out
+          for (int i = 0; i < level; i++) {
+              b.append("  ");
+          }
+          if (endNodes.contains(newArc.getTargetNode())) {
+              b.append(newArc).append(" END\n");
+          } else {
+              b.append(newArc).append('\n');
+          }
+          if (forward) {
+              depthFirstSearchHelper(newArc.getTargetNode(), marked, level + 1, forward, b);
+          } else {
+              depthFirstSearchHelper(newArc.getSourceNode(), marked, level + 1, forward, b);
+          }
       }
-      if (getEndNodes().contains(newArc.getTargetNode())) {
-        b.append(newArc + " END\n");
-      } else {
-        b.append(newArc + "\n");
-      }
-      if (forward) {
-        depthFirstSearchHelper(newArc.getTargetNode(), marked, level + 1, forward, b);
-      } else {
-        depthFirstSearchHelper(newArc.getSourceNode(), marked, level + 1, forward, b);
-      }
-    }
   }
 
   /**
    * For testing only.
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     List pathList = new ArrayList();
     TransducerGraph graph = createRandomGraph(1000, 10, 0.0, 10, pathList);
     System.out.println("Done creating random graph");

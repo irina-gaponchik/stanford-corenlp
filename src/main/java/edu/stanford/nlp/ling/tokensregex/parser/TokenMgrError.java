@@ -48,7 +48,7 @@ class TokenMgrError extends Error
    * equivalents in the given string
    */
   protected static final String addEscapes(String str) {
-    StringBuffer retval = new StringBuffer();
+    StringBuilder retval = new StringBuilder();
     char ch;
     for (int i = 0; i < str.length(); i++) {
       switch (str.charAt(i))
@@ -82,11 +82,10 @@ class TokenMgrError extends Error
         default:
           if ((ch = str.charAt(i)) < 0x20 || ch > 0x7e) {
             String s = "0000" + Integer.toString(ch, 16);
-            retval.append("\\u" + s.substring(s.length() - 4, s.length()));
+            retval.append("\\u").append(s.substring(s.length() - 4, s.length()));
           } else {
             retval.append(ch);
           }
-          continue;
       }
     }
     return retval.toString();
@@ -105,11 +104,11 @@ class TokenMgrError extends Error
    * Note: You can customize the lexical error message by modifying this method.
    */
   protected static String LexicalError(boolean EOFSeen, int lexState, int errorLine, int errorColumn, String errorAfter, char curChar) {
-    return("Lexical error at line " +
+    return "Lexical error at line " +
           errorLine + ", column " +
           errorColumn + ".  Encountered: " +
-          (EOFSeen ? "<EOF> " : ("\"" + addEscapes(String.valueOf(curChar)) + "\"") + " (" + (int)curChar + "), ") +
-          "after : \"" + addEscapes(errorAfter) + "\"");
+            (EOFSeen ? "<EOF> " : '"' + addEscapes(String.valueOf(curChar)) + '"' + " (" + (int)curChar + "), ") +
+          "after : \"" + addEscapes(errorAfter) + '"';
   }
 
   /**

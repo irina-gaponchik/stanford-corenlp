@@ -75,16 +75,18 @@ public class CRFClassifierEvaluator<IN extends CoreMap> extends CmdEvaluator {
     this.cmdStr = evalCmd;
     if (cmdStr != null) {
       cmdStr = cmdStr.trim();
-      if (cmdStr.length() == 0) { cmdStr = null; }
+      if (cmdStr.isEmpty()) { cmdStr = null; }
     }
     cmd = getCmd(cmdStr);
   }
 
-  public void setValues(double[] x)
+  @Override
+  public void setValues(double... x)
   {
     classifier.updateWeights(x);
   }
 
+  @Override
   public String[] getCmd()
   {
     return cmd;
@@ -118,11 +120,12 @@ public class CRFClassifierEvaluator<IN extends CoreMap> extends CmdEvaluator {
     }
   }
 
-  public double evaluate(double[] x) {
+  @Override
+  public double evaluate(double... x) {
     double score = 0;
     setValues(x);
-    if (getCmd() != null) {
-      evaluateCmd(getCmd());
+    if (cmd != null) {
+      evaluateCmd(cmd);
       score = interpretCmdOutput();
     } else {
       try {

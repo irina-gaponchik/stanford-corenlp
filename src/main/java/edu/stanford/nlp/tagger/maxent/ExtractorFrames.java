@@ -152,7 +152,7 @@ public class ExtractorFrames {
     arch = arch.replaceAll("bidirectional5words", "words(-2,2),order(-2,2),twoTags(-1,1),wordTag(0,-1),wordTag(0,1),biwords(-1,1)");
     arch = arch.replaceAll("bidirectional", "words(-1,1),order(-2,2),twoTags(-1,1),wordTag(0,-1),wordTag(0,1),biwords(-1,1)");
 
-    ArrayList<Extractor> extrs = new ArrayList<Extractor>();
+    ArrayList<Extractor> extrs = new ArrayList<>();
     List<String> args = StringUtils.valueSplit(arch, "[a-zA-Z0-9]*(?:\\([^)]*\\))?", "\\s*,\\s*");
     for (String arg : args) {
       if (arg.equals("sighan2005")) {
@@ -316,8 +316,8 @@ public class ExtractorFrames {
 
     @Override
     public String toString() {
-      return (getClass().getName() + "(w" + wordPosition +
-              ",t" + position + ')');
+      return getClass().getName() + "(w" + wordPosition +
+              ",t" + position + ')';
     }
   }
 
@@ -407,8 +407,8 @@ public class ExtractorFrames {
 
     @Override
     public String toString() {
-      return (getClass().getName() + "(w" + leftPosition +
-              ",w" + rightPosition + ')');
+      return getClass().getName() + "(w" + leftPosition +
+              ",w" + rightPosition + ')';
     }
   }
 
@@ -459,8 +459,8 @@ public class ExtractorFrames {
 
     @Override
     public String toString() {
-      return (getClass().getName() + "(t" + leftPosition +
-              ",t" + rightPosition + ')');
+      return getClass().getName() + "(t" + leftPosition +
+              ",t" + rightPosition + ')';
     }
   }
 
@@ -496,8 +496,8 @@ public class ExtractorFrames {
 
     @Override
       String extract(History h, PairsHolder pH) {
-      return (pH.getWord(h, leftWord) + '!' + pH.getTag(h, tag) + '!' +
-              pH.getWord(h, rightWord));
+      return pH.getWord(h, leftWord) + '!' + pH.getTag(h, tag) + '!' +
+              pH.getWord(h, rightWord);
     }
 
     @Override public boolean isLocal() { return false; }
@@ -505,8 +505,8 @@ public class ExtractorFrames {
 
     @Override
     public String toString() {
-      return (getClass().getName() + "(w" + leftWord +
-              ",t" + tag + ",w" + rightWord + ')');
+      return getClass().getName() + "(w" + leftWord +
+              ",t" + tag + ",w" + rightWord + ')';
     }
   }
 
@@ -585,20 +585,12 @@ public class ExtractorFrames {
 
     @Override
       public int rightContext() {
-      if (position3 > 0) {
-        return position3;
-      } else {
-        return 0;
-      }
+        return position3 > 0 ? position3 : 0;
     }
 
     @Override
       public int leftContext() {
-      if (position1 < 0) {
-        return -position1;
-      } else {
-        return 0;
-      }
+        return position1 < 0 ? -position1 : 0;
     }
 
     @Override
@@ -611,8 +603,8 @@ public class ExtractorFrames {
 
     @Override
     public String toString() {
-      return (getClass().getName() + "(t" + position1 +
-              ",t" + position2 + ",t" + position3 + ')');
+      return getClass().getName() + "(t" + position1 +
+              ",t" + position2 + ",t" + position3 + ')';
     }
   }
 
@@ -642,20 +634,12 @@ public class ExtractorFrames {
 
     @Override
       public int leftContext() {
-      if (position1 < 0) {
-        return  -position1;
-      } else {
-        return 0;
-      }
+        return position1 < 0 ? -position1 : 0;
     }
 
     @Override
       public int rightContext() {
-      if (position2 > 0) {
-        return position2;
-      } else {
-        return 0;
-      }
+        return position2 > 0 ? position2 : 0;
     }
 
     @Override
@@ -668,8 +652,8 @@ public class ExtractorFrames {
 
     @Override
     public String toString() {
-      return (getClass().getName() + "(t" + position1 +
-              ",t" + position2 + ",w" + word + ')');
+      return getClass().getName() + "(t" + position1 +
+              ",t" + position2 + ",w" + word + ')';
     }
   }
 
@@ -740,8 +724,7 @@ class ExtractorWordShapeConjunction extends Extractor {
   private final String name;
 
   ExtractorWordShapeConjunction(int left, int right, String wsc) {
-    super();
-    this.left = left;
+      this.left = left;
     this.right = right;
     wordShaper = WordShapeClassifier.lookupShaper(wsc);
     name = "ExtractorWordShapeConjunction(" + left + ',' + right + ',' + wsc + ')';

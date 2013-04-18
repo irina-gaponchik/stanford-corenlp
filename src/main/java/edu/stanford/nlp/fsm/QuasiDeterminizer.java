@@ -56,14 +56,14 @@ public class QuasiDeterminizer implements TransducerGraph.GraphProcessor {
           TransducerGraph.Arc arc = (TransducerGraph.Arc) arc1;
           Object newNode = arc.getSourceNode();
           Comparable a = (Comparable) arc.getInput();
-          double k = ((Double) arc.getOutput()).doubleValue();
+          double k = (Double) arc.getOutput();
           double newLen = length.getCount(newNode);
           if (newLen == Double.POSITIVE_INFINITY) {
             // we are discovering this
             queue.addLast(newNode);
           }
           Comparable f = (Comparable) first.get(newNode);
-          if (newLen == Double.POSITIVE_INFINITY || (newLen == oldLen + 1 && a.compareTo(f) < 0)) { // f can't be null, since we have a newLen
+          if (newLen == Double.POSITIVE_INFINITY || newLen == oldLen + 1 && a.compareTo(f) < 0) { // f can't be null, since we have a newLen
             // we do this to this to newNode when we have new info, possibly many times
             first.put(newNode, a); // ejecting old one if necessary
             length.setCount(newNode, oldLen + 1); // this may already be the case
@@ -84,15 +84,15 @@ public class QuasiDeterminizer implements TransducerGraph.GraphProcessor {
   /**
    * Takes time linear in number of arcs.
    */
-  public TransducerGraph pushLambdas(TransducerGraph graph, ClassicCounter lambda) {
+  public static TransducerGraph pushLambdas(TransducerGraph graph, ClassicCounter lambda) {
     TransducerGraph result = graph.clone(); // arcs have been copied too so we don't mess up graph
     Set<TransducerGraph.Arc> arcs = result.getArcs();
     for (TransducerGraph.Arc arc : arcs) {
       double sourceLambda = lambda.getCount(arc.getSourceNode());
       double targetLambda = lambda.getCount(arc.getTargetNode());
-      double oldOutput = ((Double) arc.getOutput()).doubleValue();
+      double oldOutput = (Double) arc.getOutput();
       double newOutput = oldOutput + targetLambda - sourceLambda;
-      arc.setOutput(new Double(newOutput));
+      arc.setOutput(newOutput);
     }
     // do initialOutput
     double startLambda = lambda.getCount(result.getStartNode());
@@ -100,9 +100,9 @@ public class QuasiDeterminizer implements TransducerGraph.GraphProcessor {
       // add it back to the outbound arcs from start (instead of adding it to the initialOutput)
       Set<TransducerGraph.Arc> startArcs = result.getArcsBySource(result.getStartNode());
       for (TransducerGraph.Arc arc : startArcs) {
-        double oldOutput = ((Double) arc.getOutput()).doubleValue();
+        double oldOutput = (Double) arc.getOutput();
         double newOutput = oldOutput + startLambda;
-        arc.setOutput(new Double(newOutput));
+        arc.setOutput(newOutput);
       }
     }
     // do finalOutput
@@ -112,9 +112,9 @@ public class QuasiDeterminizer implements TransducerGraph.GraphProcessor {
         // subtract it from the inbound arcs to end (instead of subtracting it from the finalOutput)
         Set<TransducerGraph.Arc> endArcs = result.getArcsByTarget(o);
         for (TransducerGraph.Arc arc : endArcs) {
-          double oldOutput = ((Double) arc.getOutput()).doubleValue();
+          double oldOutput = (Double) arc.getOutput();
           double newOutput = oldOutput - endLambda;
-          arc.setOutput(new Double(newOutput));
+          arc.setOutput(newOutput);
         }
       }
 
@@ -122,7 +122,7 @@ public class QuasiDeterminizer implements TransducerGraph.GraphProcessor {
     return result;
   }
 
-  public static void main(String[] args) {
+  public static void main(String... args) {
     TransducerGraph.GraphProcessor qd = new QuasiDeterminizer();
     List pathList = new ArrayList();
     TransducerGraph graph = TransducerGraph.createRandomGraph(1000, 10, 1.0, 10, pathList);

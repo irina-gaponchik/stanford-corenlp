@@ -32,8 +32,8 @@ public class LogPrior  implements Serializable {
 
   // these fields are just for the ADAPT prior -
   // is there a better way to do this?
-  private double[] means = null;
-  private LogPrior otherPrior = null;
+  private double[] means;
+  private LogPrior otherPrior;
 
   public static LogPrior getAdaptationPrior(double[] means, LogPrior otherPrior) {
     LogPrior lp = new LogPrior(LogPriorType.ADAPT);
@@ -87,8 +87,8 @@ public class LogPrior  implements Serializable {
   // this is the C variable in CSFoo's MM paper C = 1/\sigma^2
 //  private double[] regularizationHyperparameters = null;
   
-  private double[] sigmaSqM = null;
-  private double[] sigmaQuM = null;
+  private double[] sigmaSqM;
+  private double[] sigmaQuM;
   
 
 //  public double[] getRegularizationHyperparameters() {
@@ -105,11 +105,11 @@ public class LogPrior  implements Serializable {
    * transforms the inputs C (like the machine learning people like) to sigma
    * (like we NLP folks like).  C = 1/\sigma^2
    */
-  public LogPrior(double[] C) {
+  public LogPrior(double... C) {
     this.type = LogPriorType.MULTIPLE_QUADRATIC;
     double[] sigmaSqM = new double[C.length];
     for (int i=0;i<C.length;i++){
-      sigmaSqM[i] = 1./C[i];
+      sigmaSqM[i] = 1.0 /C[i];
     }
     this.sigmaSqM = sigmaSqM;
     setSigmaSquaredM(sigmaSqM);
@@ -123,19 +123,11 @@ public class LogPrior  implements Serializable {
   private double epsilon;
 
   public double getSigma() {
-    if (type == LogPriorType.ADAPT) {
-      return otherPrior.getSigma();
-    } else {
-      return Math.sqrt(sigmaSq);
-    }
+      return type == LogPriorType.ADAPT ? otherPrior.getSigma() : Math.sqrt(sigmaSq);
   }
 
   public double getSigmaSquared() {
-    if (type == LogPriorType.ADAPT) {
-      return otherPrior.getSigmaSquared();
-    } else {
-      return sigmaSq;
-    }
+      return type == LogPriorType.ADAPT ? otherPrior.getSigmaSquared() : sigmaSq;
   }
 
   public double[] getSigmaSquaredM() {
@@ -148,11 +140,7 @@ public class LogPrior  implements Serializable {
   
   
   public double getEpsilon() {
-    if (type == LogPriorType.ADAPT) {
-      return otherPrior.getEpsilon();
-    } else {
-      return epsilon;
-    }
+      return type == LogPriorType.ADAPT ? otherPrior.getEpsilon() : epsilon;
   }
 
   public void setSigma(double sigma) {
@@ -195,7 +183,7 @@ public class LogPrior  implements Serializable {
     }
   }
   
-  public void setSigmaSquaredM(double[] sigmaSq) {
+  public void setSigmaSquaredM(double... sigmaSq) {
     if (type == LogPriorType.ADAPT) { otherPrior.setSigmaSquaredM(sigmaSq); }
     if (type == LogPriorType.MULTIPLE_QUADRATIC) {
       //    this.sigma = Math.sqrt(sigmaSq);
@@ -218,32 +206,36 @@ public class LogPrior  implements Serializable {
     }
   }
 
-  public double computeStochastic(double[] x, double[] grad, double fractionOfData) {
-    if (type == LogPriorType.ADAPT) {
-      double[] newX = ArrayMath.pairwiseSubtract(x, means);
-      return otherPrior.computeStochastic(newX, grad, fractionOfData);
-    } else if (type == LogPriorType.MULTIPLE_QUADRATIC) {
-      
-      double[] sigmaSquaredOld = getSigmaSquaredM();
-      double[] sigmaSquaredTemp = sigmaSquaredOld.clone(); 
-      for (int i = 0; i < x.length; i++) {
-        sigmaSquaredTemp[i] /= fractionOfData;
-      }
-      setSigmaSquaredM(sigmaSquaredTemp);
-      
-      double val = compute(x, grad);
-      setSigmaSquaredM(sigmaSquaredOld);
-      return val;
-      
-    } else {
-      double sigmaSquaredOld = getSigmaSquared();
-      setSigmaSquared(sigmaSquaredOld / fractionOfData);
-      
-      double val = compute(x, grad);
-      setSigmaSquared(sigmaSquaredOld);
-      return val;
+    public double computeStochastic(double[] x, double[] grad, double fractionOfData) {
+        LogPrior other = this;
+        while (true) {
+            if (other.type == LogPriorType.ADAPT) {
+                double[] newX = ArrayMath.pairwiseSubtract(x, other.means);
+                x = newX;
+                other = other.otherPrior;
+            } else if (other.type == LogPriorType.MULTIPLE_QUADRATIC) {
+
+                double[] sigmaSquaredOld = other.getSigmaSquaredM();
+                double[] sigmaSquaredTemp = sigmaSquaredOld.clone();
+                for (int i = 0; i < x.length; i++) {
+                    sigmaSquaredTemp[i] /= fractionOfData;
+                }
+                other.setSigmaSquaredM(sigmaSquaredTemp);
+
+                double val = other.compute(x, grad);
+                other.setSigmaSquaredM(sigmaSquaredOld);
+                return val;
+
+            } else {
+                double sigmaSquaredOld = other.getSigmaSquared();
+                other.setSigmaSquared(sigmaSquaredOld / fractionOfData);
+
+                double val = other.compute(x, grad);
+                other.setSigmaSquared(sigmaSquaredOld);
+                return val;
+            }
+        }
     }
-  }
   
   /**
    * Adjust the given grad array by adding the prior's gradient component
@@ -252,7 +244,7 @@ public class LogPrior  implements Serializable {
    * @param grad the gradient array
    * @return the value
    */
-  public double compute(double[] x, double[] grad) {
+  public double compute(double[] x, double... grad) {
     
     double val = 0.0;
 
@@ -288,7 +280,7 @@ public class LogPrior  implements Serializable {
 
       case QUARTIC:
         for (int i = 0; i < x.length; i++) {
-          val += (x[i] * x[i]) * (x[i] * x[i]) / 2.0 / sigmaQu;
+          val += x[i] * x[i] * x[i] * x[i] / 2.0 / sigmaQu;
           grad[i] += x[i] / sigmaQu;
         }
         return val;
@@ -306,7 +298,7 @@ public class LogPrior  implements Serializable {
           d = 1.0 / sigmaSq;
         } else {
           val = Math.log(Math.cosh(norm));
-          d = (2 * (1 / (Math.exp(-2.0 * norm) + 1)) - 1.0) / sigmaSq;
+          d = (2 / (Math.exp(-2.0 * norm) + 1) - 1.0) / sigmaSq;
         }
         for (int i=0; i < x.length; i++) {
           grad[i] += Math.signum(x[i]) * d;

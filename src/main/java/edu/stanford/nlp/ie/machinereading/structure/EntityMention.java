@@ -48,7 +48,7 @@ public class EntityMention extends ExtractionObject {
       String subtype,
       String mentionType) {
     super(objectId, sentence, extentSpan, type, subtype);
-    this.mentionType = (mentionType != null ? mentionType.intern() : null);
+    this.mentionType = mentionType != null ? mentionType.intern() : null;
     this.headTokenSpan = headSpan;
     this.syntacticHeadTokenPosition = -1;
     this.normalizedName = null;
@@ -116,13 +116,10 @@ public class EntityMention extends ExtractionObject {
   }
 
   public boolean headIncludes(EntityMention otherEnt, boolean useSubType) {
-    if(otherEnt.getSyntacticHeadTokenPosition() >= getHeadTokenStart() && 
-        otherEnt.getSyntacticHeadTokenPosition() < getHeadTokenEnd() &&
-        ((type != null && otherEnt.type != null && type.equals(otherEnt.type)) || (type == null && otherEnt.type == null)) &&
-        (! useSubType || ((subType != null && otherEnt.subType != null && subType.equals(otherEnt.subType)) || (subType == null && otherEnt.subType == null)))){
-      return true;
-    }
-    return false;
+      return otherEnt.syntacticHeadTokenPosition >= getHeadTokenStart() &&
+              otherEnt.syntacticHeadTokenPosition < getHeadTokenEnd() &&
+              (type != null && otherEnt.type != null && type.equals(otherEnt.type) || type == null && otherEnt.type == null) &&
+              (!useSubType || subType != null && otherEnt.subType != null && subType.equals(otherEnt.subType) || subType == null && otherEnt.subType == null);
   }
 
   public boolean equals(EntityMention otherEnt, boolean useSubType) {
@@ -151,11 +148,8 @@ public class EntityMention extends ExtractionObject {
    * @param useSubType
    */
   public boolean labelEquals(EntityMention otherEnt, boolean useSubType) {
-    if(((type != null && otherEnt.type != null && type.equals(otherEnt.type)) || (type == null && otherEnt.type == null)) &&
-        (! useSubType || ((subType != null && otherEnt.subType != null && subType.equals(otherEnt.subType)) || (subType == null && otherEnt.subType == null)))){
-      return true;
-    }
-    return false;
+      return (type != null && otherEnt.type != null && type.equals(otherEnt.type) || type == null && otherEnt.type == null) &&
+              (!useSubType || subType != null && otherEnt.subType != null && subType.equals(otherEnt.subType) || subType == null && otherEnt.subType == null);
   }
   
   /** 
@@ -171,18 +165,15 @@ public class EntityMention extends ExtractionObject {
     // c) if extent spans are defined we consider two texts similar if they have the same extent span
     //
     if(syntacticHeadTokenPosition != -1 && otherEnt.syntacticHeadTokenPosition != -1){
-      if(syntacticHeadTokenPosition == otherEnt.syntacticHeadTokenPosition) return true;
-      return false;
+        return syntacticHeadTokenPosition == otherEnt.syntacticHeadTokenPosition;
     }
 
     if(headTokenSpan != null && otherEnt.headTokenSpan != null){
-      if(headTokenSpan.equals(otherEnt.headTokenSpan)) return true;
-      return false;
+        return headTokenSpan.equals(otherEnt.headTokenSpan);
     }
 
     if(extentTokenSpan != null && otherEnt.extentTokenSpan != null){
-      if(extentTokenSpan.equals(otherEnt.extentTokenSpan)) return true;
-      return false;
+        return extentTokenSpan.equals(otherEnt.extentTokenSpan);
     }
 
     return false;
@@ -214,7 +205,7 @@ public class EntityMention extends ExtractionObject {
     	  lastEnd = 0;
     	}
        */
-      if(i > headTokenSpan.start()) sb.append(" ");
+      if(i > headTokenSpan.start()) sb.append(' ');
 
       sb.append(token.word());
 
@@ -233,11 +224,11 @@ public class EntityMention extends ExtractionObject {
     + (headTokenSpan != null ? ", hstart=" + headTokenSpan.start() + ", hend=" + headTokenSpan.end() : "")
     + (extentTokenSpan != null ? ", estart=" + extentTokenSpan.start() + ", eend=" + extentTokenSpan.end() : "")
     + (syntacticHeadTokenPosition >= 0 ? ", headPosition=" + syntacticHeadTokenPosition : "")
-    + (headTokenSpan != null ? ", value=\"" + getValue() + "\"" : "") 
-    + (normalizedName != null ? ", normalizedName=\"" + normalizedName + "\"" : "")
+    + (headTokenSpan != null ? ", value=\"" + getValue() + '"' : "")
+    + (normalizedName != null ? ", normalizedName=\"" + normalizedName + '"' : "")
     + ", corefID=" + corefID
     + (typeProbabilities != null ? ", probs=" + probsToString() : "")
-    + "]";
+    + ']';
   }
   
   static class CompByHead implements Comparator<EntityMention> {
@@ -248,11 +239,7 @@ public class EntityMention extends ExtractionObject {
         return 1;
       } else if(o1.getHeadTokenEnd() < o2.getHeadTokenEnd()) {
         return -1;
-      } else if(o1.getHeadTokenEnd() > o2.getHeadTokenEnd()) {
-        return 1;
-      } else {
-        return 0;
-      }
+      } else return o1.getHeadTokenEnd() > o2.getHeadTokenEnd() ? 1 : 0;
     }
   }
 
@@ -260,7 +247,7 @@ public class EntityMention extends ExtractionObject {
     Collections.sort(mentions, new CompByHead());
   }
 
-  private static int MENTION_COUNTER = 0;
+  private static int MENTION_COUNTER;
 
   /**
    * Creates a new unique id for an entity mention

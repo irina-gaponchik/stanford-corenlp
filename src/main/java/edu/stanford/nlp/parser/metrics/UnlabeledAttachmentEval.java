@@ -122,7 +122,7 @@ public class UnlabeledAttachmentEval extends AbstractEval {
    *
    * @param args
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
     TreebankLangParserParams tlpp = new EnglishTreebankParserParams();
     int maxGoldYield = Integer.MAX_VALUE;
     boolean VERBOSE = false;
@@ -164,21 +164,21 @@ public class UnlabeledAttachmentEval extends AbstractEval {
     }
 
     tlpp.setInputEncoding(encoding);
-    final PrintWriter pwOut = tlpp.pw();
+    PrintWriter pwOut = tlpp.pw();
 
-    final Treebank guessTreebank = tlpp.diskTreebank();
+    Treebank guessTreebank = tlpp.diskTreebank();
     guessTreebank.loadPath(guessFile);
     pwOut.println("GUESS TREEBANK:");
     pwOut.println(guessTreebank.textualSummary());
 
-    final Treebank goldTreebank = tlpp.diskTreebank();
+    Treebank goldTreebank = tlpp.diskTreebank();
     goldTreebank.loadPath(goldFile);
     pwOut.println("GOLD TREEBANK:");
     pwOut.println(goldTreebank.textualSummary());
 
-    final UnlabeledAttachmentEval metric = new UnlabeledAttachmentEval("UAS LP/LR", true, tlpp.headFinder());
+    UnlabeledAttachmentEval metric = new UnlabeledAttachmentEval("UAS LP/LR", true, tlpp.headFinder());
 
-    final TreeTransformer tc = tlpp.collinizer();
+    TreeTransformer tc = tlpp.collinizer();
 
     //The evalb ref implementation assigns status for each tree pair as follows:
     //
@@ -187,8 +187,8 @@ public class UnlabeledAttachmentEval extends AbstractEval {
     //   2 - null parse e.g. (()).
     //
     //In the cases of 1,2, evalb does not include the tree pair in the LP/LR computation.
-    final Iterator<Tree> goldItr = goldTreebank.iterator();
-    final Iterator<Tree> guessItr = guessTreebank.iterator();
+    Iterator<Tree> goldItr = goldTreebank.iterator();
+    Iterator<Tree> guessItr = guessTreebank.iterator();
     int goldLineId = 0;
     int guessLineId = 0;
     int skippedGuessTrees = 0;
@@ -214,12 +214,12 @@ public class UnlabeledAttachmentEval extends AbstractEval {
         continue;
       }
       
-      final Tree evalGuess = tc.transformTree(guessTree);
+      Tree evalGuess = tc.transformTree(guessTree);
       evalGuess.indexLeaves(true);
-      final Tree evalGold = tc.transformTree(goldTree);
+      Tree evalGold = tc.transformTree(goldTree);
       evalGold.indexLeaves(true);
 
-      metric.evaluate(evalGuess, evalGold, ((VERBOSE) ? pwOut : null));
+      metric.evaluate(evalGuess, evalGold, VERBOSE ? pwOut : null);
     }
     
     if(guessItr.hasNext() || goldItr.hasNext()) {

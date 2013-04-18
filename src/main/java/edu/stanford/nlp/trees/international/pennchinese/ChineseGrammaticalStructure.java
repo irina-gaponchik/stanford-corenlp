@@ -33,13 +33,13 @@ public class ChineseGrammaticalStructure extends GrammaticalStructure {
 
 
   /**
-   * Construct a new <code>GrammaticalStructure</code> from an
-   * existing parse tree.  The new <code>GrammaticalStructure</code>
+   * Construct a new {@code GrammaticalStructure} from an
+   * existing parse tree.  The new {@code GrammaticalStructure}
    * has the same tree structure and label values as the given tree
    * (but no shared storage).  As part of construction, the parse tree
    * is analyzed using definitions from {@link GrammaticalRelation
-   * <code>GrammaticalRelation</code>} to populate the new
-   * <code>GrammaticalStructure</code> with as many labeled
+   * {@code GrammaticalRelation}} to populate the new
+   * {@code GrammaticalStructure} with as many labeled
    * grammatical relations as it can.
    *
    * @param t Tree to process
@@ -75,7 +75,7 @@ public class ChineseGrammaticalStructure extends GrammaticalStructure {
   }
 
   private static void collapsePrepAndPoss(Collection<TypedDependency> list) {
-    Collection<TypedDependency> newTypedDeps = new ArrayList<TypedDependency>();
+    Collection<TypedDependency> newTypedDeps = new ArrayList<>();
 
     // Construct a map from tree nodes to the set of typed
     // dependencies in which the node appears as governor.
@@ -89,7 +89,7 @@ public class ChineseGrammaticalStructure extends GrammaticalStructure {
     //System.err.println("here's the map: " + map);
 
     for (TypedDependency td1 : list) {
-      if (td1.reln() != GrammaticalRelation.KILL) {
+      if (!td1.reln().equals(GrammaticalRelation.KILL)) {
         TreeGraphNode td1Dep = td1.dep();
         String td1DepPOS = td1Dep.parent().value();
         // find all other typedDeps having our dep as gov
@@ -99,7 +99,7 @@ public class ChineseGrammaticalStructure extends GrammaticalStructure {
           for (TypedDependency td2 : possibles) {
             // TreeGraphNode td2Dep = td2.dep();
             // String td2DepPOS = td2Dep.parent().value();
-            if (td1.reln() == DEPENDENT && td2.reln() == DEPENDENT && td1DepPOS.equals("P")) {
+            if (td1.reln().equals(DEPENDENT) && td2.reln().equals(DEPENDENT) && td1DepPOS.equals("P")) {
               GrammaticalRelation td3reln = ChineseGrammaticalRelations.valueOf(td1Dep.value());
               if (td3reln == null) {
                 td3reln = GrammaticalRelation.valueOf(GrammaticalRelation.Language.Chinese,
@@ -161,18 +161,18 @@ public class ChineseGrammaticalStructure extends GrammaticalStructure {
   /**
    * Tests generation of Chinese grammatical relations from a file.
    * Default encoding is utf-8.
-   * 
+   *
    * TODO: remove this main method and use the one in the abstract class GrammaticalStructure. Making this
    * change is non-trivial due to some of the English specific assumptions in the code currently invoked by
    * GrammaticalStructure#main. 
-   * 
-   * Usage: <br> <code>
+   *
+   * Usage: <br> {@code
    * java edu.stanford.nlp.trees.international.pennchinese.ChineseGrammaticalStructure -treeFile [treeFile] <br>
-   * java edu.stanford.nlp.trees.international.pennchinese.ChineseGrammaticalStructure -sentFile [sentenceFile] </code>
+   * java edu.stanford.nlp.trees.international.pennchinese.ChineseGrammaticalStructure -sentFile [sentenceFile] }
    *
    * @param args Command line args as above
    */
-  public static void main(String[] args) {
+  public static void main(String... args) {
 
     // System.out.print("GrammaticalRelations under DEPENDENT:");
     // System.out.println(DEPENDENT.toPrettyString());
@@ -231,7 +231,7 @@ public class ChineseGrammaticalStructure extends GrammaticalStructure {
         File dir = new File(treeDirname);
         String[] files = dir.list();
         for (String file : files) {
-          AddTreesFromFile(treeDirname+"/"+file, encoding, tb);
+          AddTreesFromFile(treeDirname+ '/' +file, encoding, tb);
         }
       } else if (treeFileName != null) {
         AddTreesFromFile(treeFileName, encoding, tb);
@@ -276,12 +276,8 @@ public class ChineseGrammaticalStructure extends GrammaticalStructure {
     
     for (Tree t : tb) {      
       Filter<String> puncFilter;
-      
-      if (keepPunct) {
-        puncFilter = Filters.acceptFilter();        
-      } else {
-        puncFilter = new ChineseTreebankLanguagePack().punctuationWordRejectFilter();
-      }
+
+        puncFilter = keepPunct ? Filters.<String>acceptFilter() : new ChineseTreebankLanguagePack().punctuationWordRejectFilter();
       
       GrammaticalStructure gs = new ChineseGrammaticalStructure(t, puncFilter);
 

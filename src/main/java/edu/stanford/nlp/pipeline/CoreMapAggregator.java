@@ -14,7 +14,7 @@ import java.util.Map;
 public class CoreMapAggregator implements Function<List<? extends CoreMap>, CoreMap> {
   public static final CoreMapAggregator DEFAULT_AGGREGATOR = getAggregator(CoreMapAttributeAggregator.getDefaultAggregators());
   Map<Class, CoreMapAttributeAggregator> aggregators;
-  Class mergedKey = null;  // Keeps chunks that were merged to form this one
+  Class mergedKey;  // Keeps chunks that were merged to form this one
 
   public CoreMapAggregator(Map<Class, CoreMapAttributeAggregator> aggregators) {
     this.aggregators = aggregators;
@@ -29,7 +29,7 @@ public class CoreMapAggregator implements Function<List<? extends CoreMap>, Core
   {
     CoreMap merged = ChunkAnnotationUtils.getMergedChunk(in, start, end, aggregators);
     if (mergedKey != null) {
-      merged.set(mergedKey, new ArrayList<CoreMap>(in.subList(start, end)));
+      merged.set(mergedKey, new ArrayList<>(in.subList(start, end)));
     }
     return merged;
   }

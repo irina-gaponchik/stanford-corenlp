@@ -40,23 +40,26 @@ class TreeLocation {
     } else {
       parent = relativeNode.parent(t);
       if (parent == null) {
-        throw new RuntimeException("Error: looking for a non-existent parent in tree " + t + " for \"" + toString() + "\"");
+        throw new RuntimeException("Error: looking for a non-existent parent in tree " + t + " for \"" + toString() + '"');
       }
       int index = parent.objectIndexOf(relativeNode);
-      if (relation.equals("$+")) {
-        newIndex = index;
-      } else if (relation.equals("$-")) {
-        newIndex = index+1;
-      } else {
-        throw new RuntimeException("Error: Haven't dealt with relation " + relation + " yet.");
-      }
+        switch (relation) {
+            case "$+":
+                newIndex = index;
+                break;
+            case "$-":
+                newIndex = index + 1;
+                break;
+            default:
+                throw new RuntimeException("Error: Haven't dealt with relation " + relation + " yet.");
+        }
     }
-    return new Pair<Tree,Integer>(parent,newIndex);
+    return new Pair<>(parent,newIndex);
   }
 
   @Override
   public String toString() {
-    return relation + " " + p;
+    return relation + ' ' + p;
   }
 
 }

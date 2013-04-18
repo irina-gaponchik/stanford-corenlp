@@ -21,7 +21,7 @@ public class CliqueTemplates {
   public HashMap stemmedAcronymIndex = new HashMap();
   public HashMap inverseAcronymMap = new HashMap();
 
-  public ArrayList<String> urls = null;
+  public ArrayList<String> urls;
 
   public ClassicCounter dateCliqueCounter = new ClassicCounter();
   public ClassicCounter locationCliqueCounter = new ClassicCounter();

@@ -26,7 +26,7 @@ public class AlignmentFactory {
     this(longForm.toCharArray(), shortForm.toCharArray());
   }
 
-  public static char[] toLower(char []in) {
+  public static char[] toLower(char... in) {
     char[] out = new char[in.length];
     for(int i = 0; i < in.length; ++i) {
       out[i] = Character.toLowerCase(in[i]);
@@ -34,7 +34,7 @@ public class AlignmentFactory {
     return out;
   }
 
-  public AlignmentFactory(char[] longForm, char[] shortForm) {
+  public AlignmentFactory(char[] longForm, char... shortForm) {
     this.longForm = longForm;
     this.lcLongForm = toLower(longForm);
     this.shortForm = shortForm;
@@ -44,11 +44,11 @@ public class AlignmentFactory {
     backMatrix = new byte[lcLongForm.length][lcShortForm.length];
     for( int l = 0; l < lcLongForm.length; ++l) {
       for( int s = 0; s < lcShortForm.length; ++s) {
-        int match = (lcLongForm[l] == lcShortForm[s]) ? 1 : 0;
-        int froml = (l == 0) ? 0 : alignMatrix[l-1][s];
-        int froms = (s == 0) ? 0 : alignMatrix[l][s-1];
+        int match = lcLongForm[l] == lcShortForm[s] ? 1 : 0;
+        int froml = l == 0 ? 0 : alignMatrix[l-1][s];
+        int froms = s == 0 ? 0 : alignMatrix[l][s-1];
         int frommatch =
-                ((l==0 || s==0) ? 0 : alignMatrix[l-1][s-1]) + match;
+                (l==0 || s==0 ? 0 : alignMatrix[l-1][s-1]) + match;
         int max = Math.max(froml, Math.max(froms, frommatch));
         byte backp = 0;
         if( froml == max  ) backp |= SHIFT_LONG;
@@ -77,10 +77,10 @@ public class AlignmentFactory {
   }
 
   public ArrayList<Alignment> getAlignmentsList() {
-    return new ArrayList<Alignment>(alignments);
+    return new ArrayList<>(alignments);
   }
 
-  public static String dumpIntArray(int []a) {
+  public static String dumpIntArray(int... a) {
     StringBuilder buf = new StringBuilder();
     buf.append('[');
     for (int anA : a) {
@@ -169,7 +169,7 @@ public class AlignmentFactory {
 
     if( (backp & SHIFT_LONG)!= 0 ) {
       backp &= ~SHIFT_LONG;
-      int[] ptrcpy = ((backp == 0) ? pointers : pointers.clone());
+      int[] ptrcpy = backp == 0 ? pointers : pointers.clone();
       if( lg == 0 ) {
         ++addCount;
         alignments.add( new Alignment(longForm, shortForm, ptrcpy) );
@@ -180,7 +180,7 @@ public class AlignmentFactory {
 
     if( (backp & SHIFT_SHORT) != 0 ) {
       backp &= ~SHIFT_SHORT;
-      int[] ptrcpy = ((backp == 0) ? pointers : pointers.clone());
+      int[] ptrcpy = backp == 0 ? pointers : pointers.clone();
       if( s == 0 ) {
         ++addCount;
         alignments.add( new Alignment(longForm, shortForm, ptrcpy) );
@@ -190,10 +190,10 @@ public class AlignmentFactory {
     }
 
     if( lcLongForm[lg] == lcShortForm[s] )
-      assert( (backMatrix[lg][s] & SHIFT_BOTH) != 0);
+      assert (backMatrix[lg][s] & SHIFT_BOTH) != 0;
 
     if( (backp & SHIFT_BOTH) != 0 ) {
-      assert( lcLongForm[lg] == lcShortForm[s] );
+      assert lcLongForm[lg] == lcShortForm[s];
       pointers[s] = lg;
       if( lg == 0 || s == 0 ) {
         ++addCount;
@@ -204,7 +204,7 @@ public class AlignmentFactory {
     }
   }
 
-  public static void main(String[] args) throws Exception {
+  public static void main(String... args) throws Exception {
     AlignmentFactory fact = new AlignmentFactory(args[0].toCharArray(),
             AcronymModel.stripAcronym(args[1]));
 

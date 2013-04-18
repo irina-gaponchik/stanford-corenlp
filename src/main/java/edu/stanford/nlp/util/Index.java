@@ -74,7 +74,7 @@ public interface Index<E> extends Iterable<E>, Serializable {
      * @param indices An array of indices
      * @return a {@link Collection} of the objects corresponding to the indices argument.
      */
-    public Collection<E> objects(int[] indices);
+    public Collection<E> objects(int... indices);
 
     /**
      * Queries the Index for whether it's locked or not.
@@ -84,13 +84,13 @@ public interface Index<E> extends Iterable<E>, Serializable {
 
     /**
      * Locks the Index.  A locked index cannot have new elements added to it (calls to {@link #add} will
-     * leave the Index unchanged and return <code>false</code>).
+     * leave the Index unchanged and return {@code false}).
      */
     public void lock();
 
     /**
      * Unlocks the Index.  A locked index cannot have new elements added to it (calls to {@link #add} will
-     * leave the Index unchanged and return <code>false</code>).
+     * leave the Index unchanged and return {@code false}).
      * */
     public void unlock();
 
@@ -115,7 +115,7 @@ public interface Index<E> extends Iterable<E>, Serializable {
 
     public boolean contains(Object o);   // cdm: keep this, it seems reasonable
 
-    public <T> T[] toArray(T[] a);   // cdm: delete this (you can do objectsList().toArray() if you're desperate
+    public <T> T[] toArray(T... a);   // cdm: delete this (you can do objectsList().toArray() if you're desperate
 
     public boolean add(E e);  // cdm: Many, many uses; could be replaced with indexOf, but why bother?
 

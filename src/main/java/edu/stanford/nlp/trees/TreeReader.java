@@ -4,7 +4,7 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * A <code>TreeReader</code> adds functionality to another <code>Reader</code>
+ * A {@code TreeReader} adds functionality to another {@code Reader}
  * by reading in Trees, or some descendant class.
  *
  * @author Christopher Manning
@@ -16,14 +16,14 @@ public interface TreeReader extends Closeable {
   /**
    * Reads a single tree.
    *
-   * @return A single tree, or <code>null</code> at end of file.
+   * @return A single tree, or {@code null} at end of file.
    * @throws java.io.IOException If I/O problem
    */
   public Tree readTree() throws IOException;
 
 
   /**
-   * Close the Reader behind this <code>TreeReader</code>.
+   * Close the Reader behind this {@code TreeReader}.
    */
   @Override
   public void close() throws IOException;

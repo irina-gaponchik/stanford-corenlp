@@ -163,7 +163,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    *          {@link Word}
    */
   public static PTBTokenizer<Word> newPTBTokenizer(Reader r) {
-    return new PTBTokenizer<Word>(r, new WordTokenFactory(), "");
+    return new PTBTokenizer<>(r, new WordTokenFactory(), "");
   }
 
 
@@ -171,7 +171,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * Constructs a new PTBTokenizer that makes CoreLabel tokens.
    * It optionally returns carriage returns
    * as their own token. CRs come back as Words whose text is
-   * the value of <code>PTBLexer.NEWLINE_TOKEN</code>.
+   * the value of {@code PTBLexer.NEWLINE_TOKEN}.
    *
    * @param r The Reader to read tokens from
    * @param tokenizeNLs Whether to return newlines as separate tokens
@@ -182,7 +182,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * @return A PTBTokenizer which returns CoreLabel objects
    */
   public static PTBTokenizer<CoreLabel> newPTBTokenizer(Reader r, boolean tokenizeNLs, boolean invertible) {
-    return new PTBTokenizer<CoreLabel>(r, tokenizeNLs, invertible, false, new CoreLabelTokenFactory());
+    return new PTBTokenizer<>(r, tokenizeNLs, invertible, false, new CoreLabelTokenFactory());
   }
 
 
@@ -190,7 +190,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * Constructs a new PTBTokenizer that optionally returns carriage returns
    * as their own token, and has a custom LexedTokenFactory.
    * If asked for, CRs come back as Words whose text is
-   * the value of <code>PTBLexer.cr</code>.  This constructor translates
+   * the value of {@code PTBLexer.cr}.  This constructor translates
    * between the traditional boolean options of PTBTokenizer and the new
    * options String.
    *
@@ -205,11 +205,11 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * @param tokenFactory The LexedTokenFactory to use to create
    *         tokens from the text.
    */
-  private PTBTokenizer(final Reader r,
-                       final boolean tokenizeNLs,
-                       final boolean invertible,
-                       final boolean suppressEscaping,
-                       final LexedTokenFactory<T> tokenFactory) {
+  private PTBTokenizer(Reader r,
+                       boolean tokenizeNLs,
+                       boolean invertible,
+                       boolean suppressEscaping,
+                       LexedTokenFactory<T> tokenFactory) {
     StringBuilder options = new StringBuilder();
     if (suppressEscaping) {
       options.append("ptb3Escaping=false");
@@ -242,9 +242,9 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    *         normalizations done (that is, the behavior of the old
    *         suppressEscaping=true option).
    */
-  public PTBTokenizer(final Reader r,
-                      final LexedTokenFactory<T> tokenFactory,
-                      final String options) {
+  public PTBTokenizer(Reader r,
+                      LexedTokenFactory<T> tokenFactory,
+                      String options) {
     lexer = new PTBLexer(r, tokenFactory, options);
   }
 
@@ -333,7 +333,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
   }
 
   private static void untok(List<String> inputFileList, List<String> outputFileList, String charset) throws IOException {
-    final long start = System.nanoTime();
+    long start = System.nanoTime();
     int numTokens = 0;
     int sz = inputFileList.size();
     if (sz == 0) {
@@ -345,18 +345,14 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
       for (int j = 0; j < sz; j++) {
         Reader r = IOUtils.readerFromString(inputFileList.get(j), charset);
         BufferedWriter writer;
-        if (outputFileList == null) {
-          writer = new BufferedWriter(new OutputStreamWriter(System.out, charset));
-        } else {
-          writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileList.get(j)), charset));
-        }
+          writer = outputFileList == null ? new BufferedWriter(new OutputStreamWriter(System.out, charset)) : new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileList.get(j)), charset));
         numTokens += ptb2Text(r, writer);
         writer.close();
         r.close();
       }
     }
-    final long duration = System.nanoTime() - start;
-    final double wordsPerSec = (double) numTokens / ((double) duration / 1000000000.0);
+    long duration = System.nanoTime() - start;
+    double wordsPerSec = (double) numTokens / ((double) duration / 1000000000.0);
     System.err.printf("PTBTokenizer untokenized %d tokens at %.2f tokens per second.%n", numTokens, wordsPerSec);
   }
 
@@ -385,7 +381,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * @return A presentable version of the given PTB-tokenized words
    */
   public static String labelList2Text(List<? extends HasWord> ptbWords) {
-    List<String> words = new ArrayList<String>();
+    List<String> words = new ArrayList<>();
     for (HasWord hw : ptbWords) {
       words.add(hw.word());
     }
@@ -395,7 +391,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
 
 
   private static void tok(List<String> inputFileList, List<String> outputFileList, String charset, Pattern parseInsidePattern, String options, boolean preserveLines, boolean dump, boolean lowerCase) throws IOException {
-    final long start = System.nanoTime();
+    long start = System.nanoTime();
     long numTokens = 0;
     int numFiles = inputFileList.size();
     if (numFiles == 0) {
@@ -407,7 +403,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
     } else {
       for (int j = 0; j < numFiles; j++) {
         Reader r = IOUtils.readerFromString(inputFileList.get(j), charset);
-        BufferedWriter out = (outputFileList == null) ?
+        BufferedWriter out = outputFileList == null ?
           new BufferedWriter(new OutputStreamWriter(System.out, charset)) :
             new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFileList.get(j)), charset));
         numTokens += tokReader(r, out, parseInsidePattern, options, preserveLines, dump, lowerCase);
@@ -416,20 +412,20 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
       } // end for j going through inputFileList
     }
 
-    final long duration = System.nanoTime() - start;
-    final double wordsPerSec = (double) numTokens / ((double) duration / 1000000000.0);
+    long duration = System.nanoTime() - start;
+    double wordsPerSec = (double) numTokens / ((double) duration / 1000000000.0);
     System.err.printf("PTBTokenizer tokenized %d tokens at %.2f tokens per second.%n", numTokens, wordsPerSec);
   }
 
   private static int tokReader(Reader r, BufferedWriter writer, Pattern parseInsidePattern, String options, boolean preserveLines, boolean dump, boolean lowerCase) throws IOException {
     int numTokens = 0;
     boolean beginLine = true;
-    boolean printing = (parseInsidePattern == null); // start off printing, unless you're looking for a start entity
+    boolean printing = parseInsidePattern == null; // start off printing, unless you're looking for a start entity
     Matcher m = null;
     if (parseInsidePattern != null) {
       m = parseInsidePattern.matcher(""); // create once as performance hack
     }
-    for (PTBTokenizer<CoreLabel> tokenizer = new PTBTokenizer<CoreLabel>(r, new CoreLabelTokenFactory(), options); tokenizer.hasNext(); ) {
+    for (PTBTokenizer<CoreLabel> tokenizer = new PTBTokenizer<>(r, new CoreLabelTokenFactory(), options); tokenizer.hasNext(); ) {
       CoreLabel obj = tokenizer.next();
       // String origStr = obj.get(CoreAnnotations.TextAnnotation.class).replaceFirst("\n+$", ""); // DanC added this to fix a lexer bug, hopefully now corrected
       String origStr = obj.get(CoreAnnotations.TextAnnotation.class);
@@ -496,7 +492,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * @return A TokenizerFactory that does Penn Treebank tokenization
    */
   public static <T extends HasWord> TokenizerFactory<T> factory(LexedTokenFactory<T> factory, String options) {
-    return new PTBTokenizerFactory<T>(factory, options);
+    return new PTBTokenizerFactory<>(factory, options);
 
   }
 
@@ -535,7 +531,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
      * @return A TokenizerFactory that returns Word objects
      */
     public static PTBTokenizerFactory<Word> newWordTokenizerFactory(String options) {
-      return new PTBTokenizerFactory<Word>(new WordTokenFactory(), options);
+      return new PTBTokenizerFactory<>(new WordTokenFactory(), options);
     }
 
     /**
@@ -546,7 +542,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
      * @return A TokenizerFactory that returns CoreLabel objects o
      */
     public static PTBTokenizerFactory<CoreLabel> newCoreLabelTokenizerFactory(String options) {
-      return new PTBTokenizerFactory<CoreLabel>(new CoreLabelTokenFactory(), options);
+      return new PTBTokenizerFactory<>(new CoreLabelTokenFactory(), options);
     }
 
     /**
@@ -559,11 +555,11 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
      *         LexedTokenFactory
      */
     public static <T extends HasWord> PTBTokenizerFactory<T> newPTBTokenizerFactory(LexedTokenFactory<T> tokenFactory, String options) {
-      return new PTBTokenizerFactory<T>(tokenFactory, options);
+      return new PTBTokenizerFactory<>(tokenFactory, options);
     }
 
     public static PTBTokenizerFactory<CoreLabel> newPTBTokenizerFactory(boolean tokenizeNLs, boolean invertible) {
-      return new PTBTokenizerFactory<CoreLabel>(tokenizeNLs, invertible, false, new CoreLabelTokenFactory());
+      return new PTBTokenizerFactory<>(tokenizeNLs, invertible, false, new CoreLabelTokenFactory());
     }
 
 
@@ -607,16 +603,12 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
     /** Returns a tokenizer wrapping the given Reader. */
     @Override
     public Tokenizer<T> getTokenizer(Reader r) {
-      return new PTBTokenizer<T>(r, factory, options);
+      return new PTBTokenizer<>(r, factory, options);
     }
 
     @Override
     public Tokenizer<T> getTokenizer(Reader r, String extraOptions) {
-      if (options == null || options.isEmpty()) {
-        return new PTBTokenizer<T>(r, factory, extraOptions);
-      } else {
-        return new PTBTokenizer<T>(r, factory, options + ',' + extraOptions);
-      }
+        return options == null || options.isEmpty() ? new PTBTokenizer<>(r, factory, extraOptions) : new PTBTokenizer<>(r, factory, options + ',' + extraOptions);
     }
 
     @Override
@@ -648,9 +640,9 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * This main method assumes that the input file is in utf-8 encoding,
    * unless an encoding is specified.
    * <p/>
-   * Usage: <code>
+   * Usage: {@code
    * java edu.stanford.nlp.process.PTBTokenizer [options] filename+
-   * </code>
+   * }
    * <p/>
    * Options:
    * <ul>
@@ -679,7 +671,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * @param args Command line arguments
    * @throws IOException If any file I/O problem
    */
-  public static void main(String[] args) throws IOException {
+  public static void main(String... args) throws IOException {
     Properties options = StringUtils.argsToProperties(args, optionArgDefs());
     boolean showHelp = PropertiesUtils.getBool(options, "help", false);
     showHelp = PropertiesUtils.getBool(options, "h", showHelp);
@@ -715,12 +707,12 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
 
     // Other arguments are filenames
     String parsedArgStr = options.getProperty("",null);
-    String[] parsedArgs = (parsedArgStr == null) ? null : parsedArgStr.split("\\s+");
+    String[] parsedArgs = parsedArgStr == null ? null : parsedArgStr.split("\\s+");
 
-    ArrayList<String> inputFileList = new ArrayList<String>();
+    ArrayList<String> inputFileList = new ArrayList<>();
     ArrayList<String> outputFileList = null;
     if (inputOutputFileList && parsedArgs != null) {
-      outputFileList = new ArrayList<String>();
+      outputFileList = new ArrayList<>();
       for (String fileName : parsedArgs) {
         BufferedReader r = new BufferedReader(
           new InputStreamReader(new FileInputStream(fileName), charset));

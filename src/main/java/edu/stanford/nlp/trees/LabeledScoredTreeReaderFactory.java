@@ -6,7 +6,7 @@ import edu.stanford.nlp.ling.LabelFactory;
 import java.io.Reader;
 
 /**
- * This class implements a <code>TreeReaderFactory</code> that produces
+ * This class implements a {@code TreeReaderFactory} that produces
  * labeled, scored array-based Trees, which have been cleaned up to
  * delete empties, etc.   This seems to be a common case (for English).
  * By default, the labels are of type CategoryWordTag,
@@ -43,11 +43,11 @@ public class LabeledScoredTreeReaderFactory implements TreeReaderFactory {
   }
 
   /**
-   * An implementation of the <code>TreeReaderFactory</code> interface.
-   * It creates a <code>TreeReader</code> which normalizes trees using
-   * the <code>BobChrisTreeNormalizer</code>, and makes
-   * <code>LabeledScoredTree</code> objects with
-   * <code>CategoryWordTag</code> labels (unless otherwise specified on
+   * An implementation of the {@code TreeReaderFactory} interface.
+   * It creates a {@code TreeReader} which normalizes trees using
+   * the {@code BobChrisTreeNormalizer}, and makes
+   * {@code LabeledScoredTree} objects with
+   * {@code CategoryWordTag} labels (unless otherwise specified on
    * construction).
    */
   public TreeReader newTreeReader(Reader in) {

@@ -52,7 +52,6 @@ public class Triple<T1, T2, T3> implements Comparable<Triple<T1,T2,T3>>, Seriali
     third = o;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object o) {
 
@@ -64,7 +63,7 @@ public class Triple<T1, T2, T3> implements Comparable<Triple<T1,T2,T3>>, Seriali
       return false;
     }
 
-    final Triple triple = (Triple) o;
+    Triple triple = (Triple) o;
 
     if (first != null ? !first.equals(triple.first) : triple.first != null) {
       return false;
@@ -72,17 +71,14 @@ public class Triple<T1, T2, T3> implements Comparable<Triple<T1,T2,T3>>, Seriali
     if (second != null ? !second.equals(triple.second) : triple.second != null) {
       return false;
     }
-    if (third != null ? !third.equals(triple.third) : triple.third != null) {
-      return false;
-    }
+      return !(third != null ? !third.equals(triple.third) : triple.third != null);
 
-    return true;
   }
 
   @Override
   public int hashCode() {
     int result;
-    result = (first != null ? first.hashCode() : 0);
+    result = first != null ? first.hashCode() : 0;
     result = 29 * result + (second != null ? second.hashCode() : 0);
     result = 29 * result + (third != null ? third.hashCode() : 0);
     return result;
@@ -90,7 +86,7 @@ public class Triple<T1, T2, T3> implements Comparable<Triple<T1,T2,T3>>, Seriali
 
   @Override
   public String toString() {
-    return "(" + first + "," + second + "," + third + ")";
+    return "(" + first + ',' + second + ',' + third + ')';
   }
   
 
@@ -104,7 +100,7 @@ public class Triple<T1, T2, T3> implements Comparable<Triple<T1,T2,T3>>, Seriali
    * to write out potentially long class names.
    */
   public static <X, Y, Z> Triple<X, Y, Z> makeTriple(X x, Y y, Z z) {
-    return new Triple<X, Y, Z>(x, y, z);
+    return new Triple<>(x, y, z);
   }
 
   /**
@@ -122,11 +118,7 @@ public class Triple<T1, T2, T3> implements Comparable<Triple<T1,T2,T3>>, Seriali
       return comp;
     } else {
       comp = ((Comparable<T2>) second()).compareTo(another.second());
-      if (comp != 0) {
-        return comp;
-      } else {
-        return ((Comparable<T3>) third()).compareTo(another.third());
-      }
+        return comp != 0 ? comp : ((Comparable<T3>) third()).compareTo(another.third());
     }
   }
 }
