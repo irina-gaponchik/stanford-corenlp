@@ -1012,99 +1012,100 @@ public class SplittingGrammarExtractor {
                            IdentityHashMap<Tree, double[]> probIn) {
     if (tree.isLeaf()) {
       throw new RuntimeException();
-    } else if (tree.isPreTerminal()) {
-      int stateCount = getStateSplitCount(tree);
-      String word = tree.children()[0].label().value();
-      String tag = tree.label().value();
+    }
+      if (tree.isPreTerminal()) {
+        int stateCount = getStateSplitCount(tree);
+        String word = tree.children()[0].label().value();
+        String tag = tree.label().value();
 
-      double[] scores = new double[stateCount];
-      probIn.put(tree, scores);
+        double[] scores = new double[stateCount];
+        probIn.put(tree, scores);
 
-      if (splitStates && !tag.equals(Lexicon.BOUNDARY_TAG)) {
-        for (int i = 0; i < stateCount / 2; ++i) {
-          IntTaggedWord tw = new IntTaggedWord(word, state(tag, i), wordIndex, tagIndex);
-          double logProb = lex.score(tw, loc, word, null);
-          double wordWeight = 0.45 + random.nextDouble() * 0.1;
-          scores[(i << 1)] = logProb + Math.log(wordWeight);
-          scores[(i << 1) + 1] = logProb + Math.log(1.0 - wordWeight);
-          if (DEBUG()) {
-            System.out.println("Lexicon log prob " + state(tag, i) + '-' + word + ": " + logProb);
-            System.out.println("  Log Split -> " + scores[(i << 1)] + ',' + scores[(i << 1) + 1]);
+        if (splitStates && !tag.equals(Lexicon.BOUNDARY_TAG)) {
+          for (int i = 0; i < stateCount / 2; ++i) {
+            IntTaggedWord tw = new IntTaggedWord(word, state(tag, i), wordIndex, tagIndex);
+            double logProb = lex.score(tw, loc, word, null);
+            double wordWeight = 0.45 + random.nextDouble() * 0.1;
+            scores[(i << 1)] = logProb + Math.log(wordWeight);
+            scores[(i << 1) + 1] = logProb + Math.log(1.0 - wordWeight);
+            if (DEBUG()) {
+              System.out.println("Lexicon log prob " + state(tag, i) + '-' + word + ": " + logProb);
+              System.out.println("  Log Split -> " + scores[(i << 1)] + ',' + scores[(i << 1) + 1]);
+            }
+          }
+        } else {
+          for (int i = 0; i < stateCount; ++i) {
+            IntTaggedWord tw = new IntTaggedWord(word, state(tag, i), wordIndex, tagIndex);
+            double prob = lex.score(tw, loc, word, null);
+            if (DEBUG()) {
+              System.out.println("Lexicon log prob " + state(tag, i) + '-' + word + ": " + prob);
+            }
+            scores[i] = prob;
           }
         }
-      } else {
-        for (int i = 0; i < stateCount; ++i) {
-          IntTaggedWord tw = new IntTaggedWord(word, state(tag, i), wordIndex, tagIndex);
-          double prob = lex.score(tw, loc, word, null);
-          if (DEBUG()) {
-            System.out.println("Lexicon log prob " + state(tag, i) + '-' + word + ": " + prob);
-          }
-          scores[i] = prob;
-        }
-      }
-      loc = loc + 1;
-    } else if (tree.children().length == 1) {
-      loc = recountInside(tree.children()[0], splitStates, loc, probIn);
-      double[] childScores = probIn.get(tree.children()[0]);
-      String parentLabel = tree.label().value();
-      String childLabel = tree.children()[0].label().value();
-      double[][] betas = unaryBetas.get(parentLabel, childLabel);
-      int parentStates = betas.length; // size of the first key
-      int childStates = betas[0].length;
+        loc = loc + 1;
+      } else if (tree.children().length == 1) {
+        loc = recountInside(tree.children()[0], splitStates, loc, probIn);
+        double[] childScores = probIn.get(tree.children()[0]);
+        String parentLabel = tree.label().value();
+        String childLabel = tree.children()[0].label().value();
+        double[][] betas = unaryBetas.get(parentLabel, childLabel);
+        int parentStates = betas.length; // size of the first key
+        int childStates = betas[0].length;
 
-      double[] scores = neginfDoubles(parentStates);
-      probIn.put(tree, scores);
+        double[] scores = neginfDoubles(parentStates);
+        probIn.put(tree, scores);
 
-      for (int i = 0; i < parentStates; ++i) {
-        for (int j = 0; j < childStates; ++j) {
-          scores[i] = SloppyMath.logAdd(scores[i], childScores[j] + betas[i][j]);
-        }
-      }
-      if (DEBUG()) {
-        System.out.println(parentLabel + " -> " + childLabel);
         for (int i = 0; i < parentStates; ++i) {
-          System.out.println("  " + i + ':' + scores[i]);
           for (int j = 0; j < childStates; ++j) {
-            System.out.println("    " + i + ',' + j + ": " + betas[i][j] + " | " + Math.exp(betas[i][j]));
+            scores[i] = SloppyMath.logAdd(scores[i], childScores[j] + betas[i][j]);
           }
         }
-      }
-    } else { // length == 2
-      loc = recountInside(tree.children()[0], splitStates, loc, probIn);
-      loc = recountInside(tree.children()[1], splitStates, loc, probIn);
-      double[] leftScores = probIn.get(tree.children()[0]);
-      double[] rightScores = probIn.get(tree.children()[1]);
-      String parentLabel = tree.label().value();
-      String leftLabel = tree.children()[0].label().value();
-      String rightLabel = tree.children()[1].label().value();
-      double[][][] betas = binaryBetas.get(parentLabel, leftLabel, rightLabel);
-      int parentStates = betas.length;
-      int leftStates = betas[0].length;
-      int rightStates = betas[0][0].length;
-
-      double[] scores = neginfDoubles(parentStates);
-      probIn.put(tree, scores);
-
-      for (int i = 0; i < parentStates; ++i) {
-        for (int j = 0; j < leftStates; ++j) {
-          for (int k = 0; k < rightStates; ++k) {
-            scores[i] = SloppyMath.logAdd(scores[i], leftScores[j] + rightScores[k] + betas[i][j][k]);
+        if (DEBUG()) {
+          System.out.println(parentLabel + " -> " + childLabel);
+          for (int i = 0; i < parentStates; ++i) {
+            System.out.println("  " + i + ':' + scores[i]);
+            for (int j = 0; j < childStates; ++j) {
+              System.out.println("    " + i + ',' + j + ": " + betas[i][j] + " | " + Math.exp(betas[i][j]));
+            }
           }
         }
-      }
-      if (DEBUG()) {
-        System.out.println(parentLabel + " -> " + leftLabel + ',' + rightLabel);
+      } else { // length == 2
+        loc = recountInside(tree.children()[0], splitStates, loc, probIn);
+        loc = recountInside(tree.children()[1], splitStates, loc, probIn);
+        double[] leftScores = probIn.get(tree.children()[0]);
+        double[] rightScores = probIn.get(tree.children()[1]);
+        String parentLabel = tree.label().value();
+        String leftLabel = tree.children()[0].label().value();
+        String rightLabel = tree.children()[1].label().value();
+        double[][][] betas = binaryBetas.get(parentLabel, leftLabel, rightLabel);
+        int parentStates = betas.length;
+        int leftStates = betas[0].length;
+        int rightStates = betas[0][0].length;
+
+        double[] scores = neginfDoubles(parentStates);
+        probIn.put(tree, scores);
+
         for (int i = 0; i < parentStates; ++i) {
-          System.out.println("  " + i + ':' + scores[i]);
           for (int j = 0; j < leftStates; ++j) {
             for (int k = 0; k < rightStates; ++k) {
-              System.out.println("    " + i + ',' + j + ',' + k + ": " + betas[i][j][k] + " | " + Math.exp(betas[i][j][k]));
+              scores[i] = SloppyMath.logAdd(scores[i], leftScores[j] + rightScores[k] + betas[i][j][k]);
+            }
+          }
+        }
+        if (DEBUG()) {
+          System.out.println(parentLabel + " -> " + leftLabel + ',' + rightLabel);
+          for (int i = 0; i < parentStates; ++i) {
+            System.out.println("  " + i + ':' + scores[i]);
+            for (int j = 0; j < leftStates; ++j) {
+              for (int k = 0; k < rightStates; ++k) {
+                System.out.println("    " + i + ',' + j + ',' + k + ": " + betas[i][j][k] + " | " + Math.exp(betas[i][j][k]));
+              }
             }
           }
         }
       }
-    }
-    return loc;
+      return loc;
   }
 
   public void mergeStates() {

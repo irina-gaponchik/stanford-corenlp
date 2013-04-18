@@ -60,7 +60,7 @@ public class Expressions {
       if (obj != null) {
         if (obj instanceof Boolean) {
           res = (Boolean) obj;
-        } else res = obj instanceof Integer ? (Integer) obj != 0 : true;
+        } else res = !(obj instanceof Integer) || (Integer) obj != 0;
         return res;
       }
     }
@@ -677,11 +677,11 @@ public class Expressions {
         StringBuilder sb = new StringBuilder();
         sb.append("Cannot find function matching args: ").append(function).append(NEWLINE);
         sb.append("Args are: ").append(StringUtils.join(evaled, ",")).append(NEWLINE);
-        if (!fs.isEmpty()) {
-          sb.append("Options are:\n").append(StringUtils.join(fs, NEWLINE));
-        } else {
-          sb.append("No options");
-        }
+          if (fs.isEmpty()) {
+              sb.append("No options");
+          } else {
+              sb.append("Options are:\n").append(StringUtils.join(fs, NEWLINE));
+          }
         throw new RuntimeException(sb.toString());
       } else if (funcValue instanceof Class) {
         Class c = (Class) funcValue;

@@ -256,11 +256,11 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
     for (int i = m.startIndex; i < endIdx; i++) {
       // Add everything except separated dashes! The separated dashes mess with the parser too badly.
       CoreLabel label = tokens.get(i);
-      if ( ! "-".equals(label.word())) {
-        extentTokens.add(tokens.get(i));
-      } else {
-        approximateness++;
-      }
+        if ("-".equals(label.word())) {
+            approximateness++;
+        } else {
+            extentTokens.add(tokens.get(i));
+        }
     }
     extentTokens.add(initCoreLabel("."));
 
@@ -459,12 +459,7 @@ public class RuleBasedCorefMentionFinder implements CorefMentionFinder {
 
   private static boolean inStopList(Mention m) {
     String mentionSpan = m.spanToString().toLowerCase();
-    if(mentionSpan.equals("u.s.") || mentionSpan.equals("u.k.")
-        || mentionSpan.equals("u.s.s.r")) return true;
-    if(mentionSpan.equals("there") || mentionSpan.startsWith("etc.")
-        || mentionSpan.equals("ltd.")) return true;
-    if(mentionSpan.startsWith("'s ")) return true;
-      return mentionSpan.endsWith("etc.");
+      return mentionSpan.equals("u.s.") || mentionSpan.equals("u.k.") || mentionSpan.equals("u.s.s.r") || mentionSpan.equals("there") || mentionSpan.startsWith("etc.") || mentionSpan.equals("ltd.") || mentionSpan.startsWith("'s ") || mentionSpan.endsWith("etc.");
 
   }
 

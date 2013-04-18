@@ -220,11 +220,6 @@ public class SemanticHeadFinder extends ModCollinsHeadFinder {
         }
         if (pti != null) {
           return pti;
-        } else {
-          // System.err.println("------");
-          // System.err.println("SemanticHeadFinder failed to reassign head for");
-          // t.pennPrint(System.err);
-          // System.err.println("------");
         }
       }
 
@@ -316,16 +311,16 @@ public class SemanticHeadFinder extends ModCollinsHeadFinder {
       Tree[] kids = parent.children();
       // iterate over the sisters before t and checks if existential
       for (Tree kid : kids) {
-        if (!kid.value().equals("VP")) {
-          List<Label> tags = kid.preTerminalYield();
-          for (Label tag : tags) {
-            if (tag.value().equals("EX")) {
-              toReturn = true;
-            }
+          if (kid.value().equals("VP")) {
+              break;
+          } else {
+              List<Label> tags = kid.preTerminalYield();
+              for (Label tag : tags) {
+                  if (tag.value().equals("EX")) {
+                      toReturn = true;
+                  }
+              }
           }
-        } else {
-          break;
-        }
       }
     }
     // question case

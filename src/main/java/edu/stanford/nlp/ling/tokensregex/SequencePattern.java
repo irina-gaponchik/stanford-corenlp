@@ -1312,19 +1312,21 @@ public class SequencePattern<T> {
       for (int i = 0; i < reachableChildBids.length; i++) {
         Set<Pair<Integer,Integer>> v = reachableChildBids[i];
         if (v == null || v.isEmpty()) return null;
-        if (i != index) {
-          boolean ok = false;
-          for (Pair<Integer,Integer> p:v) {
-            if (p.second() == pos) {
-              ok = true;
-              matchedBids[i] = p.first();
-              break;
-            }
+          if (i == index) {
+              matchedBids[i] = bid;
+          } else {
+              boolean ok = false;
+              for (Pair<Integer, Integer> p : v) {
+                  if (p.second() == pos) {
+                      ok = true;
+                      matchedBids[i] = p.first();
+                      break;
+                  }
+              }
+              if (!ok) {
+                  return null;
+              }
           }
-          if (!ok) { return null; }
-        } else {
-          matchedBids[i] = bid;
-        }
       }
       return matchedBids;
     }

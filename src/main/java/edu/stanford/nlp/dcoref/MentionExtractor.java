@@ -360,14 +360,13 @@ public class MentionExtractor {
     int thisLast = ((CoreMap) leaves.get(leaves.size() - 1).label()).get(CoreAnnotations.IndexAnnotation.class);
     if(thisFirst == first && thisLast == last) {
       return tree;
-    } else {
+    }
       Tree [] kids = tree.children();
       for(Tree k: kids){
         Tree t = findExactMatch(k, first, last);
         if(t != null) return t;
       }
-    }
-    return null;
+      return null;
   }
 
   /** Load Stanford Processor: skip unnecessary annotator */
@@ -376,11 +375,11 @@ public class MentionExtractor {
 
     Properties pipelineProps = new Properties(props);
     StringBuilder annoSb = new StringBuilder("");
-    if (!replicateCoNLL)  {
-      annoSb.append("pos, lemma");
-    } else {
-      annoSb.append("lemma");
-    }
+      if (replicateCoNLL) {
+          annoSb.append("lemma");
+      } else {
+          annoSb.append("pos, lemma");
+      }
     if(Constants.USE_TRUECASE) {
       annoSb.append(", truecase");
     }

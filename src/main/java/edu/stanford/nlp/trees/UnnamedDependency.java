@@ -93,7 +93,8 @@ public class UnnamedDependency implements Dependency<Label, Label, Object> {
   public boolean equalsIgnoreName(Object o) {
      if (this.equals(o)) {
         return true;
-      } else if( !(o instanceof UnnamedDependency)) {
+      }
+      if( !(o instanceof UnnamedDependency)) {
         return false;
       }
       UnnamedDependency d = (UnnamedDependency) o;

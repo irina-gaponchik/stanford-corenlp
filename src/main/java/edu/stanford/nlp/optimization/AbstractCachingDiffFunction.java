@@ -60,10 +60,9 @@ public abstract class AbstractCachingDiffFunction implements DiffFunction, HasIn
       if (diff > diffThreshold && pct > diffPctThreshold) {
         System.err.println("Gradient check failed at index "+paramIndex+", appGrad=" + appDeriv+ ", calcGrad="+ calcDeriv + ", diff="+diff + ", pct=" + pct); 
         return false;
-      } else {
-        System.err.println("Gradient check passed at index "+paramIndex+", appGrad=" + appDeriv+ ", calcGrad="+ calcDeriv + ", diff="+diff + ", pct=" + pct); 
       }
-      x[paramIndex] = oldX;
+        System.err.println("Gradient check passed at index "+paramIndex+", appGrad=" + appDeriv+ ", calcGrad="+ calcDeriv + ", diff="+diff + ", pct=" + pct);
+        x[paramIndex] = oldX;
     }
     return true;
   }

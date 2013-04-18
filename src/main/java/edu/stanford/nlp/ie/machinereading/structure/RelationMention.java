@@ -248,14 +248,14 @@ public class RelationMention extends ExtractionObject {
     for(int i = 0; i < args.size(); i ++){
       ExtractionObject a = args.get(i);
       String n = argNames.get(i);
-      if(! argsToRemove.contains(a)){
-        newArgs.add(a);
-        newArgNames.add(n);
-      } else {
-        if(a instanceof EventMention && removeParent){
-          ((EventMention) a).removeParent(this);
+        if (argsToRemove.contains(a)) {
+            if (a instanceof EventMention && removeParent) {
+                ((EventMention) a).removeParent(this);
+            }
+        } else {
+            newArgs.add(a);
+            newArgNames.add(n);
         }
-      }
     }
     args = newArgs;
     argNames = newArgNames;

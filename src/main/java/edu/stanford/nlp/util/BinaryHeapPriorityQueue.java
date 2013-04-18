@@ -298,13 +298,13 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
 
   private void removeEntry(Entry<E> entry) {
     Entry<E> lastEntry = getLastEntry();
-    if (!entry.equals(lastEntry)) {
-      swap(entry, lastEntry);
-      removeLastEntry();
-      heapify(lastEntry);
-    } else {
-      removeLastEntry();
-    }
+      if (entry.equals(lastEntry)) {
+          removeLastEntry();
+      } else {
+          swap(entry, lastEntry);
+          removeLastEntry();
+          heapify(lastEntry);
+      }
   }
 
   private Entry<E> getLastEntry() {

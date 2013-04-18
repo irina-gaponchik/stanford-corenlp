@@ -30,7 +30,7 @@ public class WordTag implements Label, HasWord, HasTag, Comparable<WordTag> {
    *             tag of this Label
    */
   public WordTag(String word, String tag) {
-    setWord(word);
+      this.word = word;
       this.tag = tag;
   }
   
@@ -143,10 +143,10 @@ public class WordTag implements Label, HasWord, HasTag, Comparable<WordTag> {
   public void setFromString(String wordTagString, String divider) {
     int where = wordTagString.lastIndexOf(divider);
     if (where >= 0) {
-      setWord(wordTagString.substring(0, where).intern());
+        word = wordTagString.substring(0, where).intern();
         tag = wordTagString.substring(where + 1).intern();
     } else {
-      setWord(wordTagString.intern());
+        word = wordTagString.intern();
         tag = null;
     }
   }
@@ -158,8 +158,7 @@ public class WordTag implements Label, HasWord, HasTag, Comparable<WordTag> {
     if (this == o) return true;
     if (!(o instanceof WordTag)) return false;
     WordTag wordTag = (WordTag) o;
-    if (tag != null ? !tag.equals(wordTag.tag) : wordTag.tag != null) return false;
-      return !(word != null ? !word.equals(wordTag.word) : wordTag.word != null);
+      return !(tag != null ? !tag.equals(wordTag.tag) : wordTag.tag != null) && !(word != null ? !word.equals(wordTag.word) : wordTag.word != null);
   }
 
   @Override
@@ -179,14 +178,12 @@ public class WordTag implements Label, HasWord, HasTag, Comparable<WordTag> {
    */
   public int compareTo(WordTag wordTag) {    
     int first = word != null ? word().compareTo(wordTag.word()) : 0;
-    if(first != 0)
-      return first;
-    else {
-      if (tag() == null) {
-          return wordTag.tag() == null ? 0 : -1;
-      }
-      return tag().compareTo(wordTag.tag());
-    }
+      if (first == 0) {
+          if (tag() == null) {
+              return wordTag.tag() == null ? 0 : -1;
+          }
+          return tag().compareTo(wordTag.tag());
+      } else return first;
   }
 
 

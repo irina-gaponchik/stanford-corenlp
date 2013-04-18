@@ -43,9 +43,7 @@ public class CHTBTokenizer extends AbstractTokenizer<String> {
   public String getNext() {
     try {
       int a;
-      while ((a = lexer.yylex()) == CHTBLexer.IGNORE) {
-        //System.err.println("#ignored: " + lexer.match());
-      }
+      while ((a = lexer.yylex()) == CHTBLexer.IGNORE) ;
         return a == CHTBLexer.YYEOF ? null : lexer.match();
     } catch (IOException ioe) {
       // do nothing, return null

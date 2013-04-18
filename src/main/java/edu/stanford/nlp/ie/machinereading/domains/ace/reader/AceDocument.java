@@ -365,22 +365,17 @@ public class AceDocument extends AceElement {
     //
     // read the ACE XML annotations
     //
-    if (!usePredictedBoundaries) {
-      doc = AceDomReader.parseDocument(new File(prefix + XML_EXT));
-      // System.err.println("Parsed " + doc.getEntityMentions().size() +
-      // " entities in document " + prefix);
-    }
-
-    //
-    // will use the predicted entity boundaries (see below)
-    //
-    else {
-      int lastSlash = prefix.lastIndexOf(File.separator);
-      assert lastSlash > 0 && lastSlash < prefix.length() - 1;
-      String id = prefix.substring(lastSlash + 1);
-      // System.err.println(id + ": " + prefix);
-      doc = new AceDocument(id);
-    }
+      if (usePredictedBoundaries) {
+          int lastSlash = prefix.lastIndexOf(File.separator);
+          assert lastSlash > 0 && lastSlash < prefix.length() - 1;
+          String id = prefix.substring(lastSlash + 1);
+          // System.err.println(id + ": " + prefix);
+          doc = new AceDocument(id);
+      } else {
+          doc = AceDomReader.parseDocument(new File(prefix + XML_EXT));
+          // System.err.println("Parsed " + doc.getEntityMentions().size() +
+          // " entities in document " + prefix);
+      }
     doc.setPrefix(prefix);
 
     //
@@ -533,22 +528,17 @@ public class AceDocument extends AceElement {
     //
     // read the ACE XML annotations
     //
-    if (!usePredictedBoundaries) {
-      doc = AceDomReader.parseDocument(new File(prefix + XML_EXT));
-      // System.err.println("Parsed " + doc.getEntityMentions().size() +
-      // " entities in document " + prefix);
-    }
-
-    //
-    // will use the predicted entity boundaries (see below)
-    //
-    else {
-      int lastSlash = prefix.lastIndexOf(File.separator);
-      assert lastSlash > 0 && lastSlash < prefix.length() - 1;
-      String id = prefix.substring(lastSlash + 1);
-      // System.err.println(id + ": " + prefix);
-      doc = new AceDocument(id);
-    }
+      if (usePredictedBoundaries) {
+          int lastSlash = prefix.lastIndexOf(File.separator);
+          assert lastSlash > 0 && lastSlash < prefix.length() - 1;
+          String id = prefix.substring(lastSlash + 1);
+          // System.err.println(id + ": " + prefix);
+          doc = new AceDocument(id);
+      } else {
+          doc = AceDomReader.parseDocument(new File(prefix + XML_EXT));
+          // System.err.println("Parsed " + doc.getEntityMentions().size() +
+          // " entities in document " + prefix);
+      }
     doc.setPrefix(prefix);
 
     //

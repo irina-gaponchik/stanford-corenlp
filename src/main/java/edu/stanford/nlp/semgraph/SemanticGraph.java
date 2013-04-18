@@ -906,13 +906,11 @@ public class SemanticGraph implements Serializable {
             break;
           }
         }
-        if (!hasInbound) {
-          q.addLast(target); // this guy can be put on the queue, because he has
-                             // no more outstanding parents!
-          // System.err.println("Adding to queue: " + target);
-        } else {
-          // System.err.println("Can't add to queue: " + target);
-        }
+          if (!hasInbound) {
+              q.addLast(target); // this guy can be put on the queue, because he has
+              // no more outstanding parents!
+              // System.err.println("Adding to queue: " + target);
+          }
       }
     }
     if (result.size() != vertexSet().size())
@@ -1154,10 +1152,11 @@ public class SemanticGraph implements Serializable {
   private boolean isDagHelper(IndexedWord current, Set<IndexedWord> unused, Set<IndexedWord> trail) {
     if (trail.contains(current)) {
       return true;
-    } else if (!unused.contains(current)) {
-      return false;
     }
-    unused.remove(current);
+      if (!unused.contains(current)) {
+        return false;
+      }
+      unused.remove(current);
     trail.add(current);
     for (IndexedWord child : getChildList(current)) {
       boolean result = isDagHelper(child, unused, trail);
@@ -1510,15 +1509,15 @@ public class SemanticGraph implements Serializable {
       for (SemanticGraphEdge edge : getOutEdgesSorted(node)) {
         IndexedWord target = edge.getTarget();
         sb.append(' ').append(edge.getRelation()).append(':');
-        if (!used.contains(target)) { // avoid infinite loop
-          toCompactStringHelper(target, sb, used, showTags);
-        } else {
-          sb.append(target.word());
-          if (showTags) {
-            sb.append('/');
-            sb.append(target.tag());
+          if (used.contains(target)) {
+              sb.append(target.word());
+              if (showTags) {
+                  sb.append('/');
+                  sb.append(target.tag());
+              }
+          } else { // avoid infinite loop
+              toCompactStringHelper(target, sb, used, showTags);
           }
-        }
       }
       if (isntLeaf) {
         sb.append(']');
@@ -1708,29 +1707,27 @@ public class SemanticGraph implements Serializable {
       CoreLabel govLabel = new CoreLabel(gov.label());
       CoreLabel depLabel = new CoreLabel(dep.label());
 
-      if (reln != ROOT) { // the root relation only points to the root: the governor is a fake node that we don't want to add in the graph
-        IndexedWord govVertex = new IndexedWord(docID, sentIndex, gov.index(), govLabel);
-        govVertex.setTag(gov.highestNodeWithSameHead().headTagNode().value());
-        IndexedWord depVertex = new IndexedWord(docID, sentIndex, dep.index(), depLabel);
-        depVertex.setTag(dep.highestNodeWithSameHead().headTagNode().value());
-        if (lemmatize) {
-          govVertex.setLemma(morphology.lemma(govVertex.value(), govVertex.tag(), true));
-          depVertex.setLemma(morphology.lemma(depVertex.value(), depVertex.tag(), true));
-        }
-        addVertex(govVertex);
-        addVertex(depVertex);
-        addEdge(govVertex, depVertex, reln, Double.NEGATIVE_INFINITY, d.extra());
-      }
+        if (reln == ROOT) { //it's the root and we add it
+            IndexedWord depVertex = new IndexedWord(docID, sentIndex, dep.index(), depLabel);
+            depVertex.setTag(dep.highestNodeWithSameHead().headTagNode().value());
+            if (lemmatize) {
+                depVertex.setLemma(morphology.lemma(depVertex.value(), depVertex.tag(), true));
+            }
 
-      else { //it's the root and we add it
-        IndexedWord depVertex = new IndexedWord(docID, sentIndex, dep.index(), depLabel);
-        depVertex.setTag(dep.highestNodeWithSameHead().headTagNode().value());
-        if (lemmatize) {
-          depVertex.setLemma(morphology.lemma(depVertex.value(), depVertex.tag(), true));
+            roots.add(depVertex);
+        } else { // the root relation only points to the root: the governor is a fake node that we don't want to add in the graph
+            IndexedWord govVertex = new IndexedWord(docID, sentIndex, gov.index(), govLabel);
+            govVertex.setTag(gov.highestNodeWithSameHead().headTagNode().value());
+            IndexedWord depVertex = new IndexedWord(docID, sentIndex, dep.index(), depLabel);
+            depVertex.setTag(dep.highestNodeWithSameHead().headTagNode().value());
+            if (lemmatize) {
+                govVertex.setLemma(morphology.lemma(govVertex.value(), govVertex.tag(), true));
+                depVertex.setLemma(morphology.lemma(depVertex.value(), depVertex.tag(), true));
+            }
+            addVertex(govVertex);
+            addVertex(depVertex);
+            addEdge(govVertex, depVertex, reln, Double.NEGATIVE_INFINITY, d.extra());
         }
-
-        roots.add(depVertex);
-      }
     }
 
     // there used to be an if clause that filtered out the case of empty
@@ -1812,32 +1809,32 @@ public class SemanticGraph implements Serializable {
 
     private void readDep(IndexedWord gov, String reln) {
       readWhiteSpace();
-      if (!isLeftBracket(peek())) { // it's a leaf
-        String label = readName();
-        IndexedWord dep = makeVertex(label);
-        sg.addVertex(dep);
-        if (gov == null)
-          sg.roots.add(dep);
-        sg.addEdge(gov, dep, GrammaticalRelation.valueOf(reln), Double.NEGATIVE_INFINITY, false);
-      } else {
-        readLeftBracket();
-        String label = readName();
-        IndexedWord dep = makeVertex(label);
-        sg.addVertex(dep);
-        if (gov == null)
-          sg.roots.add(dep);
-        if (gov != null && reln != null) {
-          sg.addEdge(gov, dep, GrammaticalRelation.valueOf(reln), Double.NEGATIVE_INFINITY, false);
+        if (isLeftBracket(peek())) {
+            readLeftBracket();
+            String label = readName();
+            IndexedWord dep = makeVertex(label);
+            sg.addVertex(dep);
+            if (gov == null)
+                sg.roots.add(dep);
+            if (gov != null && reln != null) {
+                sg.addEdge(gov, dep, GrammaticalRelation.valueOf(reln), Double.NEGATIVE_INFINITY, false);
+            }
+            readWhiteSpace();
+            while (!isRightBracket(peek()) && !isEOF) {
+                reln = readName();
+                readColon();
+                readDep(dep, reln);
+                readWhiteSpace();
+            }
+            readRightBracket();
+        } else { // it's a leaf
+            String label = readName();
+            IndexedWord dep = makeVertex(label);
+            sg.addVertex(dep);
+            if (gov == null)
+                sg.roots.add(dep);
+            sg.addEdge(gov, dep, GrammaticalRelation.valueOf(reln), Double.NEGATIVE_INFINITY, false);
         }
-        readWhiteSpace();
-        while (!isRightBracket(peek()) && !isEOF) {
-          reln = readName();
-          readColon();
-          readDep(dep, reln);
-          readWhiteSpace();
-        }
-        readRightBracket();
-      }
     }
 
     private IndexedWord makeVertex(String word) {
@@ -1868,13 +1865,13 @@ public class SemanticGraph implements Serializable {
 
     private static Pair<String, Integer> readWordAndIndex(String word) {
       Matcher matcher = WORD_AND_INDEX_PATTERN.matcher(word);
-      if (!matcher.matches()) {
-        return null;
-      } else {
-        word = matcher.group(1);
-        Integer index = Integer.valueOf(matcher.group(2));
-        return new Pair<>(word, index);
-      }
+        if (matcher.matches()) {
+            word = matcher.group(1);
+            Integer index = Integer.valueOf(matcher.group(2));
+            return new Pair<>(word, index);
+        } else {
+            return null;
+        }
     }
 
     private Integer getNextFreeIndex() {

@@ -2485,7 +2485,7 @@ public class Counters {
       @Override
       @SuppressWarnings("unchecked")
       public boolean equals(Object o) {
-          return this == o || (!(o instanceof Counter) ? false : Counters.equals(this, (Counter<E>) o));
+          return this == o || (o instanceof Counter && Counters.equals(this, (Counter<E>) o));
       }
 
       @Override

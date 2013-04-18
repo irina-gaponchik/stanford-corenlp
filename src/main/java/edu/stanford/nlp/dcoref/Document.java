@@ -489,11 +489,12 @@ public class Document implements Serializable {
           insideQuotation = true;
           maxUtter++;
           continue;
-        } else if(w.equals("''")
-            || insideQuotation && normalQuotationType && w.equals("\"")) {
-          insideQuotation = false;
         }
-        if(insideQuotation) {
+          if(w.equals("''")
+              || insideQuotation && normalQuotationType && w.equals("\"")) {
+            insideQuotation = false;
+          }
+          if(insideQuotation) {
           l.set(CoreAnnotations.UtteranceAnnotation.class, maxUtter);
         }
         if(noSpeakerInfo){
@@ -644,33 +645,33 @@ public class Document implements Serializable {
   private String findParagraphSpeaker(List<CoreMap> paragraph,
       int paragraphUtterIndex, String nextParagraphSpeaker, int paragraphOffset, Dictionaries dict) {
     if(!speakers.containsKey(paragraphUtterIndex)) {
-      if(!nextParagraphSpeaker.isEmpty()) {
-        speakers.put(paragraphUtterIndex, nextParagraphSpeaker);
-      } else {  // find the speaker of this paragraph (John, nbc news)
-        CoreMap lastSent = paragraph.get(paragraph.size()-1);
-        String speaker = "";
-        boolean hasVerb = false;
-        for(int i = 0 ; i < lastSent.get(CoreAnnotations.TokensAnnotation.class).size() ; i++){
-          CoreLabel w = lastSent.get(CoreAnnotations.TokensAnnotation.class).get(i);
-          String pos = w.get(CoreAnnotations.PartOfSpeechAnnotation.class);
-          String ner = w.get(CoreAnnotations.NamedEntityTagAnnotation.class);
-          if(!pos.isEmpty() && pos.charAt(0) == 'V') {
-            hasVerb = true;
-            break;
-          }
-          if(ner.startsWith("PER")) {
-            IntTuple headPosition = new IntTuple(2);
-            headPosition.set(0, paragraph.size()-1 + paragraphOffset);
-            headPosition.set(1, i);
-            if(mentionheadPositions.containsKey(headPosition)) {
-              speaker = Integer.toString(mentionheadPositions.get(headPosition).mentionID);
+        if (nextParagraphSpeaker.isEmpty()) {  // find the speaker of this paragraph (John, nbc news)
+            CoreMap lastSent = paragraph.get(paragraph.size() - 1);
+            String speaker = "";
+            boolean hasVerb = false;
+            for (int i = 0; i < lastSent.get(CoreAnnotations.TokensAnnotation.class).size(); i++) {
+                CoreLabel w = lastSent.get(CoreAnnotations.TokensAnnotation.class).get(i);
+                String pos = w.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+                String ner = w.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+                if (!pos.isEmpty() && pos.charAt(0) == 'V') {
+                    hasVerb = true;
+                    break;
+                }
+                if (ner.startsWith("PER")) {
+                    IntTuple headPosition = new IntTuple(2);
+                    headPosition.set(0, paragraph.size() - 1 + paragraphOffset);
+                    headPosition.set(1, i);
+                    if (mentionheadPositions.containsKey(headPosition)) {
+                        speaker = Integer.toString(mentionheadPositions.get(headPosition).mentionID);
+                    }
+                }
             }
-          }
+            if (!hasVerb && !speaker.isEmpty()) {
+                speakers.put(paragraphUtterIndex, speaker);
+            }
+        } else {
+            speakers.put(paragraphUtterIndex, nextParagraphSpeaker);
         }
-        if(!hasVerb && !speaker.isEmpty()) {
-          speakers.put(paragraphUtterIndex, speaker);
-        }
-      }
     }
     return findNextParagraphSpeaker(paragraph, paragraphOffset, dict);
   }

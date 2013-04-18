@@ -160,15 +160,15 @@ public class WordLemmaTag implements Label, Comparable<WordLemmaTag>, HasWord, H
     int first = labelStr.indexOf(divider);
     int second = labelStr.lastIndexOf(divider);
     if (first == second) {
-      setWord(labelStr.substring(0, first));
+        word = labelStr.substring(0, first);
         tag = labelStr.substring(first + 1);
         lemma = Morphology.stemStatic(labelStr.substring(0, first), labelStr.substring(first + 1)).word();
     } else if (first >= 0) {
-      setWord(labelStr.substring(0, first));
+        word = labelStr.substring(0, first);
         lemma = labelStr.substring(first + 1, second);
         tag = labelStr.substring(second + 1);
     } else {
-      setWord(labelStr);
+        word = labelStr;
         lemma = null;
         tag = null;
     }

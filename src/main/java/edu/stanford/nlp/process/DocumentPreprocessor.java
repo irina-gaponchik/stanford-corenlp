@@ -288,11 +288,11 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
         // was a whitespace token such as \n.  We might as well keep
         // going as if we had never seen anything.
         if (seenBoundary && delimFollowers.isEmpty()) {
-          if (!nextSent.isEmpty()) {
-            break;
-          } else {
-            seenBoundary = false;
-          }
+            if (nextSent.isEmpty()) {
+                seenBoundary = false;
+            } else {
+                break;
+            }
         }
       }
 

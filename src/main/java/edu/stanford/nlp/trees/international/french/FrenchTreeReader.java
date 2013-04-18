@@ -137,10 +137,10 @@ public class FrenchTreeReader implements TreeReader {
 
     if(!attrPOS.equals(""))
       return attrPOS;
-    else if(!attrPOSMWE.equals(""))
-      return attrPOSMWE;
+      if(!attrPOSMWE.equals(""))
+        return attrPOSMWE;
 
-    return MISSING_POS;
+      return MISSING_POS;
   }
 
   /**

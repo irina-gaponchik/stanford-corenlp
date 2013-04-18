@@ -178,7 +178,7 @@ public class TreePrint {
     treeDependencies = propertyToBoolean(this.options, "treeDependencies");
 
     // if no option format for the dependencies is specified, CCPropagated is the default
-      CCPropagatedDependencies = !basicDependencies && !collapsedDependencies && !nonCollapsedDependencies && !nonCollapsedDependenciesSeparated && !treeDependencies ? true : propertyToBoolean(this.options, "CCPropagatedDependencies");
+      CCPropagatedDependencies = !basicDependencies && !collapsedDependencies && !nonCollapsedDependencies && !nonCollapsedDependenciesSeparated && !treeDependencies || propertyToBoolean(this.options, "CCPropagatedDependencies");
   }
 
 

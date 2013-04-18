@@ -177,35 +177,35 @@ public class BisequenceEmpiricalNERPrior<IN extends CoreMap> {
     List<Entity> entityList = new ArrayList<>();
 
     for (int i = 0; i < sequence.length; i++) {
-      if (sequence[i] != backgroundSymbolIndex) {
-        rawTag = classIndex.get(sequence[i]);
-        parts = COMPILE2.split(rawTag);
-        if (parts[0].equals("B")) { // B-
-          if (!currWords.isEmpty()) {
-            entityList.add(new Entity(i-currWords.size(), currWords, tagIndex.indexOf(currTag)));
-            currWords.clear();
-          }
-          currWords.add(wordDoc.get(i));
-          currTag = parts[1];
-        } else { // I-
-          if (!currWords.isEmpty() && parts[1].equals(currTag)) { // matches proceeding tag
-            currWords.add(wordDoc.get(i));
-          } else { // orphan I- without proceeding B- or mismatch previous tag
+        if (sequence[i] == backgroundSymbolIndex) {
             if (!currWords.isEmpty()) {
-              entityList.add(new Entity(i-currWords.size(), currWords, tagIndex.indexOf(currTag)));
-              currWords.clear();
+                entityList.add(new Entity(i - currWords.size(), currWords, tagIndex.indexOf(currTag)));
+                currWords.clear();
+                currTag = "";
             }
-            currWords.add(wordDoc.get(i));
-            currTag = parts[1];
-          }
+        } else {
+            rawTag = classIndex.get(sequence[i]);
+            parts = COMPILE2.split(rawTag);
+            if (parts[0].equals("B")) { // B-
+                if (!currWords.isEmpty()) {
+                    entityList.add(new Entity(i - currWords.size(), currWords, tagIndex.indexOf(currTag)));
+                    currWords.clear();
+                }
+                currWords.add(wordDoc.get(i));
+                currTag = parts[1];
+            } else { // I-
+                if (!currWords.isEmpty() && parts[1].equals(currTag)) { // matches proceeding tag
+                    currWords.add(wordDoc.get(i));
+                } else { // orphan I- without proceeding B- or mismatch previous tag
+                    if (!currWords.isEmpty()) {
+                        entityList.add(new Entity(i - currWords.size(), currWords, tagIndex.indexOf(currTag)));
+                        currWords.clear();
+                    }
+                    currWords.add(wordDoc.get(i));
+                    currTag = parts[1];
+                }
+            }
         }
-      } else {
-        if (!currWords.isEmpty()) {
-          entityList.add(new Entity(i-currWords.size(), currWords, tagIndex.indexOf(currTag)));
-          currWords.clear();
-          currTag = "";
-        }
-      }
     }
     if (!currWords.isEmpty()) {
       entityList.add(new Entity(sequence.length-currWords.size(), currWords, tagIndex.indexOf(currTag)));

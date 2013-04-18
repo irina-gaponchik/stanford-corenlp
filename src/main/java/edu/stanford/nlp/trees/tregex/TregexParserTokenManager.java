@@ -565,11 +565,11 @@ public Token getNextToken()
         if (jjmatchedKind != 0x7fffffff) {
             if (jjmatchedPos + 1 < curPos)
                 input_stream.backup(curPos - jjmatchedPos - 1);
-            if ((jjtoToken[jjmatchedKind >> 6] & 1L << (jjmatchedKind & 077)) != 0L) {
+            if ((jjtoToken[jjmatchedKind >> 6] & 1L << (jjmatchedKind & 077)) == 0L) {
+                continue;
+            } else {
                 matchedToken = jjFillToken();
                 return matchedToken;
-            } else {
-                continue;
             }
         }
         int error_line = input_stream.getEndLine();

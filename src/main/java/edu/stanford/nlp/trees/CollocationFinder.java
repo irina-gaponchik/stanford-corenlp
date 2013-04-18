@@ -221,11 +221,8 @@ public class CollocationFinder {
         testString.append(treeAsStemmedCollocation(sisterNode, threadSafe));
         testStringNonStemmed.append(treeAsNonStemmedCollocation(sisterNode));
         currWindowLength+=sisterNode.yield().size();
-        if (DEBUG) {
-       //   err.println("Testing string w/ reported indices:" + testString.toString()
-         //             + " (" +(leftMostLeaf+leftSistersBuffer)+","+(leftMostLeaf+leftSistersBuffer+currWindowLength-1)+")");
-        }
-        //ignore collocations beginning with "the" or "a"
+
+          //ignore collocations beginning with "the" or "a"
         if (StringUtils.lookingAt(testString.toString(), "(?:[Tt]he|THE|[Aa][Nn]?)[ _]")) {
           if (false) {
             err.println("CollocationFinder: Not collapsing the/a word: " +

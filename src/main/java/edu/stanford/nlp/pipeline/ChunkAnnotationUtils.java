@@ -366,30 +366,28 @@ public class ChunkAnnotationUtils {
         }
         // offsetBegin is now >= sentence begin and < sentence end
         // Check if sentence end includes chunk
-        if (sentence.get(CoreAnnotations.CharacterOffsetEndAnnotation.class) >= offsetEnd) {
-          // success!  sentence contains chunk
-        } else {
-          // hmm, sentence contains beginning of chunk, but not end
-          // Lets find sentence that contains end of chunk and merge sentences
-          int startSentIndex = i;
-          while (offsetEnd > sentence.get(CoreAnnotations.CharacterOffsetEndAnnotation.class)) {
-            i++;
-            if (i >= sentences.size()) { return false; }
+          if (sentence.get(CoreAnnotations.CharacterOffsetEndAnnotation.class) < offsetEnd) {
+            // hmm, sentence contains beginning of chunk, but not end
+            // Lets find sentence that contains end of chunk and merge sentences
+            int startSentIndex = i;
+            while (offsetEnd > sentence.get(CoreAnnotations.CharacterOffsetEndAnnotation.class)) {
+              i++;
+              if (i >= sentences.size()) { return false; }
+              sentence = sentences.get(i);
+            }
+            Integer firstNonWsCharOffset = getFirstNonWsCharOffset(sentence, false);
+            if (firstNonWsCharOffset != null && firstNonWsCharOffset >= offsetEnd) {
+              // Ends before first real character of this sentence, don't include this sentence
+              i--;
+              sentence = sentences.get(i);
+            }
+            // Okay, now let's merge sentences from startSendIndex to i (includes i)
+            mergeChunks(sentences, text, startSentIndex, i+1);
+            // Reset our iterating index i to startSentIndex
+            i = startSentIndex;
             sentence = sentences.get(i);
           }
-          Integer firstNonWsCharOffset = getFirstNonWsCharOffset(sentence, false);
-          if (firstNonWsCharOffset != null && firstNonWsCharOffset >= offsetEnd) {
-            // Ends before first real character of this sentence, don't include this sentence
-            i--;
-            sentence = sentences.get(i);
-          }
-          // Okay, now let's merge sentences from startSendIndex to i (includes i)
-          mergeChunks(sentences, text, startSentIndex, i+1);
-          // Reset our iterating index i to startSentIndex
-          i = startSentIndex;
-          sentence = sentences.get(i);
-        }
-        if (extendedFixSentence) {
+          if (extendedFixSentence) {
           //System.err.println("Doing extended fixing of sentence:" + text.substring(offsetBegin,offsetEnd));
           if (i+1 < sentences.size()) {
             // Extended sentence fixing:

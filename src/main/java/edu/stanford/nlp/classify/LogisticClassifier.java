@@ -324,19 +324,19 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, RVFClassifier
     }
 
     Minimizer<DiffFunction> minim;
-    if (!biased) {
-      LogisticObjectiveFunction lof = null;
-      if(data instanceof Dataset<?,?>)
-        lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getLabelsArray(), prior);
-      else if(data instanceof RVFDataset<?,?>)
-        lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getValuesArray(), data.getLabelsArray(), prior);
-        minim = l1reg > 0.0 ? ReflectionLoading.<Minimizer<DiffFunction>>loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg) : new QNMinimizer(lof);
-      weights = minim.minimize(lof, tol, new double[data.numFeatureTypes()]);
-    } else {
-      BiasedLogisticObjectiveFunction lof = new BiasedLogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getLabelsArray(), prior);
-        minim = l1reg > 0.0 ? ReflectionLoading.<Minimizer<DiffFunction>>loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg) : new QNMinimizer(lof);
-      weights = minim.minimize(lof, tol, new double[data.numFeatureTypes()]);
-    }
+      if (biased) {
+          BiasedLogisticObjectiveFunction lof = new BiasedLogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getLabelsArray(), prior);
+          minim = l1reg > 0.0 ? ReflectionLoading.<Minimizer<DiffFunction>>loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg) : new QNMinimizer(lof);
+          weights = minim.minimize(lof, tol, new double[data.numFeatureTypes()]);
+      } else {
+          LogisticObjectiveFunction lof = null;
+          if (data instanceof Dataset<?, ?>)
+              lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getLabelsArray(), prior);
+          else if (data instanceof RVFDataset<?, ?>)
+              lof = new LogisticObjectiveFunction(data.numFeatureTypes(), data.getDataArray(), data.getValuesArray(), data.getLabelsArray(), prior);
+          minim = l1reg > 0.0 ? ReflectionLoading.<Minimizer<DiffFunction>>loadByReflection("edu.stanford.nlp.optimization.OWLQNMinimizer", l1reg) : new QNMinimizer(lof);
+          weights = minim.minimize(lof, tol, new double[data.numFeatureTypes()]);
+      }
 
     featureIndex = data.featureIndex;
     classes[0] = data.labelIndex.get(0);

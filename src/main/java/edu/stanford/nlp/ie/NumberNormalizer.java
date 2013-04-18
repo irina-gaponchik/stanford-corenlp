@@ -488,9 +488,7 @@ public class NumberNormalizer {
               case "and":
                   // Check if number before and was unit
                   String prevWord = prev.word();
-                  if (lastUnitPos == i - 1 || lastUnitPos == i - 2 && ",".equals(prevWord)) {
-                      // Okay
-                  } else {
+                  if (lastUnitPos != i - 1 && (lastUnitPos != i - 2 || !",".equals(prevWord))) {
                       // Two separate numbers
                       if (numStart < possibleNumEnd) {
                           numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, possibleNumEnd));
@@ -512,11 +510,7 @@ public class NumberNormalizer {
                   String numType = token.get(CoreAnnotations.NumericTypeAnnotation.class);
                   if ("UNIT".equals(numType)) {
                       // Compare this unit with previous
-                      if (lastUnit == null || lastUnit.longValue() > num.longValue()) {
-                          // lastUnit larger than this unit
-                          // maybe four thousand two hundred?
-                          // OKAY, probably one big number
-                      } else {
+                      if (lastUnit != null && lastUnit.longValue() <= num.longValue()) {
                           if (numStart < possibleNumEnd) {
                               // Units are increasing - check if this unit is >= unit before "," (if so, need to split into chunks)
                               // Not one big number  ( had a comma )
@@ -526,81 +520,72 @@ public class NumberNormalizer {
                                   possibleNumEnd = -1;
                                   possibleNumEndUnit = null;
                               }
-                          } else {
-                              // unit is increasing - can be okay, maybe five hundred thousand?
-                              // what about four hundred five thousand
-                              // unit might also be the same, as in thousand thousand,
-                              // which we convert to million
                           }
                       }
                       lastUnit = num;
                       lastUnitPos = i;
                   } else {
                       // Normal number
-                      if (num == null) {
+                      if (num != null) {
+                          if (prevNum != null) {
+                              if (num.doubleValue() > 0) {
+                                  if (num.doubleValue() < 10) {
+                                      // This number is a digit
+                                      // Treat following as two separate numbers
+                                      //    \d+ [0-9]
+                                      //    [one to nine]  [0-9]
+                                      if (NumberNormalizer.numPattern.matcher(prev.word()).matches() ||
+                                              prevNum.longValue() < 10 || prevNum.longValue() % 10 != 0) {
+                                          // two separate numbers
+                                          if (numStart < i) {
+                                              numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, i));
+                                          }
+                                          numStart = i;
+                                          possibleNumEnd = -1;
+                                          possibleNumEndUnit = null;
+                                          lastUnit = null;
+                                          lastUnitPos = -1;
+                                      }
+                                  } else {
+                                      String prevNumType = prev.get(CoreAnnotations.NumericTypeAnnotation.class);
+                                      if ("UNIT".equals(prevNumType)) {
+                                          // OKAY
+                                      } else if (!ordinalUnitPattern.matcher(w).matches()) {
+                                          // Start of new number
+                                          if (numStart < i) {
+                                              numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, i));
+                                          }
+                                          numStart = i;
+                                          possibleNumEnd = -1;
+                                          possibleNumEndUnit = null;
+                                          lastUnit = null;
+                                          lastUnitPos = -1;
+                                      }
+                                  }
+                              }
+                          }
+                          if ("ORDINAL".equals(numType)) {
+                              if (possibleNumEnd >= 0) {
+                                  if (numStart < possibleNumEnd) {
+                                      numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, possibleNumEnd));
+                                  }
+                                  numbers.add(possibleNumStart <= possibleNumEnd ? ChunkAnnotationUtils.getAnnotatedChunk(annotation, possibleNumEnd + 1, i + 1) : ChunkAnnotationUtils.getAnnotatedChunk(annotation, possibleNumStart, i + 1));
+                              } else {
+                                  if (numStart < i + 1) {
+                                      numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, i + 1));
+                                  }
+                              }
+                              numStart = i + 1;
+                              possibleNumEnd = -1;
+                              possibleNumEndUnit = null;
+                              lastUnit = null;
+                              lastUnitPos = -1;
+                          }
+                          if (possibleNumStart < possibleNumEnd) {
+                              possibleNumStart = i;
+                          }
+                      } else {
                           logger.warning("NO NUMBER: " + token.word());
-                          continue;
-                      }
-                      if (prevNum != null) {
-                          if (num.doubleValue() > 0) {
-                              if (num.doubleValue() < 10) {
-                                  // This number is a digit
-                                  // Treat following as two separate numbers
-                                  //    \d+ [0-9]
-                                  //    [one to nine]  [0-9]
-                                  if (NumberNormalizer.numPattern.matcher(prev.word()).matches() ||
-                                          prevNum.longValue() < 10 || prevNum.longValue() % 10 != 0) {
-                                      // two separate numbers
-                                      if (numStart < i) {
-                                          numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, i));
-                                      }
-                                      numStart = i;
-                                      possibleNumEnd = -1;
-                                      possibleNumEndUnit = null;
-                                      lastUnit = null;
-                                      lastUnitPos = -1;
-                                  }
-                              } else {
-                                  String prevNumType = prev.get(CoreAnnotations.NumericTypeAnnotation.class);
-                                  if ("UNIT".equals(prevNumType)) {
-                                      // OKAY
-                                  } else if (!ordinalUnitPattern.matcher(w).matches()) {
-                                      // Start of new number
-                                      if (numStart < i) {
-                                          numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, i));
-                                      }
-                                      numStart = i;
-                                      possibleNumEnd = -1;
-                                      possibleNumEndUnit = null;
-                                      lastUnit = null;
-                                      lastUnitPos = -1;
-                                  }
-                              }
-                          }
-                      }
-                      if ("ORDINAL".equals(numType)) {
-                          if (possibleNumEnd >= 0) {
-                              if (numStart < possibleNumEnd) {
-                                  numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, possibleNumEnd));
-                              }
-                              if (possibleNumStart > possibleNumEnd) {
-                                  numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, possibleNumStart, i + 1));
-                              } else {
-                                  numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, possibleNumEnd + 1, i + 1));
-                              }
-                          } else {
-                              if (numStart < i + 1) {
-                                  numbers.add(ChunkAnnotationUtils.getAnnotatedChunk(annotation, numStart, i + 1));
-                              }
-                          }
-                          numStart = i + 1;
-                          possibleNumEnd = -1;
-                          possibleNumEndUnit = null;
-                          lastUnit = null;
-                          lastUnitPos = -1;
-                      }
-                      if (possibleNumStart < possibleNumEnd) {
-                          possibleNumStart = i;
                       }
                   }
                   break;

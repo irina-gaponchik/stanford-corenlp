@@ -140,8 +140,8 @@ public class SemanticGraphEdge
 
     if (relation != null) {
       boolean retFlag = relation.equals(semanticGraphEdge.relation);
-      boolean govMatch = getGovernor().equals(semanticGraphEdge.getGovernor());
-      boolean depMatch = getDependent().equals(semanticGraphEdge.getDependent());
+      boolean govMatch = source.equals(semanticGraphEdge.source);
+      boolean depMatch = target.equals(semanticGraphEdge.target);
       boolean matched = retFlag && govMatch && depMatch;
       return matched;
     }

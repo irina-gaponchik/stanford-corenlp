@@ -149,33 +149,33 @@ class CoordinationPattern extends TregexPattern {
             children[currChild] = myNode.children.get(currChild).matcher(root, tree, nodesToParents, namesToNodes, variableStrings);
             children[currChild].resetChildIter(tree);
           }
-          if (myNode.isNegated() != children[currChild].matches()) {
-            // This node is set correctly.  Move on to the next node
-            ++currChild;
+            if (myNode.isNegated() == children[currChild].matches()) {
+                // oops, this didn't work.
+                children[currChild].resetChildIter();
+                // go backwards to see if we can continue matching from an
+                // earlier location.
+                // TODO: perhaps there should be a version where we only
+                // care about new assignments to the root, or new
+                // assigments to the root and variables, in which case we
+                // could make use of getChangesVariables() to optimize how
+                // many nodes we can skip past
+                --currChild;
+                if (currChild < 0) {
+                    return myNode.isOptional();
+                }
+            } else {
+                // This node is set correctly.  Move on to the next node
+                ++currChild;
 
-            if (currChild == children.length) {
-              // yay, all nodes matched.
-              if (myNode.isNegated()) {
-                // a negated node should only match once (before being reset)
-                currChild = -1;
-              }
-              return true;
+                if (currChild == children.length) {
+                    // yay, all nodes matched.
+                    if (myNode.isNegated()) {
+                        // a negated node should only match once (before being reset)
+                        currChild = -1;
+                    }
+                    return true;
+                }
             }
-          } else {
-            // oops, this didn't work.
-            children[currChild].resetChildIter();
-            // go backwards to see if we can continue matching from an
-            // earlier location.
-            // TODO: perhaps there should be a version where we only
-            // care about new assignments to the root, or new
-            // assigments to the root and variables, in which case we
-            // could make use of getChangesVariables() to optimize how
-            // many nodes we can skip past
-            --currChild;
-            if (currChild < 0) {
-              return myNode.isOptional();
-            }
-          }
         }
       } else { 
         // these are the cases where a single child node can make you match

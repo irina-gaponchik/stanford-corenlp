@@ -274,18 +274,18 @@ public class MultiClassPrecisionRecallExtendedStats<L> extends MultiClassPrecisi
     clearCounts();
     while ((line = br.readLine()) != null) {
       line = line.trim();
-      if (!line.isEmpty()) {
-        String[] fields = delimPattern.split(line);
-        if (boundary != null && boundary.equals(fields[TOKEN_INDEX])) {
-          markBoundary();
+        if (line.isEmpty()) {
+            markBoundary();
         } else {
-          L answer = stringConverter.apply(fields[ANSWER_INDEX]);
-          L guess = stringConverter.apply(fields[GUESS_INDEX]);
-          addGuess(guess, answer);
+            String[] fields = delimPattern.split(line);
+            if (boundary != null && boundary.equals(fields[TOKEN_INDEX])) {
+                markBoundary();
+            } else {
+                L answer = stringConverter.apply(fields[ANSWER_INDEX]);
+                L guess = stringConverter.apply(fields[GUESS_INDEX]);
+                addGuess(guess, answer);
+            }
         }
-      } else {
-        markBoundary();
-      }
     }
     finalizeCounts();
     return getFMeasure();

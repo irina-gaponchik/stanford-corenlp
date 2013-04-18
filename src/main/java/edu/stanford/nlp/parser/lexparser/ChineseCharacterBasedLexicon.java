@@ -496,13 +496,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
 
       Symbol symbol = (Symbol) o;
 
-      if (ch != symbol.ch) {
-        return false;
-      }
-      if (type != symbol.type) {
-        return false;
-      }
-        return !(unkClass != null ? !unkClass.equals(symbol.unkClass) : symbol.unkClass != null);
+        return ch == symbol.ch && type == symbol.type && !(unkClass != null ? !unkClass.equals(symbol.unkClass) : symbol.unkClass != null);
 
     }
 

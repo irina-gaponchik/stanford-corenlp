@@ -313,29 +313,25 @@ public class ChineseLexiconAndWordSegmenter implements Lexicon, WordSegmenter {
   }
 
   public static ChineseLexiconAndWordSegmenter getSegmenterDataFromFile(String parserFileOrUrl, Options op) {
-    ChineseLexiconAndWordSegmenter cs = getSegmenterDataFromSerializedFile(parserFileOrUrl);
-    if (cs == null) {
-//      pd = getSegmenterDataFromTextFile(parserFileOrUrl, op);
-    }
-    return cs;
+      return getSegmenterDataFromSerializedFile(parserFileOrUrl);
   }
 
   protected static ChineseLexiconAndWordSegmenter getSegmenterDataFromSerializedFile(String serializedFileOrUrl) {
-    ChineseLexiconAndWordSegmenter cs = null;
-    try {
+      try {
       System.err.print("Loading segmenter from serialized file " + serializedFileOrUrl + " ...");
-      ObjectInputStream in;
       InputStream is;
       if (serializedFileOrUrl.startsWith("http://")) {
         URL u = new URL(serializedFileOrUrl);
         URLConnection uc = u.openConnection();
         is = uc.getInputStream();
       } else {
-        is = new FileInputStream(serializedFileOrUrl);
+          is = new FileInputStream(serializedFileOrUrl);
       }
-        in = serializedFileOrUrl.endsWith(".gz") ? new ObjectInputStream(new BufferedInputStream(new GZIPInputStream(is))) : new ObjectInputStream(new BufferedInputStream(is));
-      cs = (ChineseLexiconAndWordSegmenter) in.readObject();
-      in.close();
+      ChineseLexiconAndWordSegmenter cs;
+      try (ObjectInputStream in = new ObjectInputStream(serializedFileOrUrl.endsWith(".gz") ? new BufferedInputStream(new GZIPInputStream(is)) : new BufferedInputStream(is))) {
+          cs = (ChineseLexiconAndWordSegmenter) in.readObject();
+      }
+
       System.err.println(" done.");
       return cs;
     } catch (InvalidClassException | FileNotFoundException ice) {
@@ -369,8 +365,7 @@ public class ChineseLexiconAndWordSegmenter implements Lexicon, WordSegmenter {
     String textOutputFileOrUrl = null;
     String treebankPath = null;
     Treebank testTreebank = null;
-    Treebank tuneTreebank = null;
-    String testPath = null;
+      String testPath = null;
     FileFilter testFilter = null;
     FileFilter trainFilter = null;
     String encoding = null;
@@ -512,18 +507,14 @@ public class ChineseLexiconAndWordSegmenter implements Lexicon, WordSegmenter {
       Index<String> wordIndex = new HashIndex<>();
       Index<String> tagIndex = new HashIndex<>();
       cs = new ChineseLexiconAndWordSegmenter(trainTreebank, op, wordIndex, tagIndex);
-    } else if (textInputFileOrUrl != null) {
-      // so we load the segmenter from a text grammar file
-      // XXXXX fix later -pichuan
-      //cs = new LexicalizedParser(textInputFileOrUrl, true, op);
-    } else {
+    } else if (textInputFileOrUrl == null) {
       // so we load a serialized segmenter
-      if (serializedInputFileOrUrl == null) {
-        // the next argument must be the path to the serialized parser
-        serializedInputFileOrUrl = args[argIndex];
-        argIndex++;
-      }
-      try {
+        if (serializedInputFileOrUrl == null) {
+          // the next argument must be the path to the serialized parser
+          serializedInputFileOrUrl = args[argIndex];
+          argIndex++;
+        }
+        try {
         cs = new ChineseLexiconAndWordSegmenter(serializedInputFileOrUrl, op);
       } catch (IllegalArgumentException e) {
         System.err.println("Error loading segmenter, exiting...");
@@ -531,7 +522,7 @@ public class ChineseLexiconAndWordSegmenter implements Lexicon, WordSegmenter {
       }
     }
 
-    // the following has to go after reading parser to make sure
+      // the following has to go after reading parser to make sure
     // op and tlpParams are the same for train and test
     TreePrint treePrint = op.testOptions.treePrint(tlpParams);
 
@@ -588,10 +579,8 @@ public class ChineseLexiconAndWordSegmenter implements Lexicon, WordSegmenter {
       }
     }
     /* --------------------- Testing part!!!! ----------------------- */
-    if (op.testOptions.verbose) {
-//      printOptions(false, op);
-    }
-    if (testTreebank != null || argIndex < args.length && args[argIndex].equalsIgnoreCase("-treebank")) {
+
+      if (testTreebank != null || argIndex < args.length && args[argIndex].equalsIgnoreCase("-treebank")) {
       // test parser on treebank
       if (testTreebank == null) {
         // the next argument is the treebank path and range for testing

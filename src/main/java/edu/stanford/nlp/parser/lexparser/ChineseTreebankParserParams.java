@@ -1155,9 +1155,8 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
               ChineseSimWordAvgDepGrammar dg = new ChineseSimWordAvgDepGrammar(tlpParams, directional, useDistance, useCoarseDistance, op.trainOptions.basicCategoryTagsInDependencyGrammar, op, wordIndex, tagIndex);
               if (lex == null) {
                   throw new RuntimeException("Attempt to create ChineseSimWordAvgDepGrammar before Lexicon!!!");
-              } else {
-                  dg.setLex(lex);
               }
+              dg.setLex(lex);
               for (IntDependency dependency : dependencyCounter.keySet()) {
                   dg.addRule(dependency, dependencyCounter.getCount(dependency));
               }

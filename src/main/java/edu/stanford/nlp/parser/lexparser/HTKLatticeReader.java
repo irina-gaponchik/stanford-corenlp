@@ -640,17 +640,19 @@ public class HTKLatticeReader {
     public int compareTo(LatticeWord other) {
       if (startNode < other.startNode) {
         return -1;
-      } else if (startNode > other.startNode) {
-        return 1;
       }
+        if (startNode > other.startNode) {
+          return 1;
+        }
 
-      if (endNode < other.endNode) {
+        if (endNode < other.endNode) {
         return -1;
-      } else if (endNode > other.endNode) {
-        return 1;
       }
+        if (endNode > other.endNode) {
+          return 1;
+        }
 
-      return 0;
+        return 0;
     }
 
   }

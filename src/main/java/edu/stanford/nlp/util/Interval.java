@@ -739,7 +739,7 @@ public class Interval<E extends Comparable<E>> extends Pair<E,E> implements HasI
   public static boolean checkFlagExclusiveSet(int flags, int flag, int mask)
   {
     int f = flags & flag;
-      return f != 0 ? (flags & mask & ~flag) == 0 : false;
+      return f != 0 && (flags & mask & ~flag) == 0;
   }
 
   /**

@@ -117,9 +117,7 @@ public abstract class AbstractDependencyGrammar implements DependencyGrammar {
   }
 
   public short distanceBin(int distance) {
-    if (!useDistance) {
-      return 0;
-    } else return useCoarseDistance ? coarseDistanceBin(distance) : regDistanceBin(distance);
+      return !useDistance ? 0 : useCoarseDistance ? coarseDistanceBin(distance) : regDistanceBin(distance);
   }
 
   public short regDistanceBin(int distance) {

@@ -136,8 +136,6 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
       int index = featureIndex.indexOf(f);
       if (index >= 0) {
         features[i++] = index;
-      } else {
-        //System.err.println("FEATURE LESS THAN ZERO: " + f);
       }
     }
     int[] activeFeatures = new int[i];

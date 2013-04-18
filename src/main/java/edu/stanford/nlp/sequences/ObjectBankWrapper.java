@@ -217,11 +217,11 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
         }
 
         if (!prefix.equals("B")) {
-          if (!label.equals(lastTag)) {
-            wi.set(CoreAnnotations.AnswerAnnotation.class, "B-" + label);
-          } else {
-            wi.set(CoreAnnotations.AnswerAnnotation.class, "I-" + label);
-          }
+            if (label.equals(lastTag)) {
+                wi.set(CoreAnnotations.AnswerAnnotation.class, "I-" + label);
+            } else {
+                wi.set(CoreAnnotations.AnswerAnnotation.class, "B-" + label);
+            }
         }
         lastTag = label;
       } else {

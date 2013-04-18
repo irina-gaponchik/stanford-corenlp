@@ -1743,13 +1743,13 @@ public abstract class GrammaticalStructure extends TreeGraph {
           line = null;
           List<Word> words;
             words = tokenized ? WhitespaceTokenizer.newWordWhitespaceTokenizer(lineReader).tokenize() : PTBTokenizer.newPTBTokenizer(lineReader).tokenize();
-          if (!words.isEmpty()) {
-            // the parser throws an exception if told to parse an empty sentence.
-            Tree parseTree = lp.apply(words);
-            return parseTree;
-          } else {
-            return new SimpleTree();
-          }
+            if (words.isEmpty()) {
+                return new SimpleTree();
+            } else {
+                // the parser throws an exception if told to parse an empty sentence.
+                Tree parseTree = lp.apply(words);
+                return parseTree;
+            }
         }
 
         @Override

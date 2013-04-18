@@ -148,25 +148,26 @@ public class RadicalMap {
       }
       System.out.println("};");
       return;
-    } else if (argMap.containsKey("-infile")) {
-      String[] infileArgs = argMap.get("-infile");
-      if (infileArgs.length == 0) {
-        out.println("usage: RadicalMap -infile file");
-      }
-      String filename = infileArgs[0];
-      BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), encoding));
-      String line;
-      while ((line = in.readLine()) != null) {
-	for (int i = 0; i < line.length(); i++) {
-	  char ch = line.charAt(i);
-	  if ( ! (Character.isWhitespace(ch) || Character.isSpaceChar(ch))) {
-	    out.println(ch + " : " + getRadical(ch));
-	  }
-	}
-      }
     }
+      if (argMap.containsKey("-infile")) {
+        String[] infileArgs = argMap.get("-infile");
+        if (infileArgs.length == 0) {
+          out.println("usage: RadicalMap -infile file");
+        }
+        String filename = infileArgs[0];
+        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(filename), encoding));
+        String line;
+        while ((line = in.readLine()) != null) {
+      for (int i = 0; i < line.length(); i++) {
+        char ch = line.charAt(i);
+        if ( ! (Character.isWhitespace(ch) || Character.isSpaceChar(ch))) {
+          out.println(ch + " : " + getRadical(ch));
+        }
+      }
+        }
+      }
 
-    String[] otherArgs = argMap.get(null);
+      String[] otherArgs = argMap.get(null);
 
     for (String s : otherArgs) {
       char ch = s.charAt(0);

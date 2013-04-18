@@ -257,8 +257,7 @@ public class Rules {
   }
 
   public static boolean entityRelaxedHeadsAgreeBetweenMentions(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention m, Mention ant) {
-    if(m.isPronominal() || ant.isPronominal()) return false;
-      return m.headsAgree(ant);
+      return !(m.isPronominal() || ant.isPronominal()) && m.headsAgree(ant);
   }
 
   public static boolean entityHeadsAgree(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention m, Mention ant, Dictionaries dict) {
@@ -313,9 +312,8 @@ public class Rules {
         || dict.allPronouns.contains(ant.spanToString().toLowerCase())) return false;
     String mentionSpan = mention.removePhraseAfterHead();
     String antSpan = ant.removePhraseAfterHead();
-    if(mentionSpan.isEmpty() || antSpan.isEmpty()) return false;
+      return !(mentionSpan.isEmpty() || antSpan.isEmpty()) && (mentionSpan.equals(antSpan) || mentionSpan.equals(antSpan + " 's") || antSpan.equals(mentionSpan + " 's"));
 
-      return mentionSpan.equals(antSpan) || mentionSpan.equals(antSpan + " 's") || antSpan.equals(mentionSpan + " 's");
   }
 
   /** Check whether two mentions are in i-within-i relation (Chomsky, 1981) */
@@ -501,14 +499,8 @@ public class Rules {
 
   public static boolean entityIsSpeaker(Document document,
       Mention mention, Mention ant, Dictionaries dict) {
-    if(document.speakerPairs.contains(new Pair<>(mention.mentionID, ant.mentionID))) {
-      return true;
-    }
+      return document.speakerPairs.contains(new Pair<>(mention.mentionID, ant.mentionID)) || mentionMatchesSpeakerAnnotation(mention, ant) || mentionMatchesSpeakerAnnotation(ant, mention);
 
-    if(mentionMatchesSpeakerAnnotation(mention, ant)) {
-      return true;
-    }
-      return mentionMatchesSpeakerAnnotation(ant, mention);
   }
 
   public static boolean mentionMatchesSpeakerAnnotation(Mention mention, Mention ant) {
@@ -615,11 +607,7 @@ public class Rules {
   }
 
   public static boolean entitySubjectObject(Mention m1, Mention m2) {
-    if(m1.sentNum != m2.sentNum) return false;
-    if(m1.dependingVerb==null || m2.dependingVerb ==null) return false;
-      return m1.dependingVerb.equals(m2.dependingVerb)
-              && (m1.isSubject && (m2.isDirectObject || m2.isIndirectObject || m2.isPrepositionObject)
-              || m2.isSubject && (m1.isDirectObject || m1.isIndirectObject || m1.isPrepositionObject));
+      return m1.sentNum == m2.sentNum && !(m1.dependingVerb == null || m2.dependingVerb == null) && m1.dependingVerb.equals(m2.dependingVerb) && (m1.isSubject && (m2.isDirectObject || m2.isIndirectObject || m2.isPrepositionObject) || m2.isSubject && (m1.isDirectObject || m1.isIndirectObject || m1.isPrepositionObject));
   }
 
   // Return true if the two mentions are less than n mentions apart in the same sent

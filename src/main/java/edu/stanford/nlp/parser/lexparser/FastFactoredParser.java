@@ -126,18 +126,16 @@ public class FastFactoredParser implements KBestViterbiParser {
     public Tree determineHead(Tree t) {
       if (t.numChildren() == 1) {
         return t.firstChild();
-      } else {
+      }
         String lval = t.firstChild().label().value();
         if (lval != null && !lval.isEmpty() && lval.charAt(0) == '@') {
           return t.firstChild();
-        } else {
-          String rval = t.lastChild().label().value();
-          if (!rval.isEmpty() && rval.charAt(0) == '@' || rval.equals(Lexicon.BOUNDARY_TAG)) {
-            return t.lastChild();
-          }
         }
-      }
-      throw new IllegalStateException("BinaryHeadFinder: unexpected tree: " + t);
+        String rval = t.lastChild().label().value();
+        if (!rval.isEmpty() && rval.charAt(0) == '@' || rval.equals(Lexicon.BOUNDARY_TAG)) {
+          return t.lastChild();
+        }
+        throw new IllegalStateException("BinaryHeadFinder: unexpected tree: " + t);
     }
 
     public Tree determineHead(Tree t, Tree parent){

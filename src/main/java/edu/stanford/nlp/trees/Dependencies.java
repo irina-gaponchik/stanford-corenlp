@@ -131,16 +131,16 @@ public class Dependencies {
         TreeGraphNode childNode = child.dep();
         if (childNode == null) continue;
         Set<List<TypedDependency>> childDepLists = getGovMaxChains(govToDepMap, childNode, depth-1);
-        if (!childDepLists.isEmpty()) {
-          for (List<TypedDependency> childDepList : childDepLists) {
-            List<TypedDependency> depList = new ArrayList<>(childDepList.size() + 1);
-            depList.add(child);
-            depList.addAll(childDepList);
-            depLists.add(depList);
+          if (childDepLists.isEmpty()) {
+              depLists.add(Collections.singletonList(child));
+          } else {
+              for (List<TypedDependency> childDepList : childDepLists) {
+                  List<TypedDependency> depList = new ArrayList<>(childDepList.size() + 1);
+                  depList.add(child);
+                  depList.addAll(childDepList);
+                  depLists.add(depList);
+              }
           }
-        } else {
-          depLists.add(Collections.singletonList(child));
-        }
       }
     }
     return depLists;

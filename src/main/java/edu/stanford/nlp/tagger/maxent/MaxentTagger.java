@@ -1135,27 +1135,27 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       }
 
       // TODO: there is another almost identical block of code elsewhere.  Refactor
-      if (config.getNThreads() != 1) {
-        MulticoreWrapper<List<? extends HasWord>, List<? extends HasWord>> wrapper = new MulticoreWrapper<>(config.getNThreads(), new SentenceTaggingProcessor(tagger, outputLemmas));
-        for (List<? extends HasWord> sentence : sentences) {
-          wrapper.put(sentence);
-          while (wrapper.peek()) {
-            List<? extends HasWord> taggedSentence = wrapper.poll();
-            tagger.outputTaggedSentence(taggedSentence, outputLemmas, outputStyle, outputVerbosity, sentNum++, " ", taggedResults);
-          }
+        if (config.getNThreads() == 1) {
+            for (List<? extends HasWord> sent : sentences) {
+                Morphology morpha = outputLemmas ? new Morphology() : null;
+                sent = tagger.tagCoreLabelsOrHasWords(sent, morpha, outputLemmas);
+                tagger.outputTaggedSentence(sent, outputLemmas, outputStyle, outputVerbosity, sentNum++, " ", taggedResults);
+            }
+        } else {
+            MulticoreWrapper<List<? extends HasWord>, List<? extends HasWord>> wrapper = new MulticoreWrapper<>(config.getNThreads(), new SentenceTaggingProcessor(tagger, outputLemmas));
+            for (List<? extends HasWord> sentence : sentences) {
+                wrapper.put(sentence);
+                while (wrapper.peek()) {
+                    List<? extends HasWord> taggedSentence = wrapper.poll();
+                    tagger.outputTaggedSentence(taggedSentence, outputLemmas, outputStyle, outputVerbosity, sentNum++, " ", taggedResults);
+                }
+            }
+            wrapper.join();
+            while (wrapper.peek()) {
+                List<? extends HasWord> taggedSentence = wrapper.poll();
+                tagger.outputTaggedSentence(taggedSentence, outputLemmas, outputStyle, outputVerbosity, sentNum++, " ", taggedResults);
+            }
         }
-        wrapper.join();
-        while (wrapper.peek()) {
-          List<? extends HasWord> taggedSentence = wrapper.poll();
-          tagger.outputTaggedSentence(taggedSentence, outputLemmas, outputStyle, outputVerbosity, sentNum++, " ", taggedResults);
-        }
-      } else {
-        for (List<? extends HasWord> sent : sentences) {
-          Morphology morpha = outputLemmas ? new Morphology() : null;
-          sent = tagger.tagCoreLabelsOrHasWords(sent, morpha, outputLemmas);
-          tagger.outputTaggedSentence(sent, outputLemmas, outputStyle, outputVerbosity, sentNum++, " ", taggedResults);
-        }
-      }
       return taggedResults.toString();
     }
 
@@ -1387,22 +1387,22 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       boolean stdin = config.useStdin();
       BufferedReader br;
       OutputStyle outputStyle = OutputStyle.fromShortName(config.getOutputFormat());
-      if (!stdin) {
-        String filename = config.getFile();
-        if (formatPattern.matcher(filename).find()) {
-          TaggedFileRecord record = TaggedFileRecord.createRecord(config, filename);
-          runTagger(record.reader(), writer, outputStyle);
-        } else {
-          br = IOUtils.readerFromString(config.getFile(), config.getEncoding());
-          runTagger(br, writer, config.getTagInside(), outputStyle);
-        }
-      } else {
-        System.err.println("Type some text to tag, then EOF.");
-        System.err.println("  (For EOF, use Return, Ctrl-D on Unix; Enter, Ctrl-Z, Enter on Windows.)");
-        br = new BufferedReader(new InputStreamReader(System.in));
+        if (stdin) {
+            System.err.println("Type some text to tag, then EOF.");
+            System.err.println("  (For EOF, use Return, Ctrl-D on Unix; Enter, Ctrl-Z, Enter on Windows.)");
+            br = new BufferedReader(new InputStreamReader(System.in));
 
-        runTaggerStdin(br, writer, outputStyle);
-      }
+            runTaggerStdin(br, writer, outputStyle);
+        } else {
+            String filename = config.getFile();
+            if (formatPattern.matcher(filename).find()) {
+                TaggedFileRecord record = TaggedFileRecord.createRecord(config, filename);
+                runTagger(record.reader(), writer, outputStyle);
+            } else {
+                br = IOUtils.readerFromString(config.getFile(), config.getEncoding());
+                runTagger(br, writer, config.getTagInside(), outputStyle);
+            }
+        }
     } finally {
       if (writer != null) {
         IOUtils.closeIgnoringExceptions(writer);
@@ -1530,35 +1530,35 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
     }
 
 
-    if (config.getNThreads() != 1) {
-      MulticoreWrapper<List<? extends HasWord>, List<? extends HasWord>> wrapper = new MulticoreWrapper<>(config.getNThreads(), new SentenceTaggingProcessor(this, outputLemmas));
-      for (List<X> sentence : document) {
-        wrapper.put(sentence);
-        while (wrapper.peek()) {
-          List<? extends HasWord> taggedSentence = wrapper.poll();
-          numWords += taggedSentence.size();
-          outputTaggedSentence(taggedSentence, outputLemmas, outputStyle, outputVerbosity, numSentences, "\n", writer);
-          numSentences++;
-        }
-      }
-      wrapper.join();
-      while (wrapper.peek()) {
-        List<? extends HasWord> taggedSentence = wrapper.poll();
-        numWords += taggedSentence.size();
-        outputTaggedSentence(taggedSentence, outputLemmas, outputStyle, outputVerbosity, numSentences, "\n", writer);
-        numSentences++;
-      }
-    } else {
-      Morphology morpha = outputLemmas ? new Morphology() : null;
-      for (List<X> sentence : document) {
-        numWords += sentence.size();
+      if (config.getNThreads() == 1) {
+          Morphology morpha = outputLemmas ? new Morphology() : null;
+          for (List<X> sentence : document) {
+              numWords += sentence.size();
 
-        tagAndOutputSentence(sentence, outputLemmas, morpha, outputStyle,
-                             outputVerbosity, numSentences, "\n", writer);
+              tagAndOutputSentence(sentence, outputLemmas, morpha, outputStyle,
+                      outputVerbosity, numSentences, "\n", writer);
 
-        numSentences++;
+              numSentences++;
+          }
+      } else {
+          MulticoreWrapper<List<? extends HasWord>, List<? extends HasWord>> wrapper = new MulticoreWrapper<>(config.getNThreads(), new SentenceTaggingProcessor(this, outputLemmas));
+          for (List<X> sentence : document) {
+              wrapper.put(sentence);
+              while (wrapper.peek()) {
+                  List<? extends HasWord> taggedSentence = wrapper.poll();
+                  numWords += taggedSentence.size();
+                  outputTaggedSentence(taggedSentence, outputLemmas, outputStyle, outputVerbosity, numSentences, "\n", writer);
+                  numSentences++;
+              }
+          }
+          wrapper.join();
+          while (wrapper.peek()) {
+              List<? extends HasWord> taggedSentence = wrapper.poll();
+              numWords += taggedSentence.size();
+              outputTaggedSentence(taggedSentence, outputLemmas, outputStyle, outputVerbosity, numSentences, "\n", writer);
+              numSentences++;
+          }
       }
-    }
 
     if (outputStyle == OutputStyle.XML ||
         outputStyle == OutputStyle.INLINE_XML) {
@@ -1599,13 +1599,13 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
 
     //Now we do everything through the doc preprocessor
     DocumentPreprocessor docProcessor;
-    if (!tagInside.isEmpty()) {
-      docProcessor = new DocumentPreprocessor(reader, DocumentPreprocessor.DocType.XML);
-      docProcessor.setElementDelimiter(tagInside);
-    } else {
-      docProcessor = new DocumentPreprocessor(reader);
-      docProcessor.setSentenceDelimiter(sentenceDelimiter);
-    }
+      if (tagInside.isEmpty()) {
+          docProcessor = new DocumentPreprocessor(reader);
+          docProcessor.setSentenceDelimiter(sentenceDelimiter);
+      } else {
+          docProcessor = new DocumentPreprocessor(reader, DocumentPreprocessor.DocType.XML);
+          docProcessor.setElementDelimiter(tagInside);
+      }
     docProcessor.setTokenizerFactory(tokenizerFactory);
 
     runTagger(docProcessor, writer, outputStyle);

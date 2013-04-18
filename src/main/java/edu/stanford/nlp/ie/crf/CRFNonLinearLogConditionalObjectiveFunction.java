@@ -694,74 +694,83 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
         derivative[i] += w / sigmaSq;
       }
       value += valueSum / twoSigmaSq;
-    } else if (prior == L1_PRIOR) { // Do nothing, as the prior will be applied in OWL-QN
-    } else if (prior == L1_NODE_L2_EDGE_PRIOR) {
-      int paramIndex = 0;
-      double sigmaSq = sigma * sigma;
-      double lambda = 1 / 2.0 / sigmaSq;
-      double w = 0;
-      double valueSum = 0;
-      for (; paramIndex < edgeParamCount; paramIndex++) {
-        w = x[paramIndex];
-        valueSum += w * w;
-        derivative[paramIndex] += w / sigmaSq;
-      }
-      value += valueSum * lambda;
-    } else if (prior == L1_SPARSENODE_L2_EDGE_PRIOR) {
-      double sigmaSq = sigma * sigma;
-      double lambda = 1 / 2.0 / sigmaSq;
-      double w = 0;
-      double valueSum = 0;
-      for (int paramIndex = 0; paramIndex < edgeParamCount; paramIndex++) {
-        w = x[paramIndex];
-        valueSum += w * w;
-        derivative[paramIndex] += w / sigmaSq;
-      }
-      value += valueSum * lambda;
-      for (int nodeFeatureIndex = 0; nodeFeatureIndex < numNodeFeatures; nodeFeatureIndex++) { // for each node feature, we enforce the sparsity
-        for (int outputClassIndex = 0; outputClassIndex < numClasses; outputClassIndex++) {
-          double maxParamAbsVal = 0;
-          int maxHiddenUnitIndex = 0;
-          for (int hiddenUnitIndex = 0; hiddenUnitIndex < numHiddenUnits; hiddenUnitIndex++) {
-            int firstLayerIndex = hiddenUnitIndex * numClasses + outputClassIndex;
-            double absWeight = Math.abs(W[firstLayerIndex][nodeFeatureIndex]);
-            if (absWeight > maxParamAbsVal) {
-              maxParamAbsVal = absWeight;
-              maxHiddenUnitIndex = hiddenUnitIndex;
+    } else switch (prior) {
+        case L1_PRIOR:  // Do nothing, as the prior will be applied in OWL-QN
+            break;
+        case L1_NODE_L2_EDGE_PRIOR: {
+            int paramIndex = 0;
+            double sigmaSq = sigma * sigma;
+            double lambda = 1 / 2.0 / sigmaSq;
+            double w = 0;
+            double valueSum = 0;
+            for (; paramIndex < edgeParamCount; paramIndex++) {
+                w = x[paramIndex];
+                valueSum += w * w;
+                derivative[paramIndex] += w / sigmaSq;
             }
-          }
-          for (int hiddenUnitIndex = 0; hiddenUnitIndex < numHiddenUnits; hiddenUnitIndex++) {
-            if (hiddenUnitIndex == maxHiddenUnitIndex) {// only performs L2 regularization on max param, the rest will be applied L1 in OWL-QN 
-              int firstLayerIndex = hiddenUnitIndex * numClasses + outputClassIndex;
-              int oneDIndex = firstLayerIndex * numNodeFeatures + nodeFeatureIndex + edgeParamCount;
-              w = x[oneDIndex];
-              value += w * w * lambda;
-              derivative[oneDIndex] += w / sigmaSq;
+            value += valueSum * lambda;
+            break;
+        }
+        case L1_SPARSENODE_L2_EDGE_PRIOR: {
+            double sigmaSq = sigma * sigma;
+            double lambda = 1 / 2.0 / sigmaSq;
+            double w = 0;
+            double valueSum = 0;
+            for (int paramIndex = 0; paramIndex < edgeParamCount; paramIndex++) {
+                w = x[paramIndex];
+                valueSum += w * w;
+                derivative[paramIndex] += w / sigmaSq;
             }
-          }
+            value += valueSum * lambda;
+            for (int nodeFeatureIndex = 0; nodeFeatureIndex < numNodeFeatures; nodeFeatureIndex++) { // for each node feature, we enforce the sparsity
+                for (int outputClassIndex = 0; outputClassIndex < numClasses; outputClassIndex++) {
+                    double maxParamAbsVal = 0;
+                    int maxHiddenUnitIndex = 0;
+                    for (int hiddenUnitIndex = 0; hiddenUnitIndex < numHiddenUnits; hiddenUnitIndex++) {
+                        int firstLayerIndex = hiddenUnitIndex * numClasses + outputClassIndex;
+                        double absWeight = Math.abs(W[firstLayerIndex][nodeFeatureIndex]);
+                        if (absWeight > maxParamAbsVal) {
+                            maxParamAbsVal = absWeight;
+                            maxHiddenUnitIndex = hiddenUnitIndex;
+                        }
+                    }
+                    for (int hiddenUnitIndex = 0; hiddenUnitIndex < numHiddenUnits; hiddenUnitIndex++) {
+                        if (hiddenUnitIndex == maxHiddenUnitIndex) {// only performs L2 regularization on max param, the rest will be applied L1 in OWL-QN
+                            int firstLayerIndex = hiddenUnitIndex * numClasses + outputClassIndex;
+                            int oneDIndex = firstLayerIndex * numNodeFeatures + nodeFeatureIndex + edgeParamCount;
+                            w = x[oneDIndex];
+                            value += w * w * lambda;
+                            derivative[oneDIndex] += w / sigmaSq;
+                        }
+                    }
+                }
+            }
+            break;
         }
-      }
-    } else if (prior == HUBER_PRIOR) {
-      double sigmaSq = sigma * sigma;
-      for (int i = 0; i < regSize; i++) {
-        double w = x[i];
-        double wabs = Math.abs(w);
-        if (wabs < epsilon) {
-          value += w * w / 2.0 / epsilon / sigmaSq;
-          derivative[i] += w / epsilon / sigmaSq;
-        } else {
-          value += (wabs - epsilon / 2) / sigmaSq;
-          derivative[i] += (w < 0.0 ? -1.0 : 1.0) / sigmaSq;
+        case HUBER_PRIOR: {
+            double sigmaSq = sigma * sigma;
+            for (int i = 0; i < regSize; i++) {
+                double w = x[i];
+                double wabs = Math.abs(w);
+                if (wabs < epsilon) {
+                    value += w * w / 2.0 / epsilon / sigmaSq;
+                    derivative[i] += w / epsilon / sigmaSq;
+                } else {
+                    value += (wabs - epsilon / 2) / sigmaSq;
+                    derivative[i] += (w < 0.0 ? -1.0 : 1.0) / sigmaSq;
+                }
+            }
+            break;
         }
-      }
-    } else if (prior == QUARTIC_PRIOR) {
-      double sigmaQu = sigma * sigma * sigma * sigma;
-      for (int i = 0; i < regSize; i++) {
-        double k = 1.0;
-        double w = x[i];
-        value += k * w * w * w * w / 2.0 / sigmaQu;
-        derivative[i] += k * w / sigmaQu;
-      }
+        case QUARTIC_PRIOR:
+            double sigmaQu = sigma * sigma * sigma * sigma;
+            for (int i = 0; i < regSize; i++) {
+                double k = 1.0;
+                double w = x[i];
+                value += k * w * w * w * w / 2.0 / sigmaQu;
+                derivative[i] += k * w / sigmaQu;
+            }
+            break;
     }
 
     if (flags.regularizeSoftmaxTieParam &&

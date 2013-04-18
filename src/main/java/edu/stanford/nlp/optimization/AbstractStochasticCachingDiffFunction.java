@@ -486,11 +486,10 @@ public abstract class AbstractStochasticCachingDiffFunction extends AbstractCach
       getHdotVFiniteDifference(x,v,extFiniteDiffDerivative,batchSize);
       */
 
-    } else {
+    }
       //Call the objective Function
       stochasticEnsure(x,v,batchSize);
-    }
-    return HdotV;
+      return HdotV;
   }
 
 

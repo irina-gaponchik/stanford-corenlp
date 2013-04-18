@@ -50,9 +50,7 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
     aOverAFilter = new Filter<Tree>() {
       private static final long serialVersionUID = -606371737889816130L;
       public boolean accept(Tree t) {
-        if (t.isLeaf() || t.isPreTerminal() || t.children().length != 1)
-          return true;
-          return !(t.label() != null && t.label().equals(t.children()[0].label()));
+          return t.isLeaf() || t.isPreTerminal() || t.children().length != 1 || !(t.label() != null && t.label().equals(t.children()[0].label()));
       }
     };
   }
@@ -214,10 +212,11 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
   protected String cleanUpLabel(String label) {
     if (nodeCleanup == 1) {
       return tlp.categoryAndFunction(label);
-    } else if (nodeCleanup == 2) {
-      return tlp.basicCategory(label);
-    } 
-    return label;
+    }
+      if (nodeCleanup == 2) {
+        return tlp.basicCategory(label);
+      }
+      return label;
   }
 
   private static final long serialVersionUID = 8529514903815041064L;

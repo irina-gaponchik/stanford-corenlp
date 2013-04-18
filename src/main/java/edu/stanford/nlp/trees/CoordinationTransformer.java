@@ -197,56 +197,60 @@ public class CoordinationTransformer implements TreeTransformer {
 
       // if stuff after (like "soya or maize oil and vegetables")
       // we need to put the tree in another tree
-      if (!ccPositions.isEmpty()) {
-        boolean comma = false;
-        int index = ccPositions.get(0);
-        if (VERBOSE) {System.err.println("more CC index " +  index);}
-        if (ccSiblings[index - 1].value().equals(",")) {//to handle the case of a comma ("soya and maize oil, and vegetables")
-          index = index - 1;
-          comma = true;
-        }
-        if (VERBOSE) {System.err.println("more CC index " +  index);}
-        String head = getHeadTag(ccSiblings[index - 1]);
-
-        if (ccIndex + 2 < index) {
-          Tree tree = tf.newTreeNode(lf.newLabel(head), null);
-          tree.addChild(0, left);
-
-          int k = 1;
-          for (int j = ccIndex+2; j<index; j++) {
-            if (VERBOSE) ccSiblings[j].pennPrint();
-            t.removeChild(0);
-            tree.addChild(k, ccSiblings[j]);
-            k++;
-          }
-
-          if (VERBOSE) {
-            System.out.println("print t");
-            t.pennPrint();
-            
-            System.out.println("print tree");
-            tree.pennPrint();
-            System.out.println();
-          }
-          t.addChild(0, tree);
+        if (ccPositions.isEmpty()) {
+            t.addChild(0, left);
         } else {
-          t.addChild(0, left);
-        }
+            boolean comma = false;
+            int index = ccPositions.get(0);
+            if (VERBOSE) {
+                System.err.println("more CC index " + index);
+            }
+            if (ccSiblings[index - 1].value().equals(",")) {//to handle the case of a comma ("soya and maize oil, and vegetables")
+                index = index - 1;
+                comma = true;
+            }
+            if (VERBOSE) {
+                System.err.println("more CC index " + index);
+            }
+            String head = getHeadTag(ccSiblings[index - 1]);
 
-        Tree rightTree = tf.newTreeNode(lf.newLabel("NP"), null);
-        int start = 2;
-        if (comma) {
-          start++;
+            if (ccIndex + 2 < index) {
+                Tree tree = tf.newTreeNode(lf.newLabel(head), null);
+                tree.addChild(0, left);
+
+                int k = 1;
+                for (int j = ccIndex + 2; j < index; j++) {
+                    if (VERBOSE) ccSiblings[j].pennPrint();
+                    t.removeChild(0);
+                    tree.addChild(k, ccSiblings[j]);
+                    k++;
+                }
+
+                if (VERBOSE) {
+                    System.out.println("print t");
+                    t.pennPrint();
+
+                    System.out.println("print tree");
+                    tree.pennPrint();
+                    System.out.println();
+                }
+                t.addChild(0, tree);
+            } else {
+                t.addChild(0, left);
+            }
+
+            Tree rightTree = tf.newTreeNode(lf.newLabel("NP"), null);
+            int start = 2;
+            if (comma) {
+                start++;
+            }
+            while (start < t.numChildren()) {
+                Tree sib = t.getChild(start);
+                t.removeChild(start);
+                rightTree.addChild(sib);
+            }
+            t.addChild(rightTree);
         }
-        while (start < t.numChildren()) {
-          Tree sib = t.getChild(start);
-          t.removeChild(start);
-          rightTree.addChild(sib);
-        }
-        t.addChild(rightTree);
-      } else {
-        t.addChild(0, left);
-      }
     }
     // DT a CC b c -> DT (a CC b) c
     else if (ccIndex == 2 && ccSiblings[0].value().startsWith("DT") && !ccSiblings[ccIndex - 1].value().equals("NNS") && (ccSiblings.length == 5 || !ccPositions.isEmpty() && ccPositions.get(0) == 5)) {
@@ -359,44 +363,44 @@ public class CoordinationTransformer implements TreeTransformer {
       for (int i = 0; i < nextCC; i++) {
         t.removeChild(0);
       }
-      if (!ccPositions.isEmpty()) { // need an extra level
-        Tree tree = tf.newTreeNode(lf.newLabel("NP"), null);
+        if (ccPositions.isEmpty()) {
+            if (preconj) {
+                t.addChild(conjT);
+            }
+            if (left.numChildren() > 0) {
+                t.addChild(left);
+            }
+            if (commaLeft) {
+                t.addChild(ccSiblings[ccIndex - 1]);
+            }
+            t.addChild(cc);
+            if (right.numChildren() > 0) {
+                t.addChild(right);
+            }
+            if (commaRight) {
+                t.addChild(ccSiblings[nextCC - 1]);
+            }
+        } else { // need an extra level
+            Tree tree = tf.newTreeNode(lf.newLabel("NP"), null);
 
-        if (preconj) {
-          tree.addChild(conjT);
+            if (preconj) {
+                tree.addChild(conjT);
+            }
+            if (left.numChildren() > 0) {
+                tree.addChild(left);
+            }
+            if (commaLeft) {
+                tree.addChild(ccSiblings[ccIndex - 1]);
+            }
+            tree.addChild(cc);
+            if (right.numChildren() > 0) {
+                tree.addChild(right);
+            }
+            if (commaRight) {
+                t.addChild(0, ccSiblings[nextCC - 1]);
+            }
+            t.addChild(0, tree);
         }
-        if (left.numChildren() > 0) {
-          tree.addChild(left);
-        }
-        if (commaLeft) {
-          tree.addChild(ccSiblings[ccIndex - 1]);
-        }
-        tree.addChild(cc);
-        if (right.numChildren() > 0) {
-          tree.addChild(right);
-        }
-        if (commaRight) {
-          t.addChild(0, ccSiblings[nextCC - 1]);
-        }
-        t.addChild(0, tree);
-      } else {
-        if (preconj) {
-          t.addChild(conjT);
-        }
-        if (left.numChildren() > 0) {
-          t.addChild(left);
-        }
-        if (commaLeft) {
-          t.addChild(ccSiblings[ccIndex - 1]);
-        }
-        t.addChild(cc);
-        if (right.numChildren() > 0) {
-          t.addChild(right);
-        }
-        if (commaRight) {
-          t.addChild(ccSiblings[nextCC - 1]);
-        }
-      }
     }
 
     if (VERBOSE) {

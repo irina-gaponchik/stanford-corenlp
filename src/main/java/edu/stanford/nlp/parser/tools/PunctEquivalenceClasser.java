@@ -68,25 +68,25 @@ public class PunctEquivalenceClasser {
   public static String getPunctClass(String punc) {
     if(punc.equals("%") || punc.equals("-PLUS-"))//-PLUS- is an escape for "+" in the ATB
       return "perc";
-    else if(!punc.isEmpty() && punc.charAt(0) == '*')
-      return "bullet";
-    else if(sfClass.contains(punc))
-      return "sf";
-    else if(colonClass.contains(punc) || pEllipsis.matcher(punc).matches())
-      return "colon";
-    else if(commaClass.contains(punc))
-      return "comma";
-    else if(currencyClass.contains(punc))
-      return "curr";
-    else if(slashClass.contains(punc))
-      return "slash";
-    else if(lBracketClass.contains(punc))
-      return "lrb";
-    else if(rBracketClass.contains(punc))
-      return "rrb";
-    else if(quoteClass.contains(punc))
-      return "quote";
-    
-    return "";
+      if(!punc.isEmpty() && punc.charAt(0) == '*')
+        return "bullet";
+      if(sfClass.contains(punc))
+        return "sf";
+      if(colonClass.contains(punc) || pEllipsis.matcher(punc).matches())
+        return "colon";
+      if(commaClass.contains(punc))
+        return "comma";
+      if(currencyClass.contains(punc))
+        return "curr";
+      if(slashClass.contains(punc))
+        return "slash";
+      if(lBracketClass.contains(punc))
+        return "lrb";
+      if(rBracketClass.contains(punc))
+        return "rrb";
+      if(quoteClass.contains(punc))
+        return "quote";
+
+      return "";
   }
 }

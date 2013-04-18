@@ -659,7 +659,7 @@ public class GeneralizedCounter<K> implements Serializable {
         return true;
       }
       //return false;
-        return !(o instanceof ClassicCounter) ? false : entrySet().equals(((ClassicCounter<?>) o).entrySet());
+        return o instanceof ClassicCounter && entrySet().equals(((ClassicCounter<?>) o).entrySet());
     }
 
     @Override
@@ -773,7 +773,7 @@ public class GeneralizedCounter<K> implements Serializable {
         return true;
       }
       //return false;
-        return !(o instanceof ClassicCounter) ? false : entrySet().equals(((ClassicCounter<?>) o).entrySet());
+        return o instanceof ClassicCounter && entrySet().equals(((ClassicCounter<?>) o).entrySet());
     }
 
     @Override

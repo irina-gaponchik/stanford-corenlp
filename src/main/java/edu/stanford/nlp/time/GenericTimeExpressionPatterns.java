@@ -195,10 +195,7 @@ public class GenericTimeExpressionPatterns implements TimeExpressionPatterns {
             Expressions.TYPE_FUNCTION,
             new ValueFunctions.NamedValueFunction("DayOfWeek") {
               public boolean checkArgs(List<Value> in) {
-                if (in.size() != 1) {
-                  return false;
-                }
-                  return !(in.get(0) == null || !(in.get(0).get() instanceof Number));
+                  return in.size() == 1 && !(in.get(0) == null || !(in.get(0).get() instanceof Number));
               }
               public Value apply(Env env, List<Value> in) {
                 if (in.size() == 1) {
@@ -214,10 +211,7 @@ public class GenericTimeExpressionPatterns implements TimeExpressionPatterns {
             Expressions.TYPE_FUNCTION,
             new ValueFunctions.NamedValueFunction("MonthOfYear") {
               public boolean checkArgs(List<Value> in) {
-                if (in.size() != 1) {
-                  return false;
-                }
-                  return !(in.get(0) == null || !(in.get(0).get() instanceof Number));
+                  return in.size() == 1 && !(in.get(0) == null || !(in.get(0).get() instanceof Number));
               }
               public Value apply(Env env, List<Value> in) {
                 if (in.size() == 1) {
@@ -236,18 +230,7 @@ public class GenericTimeExpressionPatterns implements TimeExpressionPatterns {
               // Second argument is the quantifier (string)
               // Third argument is the multiple (how much to scale the natural period)
               public boolean checkArgs(List<Value> in) {
-                if (in.size() < 3) {
-                  return false;
-                }
-                if (in.get(0) == null ||
-                        !(in.get(0).get() instanceof SUTime.Temporal) && !(in.get(0).get() instanceof TimeExpression)) {
-                  return false;
-                }
-                if (in.get(1) == null ||
-                        !(in.get(1).get() instanceof String) && !(in.get(1).get() instanceof List)) {
-                  return false;
-                }
-                  return !(in.get(2) == null || !(in.get(2).get() instanceof Number));
+                  return in.size() >= 3 && !(in.get(0) == null || !(in.get(0).get() instanceof SUTime.Temporal) && !(in.get(0).get() instanceof TimeExpression)) && !(in.get(1) == null || !(in.get(1).get() instanceof String) && !(in.get(1).get() instanceof List)) && !(in.get(2) == null || !(in.get(2).get() instanceof Number));
               }
               public Value apply(Env env, List<Value> in) {
                 if (in.size() >= 1) {
@@ -299,10 +282,7 @@ public class GenericTimeExpressionPatterns implements TimeExpressionPatterns {
             Expressions.TYPE_FUNCTION,
             new ValueFunctions.NamedValueFunction("TemporalCompose") {
               public boolean checkArgs(List<Value> in) {
-                if (in.size() < 1) {
-                  return false;
-                }
-                  return !(in.get(0) == null || !(in.get(0).get() instanceof SUTime.TemporalOp));
+                  return in.size() >= 1 && !(in.get(0) == null || !(in.get(0).get() instanceof SUTime.TemporalOp));
               }
               public Value apply(Env env, List<Value> in) {
                 if (in.size() > 1) {

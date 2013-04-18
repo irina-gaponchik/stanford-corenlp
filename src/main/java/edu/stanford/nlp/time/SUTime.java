@@ -1341,12 +1341,14 @@ public class SUTime {
         return this;
       if (t instanceof Time) {
         return intersect((Time) t);
-      } else if (t instanceof Range) {
-        return t.intersect(this);
-      } else if (t instanceof Duration) {
-        return new RelativeTime(this, TemporalOp.INTERSECT, t);
       }
-      return null;
+        if (t instanceof Range) {
+          return t.intersect(this);
+        }
+        if (t instanceof Duration) {
+          return new RelativeTime(this, TemporalOp.INTERSECT, t);
+        }
+        return null;
     }
 
     protected Time intersect(Time t) {
@@ -2062,29 +2064,25 @@ public class SUTime {
 
     // / NOTE: This is not ISO or timex standard
     public String toFormattedString(int flags) {
-      if (getTimeLabel() != null) {
+        if (getTimeLabel() == null) {
+            if ((flags & FORMAT_ISO) != 0 || (flags & FORMAT_TIMEX3_VALUE) != 0) return null;
+// TODO: is there iso standard?
+            // TODO: is there timex3 standard?
+            StringBuilder sb = new StringBuilder();
+            if (base != null && !base.equals(TIME_REF)) sb.append(base.toFormattedString(flags));
+            if (tempOp != null) {
+                if (sb.length() > 0) {
+                    sb.append(' ');
+                }
+                sb.append(tempOp);
+                if (tempArg != null) {
+                    sb.append(' ').append(tempArg.toFormattedString(flags));
+                }
+                return sb.toString();
+            }
+            return sb.toString();
+        }
         return getTimeLabel();
-      }
-      if ((flags & FORMAT_ISO) != 0) {
-        return null;
-      } // TODO: is there iso standard?
-      if ((flags & FORMAT_TIMEX3_VALUE) != 0) {
-        return null;
-      } // TODO: is there timex3 standard?
-      StringBuilder sb = new StringBuilder();
-      if (base != null && !base.equals(TIME_REF)) {
-        sb.append(base.toFormattedString(flags));
-      }
-      if (tempOp != null) {
-        if (sb.length() > 0) {
-          sb.append(' ');
-        }
-        sb.append(tempOp);
-        if (tempArg != null) {
-          sb.append(' ').append(tempArg.toFormattedString(flags));
-        }
-      }
-      return sb.toString();
     }
 
     public Temporal resolve(Time refTime, int flags) {
@@ -2098,46 +2096,35 @@ public class SUTime {
         // NOTE: Should be always safe to resolve and then apply since
         // we will terminate here (no looping hopefully)
         Temporal t = tempOp.apply(groundedBase, tempArg, opFlags);
-        if (t != null) {
-          t = t.addModApprox(mod, approx);
-          return t;
-        } else {
-          // NOTE: this can be difficult if applying op
-          // gives back same stuff stuff as before
-          // Try applying op and then resolving
-          t = tempOp.apply(base, tempArg, opFlags);
-          if (t != null) {
-            t = t.addModApprox(mod, approx);
-              return !this.equals(t) ? t.resolve(refTime, flags) : this;
+          if (t == null) {
+            // NOTE: this can be difficult if applying op
+            // gives back same stuff stuff as before
+            // Try applying op and then resolving
+            t = tempOp.apply(base, tempArg, opFlags);
+            if (t != null) {
+              t = t.addModApprox(mod, approx);
+                return !this.equals(t) ? t.resolve(refTime, flags) : this;
+            }
+              return null;
           } else {
-            return null;
+            t = t.addModApprox(mod, approx);
+            return t;
           }
-        }
-      } else {
-        return groundedBase != null ? groundedBase.addModApprox(mod, approx) : null;
       }
+        return groundedBase != null ? groundedBase.addModApprox(mod, approx) : null;
     }
 
     public boolean equals(Object o) {
-      if (this == o) {
+        if (this != o) {
+            if (o != null && getClass() == o.getClass()) {
+
+                RelativeTime that = (RelativeTime) o;
+
+                return opFlags == that.opFlags && !(base != null ? !base.equals(that.base) : that.base != null) && !(tempArg != null ? !tempArg.equals(that.tempArg) : that.tempArg != null) && tempOp == that.tempOp;
+            }
+            return false;
+        }
         return true;
-      }
-      if (o == null || getClass() != o.getClass()) {
-        return false;
-      }
-
-      RelativeTime that = (RelativeTime) o;
-
-      if (opFlags != that.opFlags) {
-        return false;
-      }
-      if (base != null ? !base.equals(that.base) : that.base != null) {
-        return false;
-      }
-      if (tempArg != null ? !tempArg.equals(that.tempArg) : that.tempArg != null) {
-        return false;
-      }
-        return tempOp == that.tempOp;
 
     }
 
@@ -2609,17 +2596,20 @@ public class SUTime {
         return t;
       if (t instanceof CompositePartialTime) {
         return t.intersect(this);
-      } else if (t instanceof PartialTime) {
-        if (!isCompatible((PartialTime) t)) {
-          return null;
+      }
+        if (t instanceof PartialTime) {
+          if (!isCompatible((PartialTime) t)) {
+            return null;
+          }
+          Partial p = JodaTimeUtils.combine(base, ((PartialTime) t).base);
+          return new PartialTime(p);
         }
-        Partial p = JodaTimeUtils.combine(base, ((PartialTime) t).base);
-        return new PartialTime(p);
-      } else if (t instanceof GroundedTime) {
-        return t.intersect(this);
-      } else if (t instanceof RelativeTime) {
-        return t.intersect(this);
-      } else {
+        if (t instanceof GroundedTime) {
+          return t.intersect(this);
+        }
+        if (t instanceof RelativeTime) {
+          return t.intersect(this);
+        }
         Time cpt = makeComposite(this, t);
         if (cpt != null) {
           return cpt;
@@ -2627,8 +2617,7 @@ public class SUTime {
         if (t instanceof InexactTime) {
           return t.intersect(this);
         }
-      }
-      return null;
+        return null;
       // return new RelativeTime(this, TemporalOp.INTERSECT, t);
     }
 
@@ -2693,13 +2682,13 @@ public class SUTime {
             p = new PartialTime(p, p2);
             unsupported = unsupported.withDays(0);
           }
-          if (!unsupported.equals(Period.ZERO)) {
-            t = new RelativeTime(p, new DurationWithFields(unsupported));
-            t.approx = this.approx;
-            t.mod = this.mod;
-          } else {
-            t = p;
-          }
+            if (unsupported.equals(Period.ZERO)) {
+                t = p;
+            } else {
+                t = new RelativeTime(p, new DurationWithFields(unsupported));
+                t.approx = this.approx;
+                t.mod = this.mod;
+            }
         }
       }
       return t;
@@ -2771,10 +2760,9 @@ public class SUTime {
           y = y.substring(1);
           era = ERA_AD; // AD
         }
-        if (y.contains(PAD_FIELD_UNKNOWN)) {
-        } else {
-          year = Integer.parseInt(y);
-        }
+          if (!y.contains(PAD_FIELD_UNKNOWN)) {
+            year = Integer.parseInt(y);
+          }
       } else {
         y = PAD_FIELD_UNKNOWN4;
       }
@@ -3334,13 +3322,15 @@ public class SUTime {
       org.joda.time.Duration d2 = d.getJodaTimeDuration();
       if (d1 == null && d2 == null) {
         return 0;
-      } else if (d1 == null) {
-        return 1;
-      } else if (d2 == null) {
-        return -1;
       }
+        if (d1 == null) {
+          return 1;
+        }
+        if (d2 == null) {
+          return -1;
+        }
 
-      int cmp = d1.compareTo(d2);
+        int cmp = d1.compareTo(d2);
       if (cmp == 0) {
         if (d.isApprox() && !this.isApprox()) {
           // Put exact in front of approx
@@ -3380,13 +3370,14 @@ public class SUTime {
         RelativeTime rt = new RelativeTime((Time) t, TemporalOp.INTERSECT, this);
         rt = (RelativeTime) rt.addMod(this.getMod());
         return rt;
-      } else if (t instanceof Range) {
-        // return new TemporalSet(t, TemporalOp.INTERSECT, this);
-      } else if (t instanceof Duration) {
-        Duration d = (Duration) t;
-        return intersect(d);
       }
-      return null;
+        if (!(t instanceof Range)) {
+            if (t instanceof Duration) {
+              Duration d = (Duration) t;
+              return intersect(d);
+            }
+        }
+        return null;
     }
 
     public Duration intersect(Duration d) {
@@ -3787,37 +3778,37 @@ public class SUTime {
 
     // public boolean includeTimexAltValue() { return true; }
     public String toFormattedString(int flags) {
-      if ((flags & (FORMAT_ISO | FORMAT_TIMEX3_VALUE)) != 0) {
-        if (getTimeLabel() != null) {
-          return getTimeLabel();
+        if ((flags & (FORMAT_ISO | FORMAT_TIMEX3_VALUE)) == 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append('(');
+            if (begin != null)
+                sb.append(begin);
+            sb.append(',');
+            if (end != null)
+                sb.append(end);
+            sb.append(',');
+            if (duration != null)
+                sb.append(duration);
+            sb.append(')');
+            return sb.toString();
+        } else {
+            if (getTimeLabel() != null) {
+                return getTimeLabel();
+            }
+            String beginStr = begin != null ? begin.toFormattedString(flags) : null;
+            String endStr = end != null ? end.toFormattedString(flags) : null;
+            String durationStr = duration != null ? duration.toFormattedString(flags) : null;
+            if ((flags & FORMAT_ISO) != 0) {
+                if (beginStr != null && endStr != null) {
+                    return beginStr + '/' + endStr;
+                } else if (beginStr != null && durationStr != null) {
+                    return beginStr + '/' + durationStr;
+                } else if (durationStr != null && endStr != null) {
+                    return durationStr + '/' + endStr;
+                }
+            }
+            return durationStr;
         }
-        String beginStr = begin != null ? begin.toFormattedString(flags) : null;
-        String endStr = end != null ? end.toFormattedString(flags) : null;
-        String durationStr = duration != null ? duration.toFormattedString(flags) : null;
-        if ((flags & FORMAT_ISO) != 0) {
-          if (beginStr != null && endStr != null) {
-            return beginStr + '/' + endStr;
-          } else if (beginStr != null && durationStr != null) {
-            return beginStr + '/' + durationStr;
-          } else if (durationStr != null && endStr != null) {
-            return durationStr + '/' + endStr;
-          }
-        }
-        return durationStr;
-      } else {
-        StringBuilder sb = new StringBuilder();
-        sb.append('(');
-        if (begin != null)
-          sb.append(begin);
-        sb.append(',');
-        if (end != null)
-          sb.append(end);
-        sb.append(',');
-        if (duration != null)
-          sb.append(duration);
-        sb.append(')');
-        return sb.toString();
-      }
     }
 
     public Range resolve(Time refTime, int flags) {
@@ -3918,32 +3909,36 @@ public class SUTime {
     public Time mid() {
       if (duration != null && begin != null) {
         return begin.add(duration.divideBy(2));
-      } else if (duration != null && end != null) {
-        return end.subtract(duration.divideBy(2));
-      } else if (begin != null && end != null) {
-        // TODO: ....
-      } else if (begin != null) {
-        return begin;
-      } else if (end != null) {
-        return end;
       }
-      return null;
+        if (duration != null && end != null) {
+          return end.subtract(duration.divideBy(2));
+        }
+        if (begin == null || end == null) {
+            if (begin != null) {
+              return begin;
+            } else if (end != null) {
+              return end;
+            }
+        }
+        return null;
     }
 
     // TODO: correct implementation
     public Temporal intersect(Temporal t) {
       if (t instanceof Time) {
         return new RelativeTime((Time) t, TemporalOp.INTERSECT, this);
-      } else if (t instanceof Range) {
-        Range rt = (Range) t;
-        // Assume begin/end defined (TODO: handle if duration defined)
-        Time b = Time.max(begin, rt.begin);
-        Time e = Time.min(end, rt.end);
-        return new Range(b, e);
-      } else if (t instanceof Duration) {
-        return new InexactTime(null, (Duration) t, this);
       }
-      return null;
+        if (t instanceof Range) {
+          Range rt = (Range) t;
+          // Assume begin/end defined (TODO: handle if duration defined)
+          Time b = Time.max(begin, rt.begin);
+          Time e = Time.min(end, rt.end);
+          return new Range(b, e);
+        }
+        if (t instanceof Duration) {
+          return new InexactTime(null, (Duration) t, this);
+        }
+        return null;
     }
 
     public static boolean contains(Range r) {
@@ -4171,12 +4166,11 @@ public class SUTime {
       }
       if (base != null) {
         return base.toFormattedString(flags);
-      } else {
+      }
         if (periodicity != null) {
           return periodicity.toFormattedString(flags);
         }
-      }
-      return null;
+        return null;
     }
 
     public Temporal intersect(Temporal t) {

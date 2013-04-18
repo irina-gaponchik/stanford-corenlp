@@ -31,9 +31,7 @@ public class LexerTokenizer extends AbstractTokenizer<String> {
     String token = null;
     try {
       int a = Lexer.IGNORE;
-      while ((a = lexer.yylex()) == Lexer.IGNORE) {
-          // skip tokens to be ignored
-      }
+      while ((a = lexer.yylex()) == Lexer.IGNORE) ;
         token = a == lexer.getYYEOF() ? null : lexer.yytext();
     } catch (IOException e) {
       // do nothing, return null

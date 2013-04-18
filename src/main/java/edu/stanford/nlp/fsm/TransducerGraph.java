@@ -292,10 +292,7 @@ public class TransducerGraph implements Cloneable {
       return false;
     }
     s = arcsByInput.get(input);
-    if (s == null) {
-      return false;
-    }
-      return s.remove(a);
+      return s != null && s.remove(a);
   }
 
   public boolean canAddArc(Object source, Object target, Object input, Object output) {

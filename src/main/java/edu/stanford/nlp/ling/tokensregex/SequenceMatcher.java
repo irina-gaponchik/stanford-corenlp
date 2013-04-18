@@ -493,9 +493,10 @@ public class SequenceMatcher<T> extends BasicSequenceMatchResult<T> {
 
   private String getStateMessage()
   {
-    if (!matchingCompleted) {
-      return "Matching not completed";
-    } else return !matched ? "No match found" : "Match successful";
+      if (matchingCompleted) return !matched ? "No match found" : "Match successful";
+      else {
+          return "Matching not completed";
+      }
   }
 
   /**
@@ -765,10 +766,7 @@ public class SequenceMatcher<T> extends BasicSequenceMatchResult<T> {
 
       State state = (State) o;
 
-      if (bid != state.bid) {
-        return false;
-      }
-        return !(tstate != null ? !tstate.equals(state.tstate) : state.tstate != null);
+        return bid == state.bid && !(tstate != null ? !tstate.equals(state.tstate) : state.tstate != null);
 
     }
 
@@ -1423,16 +1421,16 @@ public class SequenceMatcher<T> extends BasicSequenceMatchResult<T> {
     private boolean isAllMatch()
     {
       boolean allMatch = true;
-      if (!states.isEmpty()) {
-        for (State state:states) {
-          if (!state.tstate.equals(SequencePattern.MATCH_STATE)) {
+        if (states.isEmpty()) {
             allMatch = false;
-            break;
-          }
+        } else {
+            for (State state : states) {
+                if (!state.tstate.equals(SequencePattern.MATCH_STATE)) {
+                    allMatch = false;
+                    break;
+                }
+            }
         }
-      } else {
-        allMatch = false;
-      }
       return allMatch;
     }
 

@@ -44,10 +44,11 @@ public class NamedDependency extends UnnamedDependency {
   public boolean equals(Object o) {
     if (this == o) {
       return true;
-    } else if ( !(o instanceof NamedDependency)) {
-      return false;
     }
-    NamedDependency d = (NamedDependency) o;
+      if ( !(o instanceof NamedDependency)) {
+        return false;
+      }
+      NamedDependency d = (NamedDependency) o;
     return equalsIgnoreName(o) && name.equals(d.name);
   }
 

@@ -216,10 +216,11 @@ public class CustomAnnotationSerializer implements AnnotationSerializer {
         int copyAnnotation = -1;
         if(bbits.length > 2){
           throw new RuntimeException("ERROR: Invalid format for dependency graph: " + line);
-        } else if(bbits.length == 2){
-          copyAnnotation = Integer.valueOf(bbits[1]);
         }
-        int index = Integer.valueOf(bbits[0]);
+          if(bbits.length == 2){
+            copyAnnotation = Integer.valueOf(bbits[1]);
+          }
+          int index = Integer.valueOf(bbits[0]);
         graph.nodes.add(new IntermediateNode(docId, sentIndex, index, copyAnnotation));
       }
     }

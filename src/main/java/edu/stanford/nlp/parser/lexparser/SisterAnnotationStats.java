@@ -245,15 +245,7 @@ public class SisterAnnotationStats implements TreeVisitor {
               Pair p = (Pair) answer;
               double psd = (Double) p.second();
               System.out.println(p.first() + ": " + nf.format(psd));
-              if (psd >= CUTOFFS[0]) {
-                  String annotatedLabel = (String) p.first();
-                  for (double CUTOFF : CUTOFFS) {
-                      if (psd >= CUTOFF) {
-                          //javaSB[j].append("\"").append(annotatedLabel);
-                          //javaSB[j].append("\",");
-                      }
-                  }
-              }
+
           }
           System.out.println();
       }

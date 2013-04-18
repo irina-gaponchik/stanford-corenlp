@@ -293,29 +293,29 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
       String before = StringUtils.getNotNullString(wi.get(CoreAnnotations.BeforeAnnotation.class));
 
       String current = StringUtils.getNotNullString(wi.get(CoreAnnotations.OriginalTextAnnotation.class));
-      if (!tag.equals(prevTag)) {
-        if (!prevTag.equals(background) && !tag.equals(background)) {
-          out.print("</");
-          out.print(prevTag);
-          out.print('>');
-          out.print(before);
-          out.print('<');
-          out.print(tag);
-          out.print('>');
-        } else if (!prevTag.equals(background)) {
-          out.print("</");
-          out.print(prevTag);
-          out.print('>');
-          out.print(before);
-        } else if (!tag.equals(background)) {
-          out.print(before);
-          out.print('<');
-          out.print(tag);
-          out.print('>');
+        if (tag.equals(prevTag)) {
+            out.print(before);
+        } else {
+            if (!prevTag.equals(background) && !tag.equals(background)) {
+                out.print("</");
+                out.print(prevTag);
+                out.print('>');
+                out.print(before);
+                out.print('<');
+                out.print(tag);
+                out.print('>');
+            } else if (!prevTag.equals(background)) {
+                out.print("</");
+                out.print(prevTag);
+                out.print('>');
+                out.print(before);
+            } else if (!tag.equals(background)) {
+                out.print(before);
+                out.print('<');
+                out.print(tag);
+                out.print('>');
+            }
         }
-      } else {
-        out.print(before);
-      }
       out.print(current);
       String afterWS = StringUtils.getNotNullString(wi.get(CoreAnnotations.AfterAnnotation.class));
 
@@ -338,44 +338,44 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
     for (Iterator<IN> wordIter = doc.iterator(); wordIter.hasNext();) {
       IN wi = wordIter.next();
       String tag = StringUtils.getNotNullString(wi.get(CoreAnnotations.AnswerAnnotation.class));
-      if (!tag.equals(prevTag)) {
-        if (!prevTag.equals(background) && !tag.equals(background)) {
-          out.print("</");
-          out.print(prevTag);
-          out.print("> <");
-          out.print(tag);
-          out.print('>');
-        } else if (!prevTag.equals(background)) {
-          out.print("</");
-          out.print(prevTag);
-          out.print("> ");
-        } else if (!tag.equals(background)) {
-          if (!first) {
-            out.print(' ');
-          }
-          out.print('<');
-          out.print(tag);
-          out.print('>');
+        if (tag.equals(prevTag)) {
+            if (!first) {
+                out.print(' ');
+            }
+        } else {
+            if (!prevTag.equals(background) && !tag.equals(background)) {
+                out.print("</");
+                out.print(prevTag);
+                out.print("> <");
+                out.print(tag);
+                out.print('>');
+            } else if (!prevTag.equals(background)) {
+                out.print("</");
+                out.print(prevTag);
+                out.print("> ");
+            } else if (!tag.equals(background)) {
+                if (!first) {
+                    out.print(' ');
+                }
+                out.print('<');
+                out.print(tag);
+                out.print('>');
+            }
         }
-      } else {
-        if (!first) {
-          out.print(' ');
-        }
-      }
       first = false;
       out.print(StringUtils.getNotNullString(wi.get(CoreAnnotations.OriginalTextAnnotation.class)));
 
-      if (!wordIter.hasNext()) {
-        if (!tag.equals(background)) {
-          out.print("</");
-          out.print(tag);
-          out.print('>');
+        if (wordIter.hasNext()) {
+            prevTag = tag;
+        } else {
+            if (!tag.equals(background)) {
+                out.print("</");
+                out.print(tag);
+                out.print('>');
+            }
+            out.print(' ');
+            prevTag = background;
         }
-        out.print(' ');
-        prevTag = background;
-      } else {
-        prevTag = tag;
-      }
     }
     out.println();
   }

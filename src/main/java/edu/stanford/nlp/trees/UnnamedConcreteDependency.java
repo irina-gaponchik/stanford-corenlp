@@ -66,10 +66,11 @@ public class UnnamedConcreteDependency extends UnnamedDependency {
   public boolean equals(Object o) {
     if (this == o) {
       return true;
-    } else if( !(o instanceof UnnamedConcreteDependency)) {
-      return false;
     }
-    UnnamedConcreteDependency d = (UnnamedConcreteDependency) o;
+      if( !(o instanceof UnnamedConcreteDependency)) {
+        return false;
+      }
+      UnnamedConcreteDependency d = (UnnamedConcreteDependency) o;
     return headIndex == d.headIndex && depIndex == d.depIndex;
   }
 

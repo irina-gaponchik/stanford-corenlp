@@ -48,7 +48,7 @@ public class ExtensionFileFilter extends javax.swing.filechooser.FileFilter impl
   public boolean accept(File file) {
     if (file.isDirectory()) {
       return recursively;
-    } else return extension == null ? true : file.getName().endsWith(extension);
+    } else return extension == null || file.getName().endsWith(extension);
   }
 
   /**

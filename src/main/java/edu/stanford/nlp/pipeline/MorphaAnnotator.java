@@ -66,16 +66,16 @@ public class MorphaAnnotator implements Annotator{
   private static void addLemma(Morphology morpha,
                         Class<? extends CoreAnnotation<String>> ann,
                         CoreMap map, String word, String tag) {
-    if (!tag.isEmpty()) {
-      String phrasalVerb = phrasalVerb(morpha, word, tag);
-      if (phrasalVerb == null) {
-        map.set(ann, morpha.lemma(word, tag));
+      if (tag.isEmpty()) {
+          map.set(ann, morpha.stem(word));
       } else {
-        map.set(ann, phrasalVerb);
+          String phrasalVerb = phrasalVerb(morpha, word, tag);
+          if (phrasalVerb == null) {
+              map.set(ann, morpha.lemma(word, tag));
+          } else {
+              map.set(ann, phrasalVerb);
+          }
       }
-    } else {
-      map.set(ann, morpha.stem(word));
-    }
   }
 
 

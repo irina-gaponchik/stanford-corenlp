@@ -263,18 +263,19 @@ public class SieveCoreferenceSystem {
           // Do initial check of sieves order, can only have one where the first is ANY (< 0), and one where second is ANY (< 0)
           if (p.first() < 0 && p.second() < 0) {
             throw new IllegalArgumentException("Invalid ordering constraint: " + ordering);
-          } else if (p.first() < 0) {
-            if (lastSieveConstraint != null) {
-              throw new IllegalArgumentException("Cannot have these two ordering constraints: " + lastSieveConstraint + ',' + ordering);
-            }
-            lastSieveConstraint = ordering;
-          } else if (p.second() < 0) {
-            if (firstSieveConstraint != null) {
-              throw new IllegalArgumentException("Cannot have these two ordering constraints: " + firstSieveConstraint + ',' + ordering);
-            }
-            firstSieveConstraint = ordering;
           }
-          sievesKeepOrder.add(p);
+            if (p.first() < 0) {
+              if (lastSieveConstraint != null) {
+                throw new IllegalArgumentException("Cannot have these two ordering constraints: " + lastSieveConstraint + ',' + ordering);
+              }
+              lastSieveConstraint = ordering;
+            } else if (p.second() < 0) {
+              if (firstSieveConstraint != null) {
+                throw new IllegalArgumentException("Cannot have these two ordering constraints: " + firstSieveConstraint + ',' + ordering);
+              }
+              firstSieveConstraint = ordering;
+            }
+            sievesKeepOrder.add(p);
         }
       }
     }
@@ -1399,23 +1400,23 @@ public class SieveCoreferenceSystem {
 
   private static void printScoreSummary(String summary, Logger logger, boolean afterPostProcessing) {
     String[] lines = COMPILE2.split(summary);
-    if(!afterPostProcessing) {
-      for(String line : lines) {
-        if(line.startsWith("Identification of Mentions")) {
-          logger.info(line);
-          return;
-        }
+      if (afterPostProcessing) {
+          StringBuilder sb = new StringBuilder();
+          for (String line : lines) {
+              if (line.startsWith("METRIC")) sb.append(line);
+              if (!line.startsWith("Identification of Mentions") && line.contains("Recall")) {
+                  sb.append(line).append('\n');
+              }
+          }
+          logger.info(sb.toString());
+      } else {
+          for (String line : lines) {
+              if (line.startsWith("Identification of Mentions")) {
+                  logger.info(line);
+                  return;
+              }
+          }
       }
-    } else {
-      StringBuilder sb = new StringBuilder();
-      for(String line : lines) {
-        if(line.startsWith("METRIC")) sb.append(line);
-        if(!line.startsWith("Identification of Mentions") && line.contains("Recall")) {
-          sb.append(line).append('\n');
-        }
-      }
-      logger.info(sb.toString());
-    }
   }
   /** Print average F1 of MUC, B^3, CEAF_E */
   private static void printFinalConllScore(String summary) {

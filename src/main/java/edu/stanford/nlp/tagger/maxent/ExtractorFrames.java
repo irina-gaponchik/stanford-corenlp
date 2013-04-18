@@ -154,145 +154,145 @@ public class ExtractorFrames {
 
     ArrayList<Extractor> extrs = new ArrayList<>();
     List<String> args = StringUtils.valueSplit(arch, "[a-zA-Z0-9]*(?:\\([^)]*\\))?", "\\s*,\\s*");
-    for (String arg : args) {
-      if (arg.equals("sighan2005")) {
-        extrs.addAll(Arrays.asList(eFrames_sighan2005));
-      } else if (arg.equalsIgnoreCase("german")) {
-        extrs.addAll(Arrays.asList(eFrames_german));
-      } else if (arg.startsWith("words(")) {
-        // non-sequence features with just a certain number of words to the
-        // left and right; e.g., words(-2,2) or words(-2,-1)
-        int lWindow = Extractor.getParenthesizedNum(arg, 1);
-        int rWindow = Extractor.getParenthesizedNum(arg, 2);
-        for (int i = lWindow; i <= rWindow; i++) {
-          extrs.add(new Extractor(i, false));
-        }
-      } else if (arg.startsWith("tags(")) {
-        // non-sequence features with just a certain number of words to the
-        // left and right; e.g., tags(-2,2) or tags(-2,-1)
-        int lWindow = Extractor.getParenthesizedNum(arg, 1);
-        int rWindow = Extractor.getParenthesizedNum(arg, 2);
-        for (int i = lWindow; i <= rWindow; i++) {
-          extrs.add(new Extractor(i, true));
-        }
-      } else if (arg.startsWith("biwords(")) {
-        // non-sequence features of word pairs.
-        // biwords(-2,1) would give you 3 extractors for w-2w-1, w-1,w0, w0w1
-        int lWindow = Extractor.getParenthesizedNum(arg, 1);
-        int rWindow = Extractor.getParenthesizedNum(arg, 2);
-        for (int i = lWindow; i < rWindow; i++) {
-          extrs.add(new ExtractorTwoWords(i));
-        }
-      } else if (arg.startsWith("biword(")) {
-        // non-sequence feature of a word pair.
-        // biwords(-2,1) would give you 1 extractor for w-2, w+1
-        int left = Extractor.getParenthesizedNum(arg, 1);
-        int right = Extractor.getParenthesizedNum(arg, 2);
-        extrs.add(new ExtractorTwoWords(left, right));
-      } else if (arg.startsWith("twoTags(")) {
-        // non-sequence feature of a tag pair.
-        // twoTags(-2,1) would give you 1 extractor for t-2, t+1
-        int left = Extractor.getParenthesizedNum(arg, 1);
-        int right = Extractor.getParenthesizedNum(arg, 2);
-        extrs.add(new ExtractorTwoTags(left, right));
-      } else if (arg.startsWith("lowercasewords(")) {
-        // non-sequence features with just a certain number of lowercase words
-        // to the left and right
-        int lWindow = Extractor.getParenthesizedNum(arg, 1);
-        int rWindow = Extractor.getParenthesizedNum(arg, 2);
-        for (int i = lWindow; i <= rWindow; i++) {
-          extrs.add(new ExtractorWordLowerCase(i));
-        }
-      } else if (arg.startsWith("order(")) {
-        // anything like order(2), order(-4), order(0,3), or
-        // order(-2,1) are okay.
-        int leftOrder = Extractor.getParenthesizedNum(arg, 1);
-        int rightOrder = Extractor.getParenthesizedNum(arg, 2);
-        if (leftOrder > 0) { leftOrder = -leftOrder; }
-	if (rightOrder < 0) { throw new IllegalArgumentException("Right order must be non-negative, not " + rightOrder); }
-        // cdm 2009: We only add successively higher order tag k-grams
-        // ending adjacent to t0.  Adding lower order features at a distance
-        // appears not to help (Dec 2009). But they can now be added with tags().
+    for (String arg : args)
+        if (arg.equals("sighan2005")) {
+            extrs.addAll(Arrays.asList(eFrames_sighan2005));
+        } else if (arg.equalsIgnoreCase("german")) {
+            extrs.addAll(Arrays.asList(eFrames_german));
+        } else if (arg.startsWith("words(")) {
+            // non-sequence features with just a certain number of words to the
+            // left and right; e.g., words(-2,2) or words(-2,-1)
+            int lWindow = Extractor.getParenthesizedNum(arg, 1);
+            int rWindow = Extractor.getParenthesizedNum(arg, 2);
+            for (int i = lWindow; i <= rWindow; i++) {
+                extrs.add(new Extractor(i, false));
+            }
+        } else if (arg.startsWith("tags(")) {
+            // non-sequence features with just a certain number of words to the
+            // left and right; e.g., tags(-2,2) or tags(-2,-1)
+            int lWindow = Extractor.getParenthesizedNum(arg, 1);
+            int rWindow = Extractor.getParenthesizedNum(arg, 2);
+            for (int i = lWindow; i <= rWindow; i++) {
+                extrs.add(new Extractor(i, true));
+            }
+        } else if (arg.startsWith("biwords(")) {
+            // non-sequence features of word pairs.
+            // biwords(-2,1) would give you 3 extractors for w-2w-1, w-1,w0, w0w1
+            int lWindow = Extractor.getParenthesizedNum(arg, 1);
+            int rWindow = Extractor.getParenthesizedNum(arg, 2);
+            for (int i = lWindow; i < rWindow; i++) {
+                extrs.add(new ExtractorTwoWords(i));
+            }
+        } else if (arg.startsWith("biword(")) {
+            // non-sequence feature of a word pair.
+            // biwords(-2,1) would give you 1 extractor for w-2, w+1
+            int left = Extractor.getParenthesizedNum(arg, 1);
+            int right = Extractor.getParenthesizedNum(arg, 2);
+            extrs.add(new ExtractorTwoWords(left, right));
+        } else if (arg.startsWith("twoTags(")) {
+            // non-sequence feature of a tag pair.
+            // twoTags(-2,1) would give you 1 extractor for t-2, t+1
+            int left = Extractor.getParenthesizedNum(arg, 1);
+            int right = Extractor.getParenthesizedNum(arg, 2);
+            extrs.add(new ExtractorTwoTags(left, right));
+        } else if (arg.startsWith("lowercasewords(")) {
+            // non-sequence features with just a certain number of lowercase words
+            // to the left and right
+            int lWindow = Extractor.getParenthesizedNum(arg, 1);
+            int rWindow = Extractor.getParenthesizedNum(arg, 2);
+            for (int i = lWindow; i <= rWindow; i++) {
+                extrs.add(new ExtractorWordLowerCase(i));
+            }
+        } else if (arg.startsWith("order(")) {
+            // anything like order(2), order(-4), order(0,3), or
+            // order(-2,1) are okay.
+            int leftOrder = Extractor.getParenthesizedNum(arg, 1);
+            int rightOrder = Extractor.getParenthesizedNum(arg, 2);
+            if (leftOrder > 0) {
+                leftOrder = -leftOrder;
+            }
+            if (rightOrder < 0) {
+                throw new IllegalArgumentException("Right order must be non-negative, not " + rightOrder);
+            }
+            // cdm 2009: We only add successively higher order tag k-grams
+            // ending adjacent to t0.  Adding lower order features at a distance
+            // appears not to help (Dec 2009). But they can now be added with tags().
 
-        for (int idx = leftOrder ; idx <= rightOrder; idx++) {
-          if (idx == 0) {
-            // do nothing
-          } else if (idx == -1 || idx == 1) {
-            extrs.add(new Extractor(idx, true));
-          } else {
-            extrs.add(new ExtractorContinuousTagConjunction(idx));
-          }
+            for (int idx = leftOrder; idx <= rightOrder; idx++) {
+                if (idx != 0) {
+                    extrs.add(idx == -1 || idx == 1 ? new Extractor(idx, true) : new ExtractorContinuousTagConjunction(idx));
+                }
+            }
+        } else if (arg.startsWith("wordTag(")) {
+            // sequence feature of a word and a tag: wordTag(-1,1)
+            int posW = Extractor.getParenthesizedNum(arg, 1);
+            int posT = Extractor.getParenthesizedNum(arg, 2);
+            extrs.add(new ExtractorWordTag(posW, posT));
+        } else if (arg.startsWith("wordTwoTags(")) {
+            int word = Extractor.getParenthesizedNum(arg, 1);
+            int tag1 = Extractor.getParenthesizedNum(arg, 2);
+            int tag2 = Extractor.getParenthesizedNum(arg, 3);
+            extrs.add(new ExtractorWordTwoTags(word, tag1, tag2));
+        } else if (arg.startsWith("threeTags(")) {
+            int pos1 = Extractor.getParenthesizedNum(arg, 1);
+            int pos2 = Extractor.getParenthesizedNum(arg, 2);
+            int pos3 = Extractor.getParenthesizedNum(arg, 3);
+            extrs.add(new ExtractorThreeTags(pos1, pos2, pos3));
+        } else if (arg.startsWith("vbn(")) {
+            int order = Extractor.getParenthesizedNum(arg, 1);
+            extrs.add(new ExtractorVerbalVBNZero(order));
+        } else if (arg.startsWith("allwordshapes(")) {
+            int lWindow = Extractor.getParenthesizedNum(arg, 1);
+            int rWindow = Extractor.getParenthesizedNum(arg, 2);
+            String wsc = Extractor.getParenthesizedArg(arg, 3);
+            if (wsc == null) {
+                wsc = "chris2";
+            }
+            for (int i = lWindow; i <= rWindow; i++) {
+                extrs.add(new ExtractorWordShapeClassifier(i, wsc));
+            }
+        } else if (arg.startsWith("allwordshapeconjunction(")) {
+            int lWindow = Extractor.getParenthesizedNum(arg, 1);
+            int rWindow = Extractor.getParenthesizedNum(arg, 2);
+            String wsc = Extractor.getParenthesizedArg(arg, 3);
+            if (wsc == null) {
+                wsc = "chris2";
+            }
+            extrs.add(new ExtractorWordShapeConjunction(lWindow, rWindow, wsc));
+        } else if (arg.startsWith("allunicodeshapes(")) {
+            int lWindow = Extractor.getParenthesizedNum(arg, 1);
+            int rWindow = Extractor.getParenthesizedNum(arg, 2);
+            for (int i = lWindow; i <= rWindow; i++) {
+                extrs.add(new ExtractorWordShapeClassifier(i, "chris4"));
+            }
+        } else if (arg.startsWith("allunicodeshapeconjunction(")) {
+            int lWindow = Extractor.getParenthesizedNum(arg, 1);
+            int rWindow = Extractor.getParenthesizedNum(arg, 2);
+            extrs.add(new ExtractorWordShapeConjunction(lWindow, rWindow, "chris4"));
+        } else if (arg.equalsIgnoreCase("naacl2003unknowns") ||
+                arg.equalsIgnoreCase("lnaacl2003unknowns") ||
+                arg.equalsIgnoreCase("caselessnaacl2003unknowns") ||
+                arg.equalsIgnoreCase("naacl2003conjunctions") ||
+                arg.equalsIgnoreCase("frenchunknowns") ||
+                arg.startsWith("wordshapes(") ||
+                arg.startsWith("wordshapeconjunction(") ||
+                arg.equalsIgnoreCase("motleyUnknown") ||
+                arg.startsWith("suffix(") ||
+                arg.startsWith("prefix(") ||
+                arg.startsWith("prefixsuffix") ||
+                arg.startsWith("capitalizationsuffix(") ||
+                arg.startsWith("distsim(") ||
+                arg.startsWith("distsimconjunction(") ||
+                arg.equalsIgnoreCase("lctagfeatures") ||
+                arg.startsWith("unicodeshapes(") ||
+                arg.startsWith("chinesedictionaryfeatures(") ||
+                arg.startsWith("unicodeshapeconjunction(")) {
+            // okay; known unknown keyword
+        } else {
+            System.err.println("Unrecognized ExtractorFrames identifier (ignored): " + arg);
         }
-      } else if (arg.startsWith("wordTag(")) {
-        // sequence feature of a word and a tag: wordTag(-1,1)
-        int posW = Extractor.getParenthesizedNum(arg, 1);
-        int posT = Extractor.getParenthesizedNum(arg, 2);
-        extrs.add(new ExtractorWordTag(posW, posT));
-      } else if (arg.startsWith("wordTwoTags(")) {
-        int word = Extractor.getParenthesizedNum(arg, 1);
-        int tag1 = Extractor.getParenthesizedNum(arg, 2);
-        int tag2 = Extractor.getParenthesizedNum(arg, 3);
-        extrs.add(new ExtractorWordTwoTags(word,tag1,tag2));
-      } else if (arg.startsWith("threeTags(")) {
-        int pos1 = Extractor.getParenthesizedNum(arg, 1);
-        int pos2 = Extractor.getParenthesizedNum(arg, 2);
-        int pos3 = Extractor.getParenthesizedNum(arg, 3);
-        extrs.add(new ExtractorThreeTags(pos1,pos2,pos3));
-      } else if (arg.startsWith("vbn(")) {
-        int order = Extractor.getParenthesizedNum(arg, 1);
-        extrs.add(new ExtractorVerbalVBNZero(order));
-      } else if (arg.startsWith("allwordshapes(")) {
-        int lWindow = Extractor.getParenthesizedNum(arg, 1);
-        int rWindow = Extractor.getParenthesizedNum(arg, 2);
-        String wsc = Extractor.getParenthesizedArg(arg, 3);
-        if (wsc == null) {
-          wsc = "chris2";
-        }
-        for (int i = lWindow; i <= rWindow; i++) {
-          extrs.add(new ExtractorWordShapeClassifier(i, wsc));
-        }
-      } else if (arg.startsWith("allwordshapeconjunction(")) {
-        int lWindow = Extractor.getParenthesizedNum(arg, 1);
-        int rWindow = Extractor.getParenthesizedNum(arg, 2);
-        String wsc = Extractor.getParenthesizedArg(arg, 3);
-        if (wsc == null) {
-          wsc = "chris2";
-        }
-        extrs.add(new ExtractorWordShapeConjunction(lWindow, rWindow, wsc));
-      } else if (arg.startsWith("allunicodeshapes(")) {
-        int lWindow = Extractor.getParenthesizedNum(arg, 1);
-        int rWindow = Extractor.getParenthesizedNum(arg, 2);
-        for (int i = lWindow; i <= rWindow; i++) {
-          extrs.add(new ExtractorWordShapeClassifier(i, "chris4"));
-        }
-      } else if (arg.startsWith("allunicodeshapeconjunction(")) {
-        int lWindow = Extractor.getParenthesizedNum(arg, 1);
-        int rWindow = Extractor.getParenthesizedNum(arg, 2);
-        extrs.add(new ExtractorWordShapeConjunction(lWindow, rWindow, "chris4"));
-      } else if (arg.equalsIgnoreCase("naacl2003unknowns") ||
-                 arg.equalsIgnoreCase("lnaacl2003unknowns") ||
-                 arg.equalsIgnoreCase("caselessnaacl2003unknowns") ||
-                 arg.equalsIgnoreCase("naacl2003conjunctions") ||
-                 arg.equalsIgnoreCase("frenchunknowns") ||
-                 arg.startsWith("wordshapes(") ||
-                 arg.startsWith("wordshapeconjunction(") ||
-                 arg.equalsIgnoreCase("motleyUnknown") ||
-                 arg.startsWith("suffix(") ||
-                 arg.startsWith("prefix(") ||
-                 arg.startsWith("prefixsuffix") ||
-                 arg.startsWith("capitalizationsuffix(") ||
-                 arg.startsWith("distsim(") ||
-                 arg.startsWith("distsimconjunction(") ||
-                 arg.equalsIgnoreCase("lctagfeatures") ||
-                 arg.startsWith("unicodeshapes(") ||
-                 arg.startsWith("chinesedictionaryfeatures(") ||
-                 arg.startsWith("unicodeshapeconjunction(")) {
-        // okay; known unknown keyword
-      } else {
-        System.err.println("Unrecognized ExtractorFrames identifier (ignored): " + arg);
-      }
-    } // end for
-    return extrs.toArray(new Extractor[extrs.size()]);
+      // end for
+      return extrs.toArray(new Extractor[extrs.size()]);
   }
 
 

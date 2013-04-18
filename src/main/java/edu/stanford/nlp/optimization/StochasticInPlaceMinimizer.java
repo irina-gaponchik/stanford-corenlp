@@ -257,11 +257,10 @@ public class StochasticInPlaceMinimizer<T extends Function> implements Minimizer
 
     if (!have_max){
       throw new UnsupportedOperationException("No maximum number of iterations has been specified.");
-    } else{
-      maxIterations = Math.max(maxIterations, numPasses)*numBatches;
     }
+      maxIterations = Math.max(maxIterations, numPasses)*numBatches;
 
-    sayln("       Batch size of: " + bSize);
+      sayln("       Batch size of: " + bSize);
     sayln("       Data dimension of: " + totalSamples );
     sayln("       Batches per pass through data:  " + numBatches );
     sayln("       Number of passes is = " + numPasses);

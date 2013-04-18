@@ -278,12 +278,12 @@ public class Buckwalter implements SerializableFunction<String,String> {
 		}
 
 		if (DEBUG) {
-			if ( ! b.unmappable.keySet().isEmpty()) {
-				EncodingPrintWriter.err.println("Characters that could not be converted [passed through!]:", "utf-8");
-				EncodingPrintWriter.err.println(b.unmappable.toString(), "utf-8");
-			} else {
-				EncodingPrintWriter.err.println("All characters successfully converted!", "utf-8");
-			}
+            if (b.unmappable.keySet().isEmpty()) {
+                EncodingPrintWriter.err.println("All characters successfully converted!", "utf-8");
+            } else {
+                EncodingPrintWriter.err.println("Characters that could not be converted [passed through!]:", "utf-8");
+                EncodingPrintWriter.err.println(b.unmappable.toString(), "utf-8");
+            }
 		}
 	}
 

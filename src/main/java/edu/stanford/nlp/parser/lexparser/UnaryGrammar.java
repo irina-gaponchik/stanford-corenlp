@@ -64,12 +64,12 @@ public class UnaryGrammar implements Serializable, Iterable<UnaryRule> {
   public final void purgeRules() {
     Map<UnaryRule,UnaryRule> bR = Generics.newHashMap();
     for (UnaryRule ur : bestRulesUnderMax.keySet()) {
-      if (ur.parent != ur.child) {
-        bR.put(ur, ur);
-      } else {
-        closedRulesWithParent[ur.parent].remove(ur);
-        closedRulesWithChild[ur.child].remove(ur);
-      }
+        if (ur.parent == ur.child) {
+            closedRulesWithParent[ur.parent].remove(ur);
+            closedRulesWithChild[ur.child].remove(ur);
+        } else {
+            bR.put(ur, ur);
+        }
     }
     bestRulesUnderMax = bR;
     makeCRArrays();

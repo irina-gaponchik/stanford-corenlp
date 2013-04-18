@@ -502,13 +502,15 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   public boolean equals(Object o) {
     if (this == o) {
       return true;
-    } else if ( ! (o instanceof Counter)) {
-      return false;
-    } else if ( ! (o instanceof ClassicCounter)) {
-      return Counters.equals(this, (Counter<E>) o);
     }
+      if ( ! (o instanceof Counter)) {
+        return false;
+      }
+      if ( ! (o instanceof ClassicCounter)) {
+        return Counters.equals(this, (Counter<E>) o);
+      }
 
-    ClassicCounter<E> counter = (ClassicCounter<E>) o;
+      ClassicCounter<E> counter = (ClassicCounter<E>) o;
     return totalCount == counter.totalCount && map.equals(counter.map);
   }
 

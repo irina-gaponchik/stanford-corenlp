@@ -909,14 +909,13 @@ public class Redwood {
     public RecordHandlerTree find(LogRecordHandler toFind){
       if(toFind.equals(head())){
         return this;
-      } else {
+      }
         Iterator<RecordHandlerTree> iter = children();
         while(iter.hasNext()){
           RecordHandlerTree cand = iter.next().find(toFind);
           if(cand != null){ return cand; }
         }
-      }
-      return null;
+        return null;
     }
     public Iterator<LogRecordHandler> iterator() {
       return new Iterator<LogRecordHandler>(){
@@ -929,11 +928,11 @@ public class Redwood {
         // -- HasNext
         public boolean hasNext() {
           while(childIter != null && !childIter.hasNext()){
-            if(!childrenIter.hasNext()) {
-              break;
-            } else {
-              childIter = childrenIter.next().iterator();
-            }
+              if (childrenIter.hasNext()) {
+                  childIter = childrenIter.next().iterator();
+              } else {
+                  break;
+              }
           }
           return !seenHead || childIter != null && childIter.hasNext();
         }

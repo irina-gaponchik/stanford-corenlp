@@ -448,11 +448,11 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
             beginLine = true;
             writer.newLine();
           } else {
-            if ( ! beginLine) {
-              writer.write(' ');
-            } else {
-              beginLine = false;
-            }
+              if (beginLine) {
+                  beginLine = false;
+              } else {
+                  writer.write(' ');
+              }
             // writer.write(str.replace("\n", ""));
             writer.write(str);
           }

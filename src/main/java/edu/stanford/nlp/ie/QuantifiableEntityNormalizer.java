@@ -358,9 +358,7 @@ public class QuantifiableEntityNormalizer {
                 entityStringCollector = null;
             }
             //If its not to be collapsed, toss it onto the sentence.
-            if (!collapseBeforeParsing.contains(entityType)) {
-                s.add(w);
-            } else { //If it is to be collapsed....
+            if (collapseBeforeParsing.contains(entityType)) { //If it is to be collapsed....
                 //if its a continuation of the last entity, add it to the
                 //current buffer.
                 if (entityType.equals(lastEntity)) {
@@ -372,6 +370,8 @@ public class QuantifiableEntityNormalizer {
                     entityStringCollector = new StringBuilder();
                     entityStringCollector.append(w.get(CoreAnnotations.TextAnnotation.class));
                 }
+            } else {
+                s.add(w);
             }
             lastEntity = entityType;
         }
@@ -631,39 +631,56 @@ public class QuantifiableEntityNormalizer {
         Matcher m = timePattern.matcher(s);
         if (s.equalsIgnoreCase("noon")) {
             return "12:00pm";
-        } else if (s.equalsIgnoreCase("midnight")) {
+        }
+        if (s.equalsIgnoreCase("midnight")) {
             return "00:00am";  // or "12:00am" ?
-        } else if (s.equalsIgnoreCase("morning")) {
+        }
+        if (s.equalsIgnoreCase("morning")) {
             return "M";
-        } else if (s.equalsIgnoreCase("afternoon")) {
+        }
+        if (s.equalsIgnoreCase("afternoon")) {
             return "A";
-        } else if (s.equalsIgnoreCase("evening")) {
+        }
+        if (s.equalsIgnoreCase("evening")) {
             return "EN";
-        } else if (s.equalsIgnoreCase("night")) {
+        }
+        if (s.equalsIgnoreCase("night")) {
             return "N";
-        } else if (s.equalsIgnoreCase("day")) {
+        }
+        if (s.equalsIgnoreCase("day")) {
             return "D";
-        } else if (s.equalsIgnoreCase("suppertime")) {
+        }
+        if (s.equalsIgnoreCase("suppertime")) {
             return "EN";
-        } else if (s.equalsIgnoreCase("lunchtime")) {
+        }
+        if (s.equalsIgnoreCase("lunchtime")) {
             return "MD";
-        } else if (s.equalsIgnoreCase("midday")) {
+        }
+        if (s.equalsIgnoreCase("midday")) {
             return "MD";
-        } else if (s.equalsIgnoreCase("teatime")) {
+        }
+        if (s.equalsIgnoreCase("teatime")) {
             return "A";
-        } else if (s.equalsIgnoreCase("dinnertime")) {
+        }
+        if (s.equalsIgnoreCase("dinnertime")) {
             return "EN";
-        } else if (s.equalsIgnoreCase("dawn")) {
+        }
+        if (s.equalsIgnoreCase("dawn")) {
             return "EM";
-        } else if (s.equalsIgnoreCase("dusk")) {
+        }
+        if (s.equalsIgnoreCase("dusk")) {
             return "EN";
-        } else if (s.equalsIgnoreCase("sundown")) {
+        }
+        if (s.equalsIgnoreCase("sundown")) {
             return "EN";
-        } else if (s.equalsIgnoreCase("sunup")) {
+        }
+        if (s.equalsIgnoreCase("sunup")) {
             return "EM";
-        } else if (s.equalsIgnoreCase("daybreak")) {
+        }
+        if (s.equalsIgnoreCase("daybreak")) {
             return "EM";
-        } else if (m.matches()) {
+        }
+        if (m.matches()) {
             if (DEBUG2) {
                 err.printf("timePattern matched groups: |%s| |%s| |%s| |%s|\n", m.group(0), m.group(1), m.group(2), m.group(3));
             }
@@ -682,15 +699,13 @@ public class QuantifiableEntityNormalizer {
                 sb.append(suffix);
             } else if (ampm != null) {
                 sb.append(ampm);
-            } else {
-                // Do nothing; leave ambiguous
-                // sb.append("pm");
             }
             if (DEBUG2) {
                 err.println("normalizedTimeString new str: " + sb);
             }
             return sb.toString();
-        } else if (DEBUG) {
+        }
+        if (DEBUG) {
             err.println("Quantifiable: couldn't normalize " + s);
         }
         return null;
@@ -1165,24 +1180,29 @@ public class QuantifiableEntityNormalizer {
         String longPrev = prev3 + ' ' + prev2 + ' ' + prev;
         if (longPrev.matches(earlyThreeWords)) {
             return "E";
-        } else if (longPrev.matches(lateThreeWords)) {
+        }
+        if (longPrev.matches(lateThreeWords)) {
             return "L";
-        } else if (longPrev.matches(middleThreeWords)) {
+        }
+        if (longPrev.matches(middleThreeWords)) {
             return "M";
         }
 
         longPrev = prev2 + ' ' + prev;
         if (longPrev.matches(earlyTwoWords)) {
             return "E";
-        } else if (longPrev.matches(lateTwoWords)) {
+        }
+        if (longPrev.matches(lateTwoWords)) {
             return "L";
-        } else if (longPrev.matches(middleTwoWords)) {
+        }
+        if (longPrev.matches(middleTwoWords)) {
             return "M";
         }
 
         if (prev.matches(earlyOneWord) || prev2.matches(earlyOneWord)) {
             return "E";
-        } else if (prev.matches(lateOneWord) || prev2.matches(lateOneWord)) {
+        }
+        if (prev.matches(lateOneWord) || prev2.matches(lateOneWord)) {
             return "L";
         }
 

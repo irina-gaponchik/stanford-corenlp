@@ -358,14 +358,20 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
           ansPrefix = bits[0];
         }
         numTokens++;
-        if (ansBase.equals("O")) {
-        } else if (ansBase.equals(lastAnsBase)) {
-          if (ansPrefix.equals("B")) {
-            numEntities++;
+          switch (ansBase) {
+              case "O":
+                  continue;
+              default:
+                  if (ansBase.equals(lastAnsBase)) {
+                      if (ansPrefix.equals("B")) {
+                          numEntities++;
+
+                      }
+                  } else {
+                      numEntities++;
+                  }
+                  break;
           }
-        } else {
-          numEntities++;
-        }
       }
     }
     System.out.println("File " + args[0] + " has " + numDocs + " documents, " +

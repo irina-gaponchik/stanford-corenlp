@@ -752,12 +752,12 @@ public class BiLexPCFGParser implements KBestViterbiParser {
     initialize(words);
     while (!agenda.isEmpty()) {
       Item item = agenda.extractMin();
-      if (!item.isEdge()) {
-        exHook++;
-        extractedHooks++;
-      } else {
-        extractedEdges++;
-      }
+        if (item.isEdge()) {
+            extractedEdges++;
+        } else {
+            exHook++;
+            extractedHooks++;
+        }
       if (relaxHook1 > last + 1000000) {
         last = relaxHook1;
         if (op.testOptions.verbose) {

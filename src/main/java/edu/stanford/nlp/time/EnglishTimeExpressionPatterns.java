@@ -1065,12 +1065,7 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
                     minutes = NumberNormalizer.wordToNumber(str).intValue();
                   }
                   str = in.group(2).toLowerCase();
-                  if (str.equals("past") || str.equals("after")) {
-                    // after - keep minutes as is
-                  } else {
-                    // before
-                    minutes = -minutes;
-                  }
+                    if (!str.equals("past") && !str.equals("after")) minutes = -minutes;
                 }
                 str = in.group(3);
                 if (str != null) {
@@ -1219,13 +1214,10 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
         int m = Integer.parseInt(matcher.group());
         d = d.multiplyBy(m);
       } else {
-        Number n = null;
-        n = NumberNormalizer.wordToNumber(val);
-        if (n != null) {
+          Number n = NumberNormalizer.wordToNumber(val);
+          if (n != null) {
           int m = n.intValue();
           d = d.multiplyBy(m);
-        } else {
-          // TODO: unspecified...
         }
       }
     }
@@ -1374,14 +1366,14 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
 			  }
       }
     }
-    if (flags != 0) {
-      logger.warning("Should resolve " + te + " using flags " + flags + " due to reason " + reason);
-      logger.warning("Resolution context " + annotation.get(CoreAnnotations.TextAnnotation.class));
-    } else {
-      if (te.getTemporal() instanceof SUTime.PartialTime) {
-        flags = SUTime.RESOLVE_TO_CLOSEST;
+      if (flags == 0) {
+          if (te.getTemporal() instanceof SUTime.PartialTime) {
+              flags = SUTime.RESOLVE_TO_CLOSEST;
+          }
+      } else {
+          logger.warning("Should resolve " + te + " using flags " + flags + " due to reason " + reason);
+          logger.warning("Resolution context " + annotation.get(CoreAnnotations.TextAnnotation.class));
       }
-    }
     return flags;
   }
 
@@ -1583,26 +1575,34 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
 	  if (expression.matches("(?i).*\\b(late|end)\\b.*")) {
       // NOTE: TIMEX3 standard has END, not LATE
       return temporal.addMod(SUTime.TimexMod.LATE.name());
-  	} else if (expression.matches("(?i).*\\bno\\s+more\\s+than\\b.*") || expression.matches("(?i).*\\bup\\s+to\\b.*")) {
- 	    return temporal.addMod(SUTime.TimexMod.EQUAL_OR_LESS.name());
-    } else if (expression.matches("(?i).*\\bmore\\s+than\\b.*")) {
+  	}
+      if (expression.matches("(?i).*\\bno\\s+more\\s+than\\b.*") || expression.matches("(?i).*\\bup\\s+to\\b.*")) {
+         return temporal.addMod(SUTime.TimexMod.EQUAL_OR_LESS.name());
+}
+      if (expression.matches("(?i).*\\bmore\\s+than\\b.*")) {
       return temporal.addMod(SUTime.TimexMod.MORE_THAN.name());
-    } else if (expression.matches("(?i).*\\bno\\s+less\\s+than\\b.*")) {
+      }
+      if (expression.matches("(?i).*\\bno\\s+less\\s+than\\b.*")) {
       return temporal.addMod(SUTime.TimexMod.EQUAL_OR_MORE.name());
-    } else if (expression.matches("(?i).*\\bless\\s+than\\b.*")) {
+      }
+      if (expression.matches("(?i).*\\bless\\s+than\\b.*")) {
       return temporal.addMod(SUTime.TimexMod.LESS_THAN.name());
-    } else if (expression.matches("(?i).*\\b(early|start|beginning|dawn\\s+of)\\b.*")) {
+      }
+      if (expression.matches("(?i).*\\b(early|start|beginning|dawn\\s+of)\\b.*")) {
       // NOTE: TIMEX3 standard has START, not EARLY
       return temporal.addMod(SUTime.TimexMod.EARLY.name());
-    } else if (expression.matches("(?i).*\\bmid(dle)?\\b.*")) {
+      }
+      if (expression.matches("(?i).*\\bmid(dle)?\\b.*")) {
       return temporal.addMod(SUTime.TimexMod.MID.name());
-    } else if (expression.matches("(?i).*\\bat\\s+least\\b.*")) {
+      }
+      if (expression.matches("(?i).*\\bat\\s+least\\b.*")) {
       return temporal.addMod(SUTime.TimexMod.EQUAL_OR_MORE.name());
-    } else if (expression.matches("(?i).*\\b(about|around|some)\\b.*")) {
+      }
+      if (expression.matches("(?i).*\\b(about|around|some)\\b.*")) {
       // In GUTIME, this was extra MOD attribute but XML standard doesn't really allow for multiple attributes with same name...
       return temporal.addMod(SUTime.TimexMod.APPROX.name());
-    }
-    return temporal;
+      }
+      return temporal;
   }
 
   /**
@@ -1713,60 +1713,18 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
 
     // Now add Time of Day
     SUTime.IsoTime isoTime = null;
-    if (isoTime == null) {
-      p = Pattern.compile(".*(\\d?\\d):(\\d\\d)(:(\\d\\d)(\\.\\d+)?)?(\\s*([AP])\\.?M\\.?)?(\\s+([+\\-]\\d+|[A-Z][SD]T|GMT([+\\-]\\d+)?))?.*");
-      m = p.matcher(dateStr);
-      if (m.matches()) {
-        // TODO: Fix
-  //      isoTime = new SUTime.IsoTime(m.group(1), m.group(2), m.group(4), m.group(5), m.group(7), m.group(9));
-      }
-    }
+      if (isoTime == null) {
+          p = Pattern.compile(".*(\\d?\\d):(\\d\\d)(:(\\d\\d)(\\.\\d+)?)?(\\s*([AP])\\.?M\\.?)?(\\s+([+\\-]\\d+|[A-Z][SD]T|GMT([+\\-]\\d+)?))?.*");
+          m = p.matcher(dateStr);
 
-    if (isoTime == null) {
-      p = Pattern.compile("");
-      m = p.matcher(dateStr);
-      if (m.matches()) {
-        isoTime = new SUTime.IsoTime(m.group(1), m.group(2), m.group(3));
-      }
-    }
-    /*
-
-      if($string =~ //oi) {
-    $H = $1;  $m = $2;  $S = $4; $FS = $5; $AMPM = $7; $zone = $9;
-    if((defined($AMPM)) && ($AMPM =~ /P/oi)) { $H += 12; }
-    if(defined($zone)) {
-        if($zone =~ /(GMT)([+\-]\d+)/o) { $zone = $2; }
-        elsif($zone =~ /GMT/o) { $zone = "Z"; }
-        elsif($zone =~ /([A-Z])([SD])T/o) {
-      if(defined($TE_TimeZones{$1})) {
-          $Z = $TE_TimeZones{$1};
-          if($2 eq "D") { $Z++; }
-          if($Z<0) { $zone = sprintf("-%02d", -1*$Z); }
-          else { $zone = sprintf("+%02d", $Z); }
-      }
-        }
-    }
-      } elsif($string =~ /(\d\d)(\d\d)\s+(h(ou)?r|(on\s+)?\d\d?\/\d)/oi) {
-    $H = $1;  $m = $2;
+          p = Pattern.compile("");
+          m = p.matcher(dateStr);
+          if (m.matches()) {
+              isoTime = new SUTime.IsoTime(m.group(1), m.group(2), m.group(3));
+          }
       }
 
-      if(defined($H)) {
-    if(defined($FS)) {
-      $FS =~ s/\.//;
-      $TOD = sprintf("T%02d:%02d:%02d.%02d", $H, $m, $S, $FS); }
-    elsif(defined($S)) { $TOD = sprintf("T%02d:%02d:%02d", $H, $m, $S); }
-    elsif(defined($m)) { $TOD = sprintf("T%02d:%02d", $H, $m); }
-    else { $TOD = sprintf("T%02d", $H); }
-    $ISO .= $TOD;
-    if(defined($zone)) {
-        if($zone =~ /\A\s+/o) { $zone = $'; }
-        $ISO .= $zone; }
-      }
-
-      return($ISO); */
-    if (isoDate != null && isoTime != null) {
-      return new SUTime.IsoDateTime(isoDate, isoTime);
-    } else return isoDate != null ? isoDate : isoTime;
+      return isoDate != null && isoTime != null ? new SUTime.IsoDateTime(isoDate, isoTime) : isoDate != null ? isoDate : isoTime;
   }  // Date2ISO
 
   public static SUTime.IsoDate createIsoDate(String year, String month, String day) {

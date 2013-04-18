@@ -426,26 +426,30 @@ public final class SloppyMath {
     // was a bug in the Fisher's exact routine.
     if (r == n) {
         return k == m ? 1.0 : 0.0;
-    } else if (r == n - 1) {
-      if (k == m) {
-        return (n - m) / (double) n;
-      } else return k == m - 1 ? m / (double) n : 0.0;
-    } else if (m == 1) {
-      if (k == 0) {
-        return (n - r) / (double) n;
-      } else return k == 1 ? r / (double) n : 0.0;
-    } else if (m == 0) {
-        return k == 0 ? 1.0 : 0.0;
-    } else if (k == 0) {
-      double ans = 1.0;
-      for (int m0 = 0; m0 < m; m0++) {
-        ans *= n - r - m0;
-        ans /= n - m0;
-      }
-      return ans;
     }
+      if (r == n - 1) {
+        if (k == m) {
+          return (n - m) / (double) n;
+        } else return k == m - 1 ? m / (double) n : 0.0;
+      }
+      if (m == 1) {
+        if (k == 0) {
+          return (n - r) / (double) n;
+        } else return k == 1 ? r / (double) n : 0.0;
+      }
+      if (m == 0) {
+          return k == 0 ? 1.0 : 0.0;
+      }
+      if (k == 0) {
+        double ans = 1.0;
+        for (int m0 = 0; m0 < m; m0++) {
+          ans *= n - r - m0;
+          ans /= n - m0;
+        }
+        return ans;
+      }
 
-    double ans = 1.0;
+      double ans = 1.0;
     // do (n-r)x...x((n-r)-((m-k)-1))/n x...x (n-((m-k-1)))
     // leaving rest of denominator to get to multimply by (n-(m-1))
     // that's k things which goes into next loop

@@ -777,7 +777,7 @@ public class ISODateInstance {
     //first see if either is a range
     if (this.isRange()) {
       return this.contains(other);
-    } else return other.isRange() ? false : isCompatible(isoDate, other.getDateString());
+    } else return !other.isRange() && isCompatible(isoDate, other.getDateString());
   }
 
   /**

@@ -208,9 +208,8 @@ class TregexParser {
         name = jj_consume_token(TregexParserConstants.IDENTIFIER);
           if (knownVariables.contains(name.image)) {
               if (true) throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");
-          } else {
-            knownVariables.add(name.image);
           }
+          knownVariables.add(name.image);
           if (underNegation)
             {if (true) throw new ParseException("No named tregex nodes allowed in the scope of negation.");}
         break;

@@ -395,22 +395,22 @@ public class QNMinimizer implements Minimizer<DiffFunction>, HasEvaluators {
 
     public void add(double val, double[] grad, double[] x, int fevals, double evalScore) {
 
-      if (!memoryConscious) {
-        if (gNorms.size() > maxSize) {
-          gNorms.remove(0);
+        if (memoryConscious) {
+            maxSize = 10;
+        } else {
+            if (gNorms.size() > maxSize) {
+                gNorms.remove(0);
+            }
+            if (time.size() > maxSize) {
+                time.remove(0);
+            }
+            if (funcEvals.size() > maxSize) {
+                funcEvals.remove(0);
+            }
+            gNorms.add(gNormLast);
+            time.add(howLong());
+            funcEvals.add(fevals);
         }
-        if (time.size() > maxSize) {
-          time.remove(0);
-        }
-        if (funcEvals.size() > maxSize) {
-          funcEvals.remove(0);
-        }
-        gNorms.add(gNormLast);
-        time.add(howLong());
-        funcEvals.add(fevals);
-      } else {
-        maxSize = 10;
-      }
 
       gNormLast = ArrayMath.norm(grad);
       if (values.size() > maxSize) {
@@ -1082,15 +1082,15 @@ public class QNMinimizer implements Minimizer<DiffFunction>, HasEvaluators {
         break;
       } catch (OutOfMemoryError oome) {
         sayln();
-        if ( ! qn.s.isEmpty()) {
-          qn.s.remove(0);
-          qn.y.remove(0);
-          qn.rho.remove(0);
-          qn.mem = qn.s.size();
-          System.err.println("Caught OutOfMemoryError, changing m = " + qn.mem);
-        } else {
-          throw oome;
-        }
+          if (qn.s.isEmpty()) {
+              throw oome;
+          } else {
+              qn.s.remove(0);
+              qn.y.remove(0);
+              qn.rho.remove(0);
+              qn.mem = qn.s.size();
+              System.err.println("Caught OutOfMemoryError, changing m = " + qn.mem);
+          }
       }
 
     } while ((state = rec.toContinue()) == eState.CONTINUE); // do
@@ -1296,16 +1296,14 @@ public class QNMinimizer implements Minimizer<DiffFunction>, HasEvaluators {
 
       if (newPoint[f] <= lastValue + c * dgtest)
         break;
-      else {
         if (newPoint[f] < lastValue) {
           // an improvement, but not good enough... suspicious!
           say("!");
         } else {
           say(".");
         }
-      }
 
-      step = c1 * step;
+        step = c1 * step;
     }
 
     newPoint[a] = step;

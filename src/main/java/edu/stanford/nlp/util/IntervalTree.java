@@ -347,8 +347,6 @@ public class IntervalTree<E extends Comparable<E>, T extends HasInterval<E>>
       boolean addOk = intervals.addNonNested(i);
       if (addOk) {
         res.add(item);
-      } else {
-        //        System.err.println("Discarding " + item);
       }
     }
     return res;

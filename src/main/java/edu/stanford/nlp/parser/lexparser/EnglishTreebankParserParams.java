@@ -38,61 +38,62 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
         Tree leaf = tf.newLeaf(lab);
         leaf.setScore(tree.score());
         return leaf;
-      } else if (tree.isPhrasal()) {
-        if (englishTest.retainADVSubcategories && s.contains("-ADV")) {
-          s = tlp.basicCategory(s);
-          s += "-ADV";
-        } else if (englishTest.retainTMPSubcategories && s.contains("-TMP")) {
-          s = tlp.basicCategory(s);
-          s += "-TMP";
-        } else s = englishTest.retainNPTMPSubcategories && s.startsWith("NP-TMP") ? "NP-TMP" : tlp.basicCategory(s);
-        // remove the extra NPs inserted in the splitBaseNP == Collins option
-        if (englishTrain.splitBaseNP == 2 &&
-            s.equals("NP")) {
-          Tree[] kids = tree.children();
-          if (kids.length == 1 &&
-              tlp.basicCategory(kids[0].value()).equals("NP")) {
-            // go through kidkids here so as to keep any annotation on me.
-            List<Tree> kidkids = new ArrayList<>();
-            for (int cNum = 0; cNum < kids[0].children().length; cNum++) {
-              Tree child = kids[0].children()[cNum];
-              Tree newChild = transformTree(child);
-              if (newChild != null) {
-                kidkids.add(newChild);
-              }
-            }
-            CategoryWordTag myLabel = new CategoryWordTag(lab);
-            myLabel.setCategory(s);
-            return tf.newTreeNode(myLabel, kidkids);
-          }
-        }
-        // remove the extra POSSPs inserted by restructurePossP
-        if (englishTrain.splitPoss == 2 &&
-            s.equals("POSSP")) {
-          Tree[] kids = tree.children();
-          List<Tree> newkids = new ArrayList<>();
-          for (int j = 0; j < kids.length - 1; j++) {
-            for (int cNum = 0; cNum < kids[j].children().length; cNum++) {
-              Tree child = kids[0].children()[cNum];
-              Tree newChild = transformTree(child);
-              if (newChild != null) {
-                newkids.add(newChild);
-              }
-            }
-          }
-          Tree finalChild = transformTree(kids[kids.length - 1]);
-          newkids.add(finalChild);
-          CategoryWordTag myLabel = new CategoryWordTag(lab);
-          myLabel.setCategory("NP");
-          return tf.newTreeNode(myLabel, newkids);
-        }
-      } else { // preterminal
-        s = tlp.basicCategory(s);
-        if (tag != null) {
-          tag = tlp.basicCategory(tag);
-        }
       }
-      List<Tree> children = new ArrayList<>();
+        if (tree.isPhrasal()) {
+          if (englishTest.retainADVSubcategories && s.contains("-ADV")) {
+            s = tlp.basicCategory(s);
+            s += "-ADV";
+          } else if (englishTest.retainTMPSubcategories && s.contains("-TMP")) {
+            s = tlp.basicCategory(s);
+            s += "-TMP";
+          } else s = englishTest.retainNPTMPSubcategories && s.startsWith("NP-TMP") ? "NP-TMP" : tlp.basicCategory(s);
+          // remove the extra NPs inserted in the splitBaseNP == Collins option
+          if (englishTrain.splitBaseNP == 2 &&
+              s.equals("NP")) {
+            Tree[] kids = tree.children();
+            if (kids.length == 1 &&
+                tlp.basicCategory(kids[0].value()).equals("NP")) {
+              // go through kidkids here so as to keep any annotation on me.
+              List<Tree> kidkids = new ArrayList<>();
+              for (int cNum = 0; cNum < kids[0].children().length; cNum++) {
+                Tree child = kids[0].children()[cNum];
+                Tree newChild = transformTree(child);
+                if (newChild != null) {
+                  kidkids.add(newChild);
+                }
+              }
+              CategoryWordTag myLabel = new CategoryWordTag(lab);
+              myLabel.setCategory(s);
+              return tf.newTreeNode(myLabel, kidkids);
+            }
+          }
+          // remove the extra POSSPs inserted by restructurePossP
+          if (englishTrain.splitPoss == 2 &&
+              s.equals("POSSP")) {
+            Tree[] kids = tree.children();
+            List<Tree> newkids = new ArrayList<>();
+            for (int j = 0; j < kids.length - 1; j++) {
+              for (int cNum = 0; cNum < kids[j].children().length; cNum++) {
+                Tree child = kids[0].children()[cNum];
+                Tree newChild = transformTree(child);
+                if (newChild != null) {
+                  newkids.add(newChild);
+                }
+              }
+            }
+            Tree finalChild = transformTree(kids[kids.length - 1]);
+            newkids.add(finalChild);
+            CategoryWordTag myLabel = new CategoryWordTag(lab);
+            myLabel.setCategory("NP");
+            return tf.newTreeNode(myLabel, newkids);
+          }
+        } else { // preterminal
+          s = tlp.basicCategory(s);
+          if (tag != null) {
+            tag = tlp.basicCategory(tag);
+          }
+        }
+        List<Tree> children = new ArrayList<>();
       for (int cNum = 0; cNum < tree.numChildren(); cNum++) {
         Tree child = tree.getChild(cNum);
         Tree newChild = transformTree(child);
@@ -1288,12 +1289,12 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
         }
       }
       if (englishTrain.splitIN == 1 && baseCat.equals("IN") && parentStr.charAt(0) == 'S') {
-        cat = cat + "^S";
+          cat += "^S";
       } else if (englishTrain.splitIN == 2 && baseCat.equals("IN")) {
         if (parentStr.charAt(0) == 'S') {
-          cat = cat + "^S";
+            cat += "^S";
         } else if (grandParentStr.charAt(0) == 'N') {
-          cat = cat + "^N";
+            cat += "^N";
         }
       } else if (englishTrain.splitIN == 3 && baseCat.equals("IN")) {
         // 6 classes seems good!
@@ -1301,67 +1302,59 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
         // and joining two SC cases
         if (grandParentStr.charAt(0) == 'N' && (parentStr.charAt(0) == 'P' || parentStr.charAt(0) == 'A')) {
           // noun postmodifier PP (or so-called ADVP like "outside India")
-          cat = cat + "-N";
+            cat += "-N";
         } else if (parentStr.charAt(0) == 'Q' && (grandParentStr.charAt(0) == 'N' || grandParentStr.startsWith("ADJP"))) {
           // about, than, between, etc. in a QP preceding head of NP
-          cat = cat + "-Q";
+            cat += "-Q";
         } else if (grandParentStr.equals("S")) {
           // the distinction here shouldn't matter given parent annotation!
             cat = baseParentStr.equals("SBAR") ? cat + "-SCC" : cat + "-SC";
         } else if (baseParentStr.equals("SBAR") || baseParentStr.equals("WHNP")) {
           // that-clause complement of VP or NP (or whether, if complement)
           // but also VP adverbial because, until, as, etc.
-          cat = cat + "-T";
+            cat += "-T";
         }
         // all the rest under VP, PP, ADJP, ADVP, etc. are basic case
       } else if (englishTrain.splitIN >= 4 && englishTrain.splitIN <= 5 && baseCat.equals("IN")) {
         if (grandParentStr.charAt(0) == 'N' && (parentStr.charAt(0) == 'P' || parentStr.charAt(0) == 'A')) {
           // noun postmodifier PP (or so-called ADVP like "outside India")
-          cat = cat + "-N";
+            cat += "-N";
         } else if (parentStr.charAt(0) == 'Q' && (grandParentStr.charAt(0) == 'N' || grandParentStr.startsWith("ADJP"))) {
           // about, than, between, etc. in a QP preceding head of NP
-          cat = cat + "-Q";
+            cat += "-Q";
         } else if (baseGrandParentStr.charAt(0) == 'S' &&
                    ! baseGrandParentStr.equals("SBAR")) {
           // the distinction here shouldn't matter given parent annotation!
           if (baseParentStr.equals("SBAR")) {
             // sentential subordinating conj: although, if, until, as, while
-            cat = cat + "-SCC";
+              cat += "-SCC";
           } else if (!baseParentStr.equals("NP") && !baseParentStr.equals("ADJP")) {
             // PP adverbial clause: among, in, for, after
-            cat = cat + "-SC";
+              cat += "-SC";
           }
         } else if (baseParentStr.equals("SBAR") || baseParentStr.equals("WHNP") || baseParentStr.equals("WHADVP")) {
           // that-clause complement of VP or NP (or whether, if complement)
           // but also VP adverbial because, until, as, etc.
-          cat = cat + "-T";
+            cat += "-T";
         }
         // all the rest under VP, PP, ADJP, ADVP, etc. are basic case
       } else if (englishTrain.splitIN == 6 && baseCat.equals("IN")) {
         if (grandParentStr.charAt(0) == 'V' || grandParentStr.charAt(0) == 'A') {
-          cat = cat + "-V";
-        } else if (grandParentStr.charAt(0) == 'N' && (parentStr.charAt(0) == 'P' || parentStr.charAt(0) == 'A')) {
-          // noun postmodifier PP (or so-called ADVP like "outside India")
-          // XXX experiment cat = cat + "-N";
-        } else if (parentStr.charAt(0) == 'Q' && (grandParentStr.charAt(0) == 'N' || grandParentStr.startsWith("ADJP"))) {
-          // about, than, between, etc. in a QP preceding head of NP
-          cat = cat + "-Q";
-        } else if (baseGrandParentStr.charAt(0) == 'S' &&
-                   ! baseGrandParentStr.equals("SBAR")) {
-          // the distinction here shouldn't matter given parent annotation!
-          if (baseParentStr.equals("SBAR")) {
-            // sentential subordinating conj: although, if, until, as, while
-            cat = cat + "-SCC";
-          } else if (!baseParentStr.equals("NP") && !baseParentStr.equals("ADJP")) {
-            // PP adverbial clause: among, in, for, after
-            cat = cat + "-SC";
-          }
-        } else if (baseParentStr.equals("SBAR") || baseParentStr.equals("WHNP") || baseParentStr.equals("WHADVP")) {
-          // that-clause complement of VP or NP (or whether, if complement)
-          // but also VP adverbial because, until, as, etc.
-          cat = cat + "-T";
+            cat += "-V";
+        } else if (grandParentStr.charAt(0) != 'N' || (parentStr.charAt(0) != 'P' && parentStr.charAt(0) != 'A')) {
+            if (parentStr.charAt(0) == 'Q' && (grandParentStr.charAt(0) == 'N' || grandParentStr.startsWith("ADJP"))) {
+                cat += "-Q";
+           } else if (baseGrandParentStr.charAt(0) == 'S' &&
+                      ! baseGrandParentStr.equals("SBAR")) {
+              if (baseParentStr.equals("SBAR")) {
+                  cat += "-SCC";
+             } else if (!baseParentStr.equals("NP") && !baseParentStr.equals("ADJP")) {
+                  cat += "-SC";
+             }
+           } else if (baseParentStr.equals("SBAR") || baseParentStr.equals("WHNP") || baseParentStr.equals("WHADVP")) {
+                cat += "-T";
+           }
         }
-        // all the rest under VP, PP, ADJP, ADVP, etc. are basic case
       }
       if (englishTrain.splitPercent && word.equals("%")) {
         cat += "-%";
@@ -1377,11 +1370,11 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
           }
         } else if (englishTrain.splitNNP == 2) {
           if (word.matches("[A-Z]\\.?")) {
-            cat = cat + "-I";
+              cat += "-I";
           } else if (firstOfSeveralNNP(parent, t)) {
-            cat = cat + "-B";
+              cat += "-B";
           } else if (lastOfSeveralNNP(parent, t)) {
-            cat = cat + "-E";
+              cat += "-E";
           }
         }
       }
@@ -1415,7 +1408,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
         cat = changeBaseCat(cat, "JJ");
       }
       if (englishTrain.splitPPJJ && cat.startsWith("JJ") && parentStr.startsWith("PP")) {
-        cat = cat + "^S";
+          cat += "^S";
       }
       if (englishTrain.splitTRJJ && cat.startsWith("JJ") && (parentStr.startsWith("PP") || parentStr.startsWith("ADJP")) && headFinder().determineHead(parent) == t) {
         // look for NP right sister of head JJ -- if so transitive adjective
@@ -1429,14 +1422,13 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
         }
         for (int j = i; j < kids.length; j++) {
           if (kids[j].label().value().startsWith("NP")) {
-            cat = cat + "^T";
+              cat += "^T";
             break;
           }
         }
       }
       if (englishTrain.splitJJCOMP && cat.startsWith("JJ") && (parentStr.startsWith("PP") || parentStr.startsWith("ADJP")) && headFinder().determineHead(parent) == t) {
-        // look for _anything_ right sister of JJ -- if so has comp (I guess)
-        Tree[] kids = parent.children();
+         Tree[] kids = parent.children();
         boolean foundJJ = false;
         int i = 0;
         for (; i < kids.length && !foundJJ; i++) {
@@ -1445,27 +1437,25 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
           }
         }
         if (i < kids.length - 1) {
-          // there's still a complement to go.
-          cat = cat + "^CMPL";
+            cat += "^CMPL";
         }
       }
       if (englishTrain.splitMoreLess) {
         char ch = cat.charAt(0);
         if (ch == 'R' || ch == 'J' || ch == 'C') {
-          // adverbs, adjectives and coordination -- what you'd expect
-          if (word.equalsIgnoreCase("more") || word.equalsIgnoreCase("most") || word.equalsIgnoreCase("less") || word.equalsIgnoreCase("least")) {
-            cat = cat + "-ML";
+           if (word.equalsIgnoreCase("more") || word.equalsIgnoreCase("most") || word.equalsIgnoreCase("less") || word.equalsIgnoreCase("least")) {
+               cat += "-ML";
           }
         }
       }
       if (englishTrain.unaryDT && cat.startsWith("DT")) {
         if (parent.children().length == 1) {
-          cat = cat + "^U";
+            cat += "^U";
         }
       }
       if (englishTrain.unaryRB && cat.startsWith("RB")) {
         if (parent.children().length == 1) {
-          cat = cat + "^U";
+            cat += "^U";
         }
       }
       if (englishTrain.markReflexivePRP && cat.startsWith("PRP")) {
@@ -1475,31 +1465,31 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
       }
       if (englishTrain.unaryPRP && cat.startsWith("PRP")) {
         if (parent.children().length == 1) {
-          cat = cat + "^U";
+            cat += "^U";
         }
       }
       if (englishTrain.unaryIN && cat.startsWith("IN")) {
         if (parent.children().length == 1) {
-          cat = cat + "^U";
+            cat += "^U";
         }
       }
       if (englishTrain.splitCC > 0 && baseCat.equals("CC")) {
         if (englishTrain.splitCC == 1 && (word.equals("and") || word.equals("or"))) {
-          cat = cat + "-C";
+            cat += "-C";
         } else if (englishTrain.splitCC == 2) {
           if (word.equalsIgnoreCase("but")) {
-            cat = cat + "-B";
+              cat += "-B";
           } else if (word.equals("&")) {
-            cat = cat + "-A";
+              cat += "-A";
           }
         } else if (englishTrain.splitCC == 3 && word.equalsIgnoreCase("and")) {
-          cat = cat + "-A";
+            cat += "-A";
         }
       }
       if (englishTrain.splitNOT && baseCat.equals("RB") && (word.equalsIgnoreCase("n't") || word.equalsIgnoreCase("not") || word.equalsIgnoreCase("nt"))) {
-        cat = cat + "-N";
+          cat += "-N";
       } else if (englishTrain.splitRB && baseCat.equals("RB") && (baseParentStr.equals("NP") || baseParentStr.equals("QP") || baseParentStr.equals("ADJP"))) {
-        cat = cat + "^M";
+          cat += "^M";
       }
       if (englishTrain.splitAux > 1 && (baseCat.equals("VBZ") || baseCat.equals("VBP") || baseCat.equals("VBD") || baseCat.equals("VBN") || baseCat.equals("VBG") || baseCat.equals("VB"))) {
         if (word.equalsIgnoreCase("'s") || word.equalsIgnoreCase("s")) {  // a few times the apostrophe is missing!
@@ -1525,46 +1515,46 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
             cat = annotateHave ? cat + "-HV" : cat + "-BE";
         } else {
           if (word.equalsIgnoreCase("am") || word.equalsIgnoreCase("is") || word.equalsIgnoreCase("are") || word.equalsIgnoreCase("was") || word.equalsIgnoreCase("were") || word.equalsIgnoreCase("'m") || word.equalsIgnoreCase("'re") || word.equalsIgnoreCase("be") || word.equalsIgnoreCase("being") || word.equalsIgnoreCase("been") || word.equalsIgnoreCase("ai")) { // allow "ai n't"
-            cat = cat + "-BE";
+              cat += "-BE";
           } else if (word.equalsIgnoreCase("have") || word.equalsIgnoreCase("'ve") || word.equalsIgnoreCase("having") || word.equalsIgnoreCase("has") || word.equalsIgnoreCase("had") || word.equalsIgnoreCase("'d")) {
-            cat = cat + "-HV";
+              cat += "-HV";
           } else if (englishTrain.splitAux >= 3 &&
                      (word.equalsIgnoreCase("do") || word.equalsIgnoreCase("did") || word.equalsIgnoreCase("does") || word.equalsIgnoreCase("done") || word.equalsIgnoreCase("doing"))) {
             // both DO and HELP take VB form complement VP
-            cat = cat + "-DO";
+              cat += "-DO";
           } else if (englishTrain.splitAux >= 4 &&
                      (word.equalsIgnoreCase("help") || word.equalsIgnoreCase("helps") || word.equalsIgnoreCase("helped") || word.equalsIgnoreCase("helping"))) {
             // both DO and HELP take VB form complement VP
-            cat = cat + "-DO";
+              cat += "-DO";
           } else if (englishTrain.splitAux >= 5 &&
                      (word.equalsIgnoreCase("let") || word.equalsIgnoreCase("lets") || word.equalsIgnoreCase("letting"))) {
             // LET also takes VB form complement VP
-            cat = cat + "-DO";
+              cat += "-DO";
           } else if (englishTrain.splitAux >= 6 &&
                      (word.equalsIgnoreCase("make") || word.equalsIgnoreCase("makes") || word.equalsIgnoreCase("making") || word.equalsIgnoreCase("made"))) {
             // MAKE can also take VB form complement VP
-            cat = cat + "-DO";
+              cat += "-DO";
           } else if (englishTrain.splitAux >= 7 &&
                      (word.equalsIgnoreCase("watch") || word.equalsIgnoreCase("watches") || word.equalsIgnoreCase("watching") || word.equalsIgnoreCase("watched") || word.equalsIgnoreCase("see") || word.equalsIgnoreCase("sees") || word.equalsIgnoreCase("seeing") || word.equalsIgnoreCase("saw") || word.equalsIgnoreCase("seen"))) {
             // WATCH, SEE can also take VB form complement VP
-            cat = cat + "-DO";
+              cat += "-DO";
           } else if (englishTrain.splitAux >= 8 &&
                      (word.equalsIgnoreCase("go") || word.equalsIgnoreCase("come"))) {
             // go, come, but not inflections can also take VB form complement VP
-            cat = cat + "-DO";
+              cat += "-DO";
           } else if (englishTrain.splitAux >= 9 &&
                      (word.equalsIgnoreCase("get") || word.equalsIgnoreCase("gets") || word.equalsIgnoreCase("getting") || word.equalsIgnoreCase("got") || word.equalsIgnoreCase("gotten"))) {
             // GET also takes a VBN form complement VP
-            cat = cat + "-BE";
+              cat += "-BE";
           }
         }
       } else if (englishTrain.splitAux > 0 && (baseCat.equals("VBZ") || baseCat.equals("VBP") || baseCat.equals("VBD") || baseCat.equals("VBN") || baseCat.equals("VBG") || baseCat.equals("VB"))) {
         if (word.equalsIgnoreCase("is") || word.equalsIgnoreCase("am") || word.equalsIgnoreCase("are") || word.equalsIgnoreCase("was") || word.equalsIgnoreCase("were") || word.equalsIgnoreCase("'m") || word.equalsIgnoreCase("'re") || word.equalsIgnoreCase("'s") || // imperfect -- could be (ha)s
                 word.equalsIgnoreCase("being") || word.equalsIgnoreCase("be") || word.equalsIgnoreCase("been")) {
-          cat = cat + "-BE";
+            cat += "-BE";
         }
         if (word.equalsIgnoreCase("have") || word.equalsIgnoreCase("'ve") || word.equalsIgnoreCase("having") || word.equalsIgnoreCase("has") || word.equalsIgnoreCase("had") || word.equalsIgnoreCase("'d")) {
-          cat = cat + "-HV";
+            cat += "-HV";
         }
       }
       if (EnglishTrain.collapseWhCategories != 0) {
@@ -1583,7 +1573,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
       if (englishTrain.markDitransV > 0 && cat.startsWith("VB")) {
         cat += ditrans(parent);
       } else if (englishTrain.vpSubCat && cat.startsWith("VB")) {
-        cat = cat + subCatify(parent);
+          cat += subCatify(parent);
       }
       // VITAL: update tag to be same as cat for when new node is created below
       tag = cat;
@@ -1593,7 +1583,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
       if (baseCat.equals("VP")) {
         if (englishTrain.gpaRootVP) {
           if (tlp.isStartSymbol(baseGrandParentStr)) {
-            cat = cat + "~ROOT";
+              cat += "~ROOT";
           }
         }
         if (englishTrain.splitVPNPAgr) {
@@ -1603,7 +1593,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
             switch (baseTag) {
                 case "VBD":
                 case "MD":
-                    cat = cat + "-VBF";
+                    cat += "-VBF";
                     break;
                 case "VBZ":
                 case "TO":
@@ -1620,7 +1610,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
         } else if (englishTrain.splitVP == 3 || englishTrain.splitVP == 4) {
           // don't split on weirdo categories but deduce
           if (baseTag.equals("VBZ") || baseTag.equals("VBD") || baseTag.equals("VBP") || baseTag.equals("MD")) {
-            cat = cat + "-VBF";
+              cat += "-VBF";
           } else if (baseTag.equals("TO") || baseTag.equals("VBG") || baseTag.equals("VBN") || baseTag.equals("VB")) {
             cat = cat + '-' + baseTag;
           } else if (englishTrain.splitVP == 4) {
@@ -1636,25 +1626,25 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
       if (englishTrain.dominatesV > 0) {
         if (englishTrain.dominatesV == 2) {
           if (hasClausalV(t)) {
-            cat = cat + "-v";
+              cat += "-v";
           }
         } else if (englishTrain.dominatesV == 3) {
           if (hasV(t.preTerminalYield()) &&
                 ! baseCat.equals("WHPP") && ! baseCat.equals("RRC") &&
                 ! baseCat.equals("QP") && ! baseCat.equals("PRT")) {
-            cat = cat + "-v";
+              cat += "-v";
           }
         } else {
           if (hasV(t.preTerminalYield())) {
-            cat = cat + "-v";
+              cat += "-v";
           }
         }
       }
       if (englishTrain.dominatesI && hasI(t.preTerminalYield())) {
-        cat = cat + "-i";
+          cat += "-i";
       }
       if (englishTrain.dominatesC && hasC(t.preTerminalYield())) {
-        cat = cat + "-c";
+          cat += "-c";
       }
       if (englishTrain.splitNPpercent > 0 && word.equals("%")) {
         if (baseCat.equals("NP") ||
@@ -1680,18 +1670,18 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
               }
           }
         if (englishTrain.splitSbar > 1 && infinitive) {
-          cat = cat + "-INF";
+            cat += "-INF";
         }
         if ((englishTrain.splitSbar == 1 || englishTrain.splitSbar == 3) &&
             foundIn && foundOrder) {
-          cat = cat + "-PURP";
+            cat += "-PURP";
         }
       }
       if (englishTrain.splitNPNNP > 0) {
         if (englishTrain.splitNPNNP == 1 && baseCat.equals("NP") && baseTag.equals("NNP")) {
-          cat = cat + "-NNP";
+            cat += "-NNP";
         } else if (englishTrain.splitNPNNP == 2 && baseCat.equals("NP") && baseTag.startsWith("NNP")) {
-          cat = cat + "-NNP";
+            cat += "-NNP";
         } else if (englishTrain.splitNPNNP == 3 && baseCat.equals("NP")) {
           boolean split = false;
             for (Tree kid : kids) {
@@ -1701,7 +1691,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
                 }
             }
           if (split) {
-            cat = cat + "-NNP";
+              cat += "-NNP";
           }
         }
       }
@@ -1719,63 +1709,64 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
         }
       }
       if (englishTrain.splitVPNPAgr && baseCat.equals("NP") &&
-              !baseParentStr.isEmpty() && baseParentStr.charAt(0) == 'S') {
-        if (baseTag.equals("NNPS") || baseTag.equals("NNS")) {
-          cat = cat + "-PL";
-        } else if (word.equalsIgnoreCase("many") || word.equalsIgnoreCase("more") || word.equalsIgnoreCase("most") || word.equalsIgnoreCase("plenty")) {
-          cat = cat + "-PL";
-        } else if (baseTag.equals("NN") || baseTag.equals("NNP") || baseTag.equals("POS") || baseTag.equals("CD") || baseTag.equals("PRP$") || baseTag.equals("JJ") || baseTag.equals("EX") || baseTag.equals("$") || baseTag.equals("RB") || baseTag.equals("FW") || baseTag.equals("VBG") || baseTag.equals("JJS") || baseTag.equals("JJR")) {
-        } else if (baseTag.equals("PRP")) {
-          if (word.equalsIgnoreCase("they") || word.equalsIgnoreCase("them") || word.equalsIgnoreCase("we") || word.equalsIgnoreCase("us")) {
-            cat = cat + "-PL";
+              !baseParentStr.isEmpty() && baseParentStr.charAt(0) == 'S')
+          if (baseTag.equals("NNPS") || baseTag.equals("NNS") || word.equalsIgnoreCase("many") || word.equalsIgnoreCase("more") || word.equalsIgnoreCase("most") || word.equalsIgnoreCase("plenty")) {
+              cat += "-PL";
+          } else if (baseTag.equals("NN") || baseTag.equals("NNP") || baseTag.equals("POS") || baseTag.equals("CD") || baseTag.equals("PRP$") || baseTag.equals("JJ") || baseTag.equals("EX") || baseTag.equals("$") || baseTag.equals("RB") || baseTag.equals("FW") || baseTag.equals("VBG") || baseTag.equals("JJS") || baseTag.equals("JJR")) {
+          } else {
+              switch (baseTag) {
+                  case "PRP":
+                      if (word.equalsIgnoreCase("they") || word.equalsIgnoreCase("them") || word.equalsIgnoreCase("we") || word.equalsIgnoreCase("us")) {
+                          cat += "-PL";
+                      }
+
+                      break;
+                  case "DT":
+                  case "WDT":
+                      if (word.equalsIgnoreCase("these") || word.equalsIgnoreCase("those") || word.equalsIgnoreCase("several")) {
+                          cat += "-PL";
+                      }
+
+                      break;
+                  default:
+                      System.err.println("XXXX Head of " + t + " is " + word + '/' + baseTag);
+
+                      break;
+              }
           }
-        } else if (baseTag.equals("DT") || baseTag.equals("WDT")) {
-          if (word.equalsIgnoreCase("these") || word.equalsIgnoreCase("those") || word.equalsIgnoreCase("several")) {
-            cat += "-PL";
-          }
-        } else {
-          System.err.println("XXXX Head of " + t + " is " + word + '/' + baseTag);
-        }
-      }
-      if (englishTrain.splitSTag > 0 &&
-          (baseCat.equals("S") || englishTrain.splitSTag <= 3 && (baseCat.equals("SINV") || baseCat.equals("SQ")))) {
-        if (englishTrain.splitSTag == 1) {
-          cat = cat + '-' + baseTag;
-        } else if (baseTag.equals("VBZ") || baseTag.equals("VBD") || baseTag.equals("VBP") || baseTag.equals("MD")) {
-          cat = cat + "-VBF";
-        } else if ((englishTrain.splitSTag == 3 || englishTrain.splitSTag == 5) &&
-                (baseTag.equals("TO") || baseTag.equals("VBG") || baseTag.equals("VBN") || baseTag.equals("VB"))) {
-          cat = cat + "-VBNF";
-        }
-      }
-      if (englishTrain.markContainedVP && containsVP(t)) {
-        cat = cat + "-vp";
-      }
-      if (englishTrain.markCC > 0) {
-        // was: for (int i = 0; i < kids.length; i++) {
-        // This second version takes an idea from Collins: don't count
-        // marginal conjunctions which don't conjoin 2 things.
-        for (int i = 1; i < kids.length - 1; i++) {
-          String cat2 = kids[i].label().value();
-          if (cat2.startsWith("CC")) {
-            String word2 = kids[i].children()[0].value(); // get word
-            // added this if since -acl03pcfg
-            if (!(word2.equals("either") || word2.equals("both") || word2.equals("neither"))) {
-              cat = cat + "-CC";
-              break;
-            } else {
-              // System.err.println("XXX Found non-marginal either/both/neither");
+        if (englishTrain.splitSTag > 0 &&
+          (baseCat.equals("S") || englishTrain.splitSTag <= 3 && (baseCat.equals("SINV") || baseCat.equals("SQ"))))
+            if (englishTrain.splitSTag == 1) {
+                cat = cat + '-' + baseTag;
+            } else if (baseTag.equals("VBZ") || baseTag.equals("VBD") || baseTag.equals("VBP") || baseTag.equals("MD")) {
+                cat += "-VBF";
+            } else if ((englishTrain.splitSTag == 3 || englishTrain.splitSTag == 5) &&
+                    (baseTag.equals("TO") || baseTag.equals("VBG") || baseTag.equals("VBN") || baseTag.equals("VB"))) {
+                cat += "-VBNF";
             }
-          } else if (englishTrain.markCC > 1 && cat2.startsWith("CONJP")) {
-            cat = cat + "-CC";
-            break;
-          }
-        }
+      if (englishTrain.markContainedVP && containsVP(t)) {
+          cat += "-vp";
       }
-      if (englishTrain.splitSGapped == 1 && baseCat.equals("S") && !kids[0].label().value().startsWith("NP")) {
+        if (englishTrain.markCC > 0) for (int i = 1; i < kids.length - 1; i++) {
+            String cat2 = kids[i].label().value();
+            if (cat2.startsWith("CC")) {
+                String word2 = kids[i].children()[0].value(); // get word
+                // added this if since -acl03pcfg
+                if (word2.equals("either") || word2.equals("both") || word2.equals("neither")) {
+                    // System.err.println("XXX Found non-marginal either/both/neither");
+                } else {
+                    cat += "-CC";
+                    break;
+                }
+            } else if (englishTrain.markCC > 1 && cat2.startsWith("CONJP")) {
+                cat += "-CC";
+                break;
+            }
+        }
+        if (englishTrain.splitSGapped == 1 && baseCat.equals("S") && !kids[0].label().value().startsWith("NP")) {
         // this doesn't handle predicative NPs right yet
         // to do that, need to intervene before tree normalization
-        cat = cat + "-G";
+          cat += "-G";
       } else if (englishTrain.splitSGapped == 2 && baseCat.equals("S")) {
         // better version: you're gapped if there is no NP, or there is just
         // one (putatively predicative) NP with no VP, ADJP, NP, PP, or UCP
@@ -1790,7 +1781,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
               }
           }
         if (seenNP == 0 || seenNP == 1 && !seenPredCat) {
-          cat = cat + "-G";
+            cat += "-G";
         }
       } else if (englishTrain.splitSGapped == 3 && baseCat.equals("S")) {
         // better version: you're gapped if there is no NP, or there is just
@@ -1812,10 +1803,10 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
                   seenS = true;
               }
           }
-        if (!(seenCC && seenS) && (seenNP == 0 || seenNP == 1 && !seenPredCat)) {
-          cat = cat + "-G";
-        }
-      } else if (englishTrain.splitSGapped == 4 && baseCat.equals("S")) {
+            if ((!seenCC || !seenS) && ((seenNP == 0 || (seenNP == 1 && !seenPredCat)))) {
+                cat += "-G";
+            }
+        } else if (englishTrain.splitSGapped == 4 && baseCat.equals("S")) {
         // better version: you're gapped if there is no NP, or there is just
         // one (putatively predicative) NP with no VP, ADJP, NP, PP, or UCP
         // But: not gapped if S(BAR)-NOM-SBJ constituent
@@ -1838,7 +1829,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
               }
           }
         if (seenS < 2 && !(sawSBeforePredCat && seenPredCat) && (seenNP == 0 || seenNP == 1 && !seenPredCat)) {
-          cat = cat + "-G";
+            cat += "-G";
         }
       }
       if (englishTrain.splitNumNP && baseCat.equals("NP")) {
@@ -1882,14 +1873,14 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
           newerChildren.add(last);
           return categoryWordTagTreeFactory.newTreeNode(labelTop, newerChildren);
         } else {
-          cat = cat + "-P";
+            cat += "-P";
         }
       }
       if (englishTrain.splitBaseNP > 0 && baseCat.equals("NP") &&
           t.isPrePreTerminal()) {
         if (englishTrain.splitBaseNP == 2) {
           if (parentStr.startsWith("NP")) { // already got one above us
-            cat = cat + "-B";
+              cat += "-B";
           } else {
             // special case splice in a new node!  Do it all here
             Label labelBot = new CategoryWordTag("NP^NP-B", word, tag);
@@ -1900,11 +1891,11 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
             return categoryWordTagTreeFactory.newTreeNode(labelTop, newerChildren);
           }
         } else {
-          cat = cat + "-B";
+            cat += "-B";
         }
       }
       if (englishTrain.rightPhrasal && rightPhrasal(t)) {
-        cat = cat + "-RX";
+          cat += "-RX";
       }
     }
 

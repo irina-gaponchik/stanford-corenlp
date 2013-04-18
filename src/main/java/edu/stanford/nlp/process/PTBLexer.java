@@ -12898,9 +12898,10 @@ class PTBLexer {
         case 5:
             if (tokenizeNLs) {
                         return getNext(NEWLINE_TOKEN, yytext()); // js: for tokenizing carriage returns
-                    } else if (invertible) {
-                        prevWordAfter.append(yytext());
                     }
+            if (invertible) {
+                prevWordAfter.append(yytext());
+            }
           case 98: break;
         default: 
           if (zzInput == YYEOF && zzStartRead == zzCurrentPos) {

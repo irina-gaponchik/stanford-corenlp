@@ -44,10 +44,10 @@ public class FrenchTreeNormalizer extends BobChrisTreeNormalizer {
     // PTB escaping
     if(terminal.equals(")"))
       return "-RRB-";
-    else if(terminal.equals("("))
-      return "-LRB-";
+      if(terminal.equals("("))
+        return "-LRB-";
 
-    return super.normalizeTerminal(terminal).intern();
+      return super.normalizeTerminal(terminal).intern();
   }
 
   @Override

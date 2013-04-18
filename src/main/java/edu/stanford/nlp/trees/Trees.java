@@ -383,10 +383,9 @@ public class Trees {
       return " with " + nodes + " interior nodes and " + leaves +
         " leaves, and " + phraseLabels + " phrase labels, " +
         tagLabels + " tag labels, and " + leafLabels + " leaf labels.";
-    } else {
-      sb.append(" (and uniform use of these Tree and Label classes throughout the tree).");
     }
-    return sb.toString();
+      sb.append(" (and uniform use of these Tree and Label classes throughout the tree).");
+      return sb.toString();
   }
 
 
@@ -665,10 +664,11 @@ public class Trees {
       List<Tree> l = new ArrayList<>(1);
       l.add(t);
       return l;
-    } else if (root == null) {
-      return null;
     }
-    return root.dominationPath(t);
+      if (root == null) {
+        return null;
+      }
+      return root.dominationPath(t);
   }
 
 
@@ -682,12 +682,12 @@ public class Trees {
     Tree[] kids = t.children();
     List<Tree> newKids = new ArrayList<>(kids.length);
     for (Tree kid : kids) {
-      if (!kid.equals(node)) {
-        newKids.add(kid);
-        replaceNode(node, node1, kid);
-      } else {
-        newKids.add(node1);
-      }
+        if (kid.equals(node)) {
+            newKids.add(node1);
+        } else {
+            newKids.add(kid);
+            replaceNode(node, node1, kid);
+        }
     }
     t.setChildren(newKids);
   }

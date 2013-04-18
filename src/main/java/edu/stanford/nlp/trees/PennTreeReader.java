@@ -167,7 +167,8 @@ public class PennTreeReader implements TreeReader {
                   String label = tokenizer.peek().equals(leftParen) ? null : tokenizer.next();
                   if (rightParen.equals(label)) {//Skip past empty trees
                       continue;
-                  } else if (treeNormalizer != null) {
+                  }
+                  if (treeNormalizer != null) {
                       label = treeNormalizer.normalizeNonterminal(label);
                   }
 

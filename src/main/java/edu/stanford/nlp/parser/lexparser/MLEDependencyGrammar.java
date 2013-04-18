@@ -262,79 +262,79 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
 
     System.err.println("Tuning other parameters...");
 
-    if ( ! useSmoothTagProjection) {
-      bestScore = Double.NEGATIVE_INFINITY;
-      for (smooth_aTW_hTWd = 0.5; smooth_aTW_hTWd < 100.0; smooth_aTW_hTWd *= 1.25) {
-        System.err.print(".");
-        for (smooth_aT_hTWd = 0.5; smooth_aT_hTWd < 100.0; smooth_aT_hTWd *= 1.25) {
-          for (interp = 0.02; interp < 1.0; interp += 0.02) {
-            double totalScore = 0.0;
-            for (IntDependency dep : deps) {
-              double score = score(dep);
-              if (score > Double.NEGATIVE_INFINITY) {
-                totalScore += score;
-              }
-            }
-            if (totalScore > bestScore) {
-              bestScore = totalScore;
-              bestInterp = interp;
-              bestSmooth_aTW_hTWd = smooth_aTW_hTWd;
-              bestSmooth_aT_hTWd = smooth_aT_hTWd;
-              System.err.println("Current best interp: " + interp + " with score " + totalScore);
-            }
-          }
-        }
-      }
-      smooth_aTW_hTWd = bestSmooth_aTW_hTWd;
-      smooth_aT_hTWd = bestSmooth_aT_hTWd;
-      interp = bestInterp;
-    } else {
-      // for useSmoothTagProjection
-      double bestSmooth_aTW_aT = 0.0;
-      double bestSmooth_aTW_hTd = 0.0;
-      double bestSmooth_aT_hTd = 0.0;
+      if (useSmoothTagProjection) {
+          // for useSmoothTagProjection
+          double bestSmooth_aTW_aT = 0.0;
+          double bestSmooth_aTW_hTd = 0.0;
+          double bestSmooth_aT_hTd = 0.0;
 
-      bestScore = Double.NEGATIVE_INFINITY;
-      for (smooth_aTW_hTWd = 1.125; smooth_aTW_hTWd < 100.0; smooth_aTW_hTWd *= 1.5) {
-        System.err.print("#");
-        for (smooth_aT_hTWd = 1.125; smooth_aT_hTWd < 100.0; smooth_aT_hTWd *= 1.5) {
-          System.err.print(":");
-          for (smooth_aTW_aT = 1.125; smooth_aTW_aT < 200.0; smooth_aTW_aT *= 1.5) {
-            System.err.print(".");
-            for (smooth_aTW_hTd = 1.125; smooth_aTW_hTd < 100.0; smooth_aTW_hTd *= 1.5) {
-              for (smooth_aT_hTd = 1.125; smooth_aT_hTd < 100.0; smooth_aT_hTd *= 1.5) {
-                for (interp = 0.2; interp <= 0.8; interp += 0.02) {
-                  double totalScore = 0.0;
-                  for (IntDependency dep : deps) {
-                    double score = score(dep);
-                    if (score > Double.NEGATIVE_INFINITY) {
-                      totalScore += score;
-                    }
+          bestScore = Double.NEGATIVE_INFINITY;
+          for (smooth_aTW_hTWd = 1.125; smooth_aTW_hTWd < 100.0; smooth_aTW_hTWd *= 1.5) {
+              System.err.print("#");
+              for (smooth_aT_hTWd = 1.125; smooth_aT_hTWd < 100.0; smooth_aT_hTWd *= 1.5) {
+                  System.err.print(":");
+                  for (smooth_aTW_aT = 1.125; smooth_aTW_aT < 200.0; smooth_aTW_aT *= 1.5) {
+                      System.err.print(".");
+                      for (smooth_aTW_hTd = 1.125; smooth_aTW_hTd < 100.0; smooth_aTW_hTd *= 1.5) {
+                          for (smooth_aT_hTd = 1.125; smooth_aT_hTd < 100.0; smooth_aT_hTd *= 1.5) {
+                              for (interp = 0.2; interp <= 0.8; interp += 0.02) {
+                                  double totalScore = 0.0;
+                                  for (IntDependency dep : deps) {
+                                      double score = score(dep);
+                                      if (score > Double.NEGATIVE_INFINITY) {
+                                          totalScore += score;
+                                      }
+                                  }
+                                  if (totalScore > bestScore) {
+                                      bestScore = totalScore;
+                                      bestInterp = interp;
+                                      bestSmooth_aTW_hTWd = smooth_aTW_hTWd;
+                                      bestSmooth_aT_hTWd = smooth_aT_hTWd;
+                                      bestSmooth_aTW_aT = smooth_aTW_aT;
+                                      bestSmooth_aTW_hTd = smooth_aTW_hTd;
+                                      bestSmooth_aT_hTd = smooth_aT_hTd;
+                                      System.err.println("Current best interp: " + interp + " with score " + totalScore);
+                                  }
+                              }
+                          }
+                      }
                   }
-                  if (totalScore > bestScore) {
-                    bestScore = totalScore;
-                    bestInterp = interp;
-                    bestSmooth_aTW_hTWd = smooth_aTW_hTWd;
-                    bestSmooth_aT_hTWd = smooth_aT_hTWd;
-                    bestSmooth_aTW_aT = smooth_aTW_aT;
-                    bestSmooth_aTW_hTd = smooth_aTW_hTd;
-                    bestSmooth_aT_hTd = smooth_aT_hTd;
-                    System.err.println("Current best interp: " + interp + " with score " + totalScore);
-                  }
-                }
               }
-            }
+              System.err.println();
           }
-        }
-        System.err.println();
+          smooth_aTW_hTWd = bestSmooth_aTW_hTWd;
+          smooth_aT_hTWd = bestSmooth_aT_hTWd;
+          smooth_aTW_aT = bestSmooth_aTW_aT;
+          smooth_aTW_hTd = bestSmooth_aTW_hTd;
+          smooth_aT_hTd = bestSmooth_aT_hTd;
+          interp = bestInterp;
+      } else {
+          bestScore = Double.NEGATIVE_INFINITY;
+          for (smooth_aTW_hTWd = 0.5; smooth_aTW_hTWd < 100.0; smooth_aTW_hTWd *= 1.25) {
+              System.err.print(".");
+              for (smooth_aT_hTWd = 0.5; smooth_aT_hTWd < 100.0; smooth_aT_hTWd *= 1.25) {
+                  for (interp = 0.02; interp < 1.0; interp += 0.02) {
+                      double totalScore = 0.0;
+                      for (IntDependency dep : deps) {
+                          double score = score(dep);
+                          if (score > Double.NEGATIVE_INFINITY) {
+                              totalScore += score;
+                          }
+                      }
+                      if (totalScore > bestScore) {
+                          bestScore = totalScore;
+                          bestInterp = interp;
+                          bestSmooth_aTW_hTWd = smooth_aTW_hTWd;
+                          bestSmooth_aT_hTWd = smooth_aT_hTWd;
+                          System.err.println("Current best interp: " + interp + " with score " + totalScore);
+                      }
+                  }
+              }
+          }
+          smooth_aTW_hTWd = bestSmooth_aTW_hTWd;
+          smooth_aT_hTWd = bestSmooth_aT_hTWd;
+          interp = bestInterp;
       }
-      smooth_aTW_hTWd = bestSmooth_aTW_hTWd;
-      smooth_aT_hTWd = bestSmooth_aT_hTWd;
-      smooth_aTW_aT = bestSmooth_aTW_aT;
-      smooth_aTW_hTd = bestSmooth_aTW_hTd;
-      smooth_aT_hTd = bestSmooth_aT_hTd;
-      interp = bestInterp;
-    }
 
     System.err.println("\nTuning selected smooth_aTW_hTWd: " + smooth_aTW_hTWd + " smooth_aT_hTWd: " + smooth_aT_hTWd + " interp: " + interp + " smooth_aTW_aT: " + smooth_aTW_aT + " smooth_aTW_hTd: " + smooth_aTW_hTd + " smooth_aT_hTd: " + smooth_aT_hTd);
   }

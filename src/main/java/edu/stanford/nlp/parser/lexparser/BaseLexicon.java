@@ -198,26 +198,26 @@ public class BaseLexicon implements Lexicon {
     // }
     List<IntTaggedWord> wordTaggings;
     if (isKnown(word)) {
-      if ( ! flexiTag) {
-        // Strict lexical tagging for seen items
-        wordTaggings = rulesWithWord[word];
-      } else {
+        if (flexiTag) {
         /* Allow all tags with same basicCategory */
         /* Allow all scored taggings, unless very common */
-        IntTaggedWord iW = new IntTaggedWord(word, nullTag);
-        if (seenCounter.getCount(iW) > smoothInUnknownsThreshold) {
-          return rulesWithWord[word].iterator();
-        } else {
-          // give it flexible tagging not just lexicon
-          wordTaggings = new ArrayList<>(40);
-          for (IntTaggedWord iTW2 : tags) {
-            IntTaggedWord iTW = new IntTaggedWord(word, iTW2.tag);
-            if (score(iTW, loc, wordIndex.get(word), null) > Float.NEGATIVE_INFINITY) {
-              wordTaggings.add(iTW);
+            IntTaggedWord iW = new IntTaggedWord(word, nullTag);
+            if (seenCounter.getCount(iW) > smoothInUnknownsThreshold) {
+                return rulesWithWord[word].iterator();
+            } else {
+                // give it flexible tagging not just lexicon
+                wordTaggings = new ArrayList<>(40);
+                for (IntTaggedWord iTW2 : tags) {
+                    IntTaggedWord iTW = new IntTaggedWord(word, iTW2.tag);
+                    if (score(iTW, loc, wordIndex.get(word), null) > Float.NEGATIVE_INFINITY) {
+                        wordTaggings.add(iTW);
+                    }
+                }
             }
-          }
+        } else {
+            // Strict lexical tagging for seen items
+            wordTaggings = rulesWithWord[word];
         }
-      }
     } else {
       // we copy list so we can insert correct word in each item
       wordTaggings = new ArrayList<>(40);
@@ -435,21 +435,18 @@ public class BaseLexicon implements Lexicon {
    * Adds the tagging with count to the data structures in this Lexicon.
    */
   protected void addTagging(boolean seen, IntTaggedWord itw, double count) {
-    if (seen) {
-      seenCounter.incrementCount(itw, count);
-      if (itw.tag() == nullTag) {
-        words.add(itw);
-      } else if (itw.word() == nullWord) {
-        tags.add(itw);
+      if (seen) {
+          seenCounter.incrementCount(itw, count);
+          if (itw.tag() != nullTag) {
+              if (itw.word() == nullWord) {
+                  tags.add(itw);
+              }
+          } else {
+              words.add(itw);
+          }
       } else {
-        // rules.add(itw);
+          uwModel.addTagging(seen, itw, count);
       }
-    } else {
-      uwModel.addTagging(seen, itw, count);
-      // if (itw.tag() == nullTag) {
-      // sigs.add(itw);
-      // }
-    }
   }
 
 
@@ -471,18 +468,17 @@ public class BaseLexicon implements Lexicon {
         tmp[t] = seenCounter.getCount(iTW);
         tot += tmp[t];
       }
-      if (tot < 10) {
-        continue;
-      }
-      for (int t = 0; t < numTags; t++) {
-        for (int t2 = 0; t2 < numTags; t2++) {
-          if (tmp[t2] > 0.0) {
-            double c = tmp[t] / tot;
-            m_T[t] += c;
-            m_TT[t2][t] += c;
-          }
+        if (tot >= 10) {
+            for (int t = 0; t < numTags; t++) {
+                for (int t2 = 0; t2 < numTags; t2++) {
+                    if (tmp[t2] > 0.0) {
+                        double c = tmp[t] / tot;
+                        m_T[t] += c;
+                        m_TT[t2][t] += c;
+                    }
+                }
+            }
         }
-      }
     }
   }
 

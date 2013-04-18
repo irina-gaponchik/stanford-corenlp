@@ -217,14 +217,15 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
           //Cx = new Double(cx);
           //System.err.println("\nReturning3: a="+bx+" ("+fb+") b="+u+"("+fu+") c="+cx+" ("+fc+")");
           return new Triple(bx, u, cx);
-        } else if (fu > fb) {
-          //Cx = new Double(u);
-          //Ax = new Double(ax);
-          //Bx = new Double(bx);
-          //System.err.println("\nReturning2: a="+ax+" ("+fa+") b="+bx+"("+fb+") c="+u+" ("+fu+")");
-          return new Triple(ax, bx, u);
         }
-        u = cx + GOLD * (cx - bx);
+          if (fu > fb) {
+            //Cx = new Double(u);
+            //Ax = new Double(ax);
+            //Bx = new Double(bx);
+            //System.err.println("\nReturning2: a="+ax+" ("+fa+") b="+bx+"("+fb+") c="+u+" ("+fu+")");
+            return new Triple(ax, bx, u);
+          }
+          u = cx + GOLD * (cx - bx);
         fu = function.valueAt(u);
       } else if ((cx - u) * (u - ulim) > 0.0) {
         fu = function.valueAt(u);

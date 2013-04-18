@@ -71,13 +71,14 @@ public class UnlabeledAttachmentEval extends AbstractEval {
       System.err.printf("%s: Cannot compare against a null gold or guess tree!\n", this.getClass().getName());
       return;
 
-    } else if (guess.yield().size() != gold.yield().size()) {
-      System.err.println("Warning: yield differs:");
-      System.err.println("Guess: " + Sentence.listToString(guess.yield()));
-      System.err.println("Gold:  " + Sentence.listToString(gold.yield()));
     }
+      if (guess.yield().size() != gold.yield().size()) {
+        System.err.println("Warning: yield differs:");
+        System.err.println("Guess: " + Sentence.listToString(guess.yield()));
+        System.err.println("Gold:  " + Sentence.listToString(gold.yield()));
+      }
 
-    super.evaluate(guess, gold, pw);
+      super.evaluate(guess, gold, pw);
   }
   
   /**

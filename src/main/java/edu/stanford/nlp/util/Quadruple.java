@@ -78,16 +78,7 @@ public class Quadruple<T1,T2,T3,T4> implements Comparable<Quadruple<T1,T2,T3,T4>
 
     Quadruple<T1,T2,T3,T4> quadruple = ErasureUtils.uncheckedCast(o);
 
-    if (first != null ? !first.equals(quadruple.first) : quadruple.first != null) {
-      return false;
-    }
-    if (second != null ? !second.equals(quadruple.second) : quadruple.second != null) {
-      return false;
-    }
-    if (third != null ? !third.equals(quadruple.third) : quadruple.third != null) {
-      return false;
-    }
-      return !(fourth != null ? !fourth.equals(quadruple.fourth) : quadruple.fourth != null);
+      return !(first != null ? !first.equals(quadruple.first) : quadruple.first != null) && !(second != null ? !second.equals(quadruple.second) : quadruple.second != null) && !(third != null ? !third.equals(quadruple.third) : quadruple.third != null) && !(fourth != null ? !fourth.equals(quadruple.fourth) : quadruple.fourth != null);
 
   }
 
@@ -123,17 +114,17 @@ public class Quadruple<T1,T2,T3,T4> implements Comparable<Quadruple<T1,T2,T3,T4>
   @Override
   public int compareTo(Quadruple<T1, T2, T3, T4> another) {
     int comp = ((Comparable<T1>) first()).compareTo(another.first());
-    if (comp != 0) {
-      return comp;
-    } else {
-      comp = ((Comparable<T2>) second()).compareTo(another.second());
-      if (comp != 0) {
-        return comp;
+      if (comp == 0) {
+          comp = ((Comparable<T2>) second()).compareTo(another.second());
+          if (comp != 0) {
+              return comp;
+          } else {
+              comp = ((Comparable<T3>) third()).compareTo(another.third());
+              return comp != 0 ? comp : ((Comparable<T4>) fourth()).compareTo(another.fourth());
+          }
       } else {
-        comp = ((Comparable<T3>) third()).compareTo(another.third());
-          return comp != 0 ? comp : ((Comparable<T4>) fourth()).compareTo(another.fourth());
+          return comp;
       }
-    }
   }
   
   /**

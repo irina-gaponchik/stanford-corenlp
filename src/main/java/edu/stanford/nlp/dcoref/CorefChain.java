@@ -238,24 +238,24 @@ public class CorefChain implements Serializable {
     }
     private boolean moreRepresentativeThan(CorefMention m){
       if(m==null) return true;
-      if(mentionType!=m.mentionType) {
-          return mentionType == MentionType.PROPER && m.mentionType != MentionType.PROPER
-                  || mentionType == MentionType.NOMINAL && m.mentionType == MentionType.PRONOMINAL ? true : false;
-      } else {
-        // First, check length
-        if (headIndex - startIndex > m.headIndex - m.startIndex) return true;
-        if (headIndex - startIndex < m.headIndex - m.startIndex) return false;
-        if (endIndex - startIndex > m.endIndex - m.startIndex) return true;
-        if (endIndex - startIndex < m.endIndex - m.startIndex) return false;
-        // Now check relative position
-        if (sentNum < m.sentNum) return true;
-        if (sentNum > m.sentNum) return false;
-        if (headIndex < m.headIndex) return true;
-        if (headIndex > m.headIndex) return false;
-        if (startIndex < m.startIndex) return true;
-          // At this point they're equal...
-        return false;
-      }
+        if (mentionType == m.mentionType) {
+            // First, check length
+            if (headIndex - startIndex > m.headIndex - m.startIndex) return true;
+            if (headIndex - startIndex < m.headIndex - m.startIndex) return false;
+            if (endIndex - startIndex > m.endIndex - m.startIndex) return true;
+            if (endIndex - startIndex < m.endIndex - m.startIndex) return false;
+            // Now check relative position
+            if (sentNum < m.sentNum) return true;
+            if (sentNum > m.sentNum) return false;
+            if (headIndex < m.headIndex) return true;
+            if (headIndex > m.headIndex) return false;
+            if (startIndex < m.startIndex) return true;
+            // At this point they're equal...
+            return false;
+        } else {
+            return mentionType == MentionType.PROPER && m.mentionType != MentionType.PROPER
+                    || mentionType == MentionType.NOMINAL && m.mentionType == MentionType.PRONOMINAL ? true : false;
+        }
     }
 
     private static final long serialVersionUID = 3657691243504173L;

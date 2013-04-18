@@ -1914,10 +1914,7 @@ String VarName() : {
   }
 
   private boolean jj_3_23() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(TokenSequenceParserConstants.NONNEGINT)) return true;
-    if (jj_scan_token(32)) return true;
-      return jj_scan_token(23);
+      return jj_scan_token(21) || jj_scan_token(TokenSequenceParserConstants.NONNEGINT) || jj_scan_token(32) || jj_scan_token(23);
   }
 
   private boolean jj_3R_110() {
@@ -1929,9 +1926,7 @@ String VarName() : {
   }
 
   private boolean jj_3_22() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(TokenSequenceParserConstants.NONNEGINT)) return true;
-      return jj_scan_token(23);
+      return jj_scan_token(21) || jj_scan_token(TokenSequenceParserConstants.NONNEGINT) || jj_scan_token(23);
   }
 
   private boolean jj_3R_109() {
@@ -1951,8 +1946,7 @@ String VarName() : {
   }
 
   private boolean jj_3_19() {
-    if (jj_scan_token(34)) return true;
-      return jj_3R_29();
+      return jj_scan_token(34) || jj_3R_29();
   }
 
   private boolean jj_3_9() {
@@ -1980,8 +1974,7 @@ String VarName() : {
   }
 
   private boolean jj_3_18() {
-    if (jj_scan_token(34)) return true;
-      return jj_3R_30();
+      return jj_scan_token(34) || jj_3R_30();
   }
 
   private boolean jj_3R_105() {
@@ -2028,9 +2021,7 @@ String VarName() : {
   }
 
   private boolean jj_3_17() {
-    if (jj_scan_token(30)) return true;
-    if (jj_3R_28()) return true;
-      return jj_scan_token(31);
+      return jj_scan_token(30) || jj_3R_28() || jj_scan_token(31);
   }
 
   private boolean jj_3R_33() {
@@ -2068,8 +2059,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_102() {
-    if (jj_scan_token(22)) return true;
-      return jj_3R_28();
+      return jj_scan_token(22) || jj_3R_28();
   }
 
   private boolean jj_3R_23() {
@@ -2087,9 +2077,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_19() {
-    if (jj_3R_34()) return true;
-    if (jj_scan_token(28)) return true;
-      return jj_3R_28();
+      return jj_3R_34() || jj_scan_token(28) || jj_3R_28();
   }
 
   private boolean jj_3R_104() {
@@ -2109,9 +2097,7 @@ String VarName() : {
   }
 
   private boolean jj_3_7() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(27)) return true;
-      return jj_3R_21();
+      return jj_scan_token(21) || jj_scan_token(27) || jj_3R_21();
   }
 
   private boolean jj_3R_91() {
@@ -2119,8 +2105,7 @@ String VarName() : {
   }
 
   private boolean jj_3_15() {
-    if (jj_scan_token(34)) return true;
-      return jj_3R_29();
+      return jj_scan_token(34) || jj_3R_29();
   }
 
   private boolean jj_3R_90() {
@@ -2128,9 +2113,7 @@ String VarName() : {
   }
 
   private boolean jj_3_6() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(26)) return true;
-      return jj_scan_token(24);
+      return jj_scan_token(21) || jj_scan_token(26) || jj_scan_token(24);
   }
 
   private boolean jj_3R_89() {
@@ -2142,14 +2125,11 @@ String VarName() : {
   }
 
   private boolean jj_3_5() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(24)) return true;
-      return jj_3R_50();
+      return jj_scan_token(21) || jj_scan_token(24) || jj_3R_50();
   }
 
   private boolean jj_3_14() {
-    if (jj_scan_token(30)) return true;
-      return jj_3R_28();
+      return jj_scan_token(30) || jj_3R_28();
   }
 
   private boolean jj_3R_84() {
@@ -2193,9 +2173,7 @@ String VarName() : {
   }
 
   private boolean jj_3_4() {
-    if (jj_scan_token(21)) return true;
-    if (jj_3R_21()) return true;
-      return jj_scan_token(22);
+      return jj_scan_token(21) || jj_3R_21() || jj_scan_token(22);
   }
 
   private boolean jj_3R_63() {
@@ -2238,8 +2216,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_113() {
-    if (jj_scan_token(21)) return true;
-      return jj_scan_token(TokenSequenceParserConstants.NONNEGINT);
+      return jj_scan_token(21) || jj_scan_token(TokenSequenceParserConstants.NONNEGINT);
   }
 
   private boolean jj_3_3() {
@@ -2251,10 +2228,7 @@ String VarName() : {
   }
 
   private boolean jj_3_29() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(TokenSequenceParserConstants.NONNEGINT)) return true;
-    if (jj_scan_token(32)) return true;
-      return jj_scan_token(23);
+      return jj_scan_token(21) || jj_scan_token(TokenSequenceParserConstants.NONNEGINT) || jj_scan_token(32) || jj_scan_token(23);
   }
 
   private boolean jj_3_1() {
@@ -2275,9 +2249,7 @@ String VarName() : {
   }
 
   private boolean jj_3_28() {
-    if (jj_scan_token(21)) return true;
-    if (jj_scan_token(TokenSequenceParserConstants.NONNEGINT)) return true;
-      return jj_scan_token(23);
+      return jj_scan_token(21) || jj_scan_token(TokenSequenceParserConstants.NONNEGINT) || jj_scan_token(23);
   }
 
   private boolean jj_3R_101() {
@@ -2293,8 +2265,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_30() {
-    if (jj_scan_token(TokenSequenceParserConstants.IDENTIFIER)) return true;
-      return jj_scan_token(24);
+      return jj_scan_token(TokenSequenceParserConstants.IDENTIFIER) || jj_scan_token(24);
   }
 
   private boolean jj_3R_50() {
@@ -2358,8 +2329,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_42() {
-    if (jj_3R_59()) return true;
-      return jj_scan_token(22);
+      return jj_3R_59() || jj_scan_token(22);
   }
 
   private boolean jj_3R_100() {
@@ -2397,20 +2367,15 @@ String VarName() : {
   }
 
   private boolean jj_3R_103() {
-    if (jj_scan_token(30)) return true;
-    if (jj_3R_33()) return true;
-      return jj_scan_token(31);
+      return jj_scan_token(30) || jj_3R_33() || jj_scan_token(31);
   }
 
   private boolean jj_3R_69() {
-    if (jj_scan_token(24)) return true;
-    if (jj_3R_50()) return true;
-      return jj_scan_token(25);
+      return jj_scan_token(24) || jj_3R_50() || jj_scan_token(25);
   }
 
   private boolean jj_3_24() {
-    if (jj_scan_token(30)) return true;
-      return jj_scan_token(31);
+      return jj_scan_token(30) || jj_scan_token(31);
   }
 
   private boolean jj_3R_68() {
@@ -2474,8 +2439,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_115() {
-    if (jj_scan_token(40)) return true;
-      return jj_scan_token(TokenSequenceParserConstants.REGEXVAR);
+      return jj_scan_token(40) || jj_scan_token(TokenSequenceParserConstants.REGEXVAR);
   }
 
   private boolean jj_3R_81() {
@@ -2503,8 +2467,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_74() {
-    if (jj_scan_token(46)) return true;
-      return jj_3R_83();
+      return jj_scan_token(46) || jj_3R_83();
   }
 
   private boolean jj_3R_45() {
@@ -2530,8 +2493,7 @@ String VarName() : {
     Token xsp;
     xsp = jj_scanpos;
     if (jj_3R_107()) jj_scanpos = xsp;
-    if (jj_3R_50()) return true;
-      return jj_scan_token(25);
+      return jj_3R_50() || jj_scan_token(25);
   }
 
   private boolean jj_3R_71() {
@@ -2545,9 +2507,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_35() {
-    if (jj_3R_29()) return true;
-    if (jj_scan_token(33)) return true;
-      return jj_3R_28();
+      return jj_3R_29() || jj_scan_token(33) || jj_3R_28();
   }
 
   private boolean jj_3R_73() {
@@ -2575,8 +2535,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_80() {
-    if (jj_scan_token(21)) return true;
-      return jj_3R_87();
+      return jj_scan_token(21) || jj_3R_87();
   }
 
   private boolean jj_3R_46() {
@@ -2623,8 +2582,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_79() {
-    if (jj_scan_token(24)) return true;
-      return jj_3R_59();
+      return jj_scan_token(24) || jj_3R_59();
   }
 
   private boolean jj_3R_78() {
@@ -2632,8 +2590,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_20() {
-    if (jj_scan_token(21)) return true;
-      return jj_3R_35();
+      return jj_scan_token(21) || jj_3R_35();
   }
 
   private boolean jj_3R_70() {
@@ -2681,8 +2638,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_47() {
-    if (jj_scan_token(45)) return true;
-      return jj_3R_60();
+      return jj_scan_token(45) || jj_3R_60();
   }
 
   private boolean jj_3R_40() {
@@ -2714,8 +2670,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_31() {
-    if (jj_3R_46()) return true;
-      return jj_3R_28();
+      return jj_3R_46() || jj_3R_28();
   }
 
   private boolean jj_3R_52() {
@@ -2723,8 +2678,7 @@ String VarName() : {
   }
 
   private boolean jj_3_27() {
-    if (jj_scan_token(45)) return true;
-      return jj_scan_token(24);
+      return jj_scan_token(45) || jj_scan_token(24);
   }
 
   private boolean jj_3R_85() {
@@ -2756,8 +2710,7 @@ String VarName() : {
   }
 
   private boolean jj_3_26() {
-    if (jj_scan_token(24)) return true;
-      return jj_3R_33();
+      return jj_scan_token(24) || jj_3R_33();
   }
 
   private boolean jj_3_25() {
@@ -2787,8 +2740,7 @@ String VarName() : {
   }
 
   private boolean jj_3R_41() {
-    if (jj_scan_token(32)) return true;
-      return jj_3R_28();
+      return jj_scan_token(32) || jj_3R_28();
   }
 
   private boolean jj_3R_112() {
@@ -2796,14 +2748,11 @@ String VarName() : {
   }
 
   private boolean jj_3R_111() {
-    if (jj_scan_token(21)) return true;
-      return jj_scan_token(TokenSequenceParserConstants.NONNEGINT);
+      return jj_scan_token(21) || jj_scan_token(TokenSequenceParserConstants.NONNEGINT);
   }
 
   private boolean jj_3R_27() {
-    if (jj_scan_token(30)) return true;
-    if (jj_3R_43()) return true;
-      return jj_scan_token(31);
+      return jj_scan_token(30) || jj_3R_43() || jj_scan_token(31);
   }
 
   private boolean jj_3R_25() {

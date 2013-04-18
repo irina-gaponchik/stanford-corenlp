@@ -212,12 +212,12 @@ public class JodaTimeUtils {
   // Helper functions for working with joda time type
   protected static boolean hasField(ReadablePartial base, DateTimeFieldType field)
   {
-      return base == null ? false : base.isSupported(field);
+      return base != null && base.isSupported(field);
   }
 
   protected static boolean hasField(ReadablePeriod base, DurationFieldType field)
   {
-      return base == null ? false : base.isSupported(field);
+      return base != null && base.isSupported(field);
   }
 
   protected static Partial setField(Partial base, DateTimeFieldType field, int value) {
@@ -491,28 +491,26 @@ public class JodaTimeUtils {
     DateTimeFieldType msf = getMostSpecific(p);
     if (isMoreGeneral(msf, DateTimeFieldType.year(), p.getChronology()) ||
             isMoreGeneral(msf, DateTimeFieldType.yearOfCentury(), p.getChronology())) {
-      if (p.isSupported(DateTimeFieldType.yearOfCentury())) {
-        // OKAY
-      } else {
-        if (p.isSupported(JodaTimeUtils.DecadeOfCentury)) {
-          if (p.isSupported(DateTimeFieldType.centuryOfEra())) {
-            int year = p.get(DateTimeFieldType.centuryOfEra()) * 100 + p.get(JodaTimeUtils.DecadeOfCentury)*10;
-            p = p.without(JodaTimeUtils.DecadeOfCentury);
-            p = p.without(DateTimeFieldType.centuryOfEra());
-            p = p.with(DateTimeFieldType.year(), year);
+        if (!p.isSupported(DateTimeFieldType.yearOfCentury())) {
+          if (p.isSupported(JodaTimeUtils.DecadeOfCentury)) {
+            if (p.isSupported(DateTimeFieldType.centuryOfEra())) {
+              int year = p.get(DateTimeFieldType.centuryOfEra()) * 100 + p.get(JodaTimeUtils.DecadeOfCentury)*10;
+              p = p.without(JodaTimeUtils.DecadeOfCentury);
+              p = p.without(DateTimeFieldType.centuryOfEra());
+              p = p.with(DateTimeFieldType.year(), year);
+            } else {
+              int year = p.get(JodaTimeUtils.DecadeOfCentury)*10;
+              p = p.without(JodaTimeUtils.DecadeOfCentury);
+              p = p.with(DateTimeFieldType.yearOfCentury(), year);
+            }
           } else {
-            int year = p.get(JodaTimeUtils.DecadeOfCentury)*10;
-            p = p.without(JodaTimeUtils.DecadeOfCentury);
-            p = p.with(DateTimeFieldType.yearOfCentury(), year);
-          }
-        } else {
-          if (p.isSupported(DateTimeFieldType.centuryOfEra())) {
-            int year = p.get(DateTimeFieldType.centuryOfEra()) * 100;
-            p = p.without(DateTimeFieldType.centuryOfEra());
-            p = p.with(DateTimeFieldType.year(), year);
+            if (p.isSupported(DateTimeFieldType.centuryOfEra())) {
+              int year = p.get(DateTimeFieldType.centuryOfEra()) * 100;
+              p = p.without(DateTimeFieldType.centuryOfEra());
+              p = p.with(DateTimeFieldType.year(), year);
+            }
           }
         }
-      }
     }
     boolean useWeek = false;
     if (p.isSupported(DateTimeFieldType.weekOfWeekyear())) {
@@ -791,12 +789,14 @@ public class JodaTimeUtils {
     //--Special Cases
     if( begin.getYear() < -100000){
       return "PAST_REF";
-    } else if(end.getYear() > 100000){
-      return "FUTURE_REF";
-    } else if(begin.equals(end)){
-      return timexTimeValue(begin);
     }
-    StringBuilder value = new StringBuilder();
+      if(end.getYear() > 100000){
+        return "FUTURE_REF";
+      }
+      if(begin.equals(end)){
+        return timexTimeValue(begin);
+      }
+      StringBuilder value = new StringBuilder();
     boolean shouldBeDone = false;
     //--Differences
     int monthDiff = end.getMonthOfYear() - begin.getMonthOfYear() + (end.getYear()-begin.getYear())*12;
@@ -822,14 +822,15 @@ public class JodaTimeUtils {
         return timexDurationValue(begin,end);
       }
       return value.toString();
-    } else if(monthDiff < 12 || opts.forceDate) {
-      //(case: year and more)
-      value.append(begin.getYear());
-    } else {
-      //(case: treat as duration)
-      return timexDurationValue(begin, end);
     }
-    //--Week/Month/Quarters
+      if(monthDiff < 12 || opts.forceDate) {
+        //(case: year and more)
+        value.append(begin.getYear());
+      } else {
+        //(case: treat as duration)
+        return timexDurationValue(begin, end);
+      }
+      //--Week/Month/Quarters
     value.append('-');
     if(noFurtherFields(monthOfYear(), begin, end) || noFurtherFields(weekOfWeekyear(), begin, end)){
       boolean monthTerminal = noFurtherFields(monthOfYear(), begin, end);
@@ -870,36 +871,39 @@ public class JodaTimeUtils {
         return timexDurationValue(begin, end);
       }
       return value.toString();
-    } else if(noFurtherFields(dayOfWeek(), begin, end) && dayDiff == 2 && begin.getDayOfWeek() == 6){
-      //(case: a weekend)
-      value.append('W').append(zeroPad(begin.getWeekOfWeekyear(),2)).append("-WE");
-      return value.toString();
-    } else if(dayDiff < maximumValue(dayOfMonth(),begin) || opts.forceDate) {
-      //(case: month and more)
-      value.append(zeroPad(begin.getMonthOfYear(),2));
-    } else {
-      //(case: treat as duration)
-      return timexDurationValue(begin, end);
     }
-    //--Weekday/Day
+      if(noFurtherFields(dayOfWeek(), begin, end) && dayDiff == 2 && begin.getDayOfWeek() == 6){
+        //(case: a weekend)
+        value.append('W').append(zeroPad(begin.getWeekOfWeekyear(),2)).append("-WE");
+        return value.toString();
+      }
+      if(dayDiff < maximumValue(dayOfMonth(),begin) || opts.forceDate) {
+        //(case: month and more)
+        value.append(zeroPad(begin.getMonthOfYear(),2));
+      } else {
+        //(case: treat as duration)
+        return timexDurationValue(begin, end);
+      }
+      //--Weekday/Day
     value.append('-');
     if(noFurtherFields(dayOfMonth(), begin, end)){
       if(dayDiff == 1 || opts.forceDate){
         //(case: a day)
-        value.append(zeroPad(begin.getDayOfMonth(),2));
+        value.append(zeroPad(begin.getDayOfMonth(), 2));
       } else {
         //(case: treat as duration)
         return timexDurationValue(begin, end);
       }
       return value.toString();
-    } else if(hrDiff < 24 || opts.forceDate){
-      //(case: day and more)
-      value.append(zeroPad(begin.getDayOfMonth(),2));
-    } else {
-      //(case: treat as duration)
-      return timexDurationValue(begin, end);
     }
-    //--Hour/TimeOfDay
+      if(hrDiff < 24 || opts.forceDate){
+        //(case: day and more)
+        value.append(zeroPad(begin.getDayOfMonth(),2));
+      } else {
+        //(case: treat as duration)
+        return timexDurationValue(begin, end);
+      }
+      //--Hour/TimeOfDay
     value.append('T');
     if(noFurtherFields(hourOfDay(),begin,end)){
       //((case: half day)
@@ -924,14 +928,15 @@ public class JodaTimeUtils {
         return timexDurationValue(begin,end);
       }
       return value.toString();
-    } else if(minDiff <= 60 || opts.forceDate){
-      //(case: hour and more)
-      value.append(zeroPad(begin.getHourOfDay(),2));
-    } else {
-      //(case: treat as duration)
-      return timexDurationValue(begin, end);
     }
-    //--Minute/Second
+      if(minDiff <= 60 || opts.forceDate){
+        //(case: hour and more)
+        value.append(zeroPad(begin.getHourOfDay(),2));
+      } else {
+        //(case: treat as duration)
+        return timexDurationValue(begin, end);
+      }
+      //--Minute/Second
     value.append(':');
     value.append(zeroPad(begin.getMinuteOfHour(),2));
     return value.toString();

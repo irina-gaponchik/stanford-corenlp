@@ -491,12 +491,12 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
       }
       while(start >= 0){
         String head = originalSpan.get(start).get(CoreAnnotations.TextAnnotation.class).toLowerCase();
-        if(!knownSuffix(head)){
-          this.headString = head;
-          break;
-        } else {
-          start --;
-        }
+          if (knownSuffix(head)) {
+              start--;
+          } else {
+              this.headString = head;
+              break;
+          }
       }
     }
   }
@@ -579,7 +579,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
           } else if (m.nerString.startsWith("GPE")) {
             return dict.GPEPronouns.contains(headString);
           } else
-              return m.nerString.startsWith("VEH") || m.nerString.startsWith("FAC") || m.nerString.startsWith("WEA") ? dict.facilityVehicleWeaponPronouns.contains(headString) : false;
+              return (m.nerString.startsWith("VEH") || m.nerString.startsWith("FAC") || m.nerString.startsWith("WEA")) && dict.facilityVehicleWeaponPronouns.contains(headString);
         } else {  // ACE w/o gold NE or MUC
             switch (m.nerString) {
                 case "O":
@@ -669,10 +669,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
 
   /** Find which mention appears first in a document */
   public boolean appearEarlierThan(Mention m){
-    if (this.sentNum < m.sentNum) {
-      return true;
-    } else
-        return this.sentNum <= m.sentNum && (this.startIndex < m.startIndex || this.startIndex <= m.startIndex && (this.endIndex > m.endIndex ? true : false));
+      return this.sentNum < m.sentNum || this.sentNum <= m.sentNum && (this.startIndex < m.startIndex || this.startIndex <= m.startIndex && (this.endIndex > m.endIndex ? true : false));
   }
 
   public String longestNNPEndsWithHead (){
@@ -710,11 +707,13 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
     String ret = str==null ? this.spanToString() : str;
     if (ret.startsWith("a ") || ret.startsWith("A ")) {
       return ret.substring(2);
-    } else if (ret.startsWith("an ") || ret.startsWith("An ")) {
-      return ret.substring(3);
-    } else if (ret.startsWith("the ") || ret.startsWith("The "))
-      return ret.substring(4);
-    return ret;
+    }
+      if (ret.startsWith("an ") || ret.startsWith("An ")) {
+        return ret.substring(3);
+      }
+      if (ret.startsWith("the ") || ret.startsWith("The "))
+        return ret.substring(4);
+      return ret;
   }
 
   public List<String> preprocessSearchTerm (){
@@ -835,12 +834,12 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
 
   public boolean moreRepresentativeThan(Mention m){
     if(m==null) return true;
-    if(mentionType!=m.mentionType) {
-        return mentionType == MentionType.PROPER && m.mentionType != MentionType.PROPER
-                || mentionType == MentionType.NOMINAL && m.mentionType == MentionType.PRONOMINAL ? true : false;
-    } else {
-        return headIndex - startIndex > m.headIndex - m.startIndex || (sentNum < m.sentNum || sentNum == m.sentNum && headIndex < m.headIndex ? true : false);
-    }
+      if (mentionType == m.mentionType) {
+          return headIndex - startIndex > m.headIndex - m.startIndex || (sentNum < m.sentNum || sentNum == m.sentNum && headIndex < m.headIndex ? true : false);
+      } else {
+          return mentionType == MentionType.PROPER && m.mentionType != MentionType.PROPER
+                  || mentionType == MentionType.NOMINAL && m.mentionType == MentionType.PRONOMINAL ? true : false;
+      }
   }
 
   //Returns filtered premodifiers (no determiners or numerals)
@@ -938,41 +937,44 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
 
     ArrayList<String> phrase_string = new ArrayList<>();
     String ne = "";
-    for(CoreLabel token : pTokens){
-      if(token.index() == headWord.index()){
-        phrase_string.add(token.lemma());
-        ne = "";
+    for(CoreLabel token : pTokens)
+        if (token.index() != headWord.index()) {
+            if ((!token.lemma().equals("and") && !StringUtils.isPunct(token.lemma()))
+                    || pTokens.size() <= pTokens.indexOf(token) + 1
+                    || pTokens.indexOf(token) <= 0
+                    || !pTokens.get(pTokens.indexOf(token) + 1).ner().equals(pTokens.get(pTokens.indexOf(token) - 1).ner())) {
+                if (token.index() == headWord.index() - 1
+                        && token.ner().equals(nerString)) {
+                    phrase_string.add(token.lemma());
+                    ne = "";
 
-      } else if( (token.lemma().equals("and") || StringUtils.isPunct(token.lemma()))
-          && pTokens.size() > pTokens.indexOf(token)+1
-          && pTokens.indexOf(token) > 0
-          && pTokens.get(pTokens.indexOf(token)+1).ner().equals(pTokens.get(pTokens.indexOf(token)-1).ner())){
+                } else if (!token.ner().equals("O")) {
+                    if (!token.ner().equals(ne)) {
+                        ne = token.ner();
+                        phrase_string.add('<' + ne + '>');
+                    }
 
-      } else if(token.index() == headWord.index()-1
-          && token.ner().equals(nerString)){
-        phrase_string.add(token.lemma());
-        ne = "";
+                } else {
+                    phrase_string.add(token.lemma());
+                    ne = "";
+                }
+            }
+        } else {
+            phrase_string.add(token.lemma());
+            ne = "";
 
-      } else if(!token.ner().equals("O")){
-        if(!token.ner().equals(ne)){
-          ne = token.ner();
-          phrase_string.add('<' +ne+ '>');
         }
-
-      } else {
-        phrase_string.add(token.lemma());
-        ne = "";
-      }
-    }
-    return StringUtils.join(phrase_string);
+      return StringUtils.join(phrase_string);
   }
 
   public boolean isCoordinated(){
-    if(headIndexedWord == null) return false;
-    for(Pair<GrammaticalRelation,IndexedWord> child : dependency.childPairs(headIndexedWord)){
-      if(child.first().getShortName().equals("cc")) return true;
-    }
-    return false;
+      if (headIndexedWord != null) {
+          for (Pair<GrammaticalRelation, IndexedWord> child : dependency.childPairs(headIndexedWord)) {
+              if (child.first().getShortName().equals("cc")) return true;
+          }
+
+      }
+      return false;
   }
 
   private static List<String> getContextHelper(List<? extends CoreLabel> words) {
@@ -1024,16 +1026,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
     String thisString = this.spanToString();
     if(this.isPronominal() || dict.allPronouns.contains(thisString.toLowerCase())) return false;
     if(!m.nerString.startsWith("PER") && !m.nerString.equals("O")) return false;
-    if(!this.nerString.startsWith("PER") && !this.nerString.equals("O")) return false;
-    if(!sameSentence(m) || !m.spanToString().startsWith(thisString)) return false;
-    if(m.spanToString().contains("'") || m.spanToString().contains(" and ")) return false;
-    if (!animaciesAgree(m) || this.animacy == Animacy.INANIMATE
-         || this.gender == Gender.NEUTRAL || m.gender == Gender.NEUTRAL
-         || !this.numbersAgree(m)) {
-      return false;
-    }
-      return !(dict.demonymSet.contains(thisString.toLowerCase())
-              || dict.demonymSet.contains(m.spanToString().toLowerCase()));
+      return !(!this.nerString.startsWith("PER") && !this.nerString.equals("O")) && !(!sameSentence(m) || !m.spanToString().startsWith(thisString)) && !(m.spanToString().contains("'") || m.spanToString().contains(" and ")) && !(!animaciesAgree(m) || this.animacy == Animacy.INANIMATE || this.gender == Gender.NEUTRAL || m.gender == Gender.NEUTRAL || !this.numbersAgree(m)) && !(dict.demonymSet.contains(thisString.toLowerCase()) || dict.demonymSet.contains(m.spanToString().toLowerCase()));
   }
 
   public boolean isDemonym(Mention m, Dictionaries dict){
@@ -1061,18 +1054,20 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
     int size = sentenceWords.size();
     if(headIndex == 0) {
       return "first";
-    } else if (headIndex == size -1) {
-      return "last";
-    } else {
+    }
+      if (headIndex == size -1) {
+        return "last";
+      }
       if(headIndex > 0 && headIndex < size/3) {
         return "begin";
-      } else if (headIndex >= size/3 && headIndex < 2 * size/3) {
+      }
+      if (headIndex >= size/3 && headIndex < 2 * size/3) {
         return "middle";
-      } else if (headIndex >= 2 * size/3 && headIndex < size -1) {
+      }
+      if (headIndex >= 2 * size/3 && headIndex < size -1) {
         return "end";
       }
-    }
-    return null;
+      return null;
   }
 
   public String getRelation(){

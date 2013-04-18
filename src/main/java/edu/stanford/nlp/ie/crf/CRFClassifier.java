@@ -499,8 +499,6 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
           if (index >= 0) {
             data[j][k][m] = index;
             m++;
-          } else {
-            // this is where we end up when we do feature threshold cutoffs
           }
         }
 
@@ -1948,12 +1946,12 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
     cliquePotentialFunctionHelper = func;
 
     QNMinimizer minimizer;
-    if (flags.interimOutputFreq != 0) {
-      FloatFunction monitor = new ResultStoringFloatMonitor(flags.interimOutputFreq, flags.serializeTo);
-      minimizer = new QNMinimizer(monitor);
-    } else {
-      minimizer = new QNMinimizer();
-    }
+      if (flags.interimOutputFreq == 0) {
+          minimizer = new QNMinimizer();
+      } else {
+          FloatFunction monitor = new ResultStoringFloatMonitor(flags.interimOutputFreq, flags.serializeTo);
+          minimizer = new QNMinimizer(monitor);
+      }
 
     if (pruneFeatureItr == 0) {
       minimizer.setM(flags.QNsize);
@@ -2351,12 +2349,12 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
       int QNmem;
         QNmem = featurePruneIteration == 0 ? flags.QNsize : flags.QNsize2;
 
-      if (flags.interimOutputFreq != 0) {
-        Function monitor = new ResultStoringMonitor(flags.interimOutputFreq, flags.serializeTo);
-        minimizer = new QNMinimizer(monitor, QNmem, flags.useRobustQN);
-      } else {
-        minimizer = new QNMinimizer(QNmem, flags.useRobustQN);
-      }
+        if (flags.interimOutputFreq == 0) {
+            minimizer = new QNMinimizer(QNmem, flags.useRobustQN);
+        } else {
+            Function monitor = new ResultStoringMonitor(flags.interimOutputFreq, flags.serializeTo);
+            minimizer = new QNMinimizer(monitor, QNmem, flags.useRobustQN);
+        }
 
       ((QNMinimizer) minimizer).terminateOnEvalImprovement(flags.terminateOnEvalImprovement);
       ((QNMinimizer) minimizer).setTerminateOnEvalImprovementNumOfEpoch(flags.terminateOnEvalImprovementNumOfEpoch);
@@ -2371,12 +2369,12 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
         QNMinimizer qnMinimizer;
         int QNmem;
           QNmem = featurePruneIteration == 0 ? flags.QNsize : flags.QNsize2;
-        if (flags.interimOutputFreq != 0) {
-          Function monitor = new ResultStoringMonitor(flags.interimOutputFreq, flags.serializeTo);
-          qnMinimizer = new QNMinimizer(monitor, QNmem, flags.useRobustQN);
-        } else {
-          qnMinimizer = new QNMinimizer(QNmem, flags.useRobustQN);
-        }
+          if (flags.interimOutputFreq == 0) {
+              qnMinimizer = new QNMinimizer(QNmem, flags.useRobustQN);
+          } else {
+              Function monitor = new ResultStoringMonitor(flags.interimOutputFreq, flags.serializeTo);
+              qnMinimizer = new QNMinimizer(monitor, QNmem, flags.useRobustQN);
+          }
         minimizer = new HybridMinimizer(sgdMinimizer, qnMinimizer, flags.SGDPasses);
       } else {
         minimizer = sgdMinimizer;

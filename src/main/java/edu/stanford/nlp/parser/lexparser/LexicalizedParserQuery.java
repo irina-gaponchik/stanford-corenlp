@@ -252,12 +252,12 @@ public class LexicalizedParserQuery implements ParserQuery {
       throw new RuntimeInterruptedException();
     }
     if (op.doPCFG && op.doDep) {
-      if ( ! bparser.parse(sentenceB)) {
-        restoreOriginalWords(sentence);
-        return parseSucceeded;
-      } else {
-        parseSucceeded = true;
-      }
+        if (bparser.parse(sentenceB)) {
+            parseSucceeded = true;
+        } else {
+            restoreOriginalWords(sentence);
+            return parseSucceeded;
+        }
     }
     restoreOriginalWords(sentence);
     return true;
@@ -512,17 +512,17 @@ public class LexicalizedParserQuery implements ParserQuery {
   @Override
   public boolean parse(List<? extends HasWord> sentence) {
     try {
-      if (!parseInternal(sentence)) {
-        if (pparser != null && pparser.hasParse()) {
-          parseFallback = true;
-          return true;
+        if (parseInternal(sentence)) {
+            return true;
         } else {
-          parseUnparsable = true;
-          return false;
+            if (pparser != null && pparser.hasParse()) {
+                parseFallback = true;
+                return true;
+            } else {
+                parseUnparsable = true;
+                return false;
+            }
         }
-      } else {
-        return true;
-      }
     } catch (OutOfMemoryError e) {
       if (op.testOptions.maxLength != -0xDEADBEEF) {
         // this means they explicitly asked for a length they cannot handle.

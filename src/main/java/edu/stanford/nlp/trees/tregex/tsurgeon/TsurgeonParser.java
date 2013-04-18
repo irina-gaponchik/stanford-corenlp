@@ -567,15 +567,11 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
   }
 
   private boolean jj_3_8() {
-    if (jj_scan_token(TsurgeonParserConstants.INSERT)) return true;
-    if (jj_3R_3()) return true;
-      return jj_3R_4();
+      return jj_scan_token(TsurgeonParserConstants.INSERT) || jj_3R_3() || jj_3R_4();
   }
 
   private boolean jj_3_7() {
-    if (jj_scan_token(TsurgeonParserConstants.INSERT)) return true;
-    if (jj_3R_2()) return true;
-      return jj_3R_4();
+      return jj_scan_token(TsurgeonParserConstants.INSERT) || jj_3R_2() || jj_3R_4();
   }
 
   private boolean jj_3R_2() {
@@ -583,15 +579,11 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
   }
 
   private boolean jj_3_6() {
-    if (jj_scan_token(TsurgeonParserConstants.REPLACE)) return true;
-    if (jj_3R_2()) return true;
-      return jj_3R_3();
+      return jj_scan_token(TsurgeonParserConstants.REPLACE) || jj_3R_2() || jj_3R_3();
   }
 
   private boolean jj_3_5() {
-    if (jj_scan_token(TsurgeonParserConstants.REPLACE)) return true;
-    if (jj_3R_2()) return true;
-      return jj_3R_2();
+      return jj_scan_token(TsurgeonParserConstants.REPLACE) || jj_3R_2() || jj_3R_2();
   }
 
   private boolean jj_3R_11() {
@@ -613,27 +605,19 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
   }
 
   private boolean jj_3_4() {
-    if (jj_scan_token(TsurgeonParserConstants.RELABEL)) return true;
-    if (jj_3R_2()) return true;
-      return jj_scan_token(TsurgeonParserConstants.GENERAL_RELABEL);
+      return jj_scan_token(TsurgeonParserConstants.RELABEL) || jj_3R_2() || jj_scan_token(TsurgeonParserConstants.GENERAL_RELABEL);
   }
 
   private boolean jj_3_3() {
-    if (jj_scan_token(TsurgeonParserConstants.RELABEL)) return true;
-    if (jj_3R_2()) return true;
-      return jj_scan_token(TsurgeonParserConstants.REGEX);
+      return jj_scan_token(TsurgeonParserConstants.RELABEL) || jj_3R_2() || jj_scan_token(TsurgeonParserConstants.REGEX);
   }
 
   private boolean jj_3_2() {
-    if (jj_scan_token(TsurgeonParserConstants.RELABEL)) return true;
-    if (jj_3R_2()) return true;
-      return jj_scan_token(TsurgeonParserConstants.QUOTEX);
+      return jj_scan_token(TsurgeonParserConstants.RELABEL) || jj_3R_2() || jj_scan_token(TsurgeonParserConstants.QUOTEX);
   }
 
   private boolean jj_3_1() {
-    if (jj_scan_token(TsurgeonParserConstants.RELABEL)) return true;
-    if (jj_3R_2()) return true;
-      return jj_scan_token(TsurgeonParserConstants.IDENTIFIER);
+      return jj_scan_token(TsurgeonParserConstants.RELABEL) || jj_3R_2() || jj_scan_token(TsurgeonParserConstants.IDENTIFIER);
   }
 
   private boolean jj_3R_8() {
@@ -657,8 +641,7 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
   }
 
   private boolean jj_3R_7() {
-    if (jj_scan_token(TsurgeonParserConstants.TREE_NODE_NONTERMINAL_LABEL)) return true;
-      return jj_3R_9();
+      return jj_scan_token(TsurgeonParserConstants.TREE_NODE_NONTERMINAL_LABEL) || jj_3R_9();
   }
 
   private boolean jj_3R_4() {

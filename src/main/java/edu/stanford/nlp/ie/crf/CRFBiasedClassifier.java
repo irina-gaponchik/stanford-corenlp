@@ -174,16 +174,12 @@ public class CRFBiasedClassifier<IN extends CoreMap> extends CRFClassifier<IN> {
 
     if (testFile != null) {
       DocumentReaderAndWriter<CoreLabel> readerAndWriter = crf.makeReaderAndWriter();
-      if (crf.flags.printFirstOrderProbs) {
-        crf.printFirstOrderProbs(testFile, readerAndWriter);
-      } else if (crf.flags.printProbs) {
-        crf.printProbs(testFile, readerAndWriter);
-      } else if (crf.flags.useKBest) {
-        int k = crf.flags.kBest;
-        crf.classifyAndWriteAnswersKBest(testFile, k, readerAndWriter);
-      } else {
-        crf.classifyAndWriteAnswers(testFile, readerAndWriter);
-      }
+        if (crf.flags.printFirstOrderProbs) crf.printFirstOrderProbs(testFile, readerAndWriter);
+        else if (crf.flags.printProbs) crf.printProbs(testFile, readerAndWriter);
+        else if (crf.flags.useKBest) {
+            int k = crf.flags.kBest;
+            crf.classifyAndWriteAnswersKBest(testFile, k, readerAndWriter);
+        } else crf.classifyAndWriteAnswers(testFile, readerAndWriter);
     }
   } // end main
 

@@ -338,11 +338,11 @@ public class DirectedMultiGraph<V, E> implements Graph<V, E> /* Serializable */{
       if (edges.isEmpty() && !directionSensitive) {
         edges = getEdges(next, previous);
       }
-      if (!edges.isEmpty()) {
-        connection = edges.get(0);
-      } else {
-        throw new IllegalArgumentException("Path given with missing " + "edge connection");
-      }
+        if (edges.isEmpty()) {
+            throw new IllegalArgumentException("Path given with missing " + "edge connection");
+        } else {
+            connection = edges.get(0);
+        }
       path.add(connection);
       previous = next;
     }

@@ -79,9 +79,10 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
   public int start(int group) {
     if (group == GROUP_BEFORE_MATCH) {
       return 0;
-    } else if (group == GROUP_AFTER_MATCH) {
-      return matchedGroups[0].matchEnd;
     }
+      if (group == GROUP_AFTER_MATCH) {
+        return matchedGroups[0].matchEnd;
+      }
       return matchedGroups[group] != null ? matchedGroups[group].matchBegin : -1;
   }
 
@@ -97,9 +98,10 @@ public class BasicSequenceMatchResult<T> implements SequenceMatchResult<T>
   public int end(int group) {
     if (group == GROUP_BEFORE_MATCH) {
       return matchedGroups[0].matchBegin;
-    } else if (group == GROUP_AFTER_MATCH) {
-      return elements.size();
     }
+      if (group == GROUP_AFTER_MATCH) {
+        return elements.size();
+      }
       return matchedGroups[group] != null ? matchedGroups[0].matchEnd : -1;
   }
 

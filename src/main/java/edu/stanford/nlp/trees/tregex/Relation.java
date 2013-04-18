@@ -95,15 +95,18 @@ abstract class Relation implements Serializable {
     // these are shorthands for relations with arguments
     if (s.equals("<,")) {
       return getRelation("<", "1", basicCatFunction, headFinder);
-    } else if (parentOfLastChild.matcher(s).matches()) {
-      return getRelation("<", "-1", basicCatFunction, headFinder);
-    } else if (s.equals(">,")) {
-      return getRelation(">", "1", basicCatFunction, headFinder);
-    } else if (lastChildOfParent.matcher(s).matches()) {
-      return getRelation(">", "-1", basicCatFunction, headFinder);
     }
+      if (parentOfLastChild.matcher(s).matches()) {
+        return getRelation("<", "-1", basicCatFunction, headFinder);
+      }
+      if (s.equals(">,")) {
+        return getRelation(">", "1", basicCatFunction, headFinder);
+      }
+      if (lastChildOfParent.matcher(s).matches()) {
+        return getRelation(">", "-1", basicCatFunction, headFinder);
+      }
 
-    // finally try relations with headFinders
+      // finally try relations with headFinders
     Relation r;
       switch (s) {
           case ">>#":
@@ -597,8 +600,8 @@ abstract class Relation implements Serializable {
 
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
-        return t1.isLeaf() ? false : t1.children()[0].equals(t2)
-                || satisfies(t1.children()[0], t2, root);
+        return !t1.isLeaf() && (t1.children()[0].equals(t2)
+                || satisfies(t1.children()[0], t2, root));
     }
 
     @Override
@@ -975,7 +978,7 @@ abstract class Relation implements Serializable {
       if (t1.isLeaf() || t1.children().length > 1)
         return false;
       Tree onlyDtr = t1.children()[0];
-        return onlyDtr.equals(t2) ? true : satisfies(onlyDtr, t2, root);
+        return onlyDtr.equals(t2) || satisfies(onlyDtr, t2, root);
     }
 
     @Override
@@ -1017,7 +1020,7 @@ abstract class Relation implements Serializable {
       if (t2.isLeaf() || t2.children().length > 1)
         return false;
       Tree onlyDtr = t2.children()[0];
-        return onlyDtr.equals(t1) ? true : satisfies(t1, onlyDtr, root);
+        return onlyDtr.equals(t1) || satisfies(t1, onlyDtr, root);
     }
 
     @Override
@@ -1118,7 +1121,7 @@ abstract class Relation implements Serializable {
         return t2.firstChild().equals(t1);
       } else {
         Tree head = hf.determineHead(t2);
-          return head.equals(t1) ? true : satisfies(t1, head, root);
+          return head.equals(t1) || satisfies(t1, head, root);
       }
     }
 
@@ -1370,13 +1373,7 @@ abstract class Relation implements Serializable {
     @Override
     boolean satisfies(Tree t1, Tree t2, Tree root) {
       Tree[] kids = t2.children();
-      if (kids.length < Math.abs(childNum)) {
-        return false;
-      }
-      if (childNum > 0 && kids[childNum - 1].equals(t1)) {
-        return true;
-      }
-        return childNum < 0 && kids[kids.length + childNum].equals(t1);
+        return kids.length >= Math.abs(childNum) && (childNum > 0 && kids[childNum - 1].equals(t1) || childNum < 0 && kids[kids.length + childNum].equals(t1));
     }
 
     @Override
@@ -1597,10 +1594,7 @@ abstract class Relation implements Serializable {
 
       UnbrokenCategoryDominates unbrokenCategoryDominates = (UnbrokenCategoryDominates) o;
 
-      if (negatedPattern != unbrokenCategoryDominates.negatedPattern) {
-        return false;
-      }
-        return pattern.equals(unbrokenCategoryDominates.pattern);
+        return negatedPattern == unbrokenCategoryDominates.negatedPattern && pattern.equals(unbrokenCategoryDominates.pattern);
 
     }
 

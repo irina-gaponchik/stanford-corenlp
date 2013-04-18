@@ -348,9 +348,7 @@ public class MatchedExpression {
     List<T> okayChunks = new ArrayList<>(chunks.size());
       for (T chunk : chunks) {
           Value v = chunk.value;
-          if (v == null || v.get() == null) {
-              //skip
-          } else {
+          if (v != null && v.get() != null) {
               okayChunks.add(chunk);
           }
       }

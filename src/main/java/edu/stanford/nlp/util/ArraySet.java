@@ -53,7 +53,7 @@ public class ArraySet<E> extends AbstractSet<E> {
    */
   @Override
   public boolean add(E e) {
-      return backer.contains(e) ? false : backer.add(e);
+      return !backer.contains(e) && backer.add(e);
   }
 
   /**

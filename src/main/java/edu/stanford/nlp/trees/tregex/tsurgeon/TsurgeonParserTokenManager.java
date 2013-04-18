@@ -252,9 +252,9 @@ private int jjMoveStringLiteralDfa5_0(long old0, long active0)
       case 101:
          if ((active0 & 0x10L) != 0L)
             return jjStartNfaWithStates_0(5, 4, 55);
-         else if ((active0 & 0x80L) != 0L)
-            return jjStartNfaWithStates_0(5, 7, 55);
-         return jjMoveStringLiteralDfa6_0(active0, 0x4040L);
+          if ((active0 & 0x80L) != 0L)
+             return jjStartNfaWithStates_0(5, 7, 55);
+          return jjMoveStringLiteralDfa6_0(active0, 0x4040L);
       case 110:
          if ((active0 & 0x800L) != 0L)
          {
@@ -915,11 +915,11 @@ public Token getNextToken()
         if (jjmatchedKind != 0x7fffffff) {
             if (jjmatchedPos + 1 < curPos)
                 input_stream.backup(curPos - jjmatchedPos - 1);
-            if ((jjtoToken[jjmatchedKind >> 6] & 1L << (jjmatchedKind & 077)) != 0L) {
+            if ((jjtoToken[jjmatchedKind >> 6] & 1L << (jjmatchedKind & 077)) == 0L) {
+                continue;
+            } else {
                 matchedToken = jjFillToken();
                 return matchedToken;
-            } else {
-                continue;
             }
         }
         int error_line = input_stream.getEndLine();

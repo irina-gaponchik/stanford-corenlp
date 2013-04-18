@@ -13,10 +13,10 @@ import java.util.List;
 
 public class EmpiricalNERPrior<IN extends CoreMap> extends EntityCachingAbstractSequencePrior<IN> {
 
-  protected String ORG = "ORGANIZATION";
-  protected String PER = "PERSON";
-  protected String LOC = "LOCATION";
-  protected String MISC = "MISC";
+  protected final static  String ORG = "ORGANIZATION";
+  protected final static  String PER = "PERSON";
+  protected final static  String LOC = "LOCATION";
+  protected final static  String MISC = "MISC";
 
   public EmpiricalNERPrior(String backgroundSymbol, Index<String> classIndex, List<IN> doc) {
     super(backgroundSymbol, classIndex, doc);
@@ -82,11 +82,6 @@ public class EmpiricalNERPrior<IN extends CoreMap> extends EntityCachingAbstract
         int length = entity.words.size();
         String tag1 = classIndex.get(entity.type);
 
-        if (tag1.equals(LOC)) { tag1 = LOC; }
-        else if (tag1.equals(ORG)) { tag1 = ORG; }
-        else if (tag1.equals(PER)) { tag1 = PER; }
-        else if (tag1.equals(MISC)) { tag1 = MISC; }
-
         int[] other = entities[i].otherOccurrences;
           for (int anOther : other) {
 
@@ -94,193 +89,220 @@ public class EmpiricalNERPrior<IN extends CoreMap> extends EntityCachingAbstract
               for (int k = anOther; k < anOther + length && k < entities.length; k++) {
                   otherEntity = entities[k];
                   if (otherEntity != null) {
-//               if (k > other[j]) {
-//                 System.err.println(entity.words+" "+otherEntity.words);
-//               }
                       break;
                   }
               }
-              // singleton + other instance null?
-              if (otherEntity == null) {
-                  //p -= length * Math.log(0.1);
-                  //if (entity.words.size() == 1) {
-                  //p -= length * p1;
-                  //}
-                  continue;
-              }
+              if (otherEntity != null) {
 
-              int oLength = otherEntity.words.size();
-              String tag2 = classIndex.get(otherEntity.type);
+                  int oLength = otherEntity.words.size();
+                  String tag2 = classIndex.get(otherEntity.type);
 
-              if (tag2.equals(LOC)) {
-                  tag2 = LOC;
-              } else if (tag2.equals(ORG)) {
-                  tag2 = ORG;
-              } else if (tag2.equals(PER)) {
-                  tag2 = PER;
-              } else if (tag2.equals(MISC)) {
-                  tag2 = MISC;
-              }
+                  // exact match??
+                  boolean exact = false;
+                  int[] oOther = otherEntity.otherOccurrences;
+                  for (int anOOther : oOther) {
+                      if (anOOther >= i && anOOther <= i + length - 1) {
+                          exact = true;
+                          break;
+                      }
+                  }
 
-              // exact match??
-              boolean exact = false;
-              int[] oOther = otherEntity.otherOccurrences;
-              for (int anOOther : oOther) {
-                  if (anOOther >= i && anOOther <= i + length - 1) {
-                      exact = true;
-                      break;
+                  if (exact) {
+                      // entity not complete
+                      if (length != oLength)
+                          if (tag1.equals(tag2)) {
+                              p -= Math.abs(oLength - length) * p1;
+                          } else // shorter
+                              if (((!tag1.equals(ORG) || !tag2.equals(LOC))) &&
+                                      ((!tag2.equals(LOC) || !tag1.equals(ORG)))) {
+                                  p -= (oLength + length) * p1;
+                              }
+                      switch (tag1) {
+                          case LOC:
+                              if (tag2.equals(LOC)) {
+                                  break;
+                              }
+                      }
+                      switch (tag2) {
+                          case PER:
+                              //p -= length * Math.log(188 / dem);
+                              p -= length * p3;
+                              break;
+                          case MISC:
+                              //p -= length * Math.log(3 / dem);
+                              p -= length * p5;
+                              break;
+                          default:
+                              switch (tag1) {
+                                  case ORG: //p -= length * Math.log(4 / dem);
+                                      p -= length * p4;
+
+                                      break;
+                                  case PER:
+                                      switch (tag2) {
+                                          case LOC:
+                                              //p -= length * Math.log(4.0 / dem);
+                                              p -= length * p10;
+                                              break;
+                                          default:
+                                              switch (tag2) {
+                                                  case ORG:
+                                                      //p -= length * Math.log(5 / dem);
+                                                      p -= length * p11;
+                                                      break;
+                                                  default:
+                                                      switch (tag2) {
+                                                          case PER:
+                                                              continue;
+                                                          case MISC:
+                                                              p -= length * p13;
+                                                              break;
+                                                      }
+                                                      break;
+                                              }
+                                              break;
+                                      }
+                                      break;
+                                  case MISC:
+                                      switch (tag2) {
+                                          case LOC:
+                                              //p -= length * Math.log(3.0 / dem);
+                                              p -= length * p14;
+                                              break;
+                                          case ORG:
+                                              //p -= length * Math.log(1 / dem);
+                                              p -= length * p15;
+                                              break;
+                                          case PER:
+                                              //p -= length * Math.log(1 / dem);
+                                              p -= length * p16;
+                                              break;
+                                          case MISC:
+                                              //p -= length * Math.log(2030 / dem);
+                                              //p -= length * p17;
+                                              break;
+                                      }
+
+
+                                      break;
+                                  default:
+                                      switch (tag2) {
+                                          case LOC:
+                                              //p -= length * Math.log(188.0 / dem);
+                                              p -= length * p6;
+                                              break;
+                                          case ORG:
+                                              //p -= length * Math.log(2975 / dem);
+                                              //p -= length * p7;
+                                              break;
+                                          case PER:
+                                              //p -= length * Math.log(5 / dem);
+                                              p -= length * p8;
+                                              break;
+                                          case MISC:
+                                              //p -= length * Math.log(1 / dem);
+                                              p -= length * p9;
+                                              break;
+                                      }
+
+                                      break;
+                              }
+                              break;
+                      }
+                      switch (tag2) {
+                          case ORG:
+                              continue;
+                      }
+                  } else {
+                      switch (tag1) {
+                          case LOC:
+                              //double dem = 724.0;
+                              switch (tag2) {
+                                  case LOC:
+                                  case ORG:
+                                      //p -= length * Math.log(167.0 / dem);
+                                      //p -= length * p18;
+                                      break;
+                                  case PER:
+                                      //p -= length * Math.log(5.0 / dem);
+                                      p -= length * p20;
+                                      break;
+                                  case MISC:
+                                      //p -= length * Math.log(224.0 / dem);
+                                      p -= length * p21;
+                                      break;
+                              }
+                              break;
+                          case ORG:
+                              //double dem = 834.0;
+                              switch (tag2) {
+                                  case LOC:
+                                      //p -= length * Math.log(6.0 / dem);
+                                      p -= length * p22;
+                                      break;
+                                  case ORG:
+                                      //p -= length * Math.log(819.0 / dem);
+                                      //p -= length * p23;
+                                      break;
+                                  case PER:
+                                      //p -= length * Math.log(2.0 / dem);
+                                      p -= length * p24;
+                                      break;
+                                  case MISC:
+                                      //p -= length * Math.log(7.0 / dem);
+                                      p -= length * p25;
+                                      break;
+                              }
+                              break;
+                          case PER:
+                              //double dem = 1978.0;
+                              switch (tag2) {
+                                  case LOC:
+                                      //p -= length * Math.log(1.0 / dem);
+                                      p -= length * p26;
+                                      break;
+                                  case ORG:
+                                      //p -= length * Math.log(22.0 / dem);
+                                      p -= length * p27;
+                                      break;
+                                  case PER:
+                                      //p -= length * Math.log(1941.0 / dem);
+                                      //p -= length * p28;
+                                      break;
+                                  case MISC:
+                                      //p -= length * Math.log(14.0 / dem);
+                                      p -= length * p29;
+                                      break;
+                              }
+                              break;
+                          case MISC:
+                              //double dem = 622.0;
+                              switch (tag2) {
+                                  case LOC:
+                                      //p -= length * Math.log(63.0 / dem);
+                                      p -= length * p30;
+                                      break;
+                                  case ORG:
+                                      //p -= length * Math.log(191.0 / dem);
+                                      p -= length * p31;
+                                      break;
+                                  case PER:
+                                      //p -= length * Math.log(3.0 / dem);
+                                      p -= length * p32;
+                                      break;
+                                  case MISC:
+                                      //p -= length * Math.log(365.0 / dem);
+                                      p -= length * p33;
+                                      break;
+                              }
+                              break;
+                      }
                   }
               }
 
-              if (exact) {
-                  // entity not complete
-                  if (length != oLength) {
-                      if (tag1.equals(tag2)) {// || ((tag1 == LOC && tag2 == ORG) || (tag1 == ORG && tag2 == LOC))) { // ||
-                          //p -= Math.abs(oLength - length) * Math.log(0.1);
-                          p -= Math.abs(oLength - length) * p1;
-                      } else if (!(tag1.equals(ORG) && tag2.equals(LOC)) &&
-                              !(tag2.equals(LOC) && tag1.equals(ORG))) {
-                          // shorter
-                          p -= (oLength + length) * p1;
-                      }
-                  }
-                  if (tag1.equals(LOC)) {
-                      if (tag2.equals(LOC)) {
-                          //p -= length * Math.log(6436.0 / dem);
-                          //p -= length * p2;
-                      } else if (tag2.equals(ORG)) {
-                          //p -= length * Math.log(188 / dem);
-                          p -= length * p3;
-                      } else if (tag2.equals(PER)) {
-                          //p -= length * Math.log(4 / dem);
-                          p -= length * p4;
-                      } else if (tag2.equals(MISC)) {
-                          //p -= length * Math.log(3 / dem);
-                          p -= length * p5;
-                      }
-                  } else if (tag1.equals(ORG)) {
-                      //double dem = 3169.0;
-                      if (tag2.equals(LOC)) {
-                          //p -= length * Math.log(188.0 / dem);
-                          p -= length * p6;
-                      } else if (tag2.equals(ORG)) {
-                          //p -= length * Math.log(2975 / dem);
-                          //p -= length * p7;
-                      } else if (tag2.equals(PER)) {
-                          //p -= length * Math.log(5 / dem);
-                          p -= length * p8;
-                      } else if (tag2.equals(MISC)) {
-                          //p -= length * Math.log(1 / dem);
-                          p -= length * p9;
-                      }
-                  } else if (tag1.equals(PER)) {
-                      //double dem = 3151.0;
-                      if (tag2.equals(LOC)) {
-                          //p -= length * Math.log(4.0 / dem);
-                          p -= length * p10;
-                      } else if (tag2.equals(ORG)) {
-                          //p -= length * Math.log(5 / dem);
-                          p -= length * p11;
-                      } else if (tag2.equals(PER)) {
-                          //p -= length * Math.log(3141 / dem);
-                          //p -= length * p12;
-                      } else if (tag2.equals(MISC)) {
-                          //p -= length * Math.log(1 / dem);
-                          p -= length * p13;
-                      }
-                  } else if (tag1.equals(MISC)) {
-                      //double dem = 2035.0;
-                      if (tag2.equals(LOC)) {
-                          //p -= length * Math.log(3.0 / dem);
-                          p -= length * p14;
-                      } else if (tag2.equals(ORG)) {
-                          //p -= length * Math.log(1 / dem);
-                          p -= length * p15;
-                      } else if (tag2.equals(PER)) {
-                          //p -= length * Math.log(1 / dem);
-                          p -= length * p16;
-                      } else if (tag2.equals(MISC)) {
-                          //p -= length * Math.log(2030 / dem);
-                          //p -= length * p17;
-                      }
-                  }
-              } else {
-                  if (tag1.equals(LOC)) {
-                      //double dem = 724.0;
-                      if (tag2.equals(LOC) || tag2.equals(ORG)) {
-                          //p -= length * Math.log(167.0 / dem);
-                          //p -= length * p18;
-                      } else if (tag2.equals(PER)) {
-                          //p -= length * Math.log(5.0 / dem);
-                          p -= length * p20;
-                      } else if (tag2.equals(MISC)) {
-                          //p -= length * Math.log(224.0 / dem);
-                          p -= length * p21;
-                      }
-                  } else if (tag1.equals(ORG)) {
-                      //double dem = 834.0;
-                      if (tag2.equals(LOC)) {
-                          //p -= length * Math.log(6.0 / dem);
-                          p -= length * p22;
-                      } else if (tag2.equals(ORG)) {
-                          //p -= length * Math.log(819.0 / dem);
-                          //p -= length * p23;
-                      } else if (tag2.equals(PER)) {
-                          //p -= length * Math.log(2.0 / dem);
-                          p -= length * p24;
-                      } else if (tag2.equals(MISC)) {
-                          //p -= length * Math.log(7.0 / dem);
-                          p -= length * p25;
-                      }
-                  } else if (tag1.equals(PER)) {
-                      //double dem = 1978.0;
-                      if (tag2.equals(LOC)) {
-                          //p -= length * Math.log(1.0 / dem);
-                          p -= length * p26;
-                      } else if (tag2.equals(ORG)) {
-                          //p -= length * Math.log(22.0 / dem);
-                          p -= length * p27;
-                      } else if (tag2.equals(PER)) {
-                          //p -= length * Math.log(1941.0 / dem);
-                          //p -= length * p28;
-                      } else if (tag2.equals(MISC)) {
-                          //p -= length * Math.log(14.0 / dem);
-                          p -= length * p29;
-                      }
-                  } else if (tag1.equals(MISC)) {
-                      //double dem = 622.0;
-                      if (tag2.equals(LOC)) {
-                          //p -= length * Math.log(63.0 / dem);
-                          p -= length * p30;
-                      } else if (tag2.equals(ORG)) {
-                          //p -= length * Math.log(191.0 / dem);
-                          p -= length * p31;
-                      } else if (tag2.equals(PER)) {
-                          //p -= length * Math.log(3.0 / dem);
-                          p -= length * p32;
-                      } else if (tag2.equals(MISC)) {
-                          //p -= length * Math.log(365.0 / dem);
-                          p -= length * p33;
-                      }
-                  }
-              }
-
-//           if (tag1 == PER) {
-//             int personIndex = classIndex.indexOf(PER);
-//             String lastName = entity.words.get(entity.words.size()-1);
-//             for (int k = 0; k < doc.size(); k++) {
-//               String w = doc.get(k).word();
-//               if (w.equalsIgnoreCase(lastName)) {
-//                 if (sequence[k] != personIndex) {
-//                   p -= p1;
-//                 }
-//               }
-//             }
-//           }
           }
       }
     }
     return p;
   }
-
 }

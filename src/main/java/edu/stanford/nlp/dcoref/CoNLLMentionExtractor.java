@@ -108,23 +108,23 @@ public class CoNLLMentionExtractor extends MentionExtractor {
     Annotation anno = conllDoc.getAnnotation();
     List<CoreMap> sentences = anno.get(CoreAnnotations.SentencesAnnotation.class);
     for (CoreMap sentence:sentences) {
-      if (!replicateCoNLL) {
-        // Remove tree from annotation and replace with parse using stanford parser
-        sentence.remove(TreeCoreAnnotations.TreeAnnotation.class);
-      } else {
-        Tree tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
-        // generate the dependency graph
-        try {
-          SemanticGraph deps = SemanticGraphFactory.makeFromTree(tree,
-              collapse, ccProcess, includeExtras, lemmatize, threadSafe);
-          SemanticGraph basicDeps = SemanticGraphFactory.makeFromTree(tree,
-                  false, ccProcess, includeExtras, lemmatize, threadSafe);
-          sentence.set(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class, basicDeps);
-          sentence.set(SemanticGraphCoreAnnotations.CollapsedDependenciesAnnotation.class, deps);
-        } catch(Exception e) {
-          logger.log(Level.WARNING, "Exception caught during extraction of Stanford dependencies. Will ignore and continue...", e);
+        if (replicateCoNLL) {
+            Tree tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+            // generate the dependency graph
+            try {
+                SemanticGraph deps = SemanticGraphFactory.makeFromTree(tree,
+                        collapse, ccProcess, includeExtras, lemmatize, threadSafe);
+                SemanticGraph basicDeps = SemanticGraphFactory.makeFromTree(tree,
+                        false, ccProcess, includeExtras, lemmatize, threadSafe);
+                sentence.set(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class, basicDeps);
+                sentence.set(SemanticGraphCoreAnnotations.CollapsedDependenciesAnnotation.class, deps);
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "Exception caught during extraction of Stanford dependencies. Will ignore and continue...", e);
+            }
+        } else {
+            // Remove tree from annotation and replace with parse using stanford parser
+            sentence.remove(TreeCoreAnnotations.TreeAnnotation.class);
         }
-      }
     }
 
     String preSpeaker = null;

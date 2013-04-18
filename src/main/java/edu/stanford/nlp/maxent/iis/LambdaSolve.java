@@ -196,10 +196,6 @@ public class LambdaSolve {
 
       // if the expectation of a fetaure is zero make sure we are not
       // trying to find a lambda for it
-      if (ftildeArr[i] == 0) {
-        //lambda_converged[i]=true;
-        //lambda[i]=0;
-      }
 
       //dumb smoothing that is not sound and doesn't seem to work
       if (smooth) {
@@ -409,9 +405,7 @@ public class LambdaSolve {
       probConds[x][y] = probConds[x][y] * Math.exp(deltaL * val);
       s = s + probConds[x][y];
       zlambda[x] = zlambdaX;
-      if (Math.abs(s - 1) > 0.001) {
-        //System.out.println(x+" index "+i+" deltaL " +deltaL+" tag "+yTag+" zlambda "+zlambda[x]);
-      }
+
     }
 
   }

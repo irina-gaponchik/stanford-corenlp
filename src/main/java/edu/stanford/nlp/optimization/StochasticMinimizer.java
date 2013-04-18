@@ -376,11 +376,10 @@ public abstract class StochasticMinimizer<T extends Function> implements Minimiz
 
     if (!have_max){
       throw new UnsupportedOperationException("No maximum number of iterations has been specified.");
-    }else{
-      maxIterations = Math.max(maxIterations, numPasses)*numBatches;
     }
+      maxIterations = Math.max(maxIterations, numPasses)*numBatches;
 
-    sayln("       Batchsize of: " + bSize);
+      sayln("       Batchsize of: " + bSize);
     sayln("       Data dimension of: " + dfunction.dataDimension() );
     sayln("       Batches per pass through data:  " + numBatches );
     sayln("       Max iterations is = " + maxIterations);

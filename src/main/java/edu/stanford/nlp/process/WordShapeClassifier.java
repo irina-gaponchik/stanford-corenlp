@@ -726,11 +726,12 @@ public class WordShapeClassifier {
       if (length < 4) {
         return "CARDINAL13";
       } else return length == 4 ? "CARDINAL4" : "CARDINAL5PLUS";
-    } else if (number) {
-      return "NUMBER";
     }
+      if (number) {
+        return "NUMBER";
+      }
 
-    boolean seenLower = false;
+      boolean seenLower = false;
     boolean seenUpper = false;
     boolean allCaps = true;
     boolean allLower = true;

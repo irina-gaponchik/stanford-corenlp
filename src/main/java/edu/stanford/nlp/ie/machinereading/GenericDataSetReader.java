@@ -342,11 +342,11 @@ public class GenericDataSetReader {
     for (int i = ent.getExtentTokenStart(); i < ent.getExtentTokenEnd(); i++) {
       // Add everything except separated dashes! The separated dashes mess with the parser too badly.
       CoreLabel label = tokens.get(i);
-      if ( ! "-".equals(label.word())) {
-        extentTokens.add(tokens.get(i));
-      } else {
-        approximateness++;
-      }
+        if ("-".equals(label.word())) {
+            approximateness++;
+        } else {
+            extentTokens.add(tokens.get(i));
+        }
     }
     extentTokens.add(initCoreLabel("."));
 

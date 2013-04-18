@@ -235,35 +235,38 @@ public class IndexedWord extends CoreLabel implements Comparable<IndexedWord> {
     StringBuilder result = new StringBuilder();
 
     // word
-    if (format.equals(WORD_FORMAT) ||
-            format.equals(WORD_TAG_FORMAT) ||
-            format.equals(WORD_TAG_INDEX_FORMAT)) {
-      result.append(word());
+      switch (format) {
+          case WORD_FORMAT:
+          case WORD_TAG_FORMAT:
+          case WORD_TAG_INDEX_FORMAT:
+              result.append(word());
 
-      // tag
-      if (format.equals(WORD_TAG_FORMAT) ||
-              format.equals(WORD_TAG_INDEX_FORMAT)) {
-        String tag = tag();
-        if (tag != null && !tag.isEmpty()) {
-          result.append('-').append(tag);
-        }
+              // tag
+              if (format.equals(WORD_TAG_FORMAT) ||
+                      format.equals(WORD_TAG_INDEX_FORMAT)) {
+                  String tag = tag();
+                  if (tag != null && !tag.isEmpty()) {
+                      result.append('-').append(tag);
+                  }
 
-        // index
-        if (format.equals(WORD_TAG_INDEX_FORMAT)) {
-          result.append('-').append(sentIndex()).append(':').append(index());
-        }
+                  // index
+                  if (format.equals(WORD_TAG_INDEX_FORMAT)) {
+                      result.append('-').append(sentIndex()).append(':').append(index());
+                  }
+              }
+
+              // value format
+              break;
+          case VALUE_FORMAT:
+              result.append(value());
+              if (index() >= 0) {
+                  result.append(':').append(index());
+              }
+
+              break;
+          default:
+              return super.toString();
       }
-
-      // value format
-    } else if (format.equals(VALUE_FORMAT)) {
-      result.append(value());
-      if (index() >= 0) {
-        result.append(':').append(index());
-      }
-
-    } else {
-      return super.toString();
-    }
 
     return result.toString();
   }

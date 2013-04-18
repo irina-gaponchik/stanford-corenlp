@@ -610,20 +610,18 @@ public abstract class AbstractSequenceClassifier<IN extends CoreMap> implements 
             entities.add(prevEntity);
             prevEntity = null;
           }
+        } else if (guessedAnswer.equals(prevEntityType)) {
+            assert prevEntity != null; // if you read the code carefully, this
+            // should always be true!
+            prevEntity.setThird(fl.get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
         } else {
-          if (!guessedAnswer.equals(prevEntityType)) {
             if (prevEntity != null) {
-              entities.add(prevEntity);
+                entities.add(prevEntity);
             }
             prevEntity = new Triple<>(guessedAnswer, fl
-                .get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), fl.get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
-          } else {
-            assert prevEntity != null; // if you read the code carefully, this
-                                       // should always be true!
-            prevEntity.setThird(fl.get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
-          }
+                    .get(CoreAnnotations.CharacterOffsetBeginAnnotation.class), fl.get(CoreAnnotations.CharacterOffsetEndAnnotation.class));
         }
-        prevEntityType = guessedAnswer;
+          prevEntityType = guessedAnswer;
       }
 
       // include any entity at end of doc
@@ -1054,18 +1052,18 @@ public abstract class AbstractSequenceClassifier<IN extends CoreMap> implements 
     for (List<IN> doc: documents) {
       numWords += doc.size();
       numDocs++;
-      if (flags.multiThreadClassifier != 0) {
-        wrapper.put(doc);
-        while (wrapper.peek()) {
-          List<IN> results = wrapper.poll();
-          writeAnswers(results, printWriter, readerWriter);
-          resultsCounted = resultsCounted && countResults(results, entityTP, entityFP, entityFN);
+        if (flags.multiThreadClassifier != 0) {
+            wrapper.put(doc);
+            while (wrapper.peek()) {
+                List<IN> results = wrapper.poll();
+                writeAnswers(results, printWriter, readerWriter);
+                resultsCounted = resultsCounted && countResults(results, entityTP, entityFP, entityFN);
+            }
+        } else {
+            List<IN> results = threadProcessor.process(doc);
+            writeAnswers(results, printWriter, readerWriter);
+            resultsCounted = resultsCounted && countResults(results, entityTP, entityFP, entityFN);
         }
-      } else {
-        List<IN> results = threadProcessor.process(doc);
-        writeAnswers(results, printWriter, readerWriter);
-        resultsCounted = resultsCounted && countResults(results, entityTP, entityFP, entityFN);
-      }
     }
     if (flags.multiThreadClassifier != 0) {
       wrapper.join();
@@ -1424,56 +1422,46 @@ public abstract class AbstractSequenceClassifier<IN extends CoreMap> implements 
       String gold = line.get(CoreAnnotations.GoldAnswerAnnotation.class);
       String guess = line.get(CoreAnnotations.AnswerAnnotation.class);
 
-      if (gold == null || guess == null)
-        return false;
+        if (gold != null && guess != null) {
 
-      if (lastGold != null && !lastGold.equals(gold) && !lastGold.equals(background)) {
-        if (lastGuess.equals(lastGold) && !lastGuess.equals(guess) && goldIndex == guessIndex) {
-          entityTP.incrementCount(lastGold, 1.0);
-        } else {
-          entityFN.incrementCount(lastGold, 1.0);
-        }
-      }
+            if (lastGold != null && !lastGold.equals(gold) && !lastGold.equals(background)) {
+                if (lastGuess.equals(lastGold) && !lastGuess.equals(guess) && goldIndex == guessIndex) {
+                    entityTP.incrementCount(lastGold, 1.0);
+                } else {
+                    entityFN.incrementCount(lastGold, 1.0);
+                }
+            }
 
-      if (lastGuess != null && !lastGuess.equals(guess) && !lastGuess.equals(background)) {
-        if (lastGuess.equals(lastGold) && !lastGuess.equals(guess) && goldIndex == guessIndex && !lastGold.equals(gold)) {
-          // correct guesses already tallied
-          // only need to tally false positives
-        } else {
-          entityFP.incrementCount(lastGuess, 1.0);
-        }
-      }
+            if (lastGuess != null && !lastGuess.equals(guess) && !lastGuess.equals(background) && (!lastGuess.equals(lastGold) || lastGuess.equals(guess) || goldIndex != guessIndex || lastGold.equals(gold)))
+                entityFP.incrementCount(lastGuess, 1.0);
 
-      if (lastGold == null || !lastGold.equals(gold)) {
-        lastGold = gold;
-        goldIndex = index;
-      }
+            if (lastGold == null || !lastGold.equals(gold)) {
+                lastGold = gold;
+                goldIndex = index;
+            }
 
-      if (lastGuess == null || !lastGuess.equals(guess)) {
-        lastGuess = guess;
-        guessIndex = index;
-      }
-      ++index;
+            if (lastGuess == null || !lastGuess.equals(guess)) {
+                lastGuess = guess;
+                guessIndex = index;
+            }
+            ++index;
+        } else return false;
     }
 
     // We also have to account for entities at the very end of the
     // document, since the above logic only occurs when we see
     // something that tells us an entity has ended
-    if (lastGold != null && !lastGold.equals(background)) {
-      if (lastGold.equals(lastGuess) && goldIndex == guessIndex) {
-        entityTP.incrementCount(lastGold, 1.0);
+      if (lastGold != null && !lastGold.equals(background)) if (lastGold.equals(lastGuess) && goldIndex == guessIndex) {
+          entityTP.incrementCount(lastGold, 1.0);
       } else {
-        entityFN.incrementCount(lastGold, 1.0);
+          entityFN.incrementCount(lastGold, 1.0);
       }
-    }
-    if (lastGuess != null && !lastGuess.equals(background)) {
-      if (lastGold.equals(lastGuess) && goldIndex == guessIndex) {
-        // correct guesses already tallied
-      } else {
-        entityFP.incrementCount(lastGuess, 1.0);
-      }
-    }
-    return true;
+      if (lastGuess != null && !lastGuess.equals(background))
+          if (!lastGold.equals(lastGuess) || goldIndex != guessIndex) {
+              entityFP.incrementCount(lastGuess, 1.0);
+          }
+      ;
+      return true;
   }
 
   /**

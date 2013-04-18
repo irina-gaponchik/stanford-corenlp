@@ -296,12 +296,6 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
     if (previous != null) {
       if (!previous.isFromString() && !isFromString()) {
         throw new IllegalArgumentException("There is already a relation named " + toString() + '!');
-      } else {
-        /* We get here if we previously just built a fake relation from a string
-         * we previously read in from a file.
-         */
-        // TODO is it worth copying all of the information from this real
-        //      relation into the old fake one?
       }
     }
   }

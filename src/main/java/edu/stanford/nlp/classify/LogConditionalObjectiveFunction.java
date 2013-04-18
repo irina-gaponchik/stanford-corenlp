@@ -278,56 +278,56 @@ public class LogConditionalObjectiveFunction<L, F> extends AbstractStochasticCac
       // activation
       Arrays.fill(sums, 0.0);
       double total = 0;
-      if(!useIterable) {
-        int[] featuresArr = data[d];
+        if (useIterable) {
+            Collection<F> features = datum.asFeatures();
+            for (int c = 0; c < numClasses; c++) {
+                for (F feature : features) {
+                    int i = indexOf(featureIndex.indexOf(feature), c);
+                    sums[c] += x[i];
+                }
+            }
+            // expectation (slower routine replaced by fast way)
+            // double total = Double.NEGATIVE_INFINITY;
+            // for (int c=0; c<numClasses; c++) {
+            //   total = SloppyMath.logAdd(total, sums[c]);
+            // }
+            total = ArrayMath.logSum(sums);
+            for (int c = 0; c < numClasses; c++) {
+                probs[c] = Math.exp(sums[c] - total);
+                if (dataweights != null) {
+                    probs[c] *= dataweights[d];
+                }
+                for (F feature : features) {
+                    int i = indexOf(featureIndex.indexOf(feature), c);
+                    derivative[i] += probs[c];
+                }
+            }
+        } else {
+            int[] featuresArr = data[d];
 
-        for (int c = 0; c < numClasses; c++) {
-            for (int aFeaturesArr : featuresArr) {
-                int i = indexOf(aFeaturesArr, c);
-                sums[c] += x[i];
+            for (int c = 0; c < numClasses; c++) {
+                for (int aFeaturesArr : featuresArr) {
+                    int i = indexOf(aFeaturesArr, c);
+                    sums[c] += x[i];
+                }
+            }
+            // expectation (slower routine replaced by fast way)
+            // double total = Double.NEGATIVE_INFINITY;
+            // for (int c=0; c<numClasses; c++) {
+            //   total = SloppyMath.logAdd(total, sums[c]);
+            // }
+            total = ArrayMath.logSum(sums);
+            for (int c = 0; c < numClasses; c++) {
+                probs[c] = Math.exp(sums[c] - total);
+                if (dataweights != null) {
+                    probs[c] *= dataweights[d];
+                }
+                for (int aFeaturesArr : featuresArr) {
+                    int i = indexOf(aFeaturesArr, c);
+                    derivative[i] += probs[c];
+                }
             }
         }
-        // expectation (slower routine replaced by fast way)
-        // double total = Double.NEGATIVE_INFINITY;
-        // for (int c=0; c<numClasses; c++) {
-        //   total = SloppyMath.logAdd(total, sums[c]);
-        // }
-        total = ArrayMath.logSum(sums);
-        for (int c = 0; c < numClasses; c++) {
-          probs[c] = Math.exp(sums[c] - total);
-          if (dataweights != null) {
-            probs[c] *= dataweights[d];
-          }
-            for (int aFeaturesArr : featuresArr) {
-                int i = indexOf(aFeaturesArr, c);
-                derivative[i] += probs[c];
-            }
-        }
-      } else {
-        Collection<F> features = datum.asFeatures();
-        for (int c = 0; c < numClasses; c++) {
-          for (F feature : features) {
-            int i = indexOf(featureIndex.indexOf(feature), c);
-            sums[c] += x[i];
-          }
-        }
-        // expectation (slower routine replaced by fast way)
-        // double total = Double.NEGATIVE_INFINITY;
-        // for (int c=0; c<numClasses; c++) {
-        //   total = SloppyMath.logAdd(total, sums[c]);
-        // }
-        total = ArrayMath.logSum(sums);
-        for (int c = 0; c < numClasses; c++) {
-          probs[c] = Math.exp(sums[c] - total);
-          if (dataweights != null) {
-            probs[c] *= dataweights[d];
-          }
-          for (F feature : features) {
-            int i = indexOf(featureIndex.indexOf(feature), c);
-            derivative[i] += probs[c];
-          }
-        }
-      }
 
       int labelindex;
         labelindex = useIterable ? labelIndex.indexOf(datum.label()) : labels[d];

@@ -626,46 +626,46 @@ public class CoNLL2011DocumentReader {
         for (String line; (line = br.readLine()) != null; ) {
           lineCnt++;
           line = line.trim();
-          if (!line.isEmpty()) {
-            if (line.startsWith(docStart)) {
-              // Start of new document
-              if (document != null) {
-                logger.warning("Unexpected begin document at line (\" + filename + \",\" + lineCnt + \")");
-              }
-              document = new Document();
-              document.documentIdPart = line.substring(docStartLength);
-            } else if (line.startsWith("#end document")) {
-              annotateDocument(document);
-              docCnt++;
-              return document;
-              // End of document
+            if (line.isEmpty()) {
+                // Current sentence has ended, new sentence is about to be started
+                if (!curSentWords.isEmpty()) {
+                    assert document != null;
+                    document.addSentence(curSentWords);
+                    curSentWords = new ArrayList<>();
+                }
             } else {
-              assert document != null;
-              String[] fields = delimiterPattern.split(line);
-              if (fields.length < FIELDS_MIN) {
-                throw new RuntimeException("Unexpected number of field " + fields.length +
-                        ", expected >= " + FIELDS_MIN + " for line (" + filename + ',' + lineCnt + "): " + line);
-              }
-              String curDocId = fields[FIELD_DOC_ID];
-              String partNo = fields[FIELD_PART_NO];
-              if (document.getDocumentID() == null) {
-                document.setDocumentID(curDocId);
-                document.setPartNo(partNo);
-              } else {
-                // Check documentID didn't suddenly change on us
-                assert document.getDocumentID().equals(curDocId);
-                assert document.getPartNo().equals(partNo);
-              }
-              curSentWords.add(fields);
+                if (line.startsWith(docStart)) {
+                    // Start of new document
+                    if (document != null) {
+                        logger.warning("Unexpected begin document at line (\" + filename + \",\" + lineCnt + \")");
+                    }
+                    document = new Document();
+                    document.documentIdPart = line.substring(docStartLength);
+                } else if (line.startsWith("#end document")) {
+                    annotateDocument(document);
+                    docCnt++;
+                    return document;
+                    // End of document
+                } else {
+                    assert document != null;
+                    String[] fields = delimiterPattern.split(line);
+                    if (fields.length < FIELDS_MIN) {
+                        throw new RuntimeException("Unexpected number of field " + fields.length +
+                                ", expected >= " + FIELDS_MIN + " for line (" + filename + ',' + lineCnt + "): " + line);
+                    }
+                    String curDocId = fields[FIELD_DOC_ID];
+                    String partNo = fields[FIELD_PART_NO];
+                    if (document.getDocumentID() == null) {
+                        document.setDocumentID(curDocId);
+                        document.setPartNo(partNo);
+                    } else {
+                        // Check documentID didn't suddenly change on us
+                        assert document.getDocumentID().equals(curDocId);
+                        assert document.getPartNo().equals(partNo);
+                    }
+                    curSentWords.add(fields);
+                }
             }
-          } else {
-            // Current sentence has ended, new sentence is about to be started
-            if (!curSentWords.isEmpty()) {
-              assert document != null;
-              document.addSentence(curSentWords);
-              curSentWords = new ArrayList<>();
-            }
-          }
         }
       } catch (IOException ex) {
         throw new RuntimeIOException(ex);

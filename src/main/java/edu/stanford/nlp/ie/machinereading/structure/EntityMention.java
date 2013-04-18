@@ -172,11 +172,8 @@ public class EntityMention extends ExtractionObject {
         return headTokenSpan.equals(otherEnt.headTokenSpan);
     }
 
-    if(extentTokenSpan != null && otherEnt.extentTokenSpan != null){
-        return extentTokenSpan.equals(otherEnt.extentTokenSpan);
-    }
+      return extentTokenSpan != null && otherEnt.extentTokenSpan != null && extentTokenSpan.equals(otherEnt.extentTokenSpan);
 
-    return false;
   }
 
   /**

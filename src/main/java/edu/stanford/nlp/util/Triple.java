@@ -65,13 +65,7 @@ public class Triple<T1, T2, T3> implements Comparable<Triple<T1,T2,T3>>, Seriali
 
     Triple triple = (Triple) o;
 
-    if (first != null ? !first.equals(triple.first) : triple.first != null) {
-      return false;
-    }
-    if (second != null ? !second.equals(triple.second) : triple.second != null) {
-      return false;
-    }
-      return !(third != null ? !third.equals(triple.third) : triple.third != null);
+      return !(first != null ? !first.equals(triple.first) : triple.first != null) && !(second != null ? !second.equals(triple.second) : triple.second != null) && !(third != null ? !third.equals(triple.third) : triple.third != null);
 
   }
 
@@ -114,11 +108,11 @@ public class Triple<T1, T2, T3> implements Comparable<Triple<T1,T2,T3>>, Seriali
   @Override
   public int compareTo(Triple<T1, T2, T3> another) {
     int comp = ((Comparable<T1>) first()).compareTo(another.first());
-    if (comp != 0) {
-      return comp;
-    } else {
-      comp = ((Comparable<T2>) second()).compareTo(another.second());
-        return comp != 0 ? comp : ((Comparable<T3>) third()).compareTo(another.third());
-    }
+      if (comp == 0) {
+          comp = ((Comparable<T2>) second()).compareTo(another.second());
+          return comp != 0 ? comp : ((Comparable<T3>) third()).compareTo(another.third());
+      } else {
+          return comp;
+      }
   }
 }

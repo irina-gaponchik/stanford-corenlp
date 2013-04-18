@@ -212,16 +212,7 @@ public class Timex implements Serializable {
 
     Timex timex = (Timex) o;
 
-    if (beginPoint != timex.beginPoint) {
-      return false;
-    }
-    if (endPoint != timex.endPoint) {
-      return false;
-    }
-    if (type != null ? !type.equals(timex.type) : timex.type != null) {
-      return false;
-    }
-      return !(val != null ? !val.equals(timex.val) : timex.val != null);
+      return beginPoint == timex.beginPoint && endPoint == timex.endPoint && !(type != null ? !type.equals(timex.type) : timex.type != null) && !(val != null ? !val.equals(timex.val) : timex.val != null);
 
   }
 
@@ -303,13 +294,14 @@ public class Timex implements Serializable {
       int month = Integer.parseInt(this.val.substring(5, 7));
       int day = Integer.parseInt(this.val.substring(8, 10));
       return makeCalendar(year, month, day);
-    } else if (Pattern.matches("\\d\\d\\d\\d\\d\\d\\d\\d", this.val)) {
-      int year = Integer.parseInt(this.val.substring(0, 4));
-      int month = Integer.parseInt(this.val.substring(4, 6));
-      int day = Integer.parseInt(this.val.substring(6, 8));
-      return makeCalendar(year, month, day);
     }
-    throw new UnsupportedOperationException(String.format("%s is not a fully specified date", this));
+      if (Pattern.matches("\\d\\d\\d\\d\\d\\d\\d\\d", this.val)) {
+        int year = Integer.parseInt(this.val.substring(0, 4));
+        int month = Integer.parseInt(this.val.substring(4, 6));
+        int day = Integer.parseInt(this.val.substring(6, 8));
+        return makeCalendar(year, month, day);
+      }
+      throw new UnsupportedOperationException(String.format("%s is not a fully specified date", this));
   }
 
   /**
@@ -339,55 +331,55 @@ public class Timex implements Serializable {
 
     // YYYYMMDD or YYYYMMDDT... where the time is concatenated directly with the
     // date
-    else if (val.length() >= 8 && Pattern.matches("\\d\\d\\d\\d\\d\\d\\d\\d", this.val.substring(0, 8))) {
-      int year = Integer.parseInt(this.val.substring(0, 4));
-      int month = Integer.parseInt(this.val.substring(4, 6));
-      int day = Integer.parseInt(this.val.substring(6, 8));
-      return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
-    }
-    // YYYY-MM-DD or YYYY-MM-DDT...
-    else if (val.length() >= 10 && Pattern.matches("\\d\\d\\d\\d-\\d\\d-\\d\\d", this.val.substring(0, 10))) {
-      int year = Integer.parseInt(this.val.substring(0, 4));
-      int month = Integer.parseInt(this.val.substring(5, 7));
-      int day = Integer.parseInt(this.val.substring(8, 10));
-      return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
-    }
+      if (val.length() >= 8 && Pattern.matches("\\d\\d\\d\\d\\d\\d\\d\\d", this.val.substring(0, 8))) {
+        int year = Integer.parseInt(this.val.substring(0, 4));
+        int month = Integer.parseInt(this.val.substring(4, 6));
+        int day = Integer.parseInt(this.val.substring(6, 8));
+        return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
+      }
+      // YYYY-MM-DD or YYYY-MM-DDT...
+      if (val.length() >= 10 && Pattern.matches("\\d\\d\\d\\d-\\d\\d-\\d\\d", this.val.substring(0, 10))) {
+        int year = Integer.parseInt(this.val.substring(0, 4));
+        int month = Integer.parseInt(this.val.substring(5, 7));
+        int day = Integer.parseInt(this.val.substring(8, 10));
+        return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
+      }
 
-    // YYYYMMDDL+
-    else if (Pattern.matches("\\d\\d\\d\\d\\d\\d\\d\\d[A-Z]+", this.val)) {
-      int year = Integer.parseInt(this.val.substring(0, 4));
-      int month = Integer.parseInt(this.val.substring(4, 6));
-      int day = Integer.parseInt(this.val.substring(6, 8));
-      return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
-    }
+      // YYYYMMDDL+
+      if (Pattern.matches("\\d\\d\\d\\d\\d\\d\\d\\d[A-Z]+", this.val)) {
+        int year = Integer.parseInt(this.val.substring(0, 4));
+        int month = Integer.parseInt(this.val.substring(4, 6));
+        int day = Integer.parseInt(this.val.substring(6, 8));
+        return new Pair<>(makeCalendar(year, month, day), makeCalendar(year, month, day));
+      }
 
-    // YYYYMM or YYYYMMT...
-    else if (val.length() >= 6 && Pattern.matches("\\d\\d\\d\\d\\d\\d", this.val.substring(0, 6))) {
-      int year = Integer.parseInt(this.val.substring(0, 4));
-      int month = Integer.parseInt(this.val.substring(4, 6));
-      Calendar begin = makeCalendar(year, month, 1);
-      int lastDay = begin.getActualMaximum(Calendar.DATE);
-      Calendar end = makeCalendar(year, month, lastDay);
-      return new Pair<>(begin, end);
-    }
+      // YYYYMM or YYYYMMT...
+      if (val.length() >= 6 && Pattern.matches("\\d\\d\\d\\d\\d\\d", this.val.substring(0, 6))) {
+        int year = Integer.parseInt(this.val.substring(0, 4));
+        int month = Integer.parseInt(this.val.substring(4, 6));
+        Calendar begin = makeCalendar(year, month, 1);
+        int lastDay = begin.getActualMaximum(Calendar.DATE);
+        Calendar end = makeCalendar(year, month, lastDay);
+        return new Pair<>(begin, end);
+      }
 
-    // YYYY-MM or YYYY-MMT...
-    else if (val.length() >= 7 && Pattern.matches("\\d\\d\\d\\d-\\d\\d", this.val.substring(0, 7))) {
-      int year = Integer.parseInt(this.val.substring(0, 4));
-      int month = Integer.parseInt(this.val.substring(5, 7));
-      Calendar begin = makeCalendar(year, month, 1);
-      int lastDay = begin.getActualMaximum(Calendar.DATE);
-      Calendar end = makeCalendar(year, month, lastDay);
-      return new Pair<>(begin, end);
-    }
+      // YYYY-MM or YYYY-MMT...
+      if (val.length() >= 7 && Pattern.matches("\\d\\d\\d\\d-\\d\\d", this.val.substring(0, 7))) {
+        int year = Integer.parseInt(this.val.substring(0, 4));
+        int month = Integer.parseInt(this.val.substring(5, 7));
+        Calendar begin = makeCalendar(year, month, 1);
+        int lastDay = begin.getActualMaximum(Calendar.DATE);
+        Calendar end = makeCalendar(year, month, lastDay);
+        return new Pair<>(begin, end);
+      }
 
-    // YYYY or YYYYT...
-    else if (val.length() >= 4 && Pattern.matches("\\d\\d\\d\\d", this.val.substring(0, 4))) {
-      int year = Integer.parseInt(this.val.substring(0, 4));
-      return new Pair<>(makeCalendar(year, 1, 1), makeCalendar(year, 12, 31));
-    }
+      // YYYY or YYYYT...
+      if (val.length() >= 4 && Pattern.matches("\\d\\d\\d\\d", this.val.substring(0, 4))) {
+        int year = Integer.parseInt(this.val.substring(0, 4));
+        return new Pair<>(makeCalendar(year, 1, 1), makeCalendar(year, 12, 31));
+      }
 
-    // PDDY
+      // PDDY
     if (Pattern.matches("P\\d+Y", this.val) && documentTime != null) {
 
       Calendar rc = documentTime.getDate();
@@ -402,14 +394,14 @@ public class Timex implements Serializable {
       }
 
       // in the past
-      else if (this.beginPoint > this.endPoint) {
-        Calendar start = copyCalendar(rc);
-        Calendar end = copyCalendar(rc);
-        start.add(Calendar.YEAR, 0 - yearRange);
-        return new Pair<>(start, end);
-      }
+        if (this.beginPoint > this.endPoint) {
+          Calendar start = copyCalendar(rc);
+          Calendar end = copyCalendar(rc);
+          start.add(Calendar.YEAR, 0 - yearRange);
+          return new Pair<>(start, end);
+        }
 
-      throw new RuntimeException("begin and end are equal " + this);
+        throw new RuntimeException("begin and end are equal " + this);
     }
     // PDDM
     if (Pattern.matches("P\\d+M", this.val) && documentTime != null) {

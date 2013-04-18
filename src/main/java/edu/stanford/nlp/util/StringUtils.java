@@ -208,11 +208,11 @@ public class StringUtils {
     StringBuilder sb = new StringBuilder();
     boolean first = true;
     for (HasWord o : l) {
-      if ( ! first) {
-        sb.append(glue);
-      } else {
-        first = false;
-      }
+        if (first) {
+            first = false;
+        } else {
+            sb.append(glue);
+        }
       sb.append(o.word());
     }
     return sb.toString();
@@ -225,11 +225,11 @@ public class StringUtils {
     start = Math.max(start, 0);
     end = Math.min(end, l.size());
     for (int i = start; i < end; i++) {
-      if ( ! first) {
-        sb.append(glue);
-      } else {
-        first = false;
-      }
+        if (first) {
+            first = false;
+        } else {
+            sb.append(glue);
+        }
       sb.append(toStringFunc.apply(l.get(i)));
     }
     return sb.toString();
@@ -280,11 +280,11 @@ public class StringUtils {
     StringBuilder sb = new StringBuilder();
     boolean first = true;
     for (X o : l) {
-      if ( ! first) {
-        sb.append(glue);
-      } else {
-        first = false;
-      }
+        if (first) {
+            first = false;
+        } else {
+            sb.append(glue);
+        }
       sb.append(o);
     }
     return sb.toString();
@@ -1016,22 +1016,22 @@ public class StringUtils {
       if (key.charAt(0) == '-') {
         if (i + 1 < args.length) {
           String value = args[i + 1];
-          if (value.charAt(0) != '-') {
-            if (parseNumbers) {
-              Object numericValue = value;
-              try {
-                numericValue = Double.parseDouble(value);
-              } catch (NumberFormatException e2) {
-                // ignore
-              }
-              result.put(key, numericValue);
+            if (value.charAt(0) == '-') {
+                result.put(key, null);
             } else {
-              result.put(key, value);
+                if (parseNumbers) {
+                    Object numericValue = value;
+                    try {
+                        numericValue = Double.parseDouble(value);
+                    } catch (NumberFormatException e2) {
+                        // ignore
+                    }
+                    result.put(key, numericValue);
+                } else {
+                    result.put(key, value);
+                }
+                i++;
             }
-            i++;
-          } else {
-            result.put(key, null);
-          }
         } else {
           result.put(key, null);
         }

@@ -654,7 +654,7 @@ public class SequenceMatchRules {
     }
 
     public boolean extract(I in, List<O> out) {
-        return filter.accept(in) ? rule.extract(in, out) : false;
+        return filter.accept(in) && rule.extract(in, out);
     }
   }
 

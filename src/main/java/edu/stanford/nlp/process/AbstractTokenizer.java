@@ -15,7 +15,12 @@ import java.util.NoSuchElementException;
  * @author Teg Grenager (grenager@stanford.edu)
  */
 
-public abstract class AbstractTokenizer<T> implements Tokenizer<T> {
+public abstract class
+
+
+
+
+        AbstractTokenizer<T> implements Tokenizer<T> {
 
   protected T nextToken; // = null;
 

@@ -132,16 +132,17 @@ public class StochasticDiffFunctionTester {
     if( factorCount == 0 ){
       System.err.println("Attempt to test function on data of prime dimension.  This would involve a batchSize of 1 and may take a very long time.");
       System.exit(1);
-    }else if (factorCount == 2){
-      testBatchSize = (int) factors[1];
-    }else {
-      //  find the largest factor.
-      for( int f = 1; f< factorCount;f++){
-        testBatchSize *= factors[f];
-      }
     }
+      if (factorCount == 2){
+        testBatchSize = (int) factors[1];
+      }else {
+        //  find the largest factor.
+        for( int f = 1; f< factorCount;f++){
+          testBatchSize *= factors[f];
+        }
+      }
 
-    return testBatchSize;
+      return testBatchSize;
   }
 
 

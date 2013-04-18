@@ -356,10 +356,7 @@ public class ValueFunctions {
   public static final ValueFunction FORMAT_FUNCTION = new NamedValueFunction("FORMAT") {
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() < 1) {
-        return false;
-      }
-        return !(in.get(0) == null || !(in.get(0).get() instanceof String));
+        return in.size() >= 1 && !(in.get(0) == null || !(in.get(0).get() instanceof String));
     }
 
     @Override
@@ -377,10 +374,7 @@ public class ValueFunctions {
   public static final ValueFunction JOIN_FUNCTION = new NamedValueFunction("JOIN") {
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() < 1) {
-        return false;
-      }
-        return !(in.get(0) == null || !(in.get(0).get() instanceof String));
+        return in.size() >= 1 && !(in.get(0) == null || !(in.get(0).get() instanceof String));
     }
 
     @Override
@@ -398,10 +392,7 @@ public class ValueFunctions {
   public static final ValueFunction CREATE_REGEX_FUNCTION = new NamedValueFunction("CREATE_REGEX") {
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() < 1) {
-        return false;
-      }
-        return !(in.get(0) == null || !(in.get(0).get() instanceof List));
+        return in.size() >= 1 && !(in.get(0) == null || !(in.get(0).get() instanceof List));
     }
 
     @Override
@@ -678,15 +669,7 @@ public class ValueFunctions {
     // Third argument (optional) is annotation value to set
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2 && in.size() != 3) {
-        return false;
-      }
-      if (in.get(0) == null ||
-              !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) {
-        return false;
-      }
-        return !(in.get(1) == null ||
-                !(in.get(1).get() instanceof Class) && !(in.get(1).get() instanceof String));
+        return !(in.size() != 2 && in.size() != 3) && !(in.get(0) == null || !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) && !(in.get(1) == null || !(in.get(1).get() instanceof Class) && !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -738,15 +721,7 @@ public class ValueFunctions {
     // Second argument is tag
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2) {
-        return false;
-      }
-      if (in.get(0) == null || in.get(0).get() == null) return true; // Allow for NULL
-      if (in.get(0) == null ||
-              !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return in.size() == 2 && (in.get(0) == null || in.get(0).get() == null || !(in.get(0) == null || !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) && !(in.get(1) == null || !(in.get(1).get() instanceof String)));
     }
 
     public Value getTag(CoreMap cm, String tag)
@@ -783,14 +758,7 @@ public class ValueFunctions {
     // Third argument is tag value
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2 && in.size() != 3) {
-        return false;
-      }
-      if (in.get(0) == null ||
-              !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return !(in.size() != 2 && in.size() != 3) && !(in.get(0) == null || !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) && !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
 
     public void setTag(CoreMap cm, String tag, Value tagValue)
@@ -826,14 +794,7 @@ public class ValueFunctions {
     // Second argument is tag
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2) {
-        return false;
-      }
-      if (in.get(0) == null ||
-              !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return in.size() == 2 && !(in.get(0) == null || !(in.get(0).get() instanceof CoreMap) && !(in.get(0).get() instanceof List)) && !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     public void removeTag(CoreMap cm, String tag)
     {
@@ -867,13 +828,7 @@ public class ValueFunctions {
     // Third argument (optional) is tag value
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2 && in.size() != 3) {
-        return false;
-      }
-      if (in.get(0) == null || !(in.get(0).get() instanceof Tags)) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return !(in.size() != 2 && in.size() != 3) && !(in.get(0) == null || !(in.get(0).get() instanceof Tags)) && !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -894,13 +849,7 @@ public class ValueFunctions {
     // Third argument is tag value
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2 && in.size() != 3) {
-        return false;
-      }
-      if (in.get(0) == null) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return !(in.size() != 2 && in.size() != 3) && in.get(0) != null && !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -921,13 +870,7 @@ public class ValueFunctions {
     // Second argument is tag
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2) {
-        return false;
-      }
-      if (in.get(0) == null) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return in.size() == 2 && in.get(0) != null && !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
 
     @Override
@@ -944,13 +887,7 @@ public class ValueFunctions {
     // Second argument is tag
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2) {
-        return false;
-      }
-      if (in.get(0) == null) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return in.size() == 2 && in.get(0) != null && !(in.get(1) == null || !(in.get(1).get() instanceof String));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -971,14 +908,7 @@ public class ValueFunctions {
     // Third argument (optional) is value to set composite value field to
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2 && in.size() != 3) {
-        return false;
-      }
-      if (in.get(0) == null || in.get(0).get() == null) return true;   // Allow for null
-      if (in.get(0) == null || !(in.get(0) instanceof Expressions.CompositeValue)) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return !(in.size() != 2 && in.size() != 3) && (in.get(0) == null || in.get(0).get() == null || !(in.get(0) == null || !(in.get(0) instanceof Expressions.CompositeValue)) && !(in.get(1) == null || !(in.get(1).get() instanceof String)));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -996,11 +926,7 @@ public class ValueFunctions {
     // First argument is composite value
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 1) {
-        return false;
-      }
-      if (in.get(0) == null || in.get(0).get() == null) return true;   // Allow for null
-        return !(in.get(0) == null || !(in.get(0) instanceof Expressions.CompositeValue));
+        return in.size() == 1 && (in.get(0) == null || in.get(0).get() == null || !(in.get(0) == null || !(in.get(0) instanceof Expressions.CompositeValue)));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1017,14 +943,7 @@ public class ValueFunctions {
     // Third argument (optional) is value to assign to object field
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2 && in.size() != 3) {
-        return false;
-      }
-      if (in.get(0) == null || in.get(0).get() == null) return true;   // Allow for null
-      if (in.get(0) == null || !(in.get(0) instanceof Object)) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof String));
+        return !(in.size() != 2 && in.size() != 3) && (in.get(0) == null || in.get(0).get() == null || !(in.get(0) == null || !(in.get(0) instanceof Object)) && !(in.get(1) == null || !(in.get(1).get() instanceof String)));
     }
 
     @Override
@@ -1086,14 +1005,7 @@ public class ValueFunctions {
     // Third argument (optional) is value to assign list element
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2 && in.size() != 3) {
-        return false;
-      }
-      if (in.get(0) == null || in.get(0).get() == null) return true;   // Allow for null
-      if (in.get(0) == null || !(in.get(0).get() instanceof List)) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof Integer));
+        return !(in.size() != 2 && in.size() != 3) && (in.get(0) == null || in.get(0).get() == null || !(in.get(0) == null || !(in.get(0).get() instanceof List)) && !(in.get(1) == null || !(in.get(1).get() instanceof Integer)));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1123,14 +1035,7 @@ public class ValueFunctions {
     // Third argument (optional) is value to assign to element
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 2 && in.size() != 3) {
-        return false;
-      }
-      if (in.get(0) == null || in.get(0).get() == null) return true;   // Allow for null
-      if (in.get(0) == null || !(in.get(0).get() instanceof Map)) {
-        return false;
-      }
-        return !(in.get(1) == null || !(in.get(1).get() instanceof Object));
+        return !(in.size() != 2 && in.size() != 3) && (in.get(0) == null || in.get(0).get() == null || !(in.get(0) == null || !(in.get(0).get() instanceof Map)) && !(in.get(1) == null || !(in.get(1).get() instanceof Object)));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1162,11 +1067,7 @@ public class ValueFunctions {
     // First argument is Map
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() != 1) {
-        return false;
-      }
-      if (in.get(0) == null || in.get(0).get() == null) return true;   // Allow for null
-        return !(in.get(0) == null || !(in.get(0).get() instanceof Map));
+        return in.size() == 1 && (in.get(0) == null || in.get(0).get() == null || !(in.get(0) == null || !(in.get(0).get() instanceof Map)));
     }
     @Override
     public Value apply(Env env, List<Value> in) {
@@ -1182,13 +1083,7 @@ public class ValueFunctions {
     // Second argument is initial value
     @Override
     public boolean checkArgs(List<Value> in) {
-      if (in.size() < 2) {
-        return false;
-      }
-      if (in.get(0) == null || !(in.get(0).get() instanceof ValueFunction)) {
-        return false;
-      }
-        return in.get(1) != null;
+        return in.size() >= 2 && !(in.get(0) == null || !(in.get(0).get() instanceof ValueFunction)) && in.get(1) != null;
     }
     @Override
     public Value apply(Env env, List<Value> in) {

@@ -233,22 +233,25 @@ public class CharniakScoredParsesReaderWriter {
 
     public List<ScoredObject<Tree>> next()
     {
-      if (!done) {
-        List<ScoredObject<Tree>> cur = next;
-        next = getNext();
-        processed++;
-        if (next == null) {
-          logger.finer("Read " + processed + " trees, from "
-                  + inputDesc + " in " + timing.toSecondsString() + " secs");
-          done = true;
-          if (closeBufferNeeded) {
-            try { br.close();  } catch (IOException ex) {}
-          }
+        if (done) {
+            throw new NoSuchElementException("No more elements from " + inputDesc);
+        } else {
+            List<ScoredObject<Tree>> cur = next;
+            next = getNext();
+            processed++;
+            if (next == null) {
+                logger.finer("Read " + processed + " trees, from "
+                        + inputDesc + " in " + timing.toSecondsString() + " secs");
+                done = true;
+                if (closeBufferNeeded) {
+                    try {
+                        br.close();
+                    } catch (IOException ex) {
+                    }
+                }
+            }
+            return cur;
         }
-        return cur;
-      } else {
-        throw new NoSuchElementException("No more elements from " + inputDesc);
-      }
     }
   }
 

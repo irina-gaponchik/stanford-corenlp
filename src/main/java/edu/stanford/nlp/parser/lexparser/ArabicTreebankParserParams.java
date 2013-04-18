@@ -146,28 +146,29 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
         leaf.setScore(tree.score());
         return leaf;
 
-      } else if(tree.isPhrasal()) {
-        if(retainNPTmp && s.startsWith("NP-TMP")) {
-          s = "NP-TMP";
-        } else if(retainNPSbj && s.startsWith("NP-SBJ")) {
-          s = "NP-SBJ";
-        } else if(retainPRD && COMPILE.matcher(s).matches()) {
+      }
+        if(tree.isPhrasal()) {
+          if(retainNPTmp && s.startsWith("NP-TMP")) {
+            s = "NP-TMP";
+          } else if(retainNPSbj && s.startsWith("NP-SBJ")) {
+            s = "NP-SBJ";
+          } else if(retainPRD && COMPILE.matcher(s).matches()) {
+            s = tlp.basicCategory(s);
+            s += "-PRD";
+          } else {
+            s = tlp.basicCategory(s);
+          }
+
+        } else if(tree.isPreTerminal()) {
           s = tlp.basicCategory(s);
-          s += "-PRD";
+
         } else {
+          System.err.printf("Encountered a non-leaf/phrasal/pre-terminal node %s\n",s);
+          //Normalize by default
           s = tlp.basicCategory(s);
         }
 
-      } else if(tree.isPreTerminal()) {
-        s = tlp.basicCategory(s);
-
-      } else {
-        System.err.printf("Encountered a non-leaf/phrasal/pre-terminal node %s\n",s);
-        //Normalize by default
-        s = tlp.basicCategory(s);
-      }
-
-      // Recursively process children depth-first
+        // Recursively process children depth-first
       List<Tree> children = new ArrayList<>(tree.numChildren());
       for (Tree child : tree.getChildrenAsList()) {
         Tree newChild = transformTree(child);
@@ -587,23 +588,23 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
 
       if (punc.equals("."))
         return "-fs";
-      else if (punc.equals("?"))
-        return "-quest";
-      else if (punc.equals(","))
-        return "-comma";
-      else if (punc.equals(":") || punc.equals(";"))
-        return "-colon";
-      else if (punc.equals("-LRB-"))
-        return "-lrb";
-      else if (punc.equals("-RRB-"))
-        return "-rrb";
-      else if (punc.equals("-PLUS-"))
-        return "-plus";
-      else if (punc.equals("-"))
-        return "-dash";
-      else if (quote.matcher(punc).matches())
-        return "-quote";
-      //      else if(punc.equals("/"))
+        if (punc.equals("?"))
+          return "-quest";
+        if (punc.equals(","))
+          return "-comma";
+        if (punc.equals(":") || punc.equals(";"))
+          return "-colon";
+        if (punc.equals("-LRB-"))
+          return "-lrb";
+        if (punc.equals("-RRB-"))
+          return "-rrb";
+        if (punc.equals("-PLUS-"))
+          return "-plus";
+        if (punc.equals("-"))
+          return "-dash";
+        if (quote.matcher(punc).matches())
+          return "-quote";
+        //      else if(punc.equals("/"))
       //        return "-slash";
       //      else if(punc.equals("%"))
       //        return "-perc";

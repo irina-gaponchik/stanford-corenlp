@@ -239,10 +239,8 @@ public class ArabicTreeNormalizer extends BobChrisTreeNormalizer {
         return false;
 
       // Traces
-      else if(t.isPreTerminal() && t.value() != null && t.value().equals("-NONE-"))
-        return false;
+        return !(t.isPreTerminal() && t.value() != null && t.value().equals("-NONE-"));
 
-      return true;
     }
   }
 

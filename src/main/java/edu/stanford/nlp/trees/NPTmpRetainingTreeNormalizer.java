@@ -224,10 +224,7 @@ public class NPTmpRetainingTreeNormalizer extends BobChrisTreeNormalizer {
         Label l = t.label();
         // The special Switchboard non-terminals clause.
         // Note that it deletes IP which other Treebanks might use!
-        if ("RS".equals(t.label().value()) || "RM".equals(t.label().value()) || "IP".equals(t.label().value()) || "CODE".equals(t.label().value())) {
-          return false;
-        }
-          return !(l != null && l.value() != null && l.value().equals("-NONE-") && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf());
+          return !("RS".equals(t.label().value()) || "RM".equals(t.label().value()) || "IP".equals(t.label().value()) || "CODE".equals(t.label().value())) && !(l != null && l.value() != null && l.value().equals("-NONE-") && !t.isLeaf() && kids.length == 1 && kids[0].isLeaf());
       }
     };
     Filter<Tree> nodeFilter = new Filter<Tree>() {
@@ -244,10 +241,7 @@ public class NPTmpRetainingTreeNormalizer extends BobChrisTreeNormalizer {
         // if ("EDITED".equals(t.label().value())) {
         //   return false;
         // }
-        if (t.numChildren() != 1) {
-          return true;
-        }
-          return !(t.label() != null && t.label().value() != null && t.label().value().equals(t.children()[0].label().value()));
+          return t.numChildren() != 1 || !(t.label() != null && t.label().value() != null && t.label().value().equals(t.children()[0].label().value()));
       }
     };
     TreeTransformer transformer2 = new TreeTransformer() {

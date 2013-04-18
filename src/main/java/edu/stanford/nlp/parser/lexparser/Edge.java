@@ -38,13 +38,14 @@ public class Edge extends Item {
   public boolean equals(Object o) {
     if (this == o) {
       return true;
-    } else if (o instanceof Edge) {
-      Edge e = (Edge) o;
-      if (state == e.state && head == e.head && tag == e.tag && start == e.start && end == e.end) {
-        return true;
-      }
     }
-    return false;
+      if (o instanceof Edge) {
+        Edge e = (Edge) o;
+        if (state == e.state && head == e.head && tag == e.tag && start == e.start && end == e.end) {
+          return true;
+        }
+      }
+      return false;
   }
 
 }

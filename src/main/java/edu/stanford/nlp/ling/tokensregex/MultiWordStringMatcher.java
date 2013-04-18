@@ -247,11 +247,11 @@ public class MultiWordStringMatcher {
     String[] fields = lnrmDelimPattern.split(targetString);
     boolean first = true;
     for (String field:fields) {
-      if (!first) {
-        sb.append(lnrmDelimPatternAny);
-      } else {
-        first = false;
-      }
+        if (first) {
+            first = false;
+        } else {
+            sb.append(lnrmDelimPatternAny);
+        }
       sb.append(Pattern.quote(field));
     }
     return sb.toString();

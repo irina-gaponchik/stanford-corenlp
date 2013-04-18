@@ -898,81 +898,84 @@ oScore[split][end][br.rightChild] = totR;
         boolean foundBetter;  // always set below for this rule
         //System.out.println("Min "+min+" max "+max+" start "+start+" end "+end);
 
-        if ( ! lengthNormalization) {
-          // find the split that can use this rule to make the max score
-          for (int split = min; split <= max; split++) {
+          if (lengthNormalization) {
+              // find split that uses this rule to make the max *length normalized* score
+              int bestWordsInSpan = wordsInSpan[start][end][parentState];
+              float oldNormIScore = oldIScore / bestWordsInSpan;
+              float bestNormIScore = oldNormIScore;
 
-            boolean skip = false;
-            for (ParserConstraint c : constraints) {
-              if ((start < c.start && end >= c.end || start <= c.start && end > c.end) && split > c.start && split < c.end) {
-                skip = true;
-                break;
+              for (int split = min; split <= max; split++) {
+                  float lS = iScore_start[split][leftState];
+                  if (lS == Float.NEGATIVE_INFINITY) {
+                      continue;
+                  }
+                  float rS = iScore[split][end][rightChild];
+                  if (rS == Float.NEGATIVE_INFINITY) {
+                      continue;
+                  }
+                  float tot = pS + lS + rS;
+                  int newWordsInSpan = wordsInSpan[start][split][leftState] + wordsInSpan[split][end][rightChild];
+                  float normTot = tot / newWordsInSpan;
+                  if (normTot > bestNormIScore) {
+                      bestIScore = tot;
+                      bestNormIScore = normTot;
+                      bestWordsInSpan = newWordsInSpan;
+                  }
+              } // for split point
+              foundBetter = bestNormIScore > oldNormIScore;
+              if (foundBetter) {
+                  wordsInSpan[start][end][parentState] = bestWordsInSpan;
               }
-              if (start == c.start && split == c.end) {
-                String tag = stateIndex.get(leftState);
-                Matcher m = c.state.matcher(tag);
-                if (!m.matches()) {
-                  skip = true;
-                  break;
-                }
-              }
-              if (split == c.start && end == c.end) {
-                String tag = stateIndex.get(rightChild);
-                Matcher m = c.state.matcher(tag);
-                if (!m.matches()) {
-                  skip = true;
-                  break;
-                }
-              }
-            }
-            if (skip) {
-              continue;
-            }
+          } // fi op.testOptions.lengthNormalization
+          else {
+              // find the split that can use this rule to make the max score
+              for (int split = min; split <= max; split++) {
 
-            float lS = iScore_start[split][leftState];
-            if (lS == Float.NEGATIVE_INFINITY) {
-              continue;
-            }
-            float rS = iScore[split][end][rightChild];
-            if (rS == Float.NEGATIVE_INFINITY) {
-              continue;
-            }
-            float tot = pS + lS + rS;
-            if (spillGuts) { System.err.println("Rule " + rule + " over [" + start + ',' + end + ") has log score " + tot + " from L[" + stateIndex.get(leftState) + '=' + leftState + "] = "+ lS  + " R[" + stateIndex.get(rightChild) + '=' + rightChild + "] =  " + rS); }
-            if (tot > bestIScore) {
-              bestIScore = tot;
-            }
-          } // for split point
-          foundBetter = bestIScore > oldIScore;
-        } else {
-          // find split that uses this rule to make the max *length normalized* score
-          int bestWordsInSpan = wordsInSpan[start][end][parentState];
-          float oldNormIScore = oldIScore / bestWordsInSpan;
-          float bestNormIScore = oldNormIScore;
+                  boolean skip = false;
+                  for (ParserConstraint c : constraints) {
+                      if ((start < c.start && end >= c.end || start <= c.start && end > c.end) && split > c.start && split < c.end) {
+                          skip = true;
+                          break;
+                      }
+                      if (start == c.start && split == c.end) {
+                          String tag = stateIndex.get(leftState);
+                          Matcher m = c.state.matcher(tag);
+                          if (!m.matches()) {
+                              skip = true;
+                              break;
+                          }
+                      }
+                      if (split == c.start && end == c.end) {
+                          String tag = stateIndex.get(rightChild);
+                          Matcher m = c.state.matcher(tag);
+                          if (!m.matches()) {
+                              skip = true;
+                              break;
+                          }
+                      }
+                  }
+                  if (skip) {
+                      continue;
+                  }
 
-          for (int split = min; split <= max; split++) {
-            float lS = iScore_start[split][leftState];
-            if (lS == Float.NEGATIVE_INFINITY) {
-              continue;
-            }
-            float rS = iScore[split][end][rightChild];
-            if (rS == Float.NEGATIVE_INFINITY) {
-              continue;
-            }
-            float tot = pS + lS + rS;
-            int newWordsInSpan = wordsInSpan[start][split][leftState] + wordsInSpan[split][end][rightChild];
-            float normTot = tot / newWordsInSpan;
-            if (normTot > bestNormIScore) {
-              bestIScore = tot;
-              bestNormIScore = normTot;
-              bestWordsInSpan = newWordsInSpan;
-            }
-          } // for split point
-          foundBetter = bestNormIScore > oldNormIScore;
-          if (foundBetter) {
-            wordsInSpan[start][end][parentState] = bestWordsInSpan;
+                  float lS = iScore_start[split][leftState];
+                  if (lS == Float.NEGATIVE_INFINITY) {
+                      continue;
+                  }
+                  float rS = iScore[split][end][rightChild];
+                  if (rS == Float.NEGATIVE_INFINITY) {
+                      continue;
+                  }
+                  float tot = pS + lS + rS;
+                  if (spillGuts) {
+                      System.err.println("Rule " + rule + " over [" + start + ',' + end + ") has log score " + tot + " from L[" + stateIndex.get(leftState) + '=' + leftState + "] = " + lS + " R[" + stateIndex.get(rightChild) + '=' + rightChild + "] =  " + rS);
+                  }
+                  if (tot > bestIScore) {
+                      bestIScore = tot;
+                  }
+              } // for split point
+              foundBetter = bestIScore > oldIScore;
           }
-        } // fi op.testOptions.lengthNormalization
         if (foundBetter) { // this way of making "parentState" is better than previous
           iScore_start_end[parentState] = bestIScore;
 
@@ -1025,81 +1028,82 @@ oScore[split][end][br.rightChild] = totR;
         float bestIScore = oldIScore;
         boolean foundBetter; // always initialized below
         //System.out.println("Start "+start+" end "+end+" min "+min+" max "+max);
-        if ( ! lengthNormalization) {
-          // find the split that can use this rule to make the max score
-          for (int split = min; split <= max; split++) {
+          if (lengthNormalization) {
+              // find split that uses this rule to make the max *length normalized* score
+              int bestWordsInSpan = wordsInSpan[start][end][parentState];
+              float oldNormIScore = oldIScore / bestWordsInSpan;
+              float bestNormIScore = oldNormIScore;
+              for (int split = min; split <= max; split++) {
+                  float lS = iScore_start[split][leftChild];
+                  if (lS == Float.NEGATIVE_INFINITY) {
+                      continue;
+                  }
+                  float rS = iScore[split][end][rightState];
+                  if (rS == Float.NEGATIVE_INFINITY) {
+                      continue;
+                  }
+                  float tot = pS + lS + rS;
+                  int newWordsInSpan = wordsInSpan[start][split][leftChild] + wordsInSpan[split][end][rightState];
+                  float normTot = tot / newWordsInSpan;
+                  if (normTot > bestNormIScore) {
+                      bestIScore = tot;
+                      bestNormIScore = normTot;
+                      bestWordsInSpan = newWordsInSpan;
+                  }
+              } // end for split
+              foundBetter = bestNormIScore > oldNormIScore;
+              if (foundBetter) {
+                  wordsInSpan[start][end][parentState] = bestWordsInSpan;
+              }
+          } // end if lengthNormalization
+          else {
+              // find the split that can use this rule to make the max score
+              for (int split = min; split <= max; split++) {
 
-            boolean skip = false;
-            for (ParserConstraint c : constraints) {
-              if ((start < c.start && end >= c.end || start <= c.start && end > c.end) && split > c.start && split < c.end) {
-                skip = true;
-                break;
-              }
-              if (start == c.start && split == c.end) {
-                String tag = stateIndex.get(leftChild);
-                Matcher m = c.state.matcher(tag);
-                if (!m.matches()) {
-                  //if (!tag.startsWith(c.state+"^")) {
-                  skip = true;
-                  break;
-                }
-              }
-              if (split == c.start && end == c.end) {
-                String tag = stateIndex.get(rightState);
-                Matcher m = c.state.matcher(tag);
-                if (!m.matches()) {
-                  //if (!tag.startsWith(c.state+"^")) {
-                  skip = true;
-                  break;
-                }
-              }
-            }
-            if (skip) {
-              continue;
-            }
+                  boolean skip = false;
+                  for (ParserConstraint c : constraints) {
+                      if ((start < c.start && end >= c.end || start <= c.start && end > c.end) && split > c.start && split < c.end) {
+                          skip = true;
+                          break;
+                      }
+                      if (start == c.start && split == c.end) {
+                          String tag = stateIndex.get(leftChild);
+                          Matcher m = c.state.matcher(tag);
+                          if (!m.matches()) {
+                              //if (!tag.startsWith(c.state+"^")) {
+                              skip = true;
+                              break;
+                          }
+                      }
+                      if (split == c.start && end == c.end) {
+                          String tag = stateIndex.get(rightState);
+                          Matcher m = c.state.matcher(tag);
+                          if (!m.matches()) {
+                              //if (!tag.startsWith(c.state+"^")) {
+                              skip = true;
+                              break;
+                          }
+                      }
+                  }
+                  if (skip) {
+                      continue;
+                  }
 
-            float lS = iScore_start[split][leftChild];
-            if (lS == Float.NEGATIVE_INFINITY) {        // cdm [2012]: Test whether removing these 2 tests might speed things up because less branching?
-              continue;
-            }
-            float rS = iScore[split][end][rightState];
-            if (rS == Float.NEGATIVE_INFINITY) {
-              continue;
-            }
-            float tot = pS + lS + rS;
-            if (tot > bestIScore) {
-              bestIScore = tot;
-            }
-          } // end for split
-          foundBetter = bestIScore > oldIScore;
-        } else {
-          // find split that uses this rule to make the max *length normalized* score
-          int bestWordsInSpan = wordsInSpan[start][end][parentState];
-          float oldNormIScore = oldIScore / bestWordsInSpan;
-          float bestNormIScore = oldNormIScore;
-          for (int split = min; split <= max; split++) {
-            float lS = iScore_start[split][leftChild];
-            if (lS == Float.NEGATIVE_INFINITY) {
-              continue;
-            }
-            float rS = iScore[split][end][rightState];
-            if (rS == Float.NEGATIVE_INFINITY) {
-              continue;
-            }
-            float tot = pS + lS + rS;
-            int newWordsInSpan = wordsInSpan[start][split][leftChild] + wordsInSpan[split][end][rightState];
-            float normTot = tot / newWordsInSpan;
-            if (normTot > bestNormIScore) {
-              bestIScore = tot;
-              bestNormIScore = normTot;
-              bestWordsInSpan = newWordsInSpan;
-            }
-          } // end for split
-          foundBetter = bestNormIScore > oldNormIScore;
-          if (foundBetter) {
-            wordsInSpan[start][end][parentState] = bestWordsInSpan;
+                  float lS = iScore_start[split][leftChild];
+                  if (lS == Float.NEGATIVE_INFINITY) {        // cdm [2012]: Test whether removing these 2 tests might speed things up because less branching?
+                      continue;
+                  }
+                  float rS = iScore[split][end][rightState];
+                  if (rS == Float.NEGATIVE_INFINITY) {
+                      continue;
+                  }
+                  float tot = pS + lS + rS;
+                  if (tot > bestIScore) {
+                      bestIScore = tot;
+                  }
+              } // end for split
+              foundBetter = bestIScore > oldIScore;
           }
-        } // end if lengthNormalization
         if (foundBetter) { // this way of making "parentState" is better than previous
           iScore_start_end[parentState] = bestIScore;
           if (spillGuts) System.err.println("Could build " + stateIndex.get(parentState) + " from " + start + " to " + end + " with score " + bestIScore);
@@ -2042,12 +2046,12 @@ oScore[split][end][br.rightChild] = totR;
         Derivation derivation = dHatV.getLast();
         lazyNext(candV, derivation, kPrime);
       }
-      if (!candV.isEmpty()) {
-        Derivation d = candV.removeFirst();
-        dHatV.add(d);
-      } else {
-        break;
-      }
+        if (candV.isEmpty()) {
+            break;
+        } else {
+            Derivation d = candV.removeFirst();
+            dHatV.add(d);
+        }
     }
   }
 

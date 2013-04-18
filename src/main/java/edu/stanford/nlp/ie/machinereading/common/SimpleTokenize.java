@@ -57,10 +57,9 @@ public final class SimpleTokenize {
     StringBuilder buffer = new StringBuilder();
     for (int i = 0; i < str.length(); i++) {
       // do not include \ if followed by "
-      if (str.charAt(i) == '\\' && i < str.length() - 1 && str.charAt(i + 1) == '\"') {
-      } else {
-        buffer.append(str.charAt(i));
-      }
+        if (str.charAt(i) != '\\' || i >= str.length() - 1 || str.charAt(i + 1) != '\"') {
+          buffer.append(str.charAt(i));
+        }
     }
     return buffer.toString();
   }
@@ -87,12 +86,12 @@ public final class SimpleTokenize {
             end = line.length();
             break;
           } else { // found a quote
-            if (line.charAt(end - 1) != '\\') { // valid quote
-              end++;
-              break;
-            } else { // quote preceded by \
-              current = end;
-            }
+              if (line.charAt(end - 1) == '\\') { // quote preceded by \
+                  current = end;
+              } else { // valid quote
+                  end++;
+                  break;
+              }
           }
         }
 

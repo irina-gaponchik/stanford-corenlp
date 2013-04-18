@@ -114,20 +114,22 @@ public class TypedDependency implements Comparable<TypedDependency>, Serializabl
 
     if (indexThis > indexArg) {
       return 1;
-    } else if (indexThis < indexArg) {
-      return -1;
     }
+      if (indexThis < indexArg) {
+        return -1;
+      }
 
-    // dependent indices are equal, check governor
+      // dependent indices are equal, check governor
     int govIndexArg  = tdArg.gov().index();
     int govIndexThis = this.gov().index();
     if (govIndexThis > govIndexArg) {
       return 1;
-    } else if (govIndexThis < govIndexArg) {
-      return -1;
     }
+      if (govIndexThis < govIndexArg) {
+        return -1;
+      }
 
-    // dependent and governor indices equal, the relation decides
+      // dependent and governor indices equal, the relation decides
     return this.reln().compareTo(tdArg.reln());
   }
 

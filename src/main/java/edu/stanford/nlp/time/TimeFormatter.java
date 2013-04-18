@@ -432,13 +432,14 @@ public class TimeFormatter {
         return offset;
       }
       boolean negative = false;
-      if (!str.isEmpty() && str.charAt(0) == '+') {
-      } else if (!str.isEmpty() && str.charAt(0) == '-') {
-        negative = true;
-      } else {
-        throw new IllegalArgumentException("Invalid date time zone offset " + str);
-      }
-      int pos = 1;
+        if (str.isEmpty() || str.charAt(0) != '+') {
+            if (!str.isEmpty() && str.charAt(0) == '-') {
+              negative = true;
+            } else {
+              throw new IllegalArgumentException("Invalid date time zone offset " + str);
+            }
+        }
+        int pos = 1;
       // Parse hours
       offset += DateTimeConstants.MILLIS_PER_HOUR * parseInteger(str, pos, 2);
       pos += 2;
@@ -743,18 +744,18 @@ public class TimeFormatter {
     }
 
     protected void appendQuantifier(String str) {
-      if (!pieces.isEmpty()) {
-        FormatComponent last = pieces.get(pieces.size() - 1);
-        last.appendQuantifier(str);
-      } else {
-        throw new IllegalArgumentException("Illegal quantifier at beginning of pattern: " + str);
-      }
+        if (pieces.isEmpty()) {
+            throw new IllegalArgumentException("Illegal quantifier at beginning of pattern: " + str);
+        } else {
+            FormatComponent last = pieces.get(pieces.size() - 1);
+            last.appendQuantifier(str);
+        }
     }
     protected void appendGroupStart() { appendRegexPart("(?:");}
     protected void appendGroupEnd() { appendRegexPart(")"); }
     protected void appendLiteral(char c) { 
       builder.appendLiteral(c); 
-      appendLiteralField("" + c);}
+      appendLiteralField(String.valueOf(c));}
     protected void appendLiteral(String s) { 
       builder.appendLiteral(s); 
       appendLiteralField(s); }

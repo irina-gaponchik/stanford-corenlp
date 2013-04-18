@@ -348,11 +348,10 @@ public class StanfordCoreNLP extends AnnotationPipeline {
           os.append(StanfordCoreNLP.NEWLINE_SPLITTER_PROPERTY + ':').append(properties.getProperty(StanfordCoreNLP.NEWLINE_SPLITTER_PROPERTY,
                   "false"));
           return os.toString();
-        } else {
+        }
           os.append(NEWLINE_SPLITTER_PROPERTY + ':').append(Boolean.valueOf(properties.getProperty(NEWLINE_SPLITTER_PROPERTY,
                   "false")));
-        }
-        return os.toString();
+          return os.toString();
       }
     });
 
@@ -933,12 +932,12 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       os.println("\tparse.executable - path to the parseIt binary or parse.sh script");
     } else {
       // argsToProperties will set the value of a -h or -help to "true" if no arguments are given
-      if ( ! helpTopic.equalsIgnoreCase("true")) {
-        os.println("Unknown help topic: " + helpTopic);
-        os.println("See -help for a list of all help topics.");
-      } else {
-        printRequiredProperties(os);
-      }
+        if (helpTopic.equalsIgnoreCase("true")) {
+            printRequiredProperties(os);
+        } else {
+            os.println("Unknown help topic: " + helpTopic);
+            os.println("See -help for a list of all help topics.");
+        }
     }
   }
 

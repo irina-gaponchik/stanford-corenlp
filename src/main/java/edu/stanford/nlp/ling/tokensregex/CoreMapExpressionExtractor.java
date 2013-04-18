@@ -366,17 +366,17 @@ public class CoreMapExpressionExtractor<T extends MatchedExpression> {
       if (extracted) {
         annotateExpressions(merged, newExprs);
         newExprs = MatchedExpression.removeNullValues(newExprs);
-        if (!newExprs.isEmpty()) {
-          newExprs = MatchedExpression.removeNested(newExprs);
-          newExprs = MatchedExpression.removeOverlapping(newExprs);
-          merged = MatchedExpression.replaceMerged(merged, newExprs);
-          // Favor newly matched expressions over older ones
-          newExprs.addAll(matchedExpressions);
-          matchedExpressions = MatchedExpression.removeNested(newExprs);
-          matchedExpressions = MatchedExpression.removeOverlapping(matchedExpressions);
-        } else {
-          extracted = false;
-        }
+          if (newExprs.isEmpty()) {
+              extracted = false;
+          } else {
+              newExprs = MatchedExpression.removeNested(newExprs);
+              newExprs = MatchedExpression.removeOverlapping(newExprs);
+              merged = MatchedExpression.replaceMerged(merged, newExprs);
+              // Favor newly matched expressions over older ones
+              newExprs.addAll(matchedExpressions);
+              matchedExpressions = MatchedExpression.removeNested(newExprs);
+              matchedExpressions = MatchedExpression.removeOverlapping(matchedExpressions);
+          }
       }
       done = !extracted;
       iters++;
@@ -486,12 +486,12 @@ public class CoreMapExpressionExtractor<T extends MatchedExpression> {
     int nfiltered = 0;
     List<T> kept = new ArrayList<>(expressions.size());   // Approximate size
     for (T expr:expressions) {
-      if (!filterRule.accept(expr)) {
-        kept.add(expr);
-      } else {
-        nfiltered++;
+        if (filterRule.accept(expr)) {
+            nfiltered++;
 //        logger.warning("Filtering out " + expr.getText());
-      }
+        } else {
+            kept.add(expr);
+        }
     }
     if (nfiltered > 0) {
       logger.finest("Filtered " + nfiltered);

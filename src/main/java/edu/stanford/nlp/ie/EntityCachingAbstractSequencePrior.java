@@ -264,162 +264,162 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
       return;
     }
     // are we joining 2 entities?
-    else if (joiningTwoEntities(sequence, position)) {
-      if (VERBOSE) System.out.println("joining 2 entities");
-      Entity newEntity = new Entity();
-      Entity prev = entities[position - 1];
-      Entity next = entities[position + 1];
-      newEntity.startPosition = prev.startPosition;
-      newEntity.words = new ArrayList<>();
-      newEntity.words.addAll(prev.words);
-      String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
-      newEntity.words.add(word);
-      newEntity.words.addAll(next.words);
-      newEntity.type = sequence[position];
-      List<Integer> other = new ArrayList<>();
-      for (int i = 0; i < prev.otherOccurrences.length; i++) {
-        int pos = prev.otherOccurrences[i];
-        if (matches(newEntity, pos)) {
-          other.add(pos);
-        }
-      }
-      newEntity.otherOccurrences = toArray(other);
-      addEntityToEntitiesArray(newEntity);
-      if (VERBOSE) System.out.println(this);
-      return;
-    }
-    // are we splitting up an entity?
-    else if (splittingTwoEntities(sequence, position)) {
-      if (VERBOSE) System.out.println("splitting into 2 entities");
-      Entity entity = entities[position];
-      Entity prev = new Entity();
-      prev.type = entity.type;
-      prev.startPosition = entity.startPosition;
-      prev.words = new ArrayList<>(entity.words.subList(0, position - entity.startPosition));
-      prev.otherOccurrences = otherOccurrences(prev);
-      addEntityToEntitiesArray(prev);
-      Entity next = new Entity();
-      next.type = entity.type;
-      next.startPosition = position + 1;
-      next.words = new ArrayList<>(entity.words.subList(position - entity.startPosition + 1, entity.words.size()));
-      next.otherOccurrences = otherOccurrences(next);
-      addEntityToEntitiesArray(next);
-      if (sequence[position] == backgroundSymbol) {
-        entities[position] = null;
-      } else {
+      if (joiningTwoEntities(sequence, position)) {
+        if (VERBOSE) System.out.println("joining 2 entities");
         Entity newEntity = new Entity();
-        newEntity.startPosition = position;
+        Entity prev = entities[position - 1];
+        Entity next = entities[position + 1];
+        newEntity.startPosition = prev.startPosition;
+        newEntity.words = new ArrayList<>();
+        newEntity.words.addAll(prev.words);
+        String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
+        newEntity.words.add(word);
+        newEntity.words.addAll(next.words);
         newEntity.type = sequence[position];
+        List<Integer> other = new ArrayList<>();
+        for (int i = 0; i < prev.otherOccurrences.length; i++) {
+          int pos = prev.otherOccurrences[i];
+          if (matches(newEntity, pos)) {
+            other.add(pos);
+          }
+        }
+        newEntity.otherOccurrences = toArray(other);
+        addEntityToEntitiesArray(newEntity);
+        if (VERBOSE) System.out.println(this);
+        return;
+      }
+      // are we splitting up an entity?
+      if (splittingTwoEntities(sequence, position)) {
+        if (VERBOSE) System.out.println("splitting into 2 entities");
+        Entity entity = entities[position];
+        Entity prev = new Entity();
+        prev.type = entity.type;
+        prev.startPosition = entity.startPosition;
+        prev.words = new ArrayList<>(entity.words.subList(0, position - entity.startPosition));
+        prev.otherOccurrences = otherOccurrences(prev);
+        addEntityToEntitiesArray(prev);
+        Entity next = new Entity();
+        next.type = entity.type;
+        next.startPosition = position + 1;
+        next.words = new ArrayList<>(entity.words.subList(position - entity.startPosition + 1, entity.words.size()));
+        next.otherOccurrences = otherOccurrences(next);
+        addEntityToEntitiesArray(next);
+        if (sequence[position] == backgroundSymbol) {
+          entities[position] = null;
+        } else {
+          Entity newEntity = new Entity();
+          newEntity.startPosition = position;
+          newEntity.type = sequence[position];
+          newEntity.words = new ArrayList<>();
+          String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
+          newEntity.words.add(word);
+          newEntity.otherOccurrences = otherOccurrences(newEntity);
+          entities[position] = newEntity;
+        }
+        if (VERBOSE) System.out.println(this);
+        return;
+      }
+      // are we prepending to an entity ?
+      if (prependingEntity(sequence, position)) {
+        if (VERBOSE) System.out.println("prepending entity");
+        Entity newEntity = new Entity();
+        Entity next = entities[position + 1];
+        newEntity.startPosition = position;
         newEntity.words = new ArrayList<>();
         String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
         newEntity.words.add(word);
+        newEntity.words.addAll(next.words);
+        newEntity.type = sequence[position];
+        //List<Integer> other = new ArrayList<Integer>();
         newEntity.otherOccurrences = otherOccurrences(newEntity);
-        entities[position] = newEntity;
-      }
-      if (VERBOSE) System.out.println(this);
-      return;
-    }
-    // are we prepending to an entity ?
-    else if (prependingEntity(sequence, position)) {
-      if (VERBOSE) System.out.println("prepending entity");
-      Entity newEntity = new Entity();
-      Entity next = entities[position + 1];
-      newEntity.startPosition = position;
-      newEntity.words = new ArrayList<>();
-      String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
-      newEntity.words.add(word);
-      newEntity.words.addAll(next.words);
-      newEntity.type = sequence[position];
-      //List<Integer> other = new ArrayList<Integer>();
-      newEntity.otherOccurrences = otherOccurrences(newEntity);
-      addEntityToEntitiesArray(newEntity);
+        addEntityToEntitiesArray(newEntity);
 
-      if (removingEndOfEntity(sequence, position)) {
-        if (VERBOSE) System.out.println(" ... and removing end of previous entity.");
-        Entity prev = entities[position - 1];
-        prev.words.remove(prev.words.size()-1);
-        prev.otherOccurrences = otherOccurrences(prev);
-      }
-      if (VERBOSE) System.out.println(this);
-      return;
-    }
-    // are we appending to an entity ?
-    else if (appendingEntity(sequence, position)) {
-      if (VERBOSE) System.out.println("appending entity");
-      Entity newEntity = new Entity();
-      Entity prev = entities[position - 1];
-      newEntity.startPosition = prev.startPosition;
-      newEntity.words = new ArrayList<>();
-      newEntity.words.addAll(prev.words);
-      String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
-      newEntity.words.add(word);
-      newEntity.type = sequence[position];
-      List<Integer> other = new ArrayList<>();
-      for (int i = 0; i < prev.otherOccurrences.length; i++) {
-        int pos = prev.otherOccurrences[i];
-        if (matches(newEntity, pos)) {
-          other.add(pos);
+        if (removingEndOfEntity(sequence, position)) {
+          if (VERBOSE) System.out.println(" ... and removing end of previous entity.");
+          Entity prev = entities[position - 1];
+          prev.words.remove(prev.words.size()-1);
+          prev.otherOccurrences = otherOccurrences(prev);
         }
+        if (VERBOSE) System.out.println(this);
+        return;
       }
-      newEntity.otherOccurrences = toArray(other);
-      addEntityToEntitiesArray(newEntity);
-
-      if (removingBeginningOfEntity(sequence, position)) {
-        if (VERBOSE) System.out.println(" ... and removing beginning of next entity.");
-        entities[position + 1].words.remove(0);
-        entities[position + 1].startPosition++;
-      }
-      if (VERBOSE) System.out.println(this);
-      return;
-    }
-    // adding new singleton entity
-    else if (addingSingletonEntity(sequence, position)) {
-      Entity newEntity = new Entity();
-      if (VERBOSE) System.out.println("adding singleton entity");
-      newEntity.startPosition = position;
-      newEntity.words = new ArrayList<>();
-      String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
-      newEntity.words.add(word);
-      newEntity.type = sequence[position];
-      newEntity.otherOccurrences = otherOccurrences(newEntity);
-      addEntityToEntitiesArray(newEntity);
-
-      if (removingEndOfEntity(sequence, position)) {
-        if (VERBOSE) System.out.println(" ... and removing end of previous entity.");
+      // are we appending to an entity ?
+      if (appendingEntity(sequence, position)) {
+        if (VERBOSE) System.out.println("appending entity");
+        Entity newEntity = new Entity();
         Entity prev = entities[position - 1];
-        prev.words.remove(prev.words.size()-1);
+        newEntity.startPosition = prev.startPosition;
+        newEntity.words = new ArrayList<>();
+        newEntity.words.addAll(prev.words);
+        String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
+        newEntity.words.add(word);
+        newEntity.type = sequence[position];
+        List<Integer> other = new ArrayList<>();
+        for (int i = 0; i < prev.otherOccurrences.length; i++) {
+          int pos = prev.otherOccurrences[i];
+          if (matches(newEntity, pos)) {
+            other.add(pos);
+          }
+        }
+        newEntity.otherOccurrences = toArray(other);
+        addEntityToEntitiesArray(newEntity);
+
+        if (removingBeginningOfEntity(sequence, position)) {
+          if (VERBOSE) System.out.println(" ... and removing beginning of next entity.");
+          entities[position + 1].words.remove(0);
+          entities[position + 1].startPosition++;
+        }
+        if (VERBOSE) System.out.println(this);
+        return;
+      }
+      // adding new singleton entity
+      if (addingSingletonEntity(sequence, position)) {
+        Entity newEntity = new Entity();
+        if (VERBOSE) System.out.println("adding singleton entity");
+        newEntity.startPosition = position;
+        newEntity.words = new ArrayList<>();
+        String word = doc.get(position).get(CoreAnnotations.TextAnnotation.class);
+        newEntity.words.add(word);
+        newEntity.type = sequence[position];
+        newEntity.otherOccurrences = otherOccurrences(newEntity);
+        addEntityToEntitiesArray(newEntity);
+
+        if (removingEndOfEntity(sequence, position)) {
+          if (VERBOSE) System.out.println(" ... and removing end of previous entity.");
+          Entity prev = entities[position - 1];
+          prev.words.remove(prev.words.size()-1);
+          prev.otherOccurrences = otherOccurrences(prev);
+        }
+
+        if (removingBeginningOfEntity(sequence, position)) {
+          if (VERBOSE) System.out.println(" ... and removing beginning of next entity.");
+          entities[position + 1].words.remove(0);
+          entities[position + 1].startPosition++;
+        }
+
+        if (VERBOSE) System.out.println(this);
+        return;
+      }
+      // are splitting off the prev entity?
+      if (removingEndOfEntity(sequence, position)) {
+        if (VERBOSE) System.out.println("splitting off prev entity");
+        Entity prev = entities[position - 1];
+        prev.words.remove(prev.words.size() - 1);
         prev.otherOccurrences = otherOccurrences(prev);
+        entities[position] = null;
       }
-
-      if (removingBeginningOfEntity(sequence, position)) {
-        if (VERBOSE) System.out.println(" ... and removing beginning of next entity.");
-        entities[position + 1].words.remove(0);
-        entities[position + 1].startPosition++;
+      // are we splitting off the next entity?
+      else if (removingBeginningOfEntity(sequence, position)) {
+        if (VERBOSE) System.out.println("splitting off next entity");
+        Entity next = entities[position + 1];
+        next.words.remove(0);
+        next.startPosition++;
+        next.otherOccurrences = otherOccurrences(next);
+        entities[position] = null;
+      } else {
+        entities[position] = null;
       }
-
       if (VERBOSE) System.out.println(this);
-      return;
-    }
-    // are splitting off the prev entity?
-    else if (removingEndOfEntity(sequence, position)) {
-      if (VERBOSE) System.out.println("splitting off prev entity");
-      Entity prev = entities[position - 1];
-      prev.words.remove(prev.words.size() - 1);
-      prev.otherOccurrences = otherOccurrences(prev);
-      entities[position] = null;
-    }
-    // are we splitting off the next entity?
-    else if (removingBeginningOfEntity(sequence, position)) {
-      if (VERBOSE) System.out.println("splitting off next entity");
-      Entity next = entities[position + 1];
-      next.words.remove(0);
-      next.startPosition++;
-      next.otherOccurrences = otherOccurrences(next);
-      entities[position] = null;
-    } else {
-      entities[position] = null;
-    }
-    if (VERBOSE) System.out.println(this);
   }
 
   @Override

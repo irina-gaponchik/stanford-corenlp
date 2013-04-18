@@ -256,11 +256,11 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
       sb.append("-DASH");
     }
     if (hasDigit) {
-      if (!hasNonDigit) {
-        sb.append("-NUM");
-      } else {
-        sb.append("-DIG");
-      }
+        if (hasNonDigit) {
+            sb.append("-DIG");
+        } else {
+            sb.append("-NUM");
+        }
     } else if (wlen > 3) {
       // don't do for very short words: "yes" isn't an "-es" word
       // try doing to lower for further densening and skipping digits
@@ -541,16 +541,16 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
       } else if (ch == '-') {
         newClass = 'h';
       } else newClass = ch == '.' ? 'p' : 's';
-      if (newClass != lastClass) {
-        lastClass = newClass;
-        sb.append(lastClass);
-        num = 1;
-      } else {
-        if (num < 2) {
-          sb.append('+');
+        if (newClass == lastClass) {
+            if (num < 2) {
+                sb.append('+');
+            }
+            num++;
+        } else {
+            lastClass = newClass;
+            sb.append(lastClass);
+            num = 1;
         }
-        num++;
-      }
     }
     if (word.length() > 3) {
       // don't do for very short words: "yes" isn't an "-es" word
@@ -602,11 +602,11 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
       sb.append("-DASH");
     }
     if (hasDigit) {
-      if (!hasNonDigit) {
-        sb.append("-NUM");
-      } else {
-        sb.append("-DIG");
-      }
+        if (hasNonDigit) {
+            sb.append("-DIG");
+        } else {
+            sb.append("-NUM");
+        }
     } else if (wlen > 3) {
       // don't do for very short words: "yes" isn't an "-es" word
       // try doing to lower for further densening and skipping digits

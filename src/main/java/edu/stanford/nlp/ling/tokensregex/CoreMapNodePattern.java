@@ -229,7 +229,7 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
     }
 
     public boolean match(String str) {
-        return str == null ? false : pattern.matcher(str).matches();
+        return str != null && pattern.matcher(str).matches();
     }
 
     public Object matchWithResult(String str) {
@@ -291,11 +291,11 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
     public boolean match(Object node) {
       if (node instanceof String) {
         return match((String) node);
-      } else return node instanceof Number ? match((Number) node) : false;
+      } else return node instanceof Number && match((Number) node);
     }
 
     public boolean match(Number number) {
-        return number != null ? cmpType.accept(number.doubleValue(), value) : false;
+        return number != null && cmpType.accept(number.doubleValue(), value);
     }
 
     public boolean match(String str) {

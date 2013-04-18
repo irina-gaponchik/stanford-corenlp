@@ -281,32 +281,35 @@ public class LeafAncestorEval {
     
     for(Map.Entry<String, String[]> opt : argsMap.entrySet()) {
       String key = opt.getKey();
-      if(key == null) {
+        if (key != null) {
+            switch (key) {
+                case "-y":
+                    MAX_GOLD_YIELD = Integer.valueOf(opt.getValue()[0]);
 
-      } else if(key.equals("-y")) {
-        MAX_GOLD_YIELD = Integer.valueOf(opt.getValue()[0]);
-      
-      } else if(key.equals("-l")) {
-        LANGUAGE = Language.valueOf(opt.getValue()[0]);
-      
-      } else if(key.equals("-v")) {
-        VERBOSE = true;
-      
-      } else {
-        return false;
-      }
+                    break;
+                case "-l":
+                    LANGUAGE = Language.valueOf(opt.getValue()[0]);
+
+                    break;
+                case "-v":
+                    VERBOSE = true;
+
+                    break;
+                default:
+                    return false;
+            }
+        }
     }
     
     //Regular arguments
     String[] rest = argsMap.get(null);
     if(rest == null || rest.length != MIN_ARGS) {
       return false;
-    } else {
+    }
       goldFile = new File(rest[0]);
       guessFile = new File(rest[1]);
-    }
-    
-    return true;
+
+      return true;
   }
   
 

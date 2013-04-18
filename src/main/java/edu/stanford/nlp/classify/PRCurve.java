@@ -138,9 +138,7 @@ public class PRCurve {
       numpositive[i] = numpositive[i - 1] + (classes[num - i] == 0 ? 0 : 1);
     }
     System.err.println("total positive " + numpositive[num] + " total negative " + numnegative[num] + " total " + num);
-    for (int i = 1; i < numpositive.length; i++) {
-      //System.out.println(i + " positive " + numpositive[i] + " negative " + numnegative[i] + " classes " + classes[i - 1] + " " + classes[num - i]);
-    }
+    for (int i = 1; i < numpositive.length; i++) ;
   }
 
   int numSamples() {

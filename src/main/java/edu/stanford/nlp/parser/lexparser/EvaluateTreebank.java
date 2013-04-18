@@ -406,25 +406,27 @@ public class EvaluateTreebank {
           numSkippedEvals++;
           return;
 
-        } else if (treeFact == null) {
-          pwErr.println("Couldn't transform hypothesis tree for evaluation, skipping eval. Tree was:");
-          tree.pennPrint(pwErr);
-          numSkippedEvals++;
-          return;
-
-        } else if(treeFact.yield().size() != transGoldTree.yield().size()) {
-          List<Label> fYield = treeFact.yield();
-          List<Label> gYield = transGoldTree.yield();
-          pwErr.println("WARNING: Evaluation could not be performed due to gold/parsed yield mismatch.");
-          pwErr.printf("  sizes: gold: %d (transf) %d (orig); parsed: %d (transf) %d (orig).%n", gYield.size(), goldTree.yield().size(),
-                       fYield.size(), tree.yield().size());
-          pwErr.println("  gold: " + Sentence.listToString(gYield, true));
-          pwErr.println("  pars: " + Sentence.listToString(fYield, true));
-          numSkippedEvals++;
-          return;
         }
+          if (treeFact == null) {
+            pwErr.println("Couldn't transform hypothesis tree for evaluation, skipping eval. Tree was:");
+            tree.pennPrint(pwErr);
+            numSkippedEvals++;
+            return;
 
-        if (!topKEvals.isEmpty()) {
+          }
+          if(treeFact.yield().size() != transGoldTree.yield().size()) {
+            List<Label> fYield = treeFact.yield();
+            List<Label> gYield = transGoldTree.yield();
+            pwErr.println("WARNING: Evaluation could not be performed due to gold/parsed yield mismatch.");
+            pwErr.printf("  sizes: gold: %d (transf) %d (orig); parsed: %d (transf) %d (orig).%n", gYield.size(), goldTree.yield().size(),
+                         fYield.size(), tree.yield().size());
+            pwErr.println("  gold: " + Sentence.listToString(gYield, true));
+            pwErr.println("  pars: " + Sentence.listToString(fYield, true));
+            numSkippedEvals++;
+            return;
+          }
+
+          if (!topKEvals.isEmpty()) {
           List<Tree> transGuesses = new ArrayList<>();
           int kbest = Math.min(op.testOptions.evalPCFGkBest, kbestPCFGTrees.size());
           for (ScoredObject<Tree> guess : kbestPCFGTrees.subList(0, kbest)) {
@@ -578,41 +580,41 @@ public class EvaluateTreebank {
       }
     }
 
-    if (op.testOptions.testingThreads != 1) {
-      MulticoreWrapper<List<? extends HasWord>, ParserQuery> wrapper = new MulticoreWrapper<>(op.testOptions.testingThreads, new ParsingThreadsafeProcessor(pqFactory, pwErr));
+      if (op.testOptions.testingThreads == 1) {
+          ParserQuery pq = pqFactory.parserQuery();
 
-      LinkedList<Tree> goldTrees = new LinkedList<>();
-      for (Tree goldTree : testTreebank) {
-        List<? extends HasWord> sentence = getInputSentence(goldTree);
-        goldTrees.add(goldTree);
+          for (Tree goldTree : testTreebank) {
+              List<CoreLabel> sentence = getInputSentence(goldTree);
 
-        pwErr.println("Parsing [len. " + sentence.size() + "]: " + Sentence.listToString(sentence));
-        wrapper.put(sentence);
-        while (wrapper.peek()) {
-          ParserQuery pq = wrapper.poll();
-          goldTree = goldTrees.poll();
-          processResults(pq, goldTree, pwErr, pwOut, pwFileOut, pwStats, treePrint);
-        }
-      } // for tree iterator
-      wrapper.join();
-      while (wrapper.peek()) {
-        ParserQuery pq = wrapper.poll();
-        Tree goldTree = goldTrees.poll();
-        processResults(pq, goldTree, pwErr, pwOut, pwFileOut, pwStats, treePrint);
+              pwErr.println("Parsing [len. " + sentence.size() + "]: " + Sentence.listToString(sentence));
+
+              pq.parseAndReport(sentence, pwErr);
+
+              processResults(pq, goldTree, pwErr, pwOut, pwFileOut, pwStats, treePrint);
+          } // for tree iterator
+      } else {
+          MulticoreWrapper<List<? extends HasWord>, ParserQuery> wrapper = new MulticoreWrapper<>(op.testOptions.testingThreads, new ParsingThreadsafeProcessor(pqFactory, pwErr));
+
+          LinkedList<Tree> goldTrees = new LinkedList<>();
+          for (Tree goldTree : testTreebank) {
+              List<? extends HasWord> sentence = getInputSentence(goldTree);
+              goldTrees.add(goldTree);
+
+              pwErr.println("Parsing [len. " + sentence.size() + "]: " + Sentence.listToString(sentence));
+              wrapper.put(sentence);
+              while (wrapper.peek()) {
+                  ParserQuery pq = wrapper.poll();
+                  goldTree = goldTrees.poll();
+                  processResults(pq, goldTree, pwErr, pwOut, pwFileOut, pwStats, treePrint);
+              }
+          } // for tree iterator
+          wrapper.join();
+          while (wrapper.peek()) {
+              ParserQuery pq = wrapper.poll();
+              Tree goldTree = goldTrees.poll();
+              processResults(pq, goldTree, pwErr, pwOut, pwFileOut, pwStats, treePrint);
+          }
       }
-    } else {
-      ParserQuery pq = pqFactory.parserQuery();
-
-      for (Tree goldTree : testTreebank) {
-        List<CoreLabel> sentence = getInputSentence(goldTree);
-
-        pwErr.println("Parsing [len. " + sentence.size() + "]: " + Sentence.listToString(sentence));
-
-        pq.parseAndReport(sentence, pwErr);
-
-        processResults(pq, goldTree, pwErr, pwOut, pwFileOut, pwStats, treePrint);
-      } // for tree iterator
-    }
 
     //Done parsing...print the results of the evaluations
     treebankTotalTtimer.done("Testing on treebank");

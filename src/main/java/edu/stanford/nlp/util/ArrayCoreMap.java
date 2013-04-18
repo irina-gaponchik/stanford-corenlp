@@ -514,34 +514,34 @@ public class ArrayCoreMap implements CoreMap, Serializable {
     calledMap.put(this, other, true);
     calledMap.put(other, this, true);
 
-    if (this.size != other.size) {
-      result = false;
-    } else {
-    for (int i = 0; i < this.size; i++) {
-      // test if other contains this key,value pair
-      boolean matched = false;
-      for (int j = 0; j < other.size; j++) {
-        if (this.keys[i].equals(other.keys[j])) {
-          if (this.values[i] == null && other.values[j] != null ||
-                  this.values[i] != null && other.values[j] == null) {
-            matched = false;
-            break;
-          }
+      if (this.size == other.size) {
+          for (int i = 0; i < this.size; i++) {
+              // test if other contains this key,value pair
+              boolean matched = false;
+              for (int j = 0; j < other.size; j++) {
+                  if (this.keys[i].equals(other.keys[j])) {
+                      if (this.values[i] == null && other.values[j] != null ||
+                              this.values[i] != null && other.values[j] == null) {
+                          matched = false;
+                          break;
+                      }
 
-          if (this.values[i] == null && other.values[j] == null ||
-                  this.values[i].equals(other.values[j])) {
-            matched = true;
-            break;
-          }
-        }
-      }
+                      if (this.values[i] == null && other.values[j] == null ||
+                              this.values[i].equals(other.values[j])) {
+                          matched = true;
+                          break;
+                      }
+                  }
+              }
 
-      if (!matched) {
-        result = false;
-        break;
+              if (!matched) {
+                  result = false;
+                  break;
+              }
+          }
+      } else {
+          result = false;
       }
-    }
-    }
 
     if (createdCalledMap) {
       equalsCalled.set(null);

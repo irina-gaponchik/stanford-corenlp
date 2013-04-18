@@ -1511,12 +1511,11 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   		return termIdx + 1;
 
-  	} else {
-  		for(Tree kid : getChildrenAsList())
-  			termIdx = kid.taggedLabeledYield(ty, termIdx);
   	}
+      for(Tree kid : getChildrenAsList())
+          termIdx = kid.taggedLabeledYield(ty, termIdx);
 
-		return termIdx;
+      return termIdx;
   }
 
   /**
@@ -1898,10 +1897,11 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     List<Tree> l = spliceOutHelper(nodeFilter, tf);
     if (l.isEmpty()) {
       return null;
-    } else if (l.size() == 1) {
-      return l.get(0);
     }
-    // for a forest, make a new root
+      if (l.size() == 1) {
+        return l.get(0);
+      }
+      // for a forest, make a new root
     return tf.newTreeNode((Label) null, l);
   }
 

@@ -104,26 +104,26 @@ public class TestClassifier {
 
     boolean verboseResults = config.getVerboseResults();
 
-    if (config.getNThreads() != 1) {
-      MulticoreWrapper<List<TaggedWord>, TestSentence> wrapper = new MulticoreWrapper<>(config.getNThreads(), new TestSentenceProcessor(maxentTagger));
-      for (List<TaggedWord> taggedSentence : fileRecord.reader()) {
-        wrapper.put(taggedSentence);
-        while (wrapper.peek()) {
-          processResults(wrapper.poll(), pf, pf1, pf3, verboseResults);
-        }
+      if (config.getNThreads() == 1) {
+          for (List<TaggedWord> taggedSentence : fileRecord.reader()) {
+              TestSentence testS = new TestSentence(maxentTagger);
+              testS.setCorrectTags(taggedSentence);
+              testS.tagSentence(taggedSentence, false);
+              processResults(testS, pf, pf1, pf3, verboseResults);
+          }
+      } else {
+          MulticoreWrapper<List<TaggedWord>, TestSentence> wrapper = new MulticoreWrapper<>(config.getNThreads(), new TestSentenceProcessor(maxentTagger));
+          for (List<TaggedWord> taggedSentence : fileRecord.reader()) {
+              wrapper.put(taggedSentence);
+              while (wrapper.peek()) {
+                  processResults(wrapper.poll(), pf, pf1, pf3, verboseResults);
+              }
+          }
+          wrapper.join();
+          while (wrapper.peek()) {
+              processResults(wrapper.poll(), pf, pf1, pf3, verboseResults);
+          }
       }
-      wrapper.join();
-      while (wrapper.peek()) {
-        processResults(wrapper.poll(), pf, pf1, pf3, verboseResults);
-      }
-    } else{
-      for (List<TaggedWord> taggedSentence : fileRecord.reader()) {
-        TestSentence testS = new TestSentence(maxentTagger);
-        testS.setCorrectTags(taggedSentence);
-        testS.tagSentence(taggedSentence, false);
-        processResults(testS, pf, pf1, pf3, verboseResults);
-      }
-    }
 
     if(pf != null) pf.close();
     if(pf1 != null) pf1.close();

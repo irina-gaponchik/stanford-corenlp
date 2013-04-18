@@ -59,9 +59,7 @@ public class WordLemmaTagFactory implements LabelFactory {
    * @return The new WordLemmaTag (word or lemma or tag will be {@code null})
    */
   public Label newLabel(String labelStr, int options) {
-    if (options == TAG_LABEL) {
-      return new WordLemmaTag(null, null, labelStr);
-    } else return options == LEMMA_LABEL ? new WordLemmaTag(null, labelStr, null) : new WordLemmaTag(labelStr);
+      return options == TAG_LABEL ? new WordLemmaTag(null, null, labelStr) : options == LEMMA_LABEL ? new WordLemmaTag(null, labelStr, null) : new WordLemmaTag(labelStr);
 
   }
 
@@ -83,10 +81,7 @@ public class WordLemmaTagFactory implements LabelFactory {
   public Label newLabelFromString(String labelStr) {
     int first = labelStr.indexOf(divider);
     int second = labelStr.lastIndexOf(divider);
-    if (first == second) {
-      return new WordLemmaTag(labelStr.substring(0, first), Morphology.stemStatic(labelStr.substring(0, first), labelStr.substring(first + 1)).word(), labelStr.substring(first + 1));
-    } else
-        return first >= 0 ? new WordLemmaTag(labelStr.substring(0, first), labelStr.substring(first + 1, second), labelStr.substring(second + 1)) : new WordLemmaTag(labelStr);
+      return first == second ? new WordLemmaTag(labelStr.substring(0, first), Morphology.stemStatic(labelStr.substring(0, first), labelStr.substring(first + 1)).word(), labelStr.substring(first + 1)) : first >= 0 ? new WordLemmaTag(labelStr.substring(0, first), labelStr.substring(first + 1, second), labelStr.substring(second + 1)) : new WordLemmaTag(labelStr);
   }
 
 

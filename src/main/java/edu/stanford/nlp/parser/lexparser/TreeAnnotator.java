@@ -1,8 +1,6 @@
 package edu.stanford.nlp.parser.lexparser;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.ling.HasCategory;
@@ -151,21 +149,16 @@ public class TreeAnnotator implements TreeTransformer {
       List<String> leftSis = listBasicCategories(SisterAnnotationStats.leftSisterLabels(t, parent));
       List<String> rightSis = listBasicCategories(SisterAnnotationStats.rightSisterLabels(t, parent));
 
-      List<String> leftAnn = new ArrayList<>();
-      List<String> rightAnn = new ArrayList<>();
+      Collection<String> leftAnn = new HashSet<>();
+      Collection<String> rightAnn = new HashSet<>();
 
       for (String s : leftSis) {
-        //s = baseCat+"=l="+tlpParams.treebankLanguagePack().basicCategory(s);
-        leftAnn.add(baseCat + "=l=" + tlpParams.treebankLanguagePack().basicCategory(s));
-        //System.out.println("left-annotated test string " + s);
-      }
+         leftAnn.add(baseCat + "=l=" + tlpParams.treebankLanguagePack().basicCategory(s));
+       }
       for (String s : rightSis) {
-        //s = baseCat+"=r="+tlpParams.treebankLanguagePack().basicCategory(s);
-        rightAnn.add(baseCat + "=r=" + tlpParams.treebankLanguagePack().basicCategory(s));
+         rightAnn.add(baseCat + "=r=" + tlpParams.treebankLanguagePack().basicCategory(s));
       }
-      for (Iterator<String> j = rightAnn.iterator(); j.hasNext();) {
-        //System.out.println("new rightsis " + (String)j.next()); //debugging
-      }
+
       for (String annCat : trainOptions.sisterSplitters) {
         //System.out.println("annotated test string " + annCat);
         if (leftAnn.contains(annCat) || rightAnn.contains(annCat)) {

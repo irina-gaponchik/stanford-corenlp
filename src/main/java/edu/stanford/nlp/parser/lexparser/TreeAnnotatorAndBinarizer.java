@@ -370,37 +370,36 @@ public class TreeAnnotatorAndBinarizer implements TreeTransformer {
     }
 
     private Tree transformTreeHelper(Tree t) {
-      if (t == null) {
-      } else {
-        String cat = t.label().value();
-        if (t.isLeaf()) {
-          Label label = new Word(cat); //new CategoryWordTag(cat,cat,"");
-          t.setLabel(label);
-        } else {
-          Tree[] kids = t.children();
-          for (Tree child : kids) {
-            transformTreeHelper(child); // recursive call
-          }
-          Tree headChild = hf.determineHead(t);
-          String tag;
-          String word;
-          if (headChild == null) {
-            System.err.println("ERROR: null head for tree\n" + t.toString());
-            word = null;
-            tag = null;
-          } else if (headChild.isLeaf()) {
-            tag = cat;
-            word = headChild.label().value();
+        if (t != null) {
+          String cat = t.label().value();
+          if (t.isLeaf()) {
+            Label label = new Word(cat); //new CategoryWordTag(cat,cat,"");
+            t.setLabel(label);
           } else {
-            CategoryWordTag headLabel = (CategoryWordTag) headChild.label();
-            word = headLabel.word();
-            tag = headLabel.tag();
+            Tree[] kids = t.children();
+            for (Tree child : kids) {
+              transformTreeHelper(child); // recursive call
+            }
+            Tree headChild = hf.determineHead(t);
+            String tag;
+            String word;
+            if (headChild == null) {
+              System.err.println("ERROR: null head for tree\n" + t.toString());
+              word = null;
+              tag = null;
+            } else if (headChild.isLeaf()) {
+              tag = cat;
+              word = headChild.label().value();
+            } else {
+              CategoryWordTag headLabel = (CategoryWordTag) headChild.label();
+              word = headLabel.word();
+              tag = headLabel.tag();
+            }
+            Label label = new CategoryWordTag(cat, word, tag);
+            t.setLabel(label);
           }
-          Label label = new CategoryWordTag(cat, word, tag);
-          t.setLabel(label);
         }
-      }
-      return t;
+        return t;
     }
 
     public TreeNullAnnotator(HeadFinder hf) {

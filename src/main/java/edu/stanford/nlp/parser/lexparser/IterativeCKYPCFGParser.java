@@ -99,7 +99,37 @@ public class IterativeCKYPCFGParser extends ExhaustivePCFGParser {
                 boolean foundBetter;  // always set below for this rule
                 //System.out.println("Min "+min+" max "+max+" start "+start+" end "+end);
 
-                if (!op.testOptions.lengthNormalization) {
+                if (op.testOptions.lengthNormalization) {
+                    // find split that uses this rule to make the max *length normalized* score
+                    int bestWordsInSpan = wordsInSpan[start][end][parentState];
+                    float oldNormIScore = oldIScore / bestWordsInSpan;
+                    float bestNormIScore = oldNormIScore;
+
+                    for (int split = min; split <= max; split++) {
+                        float lS = iScore[start][split][leftState];
+                        if (lS == Float.NEGATIVE_INFINITY) {
+
+                            continue;
+                        }
+                        float rS = iScore[split][end][r.rightChild];
+                        if (rS == Float.NEGATIVE_INFINITY) {
+                            continue;
+                        }
+                        float tot = pS + lS + rS;
+                        int newWordsInSpan = wordsInSpan[start][split][leftState] + wordsInSpan[split][end][r.rightChild];
+                        float normTot = tot / newWordsInSpan;
+                        if (normTot > bestNormIScore) {
+                            bestIScore = tot;
+                            bestNormIScore = normTot;
+                            bestWordsInSpan = newWordsInSpan;
+                        }
+                    } // for split point
+                    foundBetter = bestNormIScore > oldNormIScore;
+                    if (foundBetter && bestIScore > threshold) {
+                        wordsInSpan[start][end][parentState] = bestWordsInSpan;
+                    }
+                } // fi op.testOptions.lengthNormalization
+                else {
                     // find the split that can use this rule to make the max score
                     for (int split = min; split <= max; split++) {
 
@@ -146,36 +176,7 @@ public class IterativeCKYPCFGParser extends ExhaustivePCFGParser {
                         }
                     } // for split point
                     foundBetter = bestIScore > oldIScore;
-                } else {
-                    // find split that uses this rule to make the max *length normalized* score
-                    int bestWordsInSpan = wordsInSpan[start][end][parentState];
-                    float oldNormIScore = oldIScore / bestWordsInSpan;
-                    float bestNormIScore = oldNormIScore;
-
-                    for (int split = min; split <= max; split++) {
-                        float lS = iScore[start][split][leftState];
-                        if (lS == Float.NEGATIVE_INFINITY) {
-
-                            continue;
-                        }
-                        float rS = iScore[split][end][r.rightChild];
-                        if (rS == Float.NEGATIVE_INFINITY) {
-                            continue;
-                        }
-                        float tot = pS + lS + rS;
-                        int newWordsInSpan = wordsInSpan[start][split][leftState] + wordsInSpan[split][end][r.rightChild];
-                        float normTot = tot / newWordsInSpan;
-                        if (normTot > bestNormIScore) {
-                            bestIScore = tot;
-                            bestNormIScore = normTot;
-                            bestWordsInSpan = newWordsInSpan;
-                        }
-                    } // for split point
-                    foundBetter = bestNormIScore > oldNormIScore;
-                    if (foundBetter && bestIScore > threshold) {
-                        wordsInSpan[start][end][parentState] = bestWordsInSpan;
-                    }
-                } // fi op.testOptions.lengthNormalization
+                }
                 if (foundBetter) {
                     if (bestIScore > threshold) {
                         // this way of making "parentState" is better than previous
@@ -241,7 +242,35 @@ public class IterativeCKYPCFGParser extends ExhaustivePCFGParser {
                 float bestIScore = oldIScore;
                 boolean foundBetter; // always initialized below
                 //System.out.println("Start "+start+" end "+end+" min "+min+" max "+max);
-                if (!op.testOptions.lengthNormalization) {
+                if (op.testOptions.lengthNormalization) {
+                    // find split that uses this rule to make the max *length normalized* score
+                    int bestWordsInSpan = wordsInSpan[start][end][parentState];
+                    float oldNormIScore = oldIScore / bestWordsInSpan;
+                    float bestNormIScore = oldNormIScore;
+                    for (int split = min; split <= max; split++) {
+                        float lS = iScore[start][split][r.leftChild];
+                        if (lS == Float.NEGATIVE_INFINITY) {
+                            continue;
+                        }
+                        float rS = iScore[split][end][rightState];
+                        if (rS == Float.NEGATIVE_INFINITY) {
+                            continue;
+                        }
+                        float tot = pS + lS + rS;
+                        int newWordsInSpan = wordsInSpan[start][split][r.leftChild] + wordsInSpan[split][end][rightState];
+                        float normTot = tot / newWordsInSpan;
+                        if (normTot > bestNormIScore) {
+                            bestIScore = tot;
+                            bestNormIScore = normTot;
+                            bestWordsInSpan = newWordsInSpan;
+                        }
+                    } // end for split
+                    foundBetter = bestNormIScore > oldNormIScore;
+                    if (foundBetter) {
+                        wordsInSpan[start][end][parentState] = bestWordsInSpan;
+                    }
+                } // end if lengthNormalization
+                else {
                     // find the split that can use this rule to make the max score
                     for (int split = min; split <= max; split++) {
 
@@ -290,34 +319,7 @@ public class IterativeCKYPCFGParser extends ExhaustivePCFGParser {
                         }
                     } // end for split
                     foundBetter = bestIScore > oldIScore;
-                } else {
-                    // find split that uses this rule to make the max *length normalized* score
-                    int bestWordsInSpan = wordsInSpan[start][end][parentState];
-                    float oldNormIScore = oldIScore / bestWordsInSpan;
-                    float bestNormIScore = oldNormIScore;
-                    for (int split = min; split <= max; split++) {
-                        float lS = iScore[start][split][r.leftChild];
-                        if (lS == Float.NEGATIVE_INFINITY) {
-                            continue;
-                        }
-                        float rS = iScore[split][end][rightState];
-                        if (rS == Float.NEGATIVE_INFINITY) {
-                            continue;
-                        }
-                        float tot = pS + lS + rS;
-                        int newWordsInSpan = wordsInSpan[start][split][r.leftChild] + wordsInSpan[split][end][rightState];
-                        float normTot = tot / newWordsInSpan;
-                        if (normTot > bestNormIScore) {
-                            bestIScore = tot;
-                            bestNormIScore = normTot;
-                            bestWordsInSpan = newWordsInSpan;
-                        }
-                    } // end for split
-                    foundBetter = bestNormIScore > oldNormIScore;
-                    if (foundBetter) {
-                        wordsInSpan[start][end][parentState] = bestWordsInSpan;
-                    }
-                } // end if lengthNormalization
+                }
                 if (foundBetter) { // this way of making "parentState" is better than previous
                     if (bestIScore > threshold) {
                         iScore[start][end][parentState] = bestIScore;

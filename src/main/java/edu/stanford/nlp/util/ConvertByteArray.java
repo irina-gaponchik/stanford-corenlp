@@ -583,11 +583,11 @@ public final class ConvertByteArray {
     Vector<String> v = new Vector<>();
     while (off < b.length) {
       int length = byteArrToInt(b, off);
-      if (length != 0) {
-        v.addElement(byteArrToUString(b, off + 4, length));
-      } else {
-        v.addElement("");
-      }
+        if (length == 0) {
+            v.addElement("");
+        } else {
+            v.addElement(byteArrToUString(b, off + 4, length));
+        }
       off = off + 2 * length + 4;
     }
     String[] s = new String[v.size()];
@@ -602,12 +602,12 @@ public final class ConvertByteArray {
     for (int i = 0; i < length; i++) {
       int stringLen = byteArrToInt(b, off);
       off += 4;
-      if (stringLen != 0) {
-        s[i] = byteArrToUString(b, off, stringLen);
-        off += 2 * s[i].length();
-      } else {
-        s[i] = "";
-      }
+        if (stringLen == 0) {
+            s[i] = "";
+        } else {
+            s[i] = byteArrToUString(b, off, stringLen);
+            off += 2 * s[i].length();
+        }
     }
     return s;
   }
@@ -616,12 +616,12 @@ public final class ConvertByteArray {
     for (int i = 0; i < length; i++) {
       int stringLen = byteArrToInt(b, off);
       off += 4;
-      if (stringLen != 0) {
-        s[i + pos] = byteArrToUString(b, off, stringLen);
-        off += 2 * s[i].length();
-      } else {
-        s[i] = "";
-      }
+        if (stringLen == 0) {
+            s[i] = "";
+        } else {
+            s[i + pos] = byteArrToUString(b, off, stringLen);
+            off += 2 * s[i].length();
+        }
     }
   }
 
@@ -630,11 +630,11 @@ public final class ConvertByteArray {
     Vector<String> v = new Vector<>();
     while (off < b.length) {
       int length = byteArrToInt(b, off);
-      if (length != 0) {
-        v.addElement(byteArrToAString(b, off + 4, length));
-      } else {
-        v.addElement("");
-      }
+        if (length == 0) {
+            v.addElement("");
+        } else {
+            v.addElement(byteArrToAString(b, off + 4, length));
+        }
       off = off + length + 4;
     }
     String[] s = new String[v.size()];
@@ -649,12 +649,12 @@ public final class ConvertByteArray {
     for (int i = 0; i < length; i++) {
       int stringLen = byteArrToInt(b, off);
       off += 4;
-      if (stringLen != 0) {
-        s[i] = byteArrToAString(b, off, stringLen);
-        off += s[i].length();
-      } else {
-        s[i] = "";
-      }
+        if (stringLen == 0) {
+            s[i] = "";
+        } else {
+            s[i] = byteArrToAString(b, off, stringLen);
+            off += s[i].length();
+        }
     }
     return s;
   }
@@ -663,12 +663,12 @@ public final class ConvertByteArray {
     for (int i = 0; i < length; i++) {
       int stringLen = byteArrToInt(b, off);
       off += 4;
-      if (stringLen != 0) {
-        s[i + pos] = byteArrToAString(b, off, stringLen);
-        off += s[i].length();
-      } else {
-        s[i] = "";
-      }
+        if (stringLen == 0) {
+            s[i] = "";
+        } else {
+            s[i + pos] = byteArrToAString(b, off, stringLen);
+            off += s[i].length();
+        }
     }
   }
 

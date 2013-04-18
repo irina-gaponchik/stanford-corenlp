@@ -347,12 +347,10 @@ public class RedwoodConfiguration {
     } else if(collapseSetting.equalsIgnoreCase("approximate")){
       repeat = new RepeatedRecordHandler(RepeatedRecordHandler.APPROXIMATE);
       config = config.handler(visibility, repeat);
-    } else if(collapseSetting.equalsIgnoreCase("none")){
-      //do nothing
-    } else {
+    } else if (!collapseSetting.equalsIgnoreCase("none")) {
       throw new IllegalArgumentException("Unknown collapse type: " + collapseSetting);
     }
-    //--Console
+      //--Console
     //((track color))
     console.trackColor = Color.valueOf(get(props,"log.console.trackColor","NONE",used).toUpperCase());
     console.trackStyle = Style.valueOf(get(props,"log.console.trackStyle","NONE",used).toUpperCase());

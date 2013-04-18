@@ -112,14 +112,14 @@ public class ParserAnnotator implements Annotator {
     this.maxParseTime = PropertiesUtils.getLong(props, annotatorName + ".maxtime", 0);
 
     String buildGraphsProperty = annotatorName + ".buildgraphs";
-    if (!this.parser.getTLPParams().supportsBasicDependencies()) {
-      if (props.getProperty(buildGraphsProperty) != null && PropertiesUtils.getBool(props, buildGraphsProperty)) {
-        System.err.println("WARNING: " + buildGraphsProperty + " set to true, but " + this.parser.getTLPParams().getClass() + " does not support dependencies");
+      if (this.parser.getTLPParams().supportsBasicDependencies()) {
+          this.BUILD_GRAPHS = PropertiesUtils.getBool(props, buildGraphsProperty, true);
+      } else {
+          if (props.getProperty(buildGraphsProperty) != null && PropertiesUtils.getBool(props, buildGraphsProperty)) {
+              System.err.println("WARNING: " + buildGraphsProperty + " set to true, but " + this.parser.getTLPParams().getClass() + " does not support dependencies");
+          }
+          this.BUILD_GRAPHS = false;
       }
-      this.BUILD_GRAPHS = false;
-    } else {
-      this.BUILD_GRAPHS = PropertiesUtils.getBool(props, buildGraphsProperty, true);
-    }
 
     if (this.BUILD_GRAPHS) {
       TreebankLanguagePack tlp = parser.getTLPParams().treebankLanguagePack();
