@@ -2,9 +2,11 @@
 
 package edu.stanford.nlp.process;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import edu.stanford.nlp.process.data.*;
 import edu.stanford.nlp.util.Generics;
 
 
@@ -14,18 +16,36 @@ import edu.stanford.nlp.util.Generics;
  * specification file
  * <tt>/juicy/u61/u/horatio/codebase2/javanlp/projects/core/src/edu/stanford/nlp/process/Morpha.flex</tt>
  */
-public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9, ZZ10, ZZ11, ZZ12, ZZ13, ZZ14, ZZ15, ZZ16, ZZ17, ZZ18, ZZ19, ZZ20, ZZ21 , VERBSTEMS{
+public class Morpha {
 
     /**
      * ZZ_ATTRIBUTE[aState] contains the attributes of state
      * <code>aState</code>
      */
-    private static final int[] ZZ_ATTRIBUTE = zzUnpackAttribute();
+    private static final int[] ZZ_ATTRIBUTE;
+
+    static {
+        int[] result = new int[13383];
+        int offset = 0;
+        int i = 0;       /* index in packed string  */
+
+        int j = offset;  /* index in unpacked array */
+
+        int l = ZZ21.ZZ_ATTRIBUTE_PACKED_0.length();
+        while (i < l) {
+            int count = ZZ21.ZZ_ATTRIBUTE_PACKED_0.charAt(i++);
+            int value = ZZ21.ZZ_ATTRIBUTE_PACKED_0.charAt(i++);
+            do {
+                result[j++] = value;
+            } while (--count > 0);
+        }
+        ZZ_ATTRIBUTE = result;
+    }
 
     /**
      * This character denotes the end of file
      */
-    public static final int YYEOF = -1;
+    private static final int YYEOF = -1;
 
     /**
      * initial size of the lookahead buffer
@@ -36,10 +56,10 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
      * lexical states
      */
     public static final int scan = 8;
-    public static final int YYINITIAL = 0;
+    private static final int YYINITIAL = 0;
     public static final int any = 6;
-    public static final int noun = 4;
-    public static final int verb = 2;
+    private static final int noun = 4;
+    private static final int verb = 2;
 
     /**
      * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l
@@ -66,95 +86,85 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
     /**
      * Translates characters to character classes
      */
-    private static final char[] ZZ_CMAP = zzUnpackCMap(ZZ_CMAP_PACKED);
+    private static final char[] ZZ_CMAP = zzUnpackCMap();
 
     /**
      * Translates DFA states to action switch labels.
      */
-    private static final int[] ZZ_ACTION = zzUnpackAction();
+    private static final int[] ZZ_ACTION;
 
-    private static int[] zzUnpackAction() {
+    static {
         int[] result = new int[13383];
-        int offset = 0;
-        offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
-        return result;
-    }
-
-    private static int zzUnpackAction(String packed, int offset, int[] result) {
         int i = 0;       /* index in packed string  */
 
-        int j = offset;  /* index in unpacked array */
+        int j = 0;  /* index in unpacked array */
 
-        int l = packed.length();
+        int l = ZZ0.ZZ_ACTION_PACKED_0.length();
         while (i < l) {
-            int count = packed.charAt(i++);
-            int value = packed.charAt(i++);
+            int count = ZZ0.ZZ_ACTION_PACKED_0.charAt(i++);
+            int value = ZZ0.ZZ_ACTION_PACKED_0.charAt(i++);
             do {
                 result[j++] = value;
             } while (--count > 0);
         }
-        return j;
+        ZZ_ACTION = result;
     }
 
     /**
      * Translates a state to a row index in the transition table
      */
-    private static final int[] ZZ_ROWMAP = zzUnpackRowMap();
+    private static final int[] ZZ_ROWMAP;
 
-    private static int[] zzUnpackRowMap() {
+    static {
         int[] result = new int[13383];
         int offset = 0;
-        offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
-        return result;
-    }
-
-    private static int zzUnpackRowMap(String packed, int offset, int[] result) {
         int i = 0;  /* index in packed string  */
 
         int j = offset;  /* index in unpacked array */
 
-        int l = packed.length();
+        int l = ZZ0.ZZ_ROWMAP_PACKED_0.length();
         while (i < l) {
-            int high = packed.charAt(i++) << 16;
-            result[j++] = high | packed.charAt(i++);
+            int high = (int) ZZ0.ZZ_ROWMAP_PACKED_0.charAt(i++) << 16;
+            result[j++] = high | (int) ZZ0.ZZ_ROWMAP_PACKED_0.charAt(i++);
         }
-        return j;
+
+        ZZ_ROWMAP = result;
     }
 
     /**
      * The transition table of the DFA
      */
-    private static final int[] ZZ_TRANS = zzUnpackTrans();
+    private static final int[] ZZ_TRANS;
 
-    private static int[] zzUnpackTrans() {
+    static {
         int[] result = new int[455729];
         int offset = 0;
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_1, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_2, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_3, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_4, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_5, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_6, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_7, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_8, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_9, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_10, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_11, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_12, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_13, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_14, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_15, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_16, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_17, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_18, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_19, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_20, offset, result);
-        offset = zzUnpackTrans(ZZ_TRANS_PACKED_21, offset, result);
-        return result;
+        offset = zzUnpackTrans(ZZ1.ZZ_TRANS_PACKED_0, offset, result);
+        offset = zzUnpackTrans(ZZ1.ZZ_TRANS_PACKED_1, offset, result);
+        offset = zzUnpackTrans(ZZ2.ZZ_TRANS_PACKED_2, offset, result);
+        offset = zzUnpackTrans(ZZ3.ZZ_TRANS_PACKED_3, offset, result);
+        offset = zzUnpackTrans(ZZ4.ZZ_TRANS_PACKED_4, offset, result);
+        offset = zzUnpackTrans(ZZ5.ZZ_TRANS_PACKED_5, offset, result);
+        offset = zzUnpackTrans(ZZ6.ZZ_TRANS_PACKED_6, offset, result);
+        offset = zzUnpackTrans(ZZ7.ZZ_TRANS_PACKED_7, offset, result);
+        offset = zzUnpackTrans(ZZ8.ZZ_TRANS_PACKED_8, offset, result);
+        offset = zzUnpackTrans(ZZ9.ZZ_TRANS_PACKED_9, offset, result);
+        offset = zzUnpackTrans(ZZ10.ZZ_TRANS_PACKED_10, offset, result);
+        offset = zzUnpackTrans(ZZ11.ZZ_TRANS_PACKED_11, offset, result);
+        offset = zzUnpackTrans(ZZ12.ZZ_TRANS_PACKED_12, offset, result);
+        offset = zzUnpackTrans(ZZ13.ZZ_TRANS_PACKED_13, offset, result);
+        offset = zzUnpackTrans(ZZ14.ZZ_TRANS_PACKED_14, offset, result);
+        offset = zzUnpackTrans(ZZ15.ZZ_TRANS_PACKED_15, offset, result);
+        offset = zzUnpackTrans(ZZ16.ZZ_TRANS_PACKED_16, offset, result);
+        offset = zzUnpackTrans(ZZ17.ZZ_TRANS_PACKED_17, offset, result);
+        offset = zzUnpackTrans(ZZ18.ZZ_TRANS_PACKED_18, offset, result);
+        offset = zzUnpackTrans(ZZ19.ZZ_TRANS_PACKED_19, offset, result);
+        offset = zzUnpackTrans(ZZ20.ZZ_TRANS_PACKED_20, offset, result);
+        offset = zzUnpackTrans(ZZ21.ZZ_TRANS_PACKED_21, offset, result);
+        ZZ_TRANS = result;
     }
 
-    private static int zzUnpackTrans(String packed, int offset, int[] result) {
+    private static int zzUnpackTrans(CharSequence packed, int offset, int... result) {
         int i = 0;       /* index in packed string  */
 
         int j = offset;  /* index in unpacked array */
@@ -164,56 +174,28 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
             int count = packed.charAt(i++);
             int value = packed.charAt(i++);
             value--;
-            do {
-                result[j++] = value;
-            } while (--count > 0);
+            do result[j++] = value; while (--count > 0);
         }
         return j;
     }
 
 
-    /* error codes */    private static final int ZZ_UNKNOWN_ERROR = 0;
+    /* error codes */
+    private static final int ZZ_UNKNOWN_ERROR = 0;
     private static final int ZZ_NO_MATCH = 1;
     private static final int ZZ_PUSHBACK_2BIG = 2;
 
-    /* error messages for the codes above */    private static final String ZZ_ERROR_MSG[] = {
+    /* error messages for the codes above */
+    private static final String ZZ_ERROR_MSG[] = {
         "Unkown internal scanner error",
         "Error: could not match input",
         "Error: pushback value was too large"
     };
 
-    private static int[] zzUnpackAttribute() {
-        int[] result = new int[13383];
-        int offset = 0;
-        offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
-        return result;
-    }
-
-    private static int zzUnpackAttribute(String packed, int offset, int[] result) {
-        int i = 0;       /* index in packed string  */
-
-        int j = offset;  /* index in unpacked array */
-
-        int l = packed.length();
-        while (i < l) {
-            int count = packed.charAt(i++);
-            int value = packed.charAt(i++);
-            do {
-                result[j++] = value;
-            } while (--count > 0);
-        }
-        return j;
-    }
-
     /**
      * the input device
      */
     private java.io.Reader zzReader;
-
-    /**
-     * the current state of the DFA
-     */
-    private int zzState;
 
     /**
      * the current lexical state
@@ -248,35 +230,9 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
     private int zzEndRead;
 
     /**
-     * number of newlines encountered up to the start of the matched text
-     */
-    private int yyline;
-
-    /**
-     * the number of characters up to the start of the matched text
-     */
-    private int yychar;
-
-    /**
-     * the number of characters from the last newline up to the start of the
-     * matched text
-     */
-    private int yycolumn;
-
-    /**
-     * zzAtBOL == true <=> the scanner is currently at the beginning of a line
-     */
-    private boolean zzAtBOL = true;
-
-    /**
      * zzAtEOF == true <=> the scanner is at the EOF
      */
     private boolean zzAtEOF;
-
-    /**
-     * denotes if the user-EOF-code has already been executed
-     */
-    private boolean zzEOFDone;
 
     /**
      * For the backwards DFA of general lookahead statements
@@ -360,21 +316,15 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
     /**
      * Loads a list of words from the array and stores them in a HashSet.
      */
-    private Set<String> loadVerbStemSet(String[] verbStems) {
-        Set<String> set = Generics.newHashSet(verbStems.length);
-        for (String stem : verbStems) {
-            set.add(stem);
-        }
+    private static Set<String> loadVerbStemSet() {
+        Set<String> set = Generics.newHashSet(VERBSTEMS.verbStems.length);
+        Collections.addAll(set, VERBSTEMS.verbStems);
         return set;
     }
 
-    String condub_stem(int del, String add, String affix) {
+    String condub_stem(int del, String affix) {
         StringBuilder yytextBuff;
-        if (option(change_case)) {
-            yytextBuff = new StringBuilder(yytext().toLowerCase());
-        } else {
-            yytextBuff = new StringBuilder(yytext());
-        }
+        yytextBuff = option(change_case) ? new StringBuilder(yytext().toLowerCase()) : new StringBuilder(yytext());
 
         int stem_length = yylength() - del;
         char d = yytextBuff.charAt(stem_length - 1);
@@ -428,12 +378,12 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
         if (option(change_case)) {
             result = result.toLowerCase();
         }
-        if (!(add.length() == 0)) {
+        if (add.length() != 0) {
             result += add;
         }
 
         if (option(print_affixes)) {
-            result += ("+" + affix);
+            result += ('+' + affix);
         }
 
         return result;
@@ -468,7 +418,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
 
         result += add;
         if (option(print_affixes)) {
-            result += "+" + affix;
+            result += '+' + affix;
         }
 
         return result;
@@ -486,7 +436,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
             options[j] = true;
         }
         options[0] = false;
-        verbStemSet = loadVerbStemSet(verbStems);
+        verbStemSet = loadVerbStemSet();
         if (noTags) {
             yybegin(any);
         } else {
@@ -508,18 +458,17 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
     /**
      * Unpacks the compressed character translation table.
      *
-     * @param packed the packed character translation table
      * @return the unpacked character translation table
      */
-    private static char[] zzUnpackCMap(String packed) {
+    private static char[] zzUnpackCMap() {
         char[] map = new char[0x10000];
         int i = 0;  /* index in packed string  */
 
         int j = 0;  /* index in unpacked array */
 
         while (i < 156) {
-            int count = packed.charAt(i++);
-            char value = packed.charAt(i++);
+            int count = Morpha.ZZ_CMAP_PACKED.charAt(i++);
+            char value = Morpha.ZZ_CMAP_PACKED.charAt(i++);
             do {
                 map[j++] = value;
             } while (--count > 0);
@@ -547,9 +496,10 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
             zzStartRead = 0;
         }
 
-        /* is the buffer big enough? */        if (zzCurrentPos >= zzBuffer.length) {
+        /* is the buffer big enough? */
+        if (zzCurrentPos >= zzBuffer.length) {
             /* if not: blow it up */
-            char newBuffer[] = new char[zzCurrentPos * 2];
+            char newBuffer[] = new char[(zzCurrentPos << 1)];
             System.arraycopy(zzBuffer, 0, newBuffer, 0, zzBuffer.length);
             zzBuffer = newBuffer;
         }
@@ -577,19 +527,6 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
     }
 
     /**
-     * Closes the input stream.
-     */
-    public final void yyclose() throws java.io.IOException {
-        zzAtEOF = true;            /* indicate end of file */
-
-        zzEndRead = zzStartRead;  /* invalidate buffer    */
-
-        if (zzReader != null) {
-            zzReader.close();
-        }
-    }
-
-    /**
      * Resets the scanner to read from a new input stream. Does not close the
      * old reader.
      *
@@ -599,22 +536,26 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
      *
      * @param reader the new input stream
      */
-    public final void yyreset(java.io.Reader reader) {
+    public void yyreset(java.io.Reader reader) {
         zzReader = reader;
-        zzAtBOL = true;
+        /*
+      zzAtBOL == true <=> the scanner is currently at the beginning of a line
+     */
         zzAtEOF = false;
-        zzEOFDone = false;
+        /*
+      denotes if the user-EOF-code has already been executed
+     */
+        boolean zzEOFDone = false;
         zzEndRead = zzStartRead = 0;
         zzCurrentPos = zzMarkedPos = 0;
-        yyline = yychar = yycolumn = 0;
-        zzLexicalState = YYINITIAL;
-    }
-
-    /**
-     * Returns the current lexical state.
+        /*
+      number of newlines encountered up to the start of the matched text
      */
-    public final int yystate() {
-        return zzLexicalState;
+        /*
+      the number of characters from the last newline up to the start of the
+      matched text
+     */
+        zzLexicalState = YYINITIAL;
     }
 
     /**
@@ -622,35 +563,21 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
      *
      * @param newState the new lexical state
      */
-    public final void yybegin(int newState) {
+    public void yybegin(int newState) {
         zzLexicalState = newState;
     }
 
     /**
      * Returns the text matched by the current regular expression.
      */
-    public final String yytext() {
+    String yytext() {
         return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
-    }
-
-    /**
-     * Returns the character at position <tt>pos</tt> from the matched text.
-     *
-     * It is equivalent to yytext().charAt(pos), but faster
-     *
-     * @param pos the position of the character to fetch. A value from 0 to
-     * yylength()-1.
-     *
-     * @return the character at position pos
-     */
-    public final char yycharat(int pos) {
-        return zzBuffer[zzStartRead + pos];
     }
 
     /**
      * Returns the length of the matched text region.
      */
-    public final int yylength() {
+    int yylength() {
         return zzMarkedPos - zzStartRead;
     }
 
@@ -667,7 +594,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
      *
      * @param errorCode the code of the errormessage to display
      */
-    private void zzScanError(int errorCode) {
+    private static void zzScanError(int errorCode) {
         String message;
         try {
             message = ZZ_ERROR_MSG[errorCode];
@@ -686,7 +613,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
      * @param number the number of characters to be read again. This number must
      * not be greater than yylength()!
      */
-    public void yypushback(int number) {
+    void yypushback(int number) {
         if (number > yylength()) {
             zzScanError(ZZ_PUSHBACK_2BIG);
         }
@@ -702,12 +629,8 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
      * @exception java.io.IOException if any I/O-Error occurs
      */
     public String next() throws java.io.IOException {
-        int zzInput;
-        int zzAction;
 
         // cached fields:
-        int zzCurrentPosL;
-        int zzMarkedPosL;
         int zzEndReadL = zzEndRead;
         char[] zzBufferL = zzBuffer;
         char[] zzCMapL = ZZ_CMAP;
@@ -717,14 +640,18 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
         int[] zzAttrL = ZZ_ATTRIBUTE;
 
         while (true) {
-            zzMarkedPosL = zzMarkedPos;
+            int zzMarkedPosL = zzMarkedPos;
 
-            zzAction = -1;
+            int zzAction = -1;
 
-            zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
+            int zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
 
-            zzState = ZZ_LEXSTATE[zzLexicalState];
+            /*
+      the current state of the DFA
+     */
+            int zzState = ZZ_LEXSTATE[zzLexicalState];
 
+            int zzInput;
             zzForAction:
             {
                 while (true) {
@@ -751,7 +678,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
                             zzInput = zzBufferL[zzCurrentPosL++];
                         }
                     }
-                    int zzNext = zzTransL[ zzRowMapL[zzState] + zzCMapL[zzInput]];
+                    int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
                     if (zzNext == -1) {
                         break zzForAction;
                     }
@@ -1093,18 +1020,18 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
                     break;
                 case 131: // general lookahead, find correct zzMarkedPos
                 {
-                    int zzFState = 5;
                     int zzFPos = zzStartRead;
                     if (zzFin.length <= zzBufferL.length) {
                         zzFin = new boolean[zzBufferL.length + 1];
                     }
                     boolean zzFinL[] = zzFin;
+                    int zzFState = 5;
                     while (zzFState != -1 && zzFPos < zzMarkedPos) {
                         if ((zzAttrL[zzFState] & 1) == 1) {
                             zzFinL[zzFPos] = true;
                         }
                         zzInput = zzBufferL[zzFPos++];
-                        zzFState = zzTransL[ zzRowMapL[zzFState] + zzCMapL[zzInput]];
+                        zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
                     }
                     if (zzFState != -1 && (zzAttrL[zzFState] & 1) == 1) {
                         zzFinL[zzFPos] = true;
@@ -1114,7 +1041,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
                     zzFPos = zzMarkedPos;
                     while (!zzFinL[zzFPos] || (zzAttrL[zzFState] & 1) != 1) {
                         zzInput = zzBufferL[--zzFPos];
-                        zzFState = zzTransL[ zzRowMapL[zzFState] + zzCMapL[zzInput]];
+                        zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
                     };
                     zzMarkedPos = zzFPos;
                 } {
@@ -1191,18 +1118,18 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
                     break;
                 case 130: // general lookahead, find correct zzMarkedPos
                 {
-                    int zzFState = 5;
                     int zzFPos = zzStartRead;
                     if (zzFin.length <= zzBufferL.length) {
                         zzFin = new boolean[zzBufferL.length + 1];
                     }
                     boolean zzFinL[] = zzFin;
+                    int zzFState = 5;
                     while (zzFState != -1 && zzFPos < zzMarkedPos) {
                         if ((zzAttrL[zzFState] & 1) == 1) {
                             zzFinL[zzFPos] = true;
                         }
                         zzInput = zzBufferL[zzFPos++];
-                        zzFState = zzTransL[ zzRowMapL[zzFState] + zzCMapL[zzInput]];
+                        zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
                     }
                     if (zzFState != -1 && (zzAttrL[zzFState] & 1) == 1) {
                         zzFinL[zzFPos] = true;
@@ -1212,7 +1139,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
                     zzFPos = zzMarkedPos;
                     while (!zzFinL[zzFPos] || (zzAttrL[zzFState] & 1) != 1) {
                         zzInput = zzBufferL[--zzFPos];
-                        zzFState = zzTransL[ zzRowMapL[zzFState] + zzCMapL[zzInput]];
+                        zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
                     };
                     zzMarkedPos = zzFPos;
                 } {
@@ -1561,11 +1488,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
                 case 3: { // The first word isn't stemmed separately, but the second half can be
                     String stem = common_noun_stem();
                     String n = next();
-                    if (n == null) {
-                        return stem;
-                    } else {
-                        return stem.concat(n);
-                    }
+                    return n == null ? stem : stem.concat(n);
                 }
                 case 513:
                     break;
@@ -2471,7 +2394,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
                 case 688:
                     break;
                 case 264: {
-                    return (condub_stem(3, "", "ing"));
+                    return (condub_stem(3, "ing"));
                 }
                 case 689:
                     break;
@@ -2757,7 +2680,7 @@ public class Morpha implements ZZ0, ZZ1, ZZ2, ZZ3, ZZ4, ZZ5, ZZ6, ZZ7, ZZ8, ZZ9,
                 case 743:
                     break;
                 case 211: {
-                    return (condub_stem(2, "", "ed"));
+                    return (condub_stem(2, "ed"));
                 }
                 case 744:
                     break;
