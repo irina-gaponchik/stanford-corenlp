@@ -19,7 +19,7 @@ import edu.stanford.nlp.util.Factory;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.MapFactory;
-import edu.stanford.nlp.util.MutableInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
 
@@ -43,7 +43,7 @@ import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
 public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
 
   @SuppressWarnings("NonSerializableFieldInSerializableClass")
-  private Map<E, MutableInteger>  map;
+  private Map<E, AtomicInteger>  map;
   private MapFactory mapFactory;
   private int totalCount;
   private int defaultValue; // = 0;
@@ -60,13 +60,13 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    * Constructs a new (empty) Counter.
    */
   public IntCounter() {
-    this(MapFactory.<E,MutableInteger>hashMapFactory());
+    this(MapFactory.<E,AtomicInteger>hashMapFactory());
   }
 
   /**
    * Pass in a MapFactory and the map it vends will back your counter.
    */
-  public IntCounter(MapFactory<E,MutableInteger> mapFactory) {
+  public IntCounter(MapFactory<E,AtomicInteger> mapFactory) {
     this.mapFactory = mapFactory;
     map = mapFactory.newMap();
     totalCount = 0;
@@ -82,8 +82,8 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
 
 
   // STANDARD ACCESS MODIFICATION METHODS
-  public MapFactory<E, MutableInteger> getMapFactory() {
-    return ErasureUtils.<MapFactory<E,MutableInteger>>uncheckedCast(mapFactory);
+  public MapFactory<E, AtomicInteger> getMapFactory() {
+    return ErasureUtils.<MapFactory<E,AtomicInteger>>uncheckedCast(mapFactory);
   }
 
   public void setDefaultReturnValue(double rv) {
@@ -163,7 +163,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    * and extracts the primitive value.
    */
   public int getIntCount(Object key) {
-    MutableInteger count =  map.get(key);
+    AtomicInteger count =  map.get(key);
     if (count == null) {
       return defaultValue; // haven't seen this object before -> 0 count
     }
@@ -187,7 +187,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    */
   public void setCount(E key, int count) {
     if (tempMInteger == null) {
-      tempMInteger = new MutableInteger();
+      tempMInteger = new AtomicInteger();
     }
     tempMInteger.set(count);
     tempMInteger = map.put(key, tempMInteger);
@@ -205,7 +205,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   }
 
   // for more efficient memory usage
-  private transient MutableInteger tempMInteger;
+  private transient AtomicInteger tempMInteger;
 
   /**
    * Sets the current count for each of the given keys. This will wipe out
@@ -234,10 +234,10 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    */
   public int incrementCount(E key, int count) {
     if (tempMInteger == null) {
-      tempMInteger = new MutableInteger();
+      tempMInteger = new AtomicInteger();
     }
 
-    MutableInteger oldMInteger = map.put(key, tempMInteger);
+    AtomicInteger oldMInteger = map.put(key, tempMInteger);
     totalCount += count;
     if (oldMInteger != null) {
       count += oldMInteger.intValue();
@@ -395,7 +395,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    */
   public double remove(E key) {
     totalCount -= getCount(key); // subtract removed count from total (may be 0)
-    MutableInteger val = map.remove(key);
+    AtomicInteger val = map.remove(key);
       return val == null ? Double.NaN : val.doubleValue();
   }
 
@@ -436,7 +436,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
       @Override
       public Iterator<Entry<E, Double>> iterator() {
         return new Iterator<Entry<E,Double>>() {
-          final Iterator<Entry<E,MutableInteger>> inner = map.entrySet().iterator();
+          final Iterator<Entry<E,AtomicInteger>> inner = map.entrySet().iterator();
 
           public boolean hasNext() {
             return inner.hasNext();
@@ -444,7 +444,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
 
           public Entry<E, Double> next() {
             return new Map.Entry<E,Double>() {
-              final Entry<E,MutableInteger> e = inner.next();
+              final Entry<E,AtomicInteger> e = inner.next();
 
               public E getKey() {
                 return e.getKey();
@@ -513,7 +513,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
     }
     for (Iterator<E> iter = list.iterator(); iter.hasNext();) {
       Object key = iter.next();
-      MutableInteger d = map.get(key);
+      AtomicInteger d = map.get(key);
       sb.append(key).append(keyValSeparator);
       sb.append(nf.format(d));
       if (iter.hasNext()) {
@@ -535,7 +535,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
     }
     for (Iterator<E> iter = list.iterator(); iter.hasNext();) {
       Object key = iter.next();
-      MutableInteger d = map.get(key);
+      AtomicInteger d = map.get(key);
       sb.append(key).append('=');
       sb.append(nf.format(d));
       if (iter.hasNext()) {
@@ -751,7 +751,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
       @Override
       public Iterator<Double> iterator() {
         return new Iterator<Double>() {
-          Iterator<MutableInteger> inner = map.values().iterator();
+          Iterator<AtomicInteger> inner = map.values().iterator();
 
           public boolean hasNext() {
             return inner.hasNext();

@@ -418,7 +418,7 @@ public class TestSentence implements SequenceModel {
     for (Pair<Integer,Extractor> e : extractors) {
       int kf = e.first();
       Extractor ex = e.second();
-      String val = ex.extract(h);
+      CharSequence val = ex.extract(h);
       int[] fAssociations = maxentTagger.fAssociations.get(kf).get(val);
       if (fAssociations != null) {
         for (int i = 0; i < maxentTagger.ySize; i++) {
@@ -433,7 +433,7 @@ public class TestSentence implements SequenceModel {
       for (Pair<Integer,Extractor> e : extractorsRare) {
         int kf = e.first();
         Extractor ex = e.second();
-        String val = ex.extract(h);
+        CharSequence val = ex.extract(h);
         int[] fAssociations = maxentTagger.fAssociations.get(kf+szCommon).get(val);
         if (fAssociations != null) {
           for (int i = 0; i < maxentTagger.ySize; i++) {
@@ -457,7 +457,7 @@ public class TestSentence implements SequenceModel {
     for (Pair<Integer,Extractor> e : extractors) {
       int kf = e.first();
       Extractor ex = e.second();
-      String val = ex.extract(h);
+      CharSequence val = ex.extract(h);
       int[] fAssociations = maxentTagger.fAssociations.get(kf).get(val);
       if (fAssociations != null) {
         for (int j = 0; j < tags.length; j++) {
@@ -474,7 +474,7 @@ public class TestSentence implements SequenceModel {
       for (Pair<Integer,Extractor> e : extractorsRare) {
         int kf = e.first();
         Extractor ex = e.second();
-        String val = ex.extract(h);
+        CharSequence val = ex.extract(h);
         int[] fAssociations = maxentTagger.fAssociations.get(szCommon+kf).get(val);
         if (fAssociations != null) {
           for (int j = 0; j < tags.length; j++) {

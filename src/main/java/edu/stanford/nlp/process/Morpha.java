@@ -2,6 +2,7 @@
 
 package edu.stanford.nlp.process;
 
+import java.nio.CharBuffer;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -35,9 +36,7 @@ public class Morpha {
         while (i < l) {
             int count = ZZ21.ZZ_ATTRIBUTE_PACKED_0.charAt(i++);
             int value = ZZ21.ZZ_ATTRIBUTE_PACKED_0.charAt(i++);
-            do {
-                result[j++] = value;
-            } while (--count > 0);
+            do result[j++] = value; while (--count > 0);
         }
         ZZ_ATTRIBUTE = result;
     }
@@ -73,7 +72,7 @@ public class Morpha {
     /**
      * Translates characters to character classes
      */
-    private static final String ZZ_CMAP_PACKED =
+    private static final CharSequence ZZ_CMAP_PACKED =
             "\11\0\1\35\1\35\3\35\22\0\1\35\3\0\1\41\2\0\1\37"
             + "\3\0\1\1\1\0\1\34\1\40\1\0\12\1\7\0\1\43\1\5"
             + "\1\6\1\42\1\30\1\10\1\11\1\12\1\31\1\13\1\14\1\15"
@@ -186,7 +185,7 @@ public class Morpha {
     private static final int ZZ_PUSHBACK_2BIG = 2;
 
     /* error messages for the codes above */
-    private static final String ZZ_ERROR_MSG[] = {
+    private static final CharSequence ZZ_ERROR_MSG[] = {
         "Unkown internal scanner error",
         "Error: could not match input",
         "Error: pushback value was too large"
@@ -275,28 +274,24 @@ public class Morpha {
     private final static boolean noTags = false;
 
    
-    private final Set<String> verbStemSet;
+    private final Set<CharSequence> verbStemSet;
 
-    String ynull_stem() {
+    CharSequence ynull_stem() {
         return common_noun_stem();
     }
 
-    private String common_noun_stem() {
-        String lower = yytext();
-        if (option(change_case)) {
-            lower = lower.toLowerCase();
-        }
-        return lower;
+    private CharSequence common_noun_stem() {
+        return changeCase() ? yytext().toString().toLowerCase() : yytext();
     }
 
-    private String proper_name_stem() {
+    private CharSequence proper_name_stem() {
         return yytext();
     }
 
     /**
      * Capitalizes the first letter and lower-cases every consecutive letter.
      */
-    private static String capitalise(String s) {
+    private static CharSequence capitalise(CharSequence s) {
         if (s.length() == 0) {
             return s;
         }
@@ -316,52 +311,43 @@ public class Morpha {
     /**
      * Loads a list of words from the array and stores them in a HashSet.
      */
-    private static Set<String> loadVerbStemSet() {
-        Set<String> set = Generics.newHashSet(VERBSTEMS.verbStems.length);
+    private static Set<CharSequence> loadVerbStemSet() {
+        Set<CharSequence> set = Generics.<CharSequence>newHashSet(VERBSTEMS.verbStems.length);
         Collections.addAll(set, VERBSTEMS.verbStems);
         return set;
     }
 
-    String condub_stem(int del, String affix) {
-        StringBuilder yytextBuff;
-        yytextBuff = option(change_case) ? new StringBuilder(yytext().toLowerCase()) : new StringBuilder(yytext());
-
+    CharSequence condub_stem(int del, CharSequence affix) {
+        StringBuilder yytextBuff = changeCase() ? new StringBuilder(yytext().toString().toLowerCase()) : new StringBuilder(yytext());
         int stem_length = yylength() - del;
         char d = yytextBuff.charAt(stem_length - 1);
-        if (del > 0) {
-            yytextBuff.setLength(stem_length - 1);
-        }
+        if (del > 0) yytextBuff.setLength(stem_length - 1);
+        if (!verbStemSet.contains(yytextBuff.toString().toLowerCase())) yytextBuff.append(d);
+        return option(print_affixes) ? yytextBuff.append('+').append(affix) : yytextBuff;
+    }
 
-        if (!verbStemSet.contains(yytextBuff.toString().toLowerCase())) {
-            yytextBuff.append(d);
-        }
-
-        if (option(print_affixes)) {
-            yytextBuff.append('+');
-            yytextBuff.append(affix);
-        }
-
-        return yytextBuff.toString();
+    private boolean changeCase() {
+        return option(change_case);
     }
 
     /**
      * word is a singular- or plural-only noun.
      */
-    String xnull_stem() {
+    CharSequence xnull_stem() {
         return common_noun_stem();
     }
 
     /**
      * this form is actually the stem so don't apply any generic analysis rules.
      */
-    String cnull_stem() {
+    CharSequence cnull_stem() {
         return common_noun_stem();
     }
 
     /**
      * the +ed/+en form is the same as the stem
      */
-    String null_stem() {
+    CharSequence null_stem() {
         return common_noun_stem();
     }
 
@@ -369,56 +355,57 @@ public class Morpha {
      * Delete del letters from end of token, and append string add to give stem.
      * Return affix as the affix of the word.
      */
-    private String stem(int del, String add, String affix) {
+    private CharSequence stem(int del, CharSequence add, CharSequence affix) {
         int stem_length = yylength() - del;
         int i = 0;
 
-        String result = yytext().substring(0, stem_length);
-
-        if (option(change_case)) {
-            result = result.toLowerCase();
-        }
-        if (add.length() != 0) {
-            result += add;
-        }
-
-        if (option(print_affixes)) {
-            result += ('+' + affix);
-        }
-
+        CharSequence result = yytext().subSequence(0, stem_length);
+        if (changeCase()) result = result.toString().toLowerCase();
+        if (add.length() != 0) result = result + add.toString();
+        if (option(print_affixes)) result = result + ("+" + affix);
         return result;
     }
 
-    private String semi_reg_stem(int del, String add) {
+    private CharSequence semi_reg_stem(int del, CharSequence add) {
         int stem_length = 0;
         int i = 0;
-        String affix = "";
+        CharSequence affix = "";
 
-        char[] yytext = yytext().toCharArray();
+        CharSequence yytext = yytext();
         int yyleng = yylength();
 
-        if (yytext[yyleng - 1] == 's' || yytext[yyleng - 1] == 'S') {
-            stem_length = yyleng - 2 - del;
-            affix = "s";
-        }
-        if (yytext[yyleng - 1] == 'd' || yytext[yyleng - 1] == 'D') {
-            stem_length = yyleng - 2 - del;
-            affix = "ed";
-        }
-        if (yytext[yyleng - 1] == 'g' || yytext[yyleng - 1] == 'G') {
-            stem_length = yyleng - 3 - del;
-            affix = "ing";
+        char c = yytext.charAt(yyleng - 1);
+        switch (c) {
+            case 's':
+                break;
+            case 'S':
+                stem_length = yyleng - 2 - del;
+                affix = "s";
+                break;
+            case 'd':
+                break;
+            case 'D':
+                stem_length = yyleng - 2 - del;
+                affix = "ed";
+                break;
+            case 'g':
+                break;
+            case 'G':
+                stem_length = yyleng - 3 - del;
+                affix = "ing";
+                break;
         }
 
-        String result = yytext().substring(0, stem_length);
+        StringBuilder result;
+        {
 
-        if (option(change_case)) {
-            result = result.toLowerCase();
+            CharSequence seq = yytext().subSequence(0, stem_length);
+            result = changeCase() ? new StringBuilder(seq.toString().toLowerCase()) : new StringBuilder(seq);
         }
 
-        result += add;
+        result.append(result).append(add);
         if (option(print_affixes)) {
-            result += '+' + affix;
+            result .append(result).append("+").append(affix).toString();
         }
 
         return result;
@@ -570,8 +557,8 @@ public class Morpha {
     /**
      * Returns the text matched by the current regular expression.
      */
-    String yytext() {
-        return new String(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
+    CharSequence yytext() {
+    return     CharBuffer.wrap(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
     }
 
     /**
@@ -595,14 +582,14 @@ public class Morpha {
      * @param errorCode the code of the errormessage to display
      */
     private static void zzScanError(int errorCode) {
-        String message;
+        CharSequence message;
         try {
             message = ZZ_ERROR_MSG[errorCode];
         } catch (ArrayIndexOutOfBoundsException e) {
             message = ZZ_ERROR_MSG[ZZ_UNKNOWN_ERROR];
         }
 
-        throw new Error(message);
+        throw new Error(message.toString());
     }
 
     /**
@@ -628,7 +615,7 @@ public class Morpha {
      * @return the next token
      * @exception java.io.IOException if any I/O-Error occurs
      */
-    public String next() throws java.io.IOException {
+    public CharSequence next() throws java.io.IOException {
 
         // cached fields:
         int zzEndReadL = zzEndRead;
@@ -656,41 +643,45 @@ public class Morpha {
             {
                 while (true) {
 
-                    if (zzCurrentPosL < zzEndReadL) {
-                        zzInput = zzBufferL[zzCurrentPosL++];
-                    } else if (zzAtEOF) {
-                        zzInput = YYEOF;
-                        break zzForAction;
-                    } else {
-                        // store back cached positions
-                        zzCurrentPos = zzCurrentPosL;
-                        zzMarkedPos = zzMarkedPosL;
-                        boolean eof = zzRefill();
-                        // get translated positions and possibly new buffer
-                        zzCurrentPosL = zzCurrentPos;
-                        zzMarkedPosL = zzMarkedPos;
-                        zzBufferL = zzBuffer;
-                        zzEndReadL = zzEndRead;
-                        if (eof) {
+                    if (zzCurrentPosL >= zzEndReadL) {
+                        if (zzAtEOF) {
                             zzInput = YYEOF;
                             break zzForAction;
                         } else {
-                            zzInput = zzBufferL[zzCurrentPosL++];
+                            // store back cached positions
+                            zzCurrentPos = zzCurrentPosL;
+                            zzMarkedPos = zzMarkedPosL;
+                            boolean eof = zzRefill();
+                            // get translated positions and possibly new buffer
+                            zzCurrentPosL = zzCurrentPos;
+                            zzMarkedPosL = zzMarkedPos;
+                            zzBufferL = zzBuffer;
+                            zzEndReadL = zzEndRead;
+                            if (!eof) {
+                                zzInput = zzBufferL[zzCurrentPosL++];
+                            } else {
+                                zzInput = YYEOF;
+                                break zzForAction;
+                            }
                         }
-                    }
+                    } else zzInput = zzBufferL[zzCurrentPosL++];
                     int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
-                    if (zzNext == -1) {
-                        break zzForAction;
+                    switch (zzNext) {
+                        case -1:
+                            break zzForAction;
                     }
                     zzState = zzNext;
 
                     int zzAttributes = zzAttrL[zzState];
-                    if ((zzAttributes & 1) == 1) {
-                        zzAction = zzState;
-                        zzMarkedPosL = zzCurrentPosL;
-                        if ((zzAttributes & 8) == 8) {
-                            break zzForAction;
-                        }
+                    switch ((zzAttributes & 1)) {
+                        case 1:
+                            zzAction = zzState;
+                            zzMarkedPosL = zzCurrentPosL;
+                            switch ((zzAttributes & 8)) {
+                                case 8:
+                                    break zzForAction;
+                            }
+                            break;
                     }
 
                 }
@@ -741,6 +732,7 @@ public class Morpha {
                         return yytext();
                     }
                 }
+                break;
                 case 380:
                     break;
                 case 11: {
@@ -1107,7 +1099,7 @@ public class Morpha {
                 case 445:
                     break;
                 case 225: {
-                    return (stem(4, "eeze", "en"));
+                    return stem(4, "eeze", "en");
                 }
                 case 446:
                     break;
@@ -1486,9 +1478,9 @@ public class Morpha {
                 case 512:
                     break;
                 case 3: { // The first word isn't stemmed separately, but the second half can be
-                    String stem = common_noun_stem();
-                    String n = next();
-                    return n == null ? stem : stem.concat(n);
+                    CharSequence stem = common_noun_stem();
+                    CharSequence n = next();
+                    return n == null ? stem : stem+(n.toString());
                 }
                 case 513:
                     break;
@@ -2471,11 +2463,11 @@ public class Morpha {
                 case 703:
                     break;
                 case 2: {
-                    String str = yytext();
+                    CharSequence str = yytext();
                     int first = str.charAt(0);
-                    String msg = String.format("Untokenizable: %s (U+%s, decimal: %s) - this may be because your text isn't using _ as a tag delimiter", yytext(), Integer.toHexString(first).toUpperCase(), Integer.toString(first));
-                    LOGGER.warning(msg);
+                    LOGGER.warning(String.format("Untokenizable: %s (U+%s, decimal: %s) - this may be because your text isn't using _ as a tag delimiter", yytext(), Integer.toHexString(first).toUpperCase(), Integer.toString(first)).toString());
                 }
+                break;
                 case 704:
                     break;
                 case 294: {

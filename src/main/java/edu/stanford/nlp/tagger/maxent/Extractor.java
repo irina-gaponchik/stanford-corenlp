@@ -8,7 +8,7 @@
 package edu.stanford.nlp.tagger.maxent;
 
 import java.io.Serializable;
-
+import java.util.regex.Pattern;
 
 
 /**
@@ -54,8 +54,9 @@ public class Extractor implements Serializable {
   private static final long serialVersionUID = -4694133872973560083L;
 
   static final String zeroSt = "0";
+    public static final Pattern COMPILE1 = Pattern.compile("\\s*[,()]\\s*");
 
-  final int position;
+    final int position;
   private final boolean isTag;
 
   public Extractor() {
@@ -146,10 +147,11 @@ public class Extractor implements Serializable {
   /** Subclasses should only override the two argument version
    *  of this method.
    *
-   *  @param h The history to extract from
+   *
+   * @param h The history to extract from
    *  @return The feature value
    */
-  final String extract(History h) {
+  final CharSequence extract(History h) {
     return extract(h, h.pairs);
   }
 
@@ -169,7 +171,7 @@ public class Extractor implements Serializable {
     return !isTag && position == 0;
   }
 
-  String extract(History h, PairsHolder pH) {
+  CharSequence extract(History h, PairsHolder pH) {
     return isTag ? pH.getTag(h, position) : pH.getWord(h, position);
   }
 
@@ -216,7 +218,7 @@ public class Extractor implements Serializable {
 
   // By default the bound is ignored, but a few subclasses make use of it.
   @SuppressWarnings("UnusedDeclaration")
-  String extract(History h, PairsHolder pH, int bound) {
+  CharSequence extract(History h, PairsHolder pH, int bound) {
     return extract(h, pH);
   }
 
@@ -240,7 +242,7 @@ public class Extractor implements Serializable {
    *  @return The parenthesized String, or null if none.
    */
   static String getParenthesizedArg(String str, int num) {
-    String[] args = str.split("\\s*[,()]\\s*");
+    String[] args = COMPILE1.split(str);
     if (args.length <= num) {
       return null;
     }
@@ -260,7 +262,7 @@ public class Extractor implements Serializable {
    *  @return The int value of the arg or 0 if missing or empty
    */
   static int getParenthesizedNum(String str, int num) {
-    String[] args = str.split("\\s*[,()]\\s*");
+    String[] args = COMPILE1.split(str);
     int ans = 0;
     try {
       ans = Integer.parseInt(args[num]);

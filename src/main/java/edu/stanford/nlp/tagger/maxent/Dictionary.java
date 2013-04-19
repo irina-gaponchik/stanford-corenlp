@@ -7,7 +7,6 @@
 package edu.stanford.nlp.tagger.maxent;
 
 import edu.stanford.nlp.io.InDataStreamFile;
-import edu.stanford.nlp.io.OutDataStreamFile;
 import edu.stanford.nlp.stats.IntCounter;
 import edu.stanford.nlp.util.Generics;
 
@@ -114,13 +113,13 @@ public class Dictionary {
   }
 
 
-  protected int getCount(String word, String tag) {
+  protected int getCount(CharSequence word, String tag) {
     TagCount count = dict.get(word);
       return count == null ? 0 : count.get(tag);
   }
 
 
-  protected String[] getTags(String word) {
+  protected String[] getTags(CharSequence word) {
     TagCount count = get(word);
     if (count == null) {
       return null;
@@ -129,7 +128,7 @@ public class Dictionary {
   }
 
 
-  protected TagCount get(String word) {
+  protected TagCount get(CharSequence word) {
     return dict.get(word);
   }
 
@@ -143,7 +142,7 @@ public class Dictionary {
   }
 
 
-  protected int sum(String word) {
+  protected int sum(CharSequence word) {
     TagCount count = dict.get(word);
     if (count != null) {
       return count.sum();

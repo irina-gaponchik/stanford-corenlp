@@ -12,7 +12,7 @@ import java.util.Set;
 
 import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Generics;
-import edu.stanford.nlp.util.MutableDouble;
+
 
 /**
  * A class for keeping double counts of {@link List}s of a
@@ -82,8 +82,8 @@ public class GeneralizedCounter<K> implements Serializable {
           System.arraycopy(key, 0, newKey, 0, key.length);
         }
         newKey[key.length] = finalKey;
-        MutableDouble value = (MutableDouble) map.get(finalKey);
-        Double value1 = value.doubleValue();
+        double[] value = (double[]) map.get(finalKey);
+        Double value1 = value[0];
         if (useLists) {
           s.add(new Entry<Object,Double>(Arrays.asList(newKey), value1));
         } else {
@@ -510,7 +510,7 @@ public class GeneralizedCounter<K> implements Serializable {
   }
 
   // for more efficient memory usage
-  private transient MutableDouble tempMDouble;
+  private transient double[] tempMDouble;
 
 
   /**
@@ -532,13 +532,13 @@ public class GeneralizedCounter<K> implements Serializable {
     addToTotal(count);
 
     if (tempMDouble == null) {
-      tempMDouble = new MutableDouble();
+      tempMDouble = new double[1];
     }
-    tempMDouble.set(count);
-    MutableDouble oldMDouble = (MutableDouble) map.put(o, tempMDouble);
+    tempMDouble[0]=(count);
+    double[] oldMDouble = (double[]) map.put(o, tempMDouble);
 
     if (oldMDouble != null) {
-      tempMDouble.set(count + oldMDouble.doubleValue());
+      tempMDouble[0]=(count + oldMDouble[0]);
     }
 
     tempMDouble = oldMDouble;

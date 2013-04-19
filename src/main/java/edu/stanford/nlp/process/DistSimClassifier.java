@@ -16,7 +16,7 @@ public class DistSimClassifier implements Serializable {
 
   private static final long serialVersionUID = 3L;
 
-  private final Map<String,String> lexicon;
+  private final Map<CharSequence, String> lexicon;
   private final boolean cased;
   private final boolean numberEquivalence;
   private final String unknownWordClass;
@@ -42,7 +42,7 @@ public class DistSimClassifier implements Serializable {
     lexicon = Generics.newHashMap(1 << 15);  // make a reasonable starting size
     boolean terryKoo = "terryKoo".equals(format);
     for (String line : ObjectBank.getLineIterator(filename, encoding)) {
-      String word;
+      CharSequence word;
       String wordClass;
       if (terryKoo) {
         String[] bits = line.split("\\t");
@@ -58,7 +58,7 @@ public class DistSimClassifier implements Serializable {
         wordClass = bits[1];
       }
       if ( ! cased) {
-        word = word.toLowerCase();
+        word = String.valueOf(word).toLowerCase();
       }
       if (numberEquivalence) {
         word = WordShapeClassifier.wordShape(word, WordShapeClassifier.WORDSHAPEDIGITS);
@@ -69,9 +69,9 @@ public class DistSimClassifier implements Serializable {
   }
 
 
-  public String distSimClass(String word) {
+  public String distSimClass(CharSequence word) {
     if ( ! cased) {
-      word = word.toLowerCase();
+      word = String.valueOf(word).toLowerCase();
     }
     if (numberEquivalence) {
       word = WordShapeClassifier.wordShape(word, WordShapeClassifier.WORDSHAPEDIGITS);

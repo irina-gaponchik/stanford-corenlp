@@ -63,7 +63,7 @@ public class History {
   }
   */
 
-  private String getX(int index) {
+  private CharSequence getX(int index) {
     // get the string by the index in x
     return extractors.get(index).extract(this);
   }
@@ -71,7 +71,7 @@ public class History {
   public String[] getX() {
     String[] x = new String[extractors.getSize()];
     for (int i = 0; i < x.length; i++) {
-      x[i] = getX(i);
+      x[i] = String.valueOf(getX(i));
     }
     return x;
   }

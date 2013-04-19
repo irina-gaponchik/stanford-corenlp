@@ -310,7 +310,7 @@ public class ExtractorFrames {
     }
 
     @Override
-    String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       return pH.getTag(h, position) + '!' + pH.getWord(h, wordPosition);
     }
 
@@ -335,7 +335,7 @@ public class ExtractorFrames {
     }
 
     @Override
-      String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       return pH.getWord(h, position).toLowerCase(Locale.ENGLISH);
     }
 
@@ -350,7 +350,7 @@ public class ExtractorFrames {
     private static final long serialVersionUID = -2393096135964969744L;
 
     @Override
-      String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       String cw = pH.getWord(h, 0);
       String lk = cw.toLowerCase(Locale.ENGLISH);
       if (lk.equals(cw)) {
@@ -393,7 +393,7 @@ public class ExtractorFrames {
     }
 
     @Override
-      String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       // I ran a bunch of timing tests that seem to indicate it is
       // cheaper to simply add string + char + string than use a
       // StringBuilder or go through the StringBuildMemoizer -horatio
@@ -447,7 +447,7 @@ public class ExtractorFrames {
     }
 
     @Override
-    String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       // I ran a bunch of timing tests that seem to indicate it is
       // cheaper to simply add string + char + string than use a
       // StringBuilder or go through the StringBuildMemoizer -horatio
@@ -495,7 +495,7 @@ public class ExtractorFrames {
     }
 
     @Override
-      String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       return pH.getWord(h, leftWord) + '!' + pH.getTag(h, tag) + '!' +
               pH.getWord(h, rightWord);
     }
@@ -526,7 +526,7 @@ public class ExtractorFrames {
     }
 
     @Override
-    String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       StringBuilder sb = new StringBuilder();
       if (position < 0) {
         for (int idx = position; idx < 0; idx++) {
@@ -543,7 +543,7 @@ public class ExtractorFrames {
           sb.append(pH.getTag(h, idx));
         }
       }
-      return sb.toString();
+      return (CharSequence)sb ;
     }
 
   }
@@ -594,7 +594,7 @@ public class ExtractorFrames {
     }
 
     @Override
-      String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       return pH.getTag(h, position1) + '!' + pH.getTag(h, position2) + '!' + pH.getTag(h, position3);
     }
 
@@ -643,7 +643,7 @@ public class ExtractorFrames {
     }
 
     @Override
-      String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       return pH.getTag(h, position1) + '!' + pH.getWord(h, word) + '!' + pH.getTag(h, position2);
     }
 
@@ -693,9 +693,9 @@ class ExtractorWordShapeClassifier extends Extractor {
   }
 
   @Override
-  String extract(History h, PairsHolder pH) {
-    String s = super.extract(h, pH);
-    String shape = WordShapeClassifier.wordShape(s, wordShaper);
+  CharSequence extract(History h, PairsHolder pH) {
+    CharSequence s = super.extract(h, pH);
+    CharSequence shape = WordShapeClassifier.wordShape(s, wordShaper);
     return shape;
   }
 
@@ -731,7 +731,7 @@ class ExtractorWordShapeConjunction extends Extractor {
   }
 
   @Override
-  String extract(History h, PairsHolder pH) {
+  CharSequence extract(History h, PairsHolder pH) {
     StringBuilder sb = new StringBuilder();
     for (int j = left; j <= right; j++) {
       String s = pH.getWord(h, j);

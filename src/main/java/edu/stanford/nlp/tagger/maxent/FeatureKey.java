@@ -26,14 +26,14 @@ public class FeatureKey {
   // this object is used as a hash key and such instances should be treated as read-only
   // TODO: refactor code so that FeatureKeys are immutable? Or is the object reuse in a tight loop worth it?
   int num;
-  String val;
+  CharSequence val;
   String tag;
 
   public FeatureKey() {
   }
 
 
-  protected FeatureKey(int num, String val, String tag) {
+  protected FeatureKey(int num, CharSequence val, String tag) {
     this.num = num;
     this.val = val;
     this.tag = tag;
@@ -47,7 +47,7 @@ public class FeatureKey {
 
   protected void save(DataOutputStream f) throws IOException {
     f.writeInt(num);
-    f.writeUTF(val);
+    f.writeUTF(String.valueOf(val));
     f.writeUTF(tag);
   }
 

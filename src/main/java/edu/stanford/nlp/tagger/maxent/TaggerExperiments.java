@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.Arrays;
 
 
@@ -154,7 +153,7 @@ public class TaggerExperiments extends Experiments {
       for (FeatureKey fK : sTemplates) {
         int numF = fK.num;
         int[] xValues;
-        Pair<Integer, String> wT = new Pair<>(numF, fK.val);
+        Pair<Integer, CharSequence> wT = new Pair<>(numF, fK.val);
         xValues = tFeature.getXValues(wT);
         if (xValues == null) {
           System.err.println("  xValues is null: " + fK.toString()); //  + " " + i
@@ -166,13 +165,13 @@ public class TaggerExperiments extends Experiments {
 
           if (maxentTagger.occurringTagsOnly) {
             //check whether the current word in x has occurred with y
-            String word = ExtractorFrames.cWord.extract(tHistories.getHistory(xValue));
+            CharSequence word = ExtractorFrames.cWord.extract(tHistories.getHistory(xValue));
             if (maxentTagger.dict.getCount(word, fK.tag) == 0) {
               continue;
             }
           }
           if (maxentTagger.possibleTagsOnly) {
-            String word = ExtractorFrames.cWord.extract(tHistories.getHistory(xValue));
+            CharSequence word = ExtractorFrames.cWord.extract(tHistories.getHistory(xValue));
             String[] tags = maxentTagger.dict.getTags(word);
             Set<String> s = Generics.newHashSet(Arrays.asList(maxentTagger.tags.deterministicallyExpandTags(tags)));
             if(DEBUG)
@@ -197,13 +196,13 @@ public class TaggerExperiments extends Experiments {
             for (int x : xValues) {
               if (maxentTagger.occurringTagsOnly) {
                 //check whether the current word in x has occurred with y
-                String word = ExtractorFrames.cWord.extract(tHistories.getHistory(x));
+                CharSequence word = ExtractorFrames.cWord.extract(tHistories.getHistory(x));
                 if (maxentTagger.dict.getCount(word, fK.tag) == 0) {
                   continue;
                 }
               }
               if(maxentTagger.possibleTagsOnly) {
-                String word = ExtractorFrames.cWord.extract(tHistories.getHistory(x));
+                CharSequence word = ExtractorFrames.cWord.extract(tHistories.getHistory(x));
                 String[] tags = maxentTagger.dict.getTags(word);
                 Set<String> s = Generics.newHashSet(Arrays.asList(maxentTagger.tags.deterministicallyExpandTags(tags)));
                 if(!s.contains(fK.tag))
@@ -240,10 +239,10 @@ public class TaggerExperiments extends Experiments {
           // look up the tag # in the index
           if (maxentTagger.fAssociations.size() <= fK.num) {
             for (int i = maxentTagger.fAssociations.size(); i <= fK.num; ++i) {
-              maxentTagger.fAssociations.add(Generics.<String, int[]>newHashMap());
+              maxentTagger.fAssociations.add(Generics.<CharSequence, int[]>newHashMap());
             }
           }
-          Map<String, int[]> fValueAssociations = maxentTagger.fAssociations.get(fK.num);
+          Map<CharSequence, int[]> fValueAssociations = maxentTagger.fAssociations.get(fK.num);
           int[] fTagAssociations = fValueAssociations.get(fK.val);
           if (fTagAssociations == null) {
             fTagAssociations = new int[ySize];
@@ -362,7 +361,7 @@ public class TaggerExperiments extends Experiments {
     // Feature templates general
 
     for (int i = 0; i < numFeatsGeneral; i++) {
-      String s = maxentTagger.extractors.extract(i, h);
+      CharSequence s = maxentTagger.extractors.extract(i, h);
       if (s.equals(zeroSt)) {
         continue;
       } //do not add the feature
@@ -403,7 +402,7 @@ public class TaggerExperiments extends Experiments {
     }
     int start = numFeatsGeneral;
     for (int i = start; i < numFeatsAll; i++) {
-      String s = maxentTagger.extractorsRare.extract(i - start, h);
+      CharSequence s = maxentTagger.extractorsRare.extract(i - start, h);
 
       if (s.equals(zeroSt)) {
         continue;

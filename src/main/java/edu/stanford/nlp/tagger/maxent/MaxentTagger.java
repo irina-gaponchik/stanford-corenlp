@@ -292,7 +292,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
   LambdaSolveTagger prob;
   // For each extractor index, we have a map from possible extracted
   // feature to an array which maps from tag number to feature index.
-  List<Map<String, int[]>> fAssociations = new ArrayList<>();
+  List <Map<CharSequence,int[]>>fAssociations = new ArrayList<>();
   //PairsHolder pairs = new PairsHolder();
   Extractors extractors;
   Extractors extractorsRare;
@@ -595,7 +595,8 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       saveExtractors(file);
 
       int sizeAssoc = 0;
-      for (Map<String, int[]> fValueAssociations : fAssociations) {
+      for (Map<CharSequence, int[]> fValueAssociations : fAssociations) {
+
         for (int[] fTagAssociations : fValueAssociations.values()) {
           for (int association : fTagAssociations) {
             if (association >= 0) {
@@ -606,15 +607,15 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       }
       file.writeInt(sizeAssoc);
       for (int i = 0; i < fAssociations.size(); ++i) {
-        Map<String, int[]> fValueAssociations = fAssociations.get(i);
-        for (Map.Entry<String, int[]> item : fValueAssociations.entrySet()) {
-          String featureValue = item.getKey();
-          int[] fTagAssociations = item.getValue();
+          Map<CharSequence, int[]> fValueAssociations = fAssociations.get(i);
+          for (Map.Entry<CharSequence, int[]> item: fValueAssociations.entrySet()) {
+            CharSequence featureValue = (CharSequence) item.getKey();
+          int[] fTagAssociations = (int[]) item.getValue();
           for (int j = 0; j < fTagAssociations.length; ++j) {
             int association = fTagAssociations[j];
             if (association >= 0) {
               file.writeInt(association);
-              FeatureKey fk = new FeatureKey(i, featureValue, tags.getTag(j));
+              FeatureKey fk = new FeatureKey(i, (CharSequence) featureValue, tags.getTag(j));
               fk.save(file);
             }
           }
@@ -705,7 +706,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       int sizeAssoc = rf.readInt();
       fAssociations = new ArrayList<>();
       for (int i = 0; i < extractors.getSize() + extractorsRare.getSize(); ++i) {
-        fAssociations.add(Generics.<String, int[]>newHashMap());
+        fAssociations.add(Generics.<CharSequence, int[]>newHashMap());
       }
       if (VERBOSE) System.err.printf("Reading %d feature keys...\n",sizeAssoc);
       PrintFile pfVP = null;
@@ -722,8 +723,8 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
         // fAssociations in a cleaner manner?  Only do this when
         // rebuilding all the tagger models anyway.  When we do that, we
         // can get rid of FeatureKey
-        Map<String, int[]> fValueAssociations = fAssociations.get(fK.num);
-        int[] fTagAssociations = fValueAssociations.get(fK.val);
+        Map  fValueAssociations = fAssociations.get(fK.num);
+        int[] fTagAssociations = (int[]) fValueAssociations.get(fK.val);
         if (fTagAssociations == null) {
           fTagAssociations = new int[ySize];
           for (int j = 0; j < ySize; ++j) {
@@ -754,10 +755,11 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
 
   protected void dumpModel(PrintStream out) {
     for (int i = 0; i < fAssociations.size(); ++i) {
-      Map<String, int[]> fValueAssociations = fAssociations.get(i);
-      for (Map.Entry<String, int[]> item : fValueAssociations.entrySet()) {
-        String featureValue = item.getKey();
-        int[] fTagAssociations = item.getValue();
+        Map<CharSequence, int[]> fValueAssociations = fAssociations.get(i);
+        for (Map.Entry<CharSequence, int[]> item : fValueAssociations.entrySet()) {
+
+        CharSequence featureValue = (CharSequence) item.getKey();
+        int[] fTagAssociations = (int[]) item.getValue();
         for (int j = 0; j < fTagAssociations.length; ++j) {
           int association = fTagAssociations[j];
           if (association >= 0) {
@@ -771,7 +773,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
 
 
   /* Package access so it doesn't appear in public API. */
-  boolean isRare(String word) {
+  boolean isRare(CharSequence word) {
     return dict.sum(word) < rareWordThresh;
   }
 

@@ -95,8 +95,8 @@ public class ObjectBankWrapper<IN extends CoreMap> extends ObjectBank<List<IN>> 
     return doc;
   }
 
-  private String intern(String s) {
-      return flags.intern ? s.intern() : s;
+  private String intern(CharSequence s) {
+      return String.valueOf(flags.intern ? String.valueOf(s).intern() : s);
   }
 
 

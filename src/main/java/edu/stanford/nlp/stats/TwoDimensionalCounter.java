@@ -14,7 +14,7 @@ import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.math.SloppyMath;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.MapFactory;
-import edu.stanford.nlp.util.MutableDouble;
+
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 
@@ -38,7 +38,7 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
   private MapFactory<K1, ClassicCounter<K2>> outerMF;
 
   // the MapFactory used to make new maps in the inner counter
-  private MapFactory<K2, MutableDouble> innerMF;
+  private MapFactory<K2, double[]> innerMF;
 
   private double defaultValue;
 
@@ -394,16 +394,16 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
     return outerMF;
   }
 
-  public MapFactory<K2, MutableDouble> getInnerMapFactory() {
+  public MapFactory<K2, double[]> getInnerMapFactory() {
     return innerMF;
   }
 
   public TwoDimensionalCounter() {
-    this(MapFactory.<K1, ClassicCounter<K2>> hashMapFactory(), MapFactory.<K2, MutableDouble> hashMapFactory());
+    this(MapFactory.<K1, ClassicCounter<K2>> hashMapFactory(), MapFactory.<K2, double[]> hashMapFactory());
   }
 
   public TwoDimensionalCounter(MapFactory<K1, ClassicCounter<K2>> outerFactory,
-      MapFactory<K2, MutableDouble> innerFactory) {
+      MapFactory<K2, double[]> innerFactory) {
     innerMF = innerFactory;
     outerMF = outerFactory;
     map = outerFactory.newMap();

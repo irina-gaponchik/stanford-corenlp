@@ -9,7 +9,7 @@ package edu.stanford.nlp.tagger.maxent;
 import edu.stanford.nlp.maxent.Feature;
 import edu.stanford.nlp.maxent.Problem;
 import edu.stanford.nlp.maxent.iis.LambdaSolve;
-import edu.stanford.nlp.util.MutableDouble;
+
 
 import java.text.NumberFormat;
 import java.io.DataInputStream;
@@ -104,14 +104,14 @@ public class LambdaSolveTagger extends LambdaSolve {
    * @return true if this lambda hasn't converged.
    */
   @SuppressWarnings("UnusedDeclaration")
-  boolean iterate(int index, double err, MutableDouble ret) {
+  boolean iterate(int index, double err, double[] ret) {
     double deltaL = 0.0;
     deltaL = newton(deltaL, index, err);
     lambda[index] = lambda[index] + deltaL;
     if (!(deltaL == deltaL)) {
       System.err.println(" NaN " + index + ' ' + deltaL);
     }
-    ret.set(deltaL);
+    ret[0]=(deltaL);
     return Math.abs(deltaL) >= eps;
   }
 
@@ -128,27 +128,26 @@ public class LambdaSolveTagger extends LambdaSolve {
       i++;
       double lambdaP = lambdaN;
       double gPrimeVal = gprime(lambdaP, index);
-      if (!(gPrimeVal == gPrimeVal)) {
-        System.err.println("gPrime of " + lambdaP + ' ' + index + " is NaN " + gPrimeVal);
-      }
+      if (!(gPrimeVal == gPrimeVal)) System.err.println("gPrime of " + lambdaP + ' ' + index + " is NaN " + gPrimeVal);
       double gVal = g(lambdaP, index);
       if (gPrimeVal == 0.0) {
         return 0.0;
       }
       lambdaN = lambdaP - gVal / gPrimeVal;
-      if (!(lambdaN == lambdaN)) {
-        System.err.println("the division of " + gVal + ' ' + gPrimeVal + ' ' + index + " is NaN " + lambdaN);
-        return 0;
-      }
-      if (Math.abs(lambdaN - lambdaP) < err) {
-        return lambdaN;
-      }
-      if (i > 100) {
-        if (Math.abs(gVal) > 1) {
-          return 0;
+        if (lambdaN == lambdaN) {
+            if (Math.abs(lambdaN - lambdaP) < err) {
+                return lambdaN;
+            }
+            if (i > 100) {
+                if (Math.abs(gVal) > 1) {
+                    return 0;
+                }
+                return lambdaN;
+            }
+        } else {
+            System.err.println("the division of " + gVal + ' ' + gPrimeVal + ' ' + index + " is NaN " + lambdaN);
+            return 0;
         }
-        return lambdaN;
-      }
     } while (true);
   }
 

@@ -13,7 +13,7 @@ import edu.stanford.nlp.io.PrintFile;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.maxent.*;
-import edu.stanford.nlp.util.MutableDouble;
+
 
 import java.text.NumberFormat;
 import java.io.IOException;
@@ -247,11 +247,11 @@ public class LambdaSolve {
         if (lambda_converged[i]) {
           continue;
         }
-        MutableDouble deltaI = new MutableDouble();
+        double[] deltaI = new double[]{};
         boolean fl = iterate(i, eps, deltaI);
         if (fl) {
           flag = true;
-          updateConds(i, deltaI.doubleValue());
+          updateConds(i, deltaI[0]);
           // checkCorrectness();
         } else {
           //lambda_converged[i]=true;
@@ -277,10 +277,10 @@ public class LambdaSolve {
         if (lambda_converged[i]) {
           continue;
         }
-        MutableDouble deltaI = new MutableDouble();
+        double[] deltaI = new double[1];
         boolean fl = iterate(i, eps, deltaI);
         if (fl) {
-          updateConds(i, deltaI.doubleValue());
+          updateConds(i, deltaI[0]);
           // checkCorrectness();
         } else {
           //lambda_converged[i]=true;
@@ -318,7 +318,7 @@ public class LambdaSolve {
    * Returns true if this lambda hasn't converged. A lambda is deemed
    * converged if the change found for it is smaller then the parameter eps.
    */
-  boolean iterate(int index, double err, MutableDouble ret) {
+  boolean iterate(int index, double err, double[] ret) {
     double deltaL = 0.0;
     deltaL = newton(deltaL, index, err);
     //System.out.println("delta is "+deltaL+" feature "+index+" expectation "+ftildeArr[index]);
@@ -332,7 +332,7 @@ public class LambdaSolve {
     if (Double.isNaN(deltaL)) {
       System.err.println(" NaN " + index + ' ' + deltaL);
     }
-    ret.set(deltaL);
+    ret[0]=(deltaL);
     return Math.abs(deltaL) >= eps;
   }
 

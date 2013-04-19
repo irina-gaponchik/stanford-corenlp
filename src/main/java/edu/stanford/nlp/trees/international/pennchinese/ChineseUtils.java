@@ -355,7 +355,7 @@ public class ChineseUtils {
   private final static Pattern midDotPattern = Pattern.compile(ChineseUtils.MID_DOT_REGEX_STR + '+');
 
 
-  public static String shapeOf(String input,
+  public static String shapeOf(CharSequence input,
                                boolean augmentedDateChars,
                                boolean useMidDotShape) {
     String shape;

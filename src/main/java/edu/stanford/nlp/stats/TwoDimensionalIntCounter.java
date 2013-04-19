@@ -12,7 +12,7 @@ import java.util.Set;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.MapFactory;
-import edu.stanford.nlp.util.MutableInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 
@@ -38,7 +38,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
   private MapFactory<K1,IntCounter<K2>> outerMF;
 
   // the MapFactory used to make new maps in the inner counter
-  private MapFactory<K2, MutableInteger> innerMF;
+  private MapFactory<K2, AtomicInteger> innerMF;
 
   private int defaultValue;
 
@@ -389,23 +389,23 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
     return outerMF;
   }
 
-  public MapFactory<K2,MutableInteger> getInnerMapFactory() {
+  public MapFactory<K2,AtomicInteger> getInnerMapFactory() {
     return innerMF;
   }
 
   public TwoDimensionalIntCounter() {
-    this(MapFactory.<K1,IntCounter<K2>>hashMapFactory(), MapFactory.<K2,MutableInteger>hashMapFactory());
+    this(MapFactory.<K1,IntCounter<K2>>hashMapFactory(), MapFactory.<K2,AtomicInteger>hashMapFactory());
   }
   
   public TwoDimensionalIntCounter(int initialCapacity) {
-    this(MapFactory.<K1,IntCounter<K2>>hashMapFactory(), MapFactory.<K2,MutableInteger>hashMapFactory(), initialCapacity);
+    this(MapFactory.<K1,IntCounter<K2>>hashMapFactory(), MapFactory.<K2,AtomicInteger>hashMapFactory(), initialCapacity);
   }
   
-  public TwoDimensionalIntCounter(MapFactory<K1,IntCounter<K2>> outerFactory, MapFactory<K2,MutableInteger> innerFactory) {
+  public TwoDimensionalIntCounter(MapFactory<K1,IntCounter<K2>> outerFactory, MapFactory<K2,AtomicInteger> innerFactory) {
     this(outerFactory, innerFactory, 100);
   }
   
-  public TwoDimensionalIntCounter(MapFactory<K1,IntCounter<K2>> outerFactory, MapFactory<K2,MutableInteger> innerFactory, int initialCapacity) {
+  public TwoDimensionalIntCounter(MapFactory<K1,IntCounter<K2>> outerFactory, MapFactory<K2,AtomicInteger> innerFactory, int initialCapacity) {
     innerMF = innerFactory;
     outerMF = outerFactory;
     map = outerFactory.newMap(initialCapacity);

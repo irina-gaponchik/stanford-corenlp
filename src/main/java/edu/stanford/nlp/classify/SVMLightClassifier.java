@@ -23,11 +23,11 @@ public class SVMLightClassifier<L, F> extends LinearClassifier<L, F> {
   private static final long serialVersionUID = 1L;
   public LinearClassifier<L, L> platt;
 
-  public SVMLightClassifier(ClassicCounter<Pair<F, L>> weightCounter, ClassicCounter<L> thresholds) {
+  public SVMLightClassifier(Counter<Pair<F, L>> weightCounter, Counter<L> thresholds) {
     super(weightCounter, thresholds);
   }
 
-  public SVMLightClassifier(ClassicCounter<Pair<F, L>> weightCounter, ClassicCounter<L> thresholds, LinearClassifier<L, L> platt) {
+  public SVMLightClassifier(Counter<Pair<F, L>> weightCounter, Counter<L> thresholds, LinearClassifier<L, L> platt) {
     super(weightCounter, thresholds);
     this.platt = platt;
   }
@@ -48,10 +48,9 @@ public class SVMLightClassifier<L, F> extends LinearClassifier<L, F> {
       throw new UnsupportedOperationException("If you want to ask for the probability, you must train a Platt model!");
     }
     Counter<L> scores = scoresOf(example);
-    scores.incrementCount(null);
-    Counter<L> probs = platt.logProbabilityOf(new RVFDatum<L, L>(scores));
-    //System.out.println(scores+" "+probs);
-    return probs;
+      double v = scores.incrementCount(null);
+      //System.out.println(scores+" "+probs);
+    return platt.logProbabilityOf(new RVFDatum<L, L>(scores));
   }
 
   /**
@@ -66,9 +65,8 @@ public class SVMLightClassifier<L, F> extends LinearClassifier<L, F> {
       throw new UnsupportedOperationException("If you want to ask for the probability, you must train a Platt model!");
     }
     Counter<L> scores = scoresOf(example);
-    scores.incrementCount(null);
-    Counter<L> probs = platt.logProbabilityOf(new RVFDatum<L, L>(scores));
-    //System.out.println(scores+" "+probs);
-    return probs;
+      double v = scores.incrementCount(null);
+      //System.out.println(scores+" "+probs);
+    return platt.logProbabilityOf(new RVFDatum<L, L>(scores));
   }
 }

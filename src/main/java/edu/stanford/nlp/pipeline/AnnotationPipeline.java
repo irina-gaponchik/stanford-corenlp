@@ -6,12 +6,8 @@ import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.logging.Redwood;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -31,15 +27,16 @@ public class AnnotationPipeline implements Annotator {
   protected static final boolean TIME = true;
 
   private List<Annotator> annotators;
-  private List<MutableInteger> accumulatedTime;
+  private List<AtomicInteger> accumulatedTime;
 
   public AnnotationPipeline(List<Annotator> annotators) {
     this.annotators = annotators;
     if (TIME) {
-      int num = annotators.size();
+
       accumulatedTime = new ArrayList<>(annotators.size());
-        for (Annotator annotator : annotators) {
-            accumulatedTime.add(new MutableInteger());
+        for (int i = 0, annotatorsSize = annotators.size(); i < annotatorsSize; i++) {
+
+            accumulatedTime.add(new AtomicInteger());
         }
     }
   }
@@ -51,7 +48,7 @@ public class AnnotationPipeline implements Annotator {
   public void addAnnotator(Annotator annotator) {
     annotators.add(annotator);
     if (TIME) {
-      accumulatedTime.add(new MutableInteger());
+      accumulatedTime.add(new AtomicInteger());
     }
   }
 
@@ -61,19 +58,20 @@ public class AnnotationPipeline implements Annotator {
    * @param annotation The input annotation, usually a raw document
    */
   public void annotate(Annotation annotation) {
-    Iterator<MutableInteger> it = accumulatedTime.iterator();
+    Iterator<AtomicInteger> it = accumulatedTime.iterator();
     Timing t = new Timing();
-    for (Annotator annotator : annotators) {
-      if (TIME) {
-        t.start();
+      for (int i = 0, annotatorsSize = annotators.size(); i < annotatorsSize; i++) {
+          Annotator annotator = annotators.get(i);
+          if (TIME) {
+              t.start();
+          }
+          annotator.annotate(annotation);
+          if (TIME) {
+              int elapsed = (int) t.stop();
+              AtomicInteger m = it.next();
+              m.getAndAdd(elapsed);
+          }
       }
-      annotator.annotate(annotation);
-      if (TIME) {
-        int elapsed = (int) t.stop();
-        MutableInteger m = it.next();
-        m.incValue(elapsed);
-      }
-    }
   }
 
   /**
@@ -81,7 +79,7 @@ public class AnnotationPipeline implements Annotator {
    * all available cores.
    * @param annotations The input annotations to process
    */
-  public void annotate(Iterable<Annotation> annotations){
+  public void annotate(List<Annotation> annotations){
     annotate(annotations, Runtime.getRuntime().availableProcessors());
   }
 
@@ -91,7 +89,7 @@ public class AnnotationPipeline implements Annotator {
 	 * @param annotations The input annotations to process
 	 * @param callback A function to be called when an annotation finishes. The return value of the callback is ignored
 	 */
-  public void annotate(Iterable<Annotation> annotations, Function<Annotation,Object> callback){
+  public void annotate(List<Annotation> annotations, Function<Annotation,Object> callback){
     annotate(annotations, Runtime.getRuntime().availableProcessors(), callback);
   }
 
@@ -101,7 +99,7 @@ public class AnnotationPipeline implements Annotator {
 	 * @param annotations The input annotations to process
 	 * @param numThreads The number of threads to run on
 	 */
-  public void annotate(Iterable<Annotation> annotations, int numThreads){
+  public void annotate(List<Annotation> annotations, int numThreads){
     annotate(annotations, numThreads, new Function<Annotation, Object>() {
       public Object apply(Annotation in) { return null; }
     });
@@ -115,14 +113,14 @@ public class AnnotationPipeline implements Annotator {
 	 * @param callback A function to be called when an annotation finishes.
 	 *                 The return value of the callback is ignored.
    */
-  public void annotate(final Iterable<Annotation> annotations, int numThreads, final Function<Annotation,Object> callback){
+  public void annotate(final List<Annotation> annotations, int numThreads, final Function<Annotation,Object> callback){
     // case: single thread (no point in spawning threads)
-    if(numThreads == 1){
-      for(Annotation ann : annotations){
-        annotate(ann);
-        callback.apply(ann);
-      }
-    }
+    if(numThreads == 1)
+        for (int i = 0, annotationsSize = annotations.size(); i < annotationsSize; i++) {
+            Annotation ann = annotations.get(i);
+            annotate(ann);
+            callback.apply(ann);
+        }
     // Java's equivalent to ".map{ lambda(annotation) => annotate(annotation) }
     Iterable<Runnable> threads = new Iterable<Runnable>(){
       public Iterator<Runnable> iterator() {
@@ -164,9 +162,10 @@ public class AnnotationPipeline implements Annotator {
    */
   protected long getTotalTime() {
     long total = 0;
-    for (MutableInteger m: accumulatedTime) {
-      total += m.longValue();
-    }
+      for (int i = 0, accumulatedTimeSize = accumulatedTime.size(); i < accumulatedTimeSize; i++) {
+          AtomicInteger m = accumulatedTime.get(i);
+          total += m.longValue();
+      }
     return total;
   }
 
@@ -182,10 +181,10 @@ public class AnnotationPipeline implements Annotator {
     StringBuilder sb = new StringBuilder();
     if (TIME) {
       sb.append("Annotation pipeline timing information:\n");
-      Iterator<MutableInteger> it = accumulatedTime.iterator();
+      Iterator<AtomicInteger> it = accumulatedTime.iterator();
       long total = 0;
       for (Annotator annotator : annotators) {
-        MutableInteger m = it.next();
+        AtomicInteger m = it.next();
         sb.append(StringUtils.getShortClassName(annotator)).append(": ");
         sb.append(Timing.toSecondsString(m.longValue())).append(" sec.\n");
         total += m.longValue();
@@ -234,9 +233,11 @@ public class AnnotationPipeline implements Annotator {
     Annotation a = new Annotation(text);
     ap.annotate(a);
     System.out.println(a.get(CoreAnnotations.TokensAnnotation.class));
-    for (CoreMap sentence : a.get(CoreAnnotations.SentencesAnnotation.class)) {
-      System.out.println(sentence.get(TreeCoreAnnotations.TreeAnnotation.class));
-    }
+      List<CoreMap> get = a.get(CoreAnnotations.SentencesAnnotation.class);
+      for (int i = 0, getSize = get.size(); i < getSize; i++) {
+          CoreMap sentence = get.get(i);
+          System.out.println(sentence.get(TreeCoreAnnotations.TreeAnnotation.class));
+      }
 
     if (TIME) {
       System.out.println(ap.timingInformation());

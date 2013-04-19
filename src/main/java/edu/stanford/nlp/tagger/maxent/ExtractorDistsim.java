@@ -5,7 +5,6 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Timing;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,9 +41,9 @@ public class ExtractorDistsim extends Extractor {
   }
 
   @Override
-  String extract(History h, PairsHolder pH) {
-    String word = super.extract(h, pH);
-    String distSim = lexicon.get(word.toLowerCase());
+  CharSequence extract(History h, PairsHolder pH) {
+    CharSequence word = super.extract(h, pH);
+    String distSim = lexicon.get(String.valueOf(word).toLowerCase());
     if (distSim == null) distSim = "null";
     return distSim;
   }
@@ -68,7 +67,7 @@ public class ExtractorDistsim extends Extractor {
     private String name;
 
     @Override
-    String extract(History h, PairsHolder pH) {
+    CharSequence extract(History h, PairsHolder pH) {
       StringBuilder sb = new StringBuilder();
       for (int j = left; j <= right; j++) {
         String word = pH.getWord(h, j);

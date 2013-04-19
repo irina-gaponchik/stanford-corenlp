@@ -24,7 +24,7 @@ import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Filters;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.IntPair;
-import edu.stanford.nlp.util.MutableInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.Scored;
 import edu.stanford.nlp.util.StringUtils;
@@ -2538,14 +2538,14 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * as measured by characters.  Returns -1 if <i>node is not found.</i>
    */
   public int leftCharEdge(Tree node) {
-    MutableInteger i = new MutableInteger(0);
+    AtomicInteger i = new AtomicInteger(0);
     if (leftCharEdge(node, i)) {
       return i.intValue();
     }
     return -1;
   }
 
-  private boolean leftCharEdge(Tree node, MutableInteger i) {
+  private boolean leftCharEdge(Tree node, AtomicInteger i) {
     if (this.equals(node)) {
       return true;
     } else if (isLeaf()) {
@@ -2577,14 +2577,14 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     for (Tree leaf : s) {
       length += leaf.label().value().length();
     }
-    MutableInteger i = new MutableInteger(length);
+    AtomicInteger i = new AtomicInteger(length);
     if (rightCharEdge(node, i)) {
       return i.intValue();
     }
     return -1;
   }
 
-  private boolean rightCharEdge(Tree node, MutableInteger i) {
+  private boolean rightCharEdge(Tree node, AtomicInteger i) {
     if (this.equals(node)) {
       return true;
     } else if (isLeaf()) {
@@ -2607,16 +2607,16 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @return the number of the current node, or -1 if {@code root} does not contain {@code this}.
    */
   public int nodeNumber(Tree root) {
-    MutableInteger i = new MutableInteger(1);
+    AtomicInteger i = new AtomicInteger(1);
     if(nodeNumberHelper(root,i))
       return i.intValue();
     return -1;
   }
 
-  private boolean nodeNumberHelper(Tree t, MutableInteger i) {
+  private boolean nodeNumberHelper(Tree t, AtomicInteger i) {
     if(this.equals(t))
       return true;
-    i.incValue(1);
+    i.getAndAdd(1);
     for(int j = 0; j < t.children().length; j++) {
       if(nodeNumberHelper(t.children()[j],i))
         return true;
@@ -2634,16 +2634,16 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *    the number of nodes (inclusive) contained in {@code this}.
    */
   public Tree getNodeNumber(int i) {
-    return getNodeNumberHelper(new MutableInteger(1),i);
+    return getNodeNumberHelper(new AtomicInteger(1),i);
   }
 
-  private Tree getNodeNumberHelper(MutableInteger i, int target) {
+  private Tree getNodeNumberHelper(AtomicInteger i, int target) {
     int i1 = i.intValue();
     if(i1 == target)
       return this;
     if(i1 > target)
       throw new IndexOutOfBoundsException("Error -- tree does not contain " + i + " nodes.");
-    i.incValue(1);
+    i.getAndAdd(1);
     for(int j = 0; j < children().length; j++) {
       Tree temp = children()[j].getNodeNumberHelper(i, target);
       if(temp != null)
@@ -2742,7 +2742,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
   }
 
   public void indexSpans(int startIndex) {
-    indexSpans(new MutableInteger(startIndex));
+    indexSpans(new AtomicInteger(startIndex));
   }
 
   /**
@@ -2751,14 +2751,14 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * The end index is equivalent to the first integer after the IndexAnnotation of the last leaf in the constituent.
    * @param startIndex Begin indexing at this value
    */
-  public Pair<Integer, Integer> indexSpans(MutableInteger startIndex) {
+  public Pair<Integer, Integer> indexSpans(AtomicInteger startIndex) {
     int start = Integer.MAX_VALUE;
     int end = Integer.MIN_VALUE;
 
     if(isLeaf()){
       start = startIndex.intValue();
       end = startIndex.intValue() + 1;
-      startIndex.incValue(1);
+      startIndex.getAndAdd(1);
     } else {
       for (Tree kid : children()) {
         Pair<Integer, Integer>  span = kid.indexSpans(startIndex);

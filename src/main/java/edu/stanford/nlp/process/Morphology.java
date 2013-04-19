@@ -76,8 +76,8 @@ public class Morphology implements Function {
 
 
   public Word next() throws IOException {
-    String nx = lexer.next();
-      return nx == null ? null : new Word(nx);
+    CharSequence nx = lexer.next();
+      return nx == null ? null : new Word(String.valueOf(nx));
   }
 
   static boolean isProper(String posTag) {
@@ -92,8 +92,7 @@ public class Morphology implements Function {
     try {
       lexer.yyreset(new StringReader(word));
       lexer.yybegin(Morpha.any);
-      String wordRes = lexer.next();
-      return wordRes;
+        return lexer.next().toString();
     } catch (IOException e) {
       LOGGER.warning("Morphology.stem() had error on word " + word);
       return word;
@@ -147,12 +146,11 @@ public class Morphology implements Function {
       lexer.setOption(1, lowercase);
       lexer.yyreset(new StringReader(wordtag));
       lexer.yybegin(Morpha.scan);
-      String wordRes = lexer.next();
+      String wordRes = String.valueOf(lexer.next());
       lexer.next(); // go past tag
       if (wordHasForbiddenChar) {
         if (DEBUG) System.err.println("Restoring forbidden chars");
-        wordRes = wordRes.replaceAll("\u1CF0", "_");
-        wordRes = wordRes.replaceAll("\u1CF1", " ");
+        wordRes = wordRes.replace ('\u1CF0', '_') .replace('\u1CF1', ' ');
       }
       return wordRes;
     } catch (IOException e) {

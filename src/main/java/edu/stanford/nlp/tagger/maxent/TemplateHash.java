@@ -94,7 +94,7 @@ class ListInstances {
 public class TemplateHash {
 
   // the positions of the feature extractors
-  private final Map<Pair<Integer,String>,ListInstances> tempHash = Generics.newHashMap();
+  private final Map<Pair<Integer, CharSequence>, ListInstances> tempHash = Generics.newHashMap();
 
   private final MaxentTagger maxentTagger;
 
@@ -103,12 +103,12 @@ public class TemplateHash {
   }
 
   protected void addPositions(int start, int end, FeatureKey fK) {
-    Pair<Integer, String> key = new Pair<>(fK.num, fK.val);
+    Pair<Integer, CharSequence> key = new Pair<>(fK.num, fK.val);
     tempHash.get(key).addPositions(start, end);
   }
 
   protected int[] getPositions(FeatureKey s) {
-    Pair<Integer, String> p = new Pair<>(s.num, s.val);
+    Pair<Integer, CharSequence> p = new Pair<>(s.num, s.val);
     return tempHash.get(p).getPositions();
   }
 
@@ -127,7 +127,7 @@ public class TemplateHash {
   }
 
   protected void add(int nFeatFrame, History history, int number) {
-    Pair<Integer,String> wT;
+    Pair<Integer, CharSequence> wT;
     int general = maxentTagger.extractors.getSize();
 
       wT = nFeatFrame < general ? new Pair<>(nFeatFrame, maxentTagger.extractors.extract(nFeatFrame, history)) : new Pair<>(nFeatFrame, maxentTagger.extractorsRare.extract(nFeatFrame - general, history));
@@ -149,7 +149,7 @@ public class TemplateHash {
 
 
   protected void addPrev(int nFeatFrame, History history) {
-    Pair<Integer,String> wT;
+    Pair<Integer, CharSequence> wT;
     int general = maxentTagger.extractors.getSize();
 
       wT = nFeatFrame < general ? new Pair<>(nFeatFrame, maxentTagger.extractors.extract(nFeatFrame, history)) : new Pair<>(nFeatFrame, maxentTagger.extractorsRare.extract(nFeatFrame - general, history));
@@ -163,7 +163,7 @@ public class TemplateHash {
   }
 
 
-  protected int[] getXValues(Pair<Integer, String> key) {
+  protected int[] getXValues(Pair<Integer, CharSequence> key) {
     if (tempHash.containsKey(key)) {
       return tempHash.get(key).getInstances();
     }

@@ -119,7 +119,7 @@ public class WordShapeClassifier {
    * @param wordShaper Constant for which shaping formula to use
    * @return The wordshape String
    */
-  public static String wordShape(String inStr, int wordShaper) {
+  public static CharSequence wordShape(CharSequence inStr, int wordShaper) {
     return wordShape(inStr, wordShaper, null);
   }
 
@@ -139,7 +139,7 @@ public class WordShapeClassifier {
    *           version of the String has been seen).
    * @return The wordshape String
    */
-  public static String wordShape(String inStr, int wordShaper, Collection<String> knownLCWords) {
+  public static CharSequence wordShape(CharSequence inStr, int wordShaper, Collection<String> knownLCWords) {
     // this first bit is for backwards compatibility with how things were first
     // implemented, where the word shaper name encodes whether to useLC.
     // If the shaper is in the old compatibility list, then a specified
@@ -194,7 +194,7 @@ public class WordShapeClassifier {
    * @param s String to find word shape of
    * @return Its word shape: a 5 way classification
    */
-  private static String wordShapeDan1(String s) {
+  private static String wordShapeDan1(CharSequence s) {
     boolean digit = true;
     boolean upper = true;
     boolean lower = true;
@@ -244,7 +244,7 @@ public class WordShapeClassifier {
    *                    Collection of known lower case words
    * @return The word shape
    */
-  private static String wordShapeDan2(String s, Collection<String> knownLCWords) {
+  private static String wordShapeDan2(CharSequence s, Collection<String> knownLCWords) {
     StringBuilder sb = new StringBuilder("WT-");
     char lastM = '~';
     boolean nonLetters = false;
@@ -271,7 +271,7 @@ public class WordShapeClassifier {
       sb.append(':').append(len);
     }
     if (knownLCWords != null) {
-      if (!nonLetters && knownLCWords.contains(s.toLowerCase())) {
+      if (!nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
         sb.append('k');
       }
     }
@@ -279,7 +279,7 @@ public class WordShapeClassifier {
     return sb.toString();
   }
 
-  private static String wordShapeJenny1(String s, Collection<String> knownLCWords) {
+  private static String wordShapeJenny1(CharSequence s, Collection<String> knownLCWords) {
     StringBuilder sb = new StringBuilder("WT-");
     char lastM = '~';
     boolean nonLetters = false;
@@ -295,14 +295,13 @@ public class WordShapeClassifier {
         m = 'X';
       }
 
-      for (String gr : greek) {
-        if (s.startsWith(gr, i)) {
-          m = 'g';
-          i = i + gr.length() - 1;
-          //System.out.println(s + "  ::  " + s.substring(i+1));
-          break;
-        }
-      }
+      for (String gr : greek)
+          if (String.valueOf(s).startsWith(gr, i)) {
+              m = 'g';
+              i = i + gr.length() - 1;
+              //System.out.println(s + "  ::  " + s.substring(i+1));
+              break;
+          }
 
       if (m != 'x' && m != 'X') {
         nonLetters = true;
@@ -318,7 +317,7 @@ public class WordShapeClassifier {
       sb.append(':').append(s.length());
     }
     if (knownLCWords != null) {
-      if ( ! nonLetters && knownLCWords.contains(s.toLowerCase())) {
+      if ( ! nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
         sb.append('k');
       }
     }
@@ -350,13 +349,13 @@ public class WordShapeClassifier {
    *                    that the word is "known" as a lowercase word).
    * @return A word shape for the word.
    */
-  private static String wordShapeChris2(String s, boolean omitIfInBoundary, Collection<String> knownLCWords) {
+  private static String wordShapeChris2(CharSequence s, boolean omitIfInBoundary, Collection<String> knownLCWords) {
     int len = s.length();
       return len <= BOUNDARY_SIZE << 1 ? wordShapeChris2Short(s, len, knownLCWords) : wordShapeChris2Long(s, omitIfInBoundary, len, knownLCWords);
   }
 
   // Do the simple case of words <= BOUNDARY_SIZE * 2 (i.e., 4) with only 1 object allocation!
-  private static String wordShapeChris2Short(String s, int len, Collection<String> knownLCWords) {
+  private static String wordShapeChris2Short(CharSequence s, int len, Collection<String> knownLCWords) {
     int sbLen = knownLCWords != null ? len + 1: len;  // markKnownLC makes String 1 longer
     StringBuilder sb = new StringBuilder(sbLen);
     boolean nonLetters = false;
@@ -372,7 +371,7 @@ public class WordShapeClassifier {
         m = 'X';
       }
       for (String gr : greek) {
-        if (s.startsWith(gr, i)) {
+        if (String.valueOf(s).startsWith(gr, i)) {
           m = 'g';
           //System.out.println(s + "  ::  " + s.substring(i+1));
           i += gr.length() - 1;
@@ -388,7 +387,7 @@ public class WordShapeClassifier {
     }
 
     if (knownLCWords != null) {
-      if ( ! nonLetters && knownLCWords.contains(s.toLowerCase())) {
+      if ( ! nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
         sb.append('k');
       }
     }
@@ -405,7 +404,7 @@ public class WordShapeClassifier {
   // seenSet is maximally of size s.length() - BOUNDARY_SIZE * 2, but might often be of size <= 4. But it has no initial size allocation
   // But we want the initial size to be greater than BOUNDARY_SIZE * 2 * (4/3) since the default loadfactor is 3/4.
   // That is, of size 6, which become 8, since HashMaps are powers of 2.  Still, it's half the size
-  private static String wordShapeChris2Long(String s, boolean omitIfInBoundary, int len, Collection<String> knownLCWords) {
+  private static String wordShapeChris2Long(CharSequence s, boolean omitIfInBoundary, int len, Collection<String> knownLCWords) {
     char[] beginChars = new char[BOUNDARY_SIZE];
     char[] endChars = new char[BOUNDARY_SIZE];
     int beginUpto = 0;
@@ -426,7 +425,7 @@ public class WordShapeClassifier {
         m = 'X';
       }
       for (String gr : greek) {
-        if (s.startsWith(gr, i)) {
+        if (String.valueOf(s).startsWith(gr, i)) {
           m = 'g';
           //System.out.println(s + "  ::  " + s.substring(i+1));
           iIncr = gr.length() - 1;
@@ -484,7 +483,7 @@ public class WordShapeClassifier {
     sb.append(endChars, 0, endUpto);
 
     if (knownLCWords != null) {
-      if (!nonLetters && knownLCWords.contains(s.toLowerCase())) {
+      if (!nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
         sb.append('k');
       }
     }
@@ -558,13 +557,13 @@ public class WordShapeClassifier {
    *                    that the word is "known" as a lowercase word).
    * @return A word shape for the word.
    */
-  private static String wordShapeChris4(String s, boolean omitIfInBoundary, Collection<String> knownLCWords) {
+  private static String wordShapeChris4(CharSequence s, boolean omitIfInBoundary, Collection<String> knownLCWords) {
     int len = s.length();
       return len <= BOUNDARY_SIZE << 1 ? wordShapeChris4Short(s, len, knownLCWords) : wordShapeChris4Long(s, omitIfInBoundary, len, knownLCWords);
   }
 
   // Do the simple case of words <= BOUNDARY_SIZE * 2 (i.e., 4) with only 1 object allocation!
-  private static String wordShapeChris4Short(String s, int len, Collection<String> knownLCWords) {
+  private static String wordShapeChris4Short(CharSequence s, int len, Collection<String> knownLCWords) {
     int sbLen = knownLCWords != null ? len + 1: len;  // markKnownLC makes String 1 longer
     StringBuilder sb = new StringBuilder(sbLen);
     boolean nonLetters = false;
@@ -573,7 +572,7 @@ public class WordShapeClassifier {
       char c = s.charAt(i);
       char m = chris4equivalenceClass(c);
       for (String gr : greek) {
-        if (s.startsWith(gr, i)) {
+        if (String.valueOf(s).startsWith(gr, i)) {
           m = 'g';
           //System.out.println(s + "  ::  " + s.substring(i+1));
           i += gr.length() - 1;
@@ -589,7 +588,7 @@ public class WordShapeClassifier {
     }
 
     if (knownLCWords != null) {
-      if ( ! nonLetters && knownLCWords.contains(s.toLowerCase())) {
+      if ( ! nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
         sb.append('k');
       }
     }
@@ -598,7 +597,7 @@ public class WordShapeClassifier {
   }
 
 
-  private static String wordShapeChris4Long(String s, boolean omitIfInBoundary, int len, Collection<String> knownLCWords) {
+  private static String wordShapeChris4Long(CharSequence s, boolean omitIfInBoundary, int len, Collection<String> knownLCWords) {
     StringBuilder sb = new StringBuilder(s.length() + 1);
     StringBuilder endSB = new StringBuilder(BOUNDARY_SIZE);
     Set<Character> boundSet = Generics.newHashSet(BOUNDARY_SIZE << 1);
@@ -609,7 +608,7 @@ public class WordShapeClassifier {
       char m = chris4equivalenceClass(c);
       int iIncr = 0;
       for (String gr : greek) {
-        if (s.startsWith(gr, i)) {
+        if (String.valueOf(s).startsWith(gr, i)) {
           m = 'g';
           iIncr = gr.length() - 1;
           //System.out.println(s + "  ::  " + s.substring(i+1));
@@ -642,7 +641,7 @@ public class WordShapeClassifier {
     sb.append(endSB);
 
     if (knownLCWords != null) {
-      if (!nonLetters && knownLCWords.contains(s.toLowerCase())) {
+      if (!nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
         sb.append('k');
       }
     }
@@ -657,7 +656,7 @@ public class WordShapeClassifier {
    * same type, but keeps all punctuation.  This adds an extra recognizer
    * for a greek letter embedded in the String, which is useful for bio.
    */
-  private static String wordShapeDan2Bio(String s, Collection<String> knownLCWords) {
+  private static String wordShapeDan2Bio(CharSequence s, Collection<String> knownLCWords) {
       return containsGreekLetter(s) ? wordShapeDan2(s, knownLCWords) + "-GREEK" : wordShapeDan2(s, knownLCWords);
   }
 
@@ -675,7 +674,7 @@ public class WordShapeClassifier {
    * @param s String to check for Greek
    * @return true iff there is a greek lette embedded somewhere in the String
    */
-  private static boolean containsGreekLetter(String s) {
+  private static boolean containsGreekLetter(CharSequence s) {
     Matcher m = biogreek.matcher(s);
     return m.find();
   }
@@ -690,7 +689,7 @@ public class WordShapeClassifier {
    *  @param s String to word class
    *  @return The string's class
    */
-  private static String wordShapeChris1(String s) {
+  private static String wordShapeChris1(CharSequence s) {
     int length = s.length();
     if (length == 0) {
       return "SYMBOL"; // unclear if this is sensible, but it's what a length 0 String becomes....
@@ -812,14 +811,14 @@ public class WordShapeClassifier {
    * @param s String to find word shape of
    * @return The same string except digits are equivalence classed to 9.
    */
-  private static String wordShapeDigits(String s) {
+  private static CharSequence wordShapeDigits(CharSequence s) {
     char[] outChars = null;
 
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
       if (Character.isDigit(c)) {
         if (outChars == null) {
-          outChars = s.toCharArray();
+          outChars = String.valueOf(s).toCharArray();
         }
         outChars[i] = '9';
       }
@@ -836,7 +835,7 @@ public class WordShapeClassifier {
    * @param s String to find word shape of
    * @return Its word shape
    */
-  private static String wordShapeCluster1(String s) {
+  private static String wordShapeCluster1(CharSequence s) {
     boolean digit = true;
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
@@ -855,7 +854,7 @@ public class WordShapeClassifier {
     }
   }
 
-  private static String wordShapeChinese(String s) {
+  private static String wordShapeChinese(CharSequence s) {
     return ChineseUtils.shapeOf(s, true, true);
   }
 

@@ -38,8 +38,7 @@ import java.util.Map.Entry;
 import edu.stanford.nlp.math.SloppyMath;
 import edu.stanford.nlp.util.Factory;
 import edu.stanford.nlp.util.MapFactory;
-import edu.stanford.nlp.util.MutableDouble;
-import edu.stanford.nlp.util.logging.PrettyLogger;
+ import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
 
 
@@ -72,8 +71,8 @@ import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
  */
 public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> {
 
-  Map<E, MutableDouble> map;  // accessed by DeltaCounter
-  private MapFactory<E, MutableDouble> mapFactory;
+  Map<E, double[]> map;  // accessed by DeltaCounter
+  private MapFactory<E, double[]> mapFactory;
   private double totalCount; // = 0.0
   private double defaultValue; // = 0.0;
 
@@ -81,7 +80,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   private static final long serialVersionUID = 4L;
 
   // for more efficient speed/memory usage
-  private transient MutableDouble tempMDouble; // = null;
+  private transient double[] tempMDouble; // = null;
 
 
   // CONSTRUCTORS
@@ -90,11 +89,11 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
    * Constructs a new (empty) Counter backed by a HashMap.
    */
   public ClassicCounter() {
-    this(MapFactory.<E,MutableDouble>hashMapFactory());
+    this(MapFactory.<E,double[]>hashMapFactory());
   }
 
   public ClassicCounter(int initialCapacity) {
-    this(MapFactory.<E,MutableDouble>hashMapFactory(), initialCapacity);
+    this(MapFactory.<E,double[]>hashMapFactory(), initialCapacity);
   }
 
   /**
@@ -102,7 +101,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
    *
    * @param mapFactory The Map this factory vends will back your Counter.
    */
-  public ClassicCounter(MapFactory<E,MutableDouble> mapFactory) {
+  public ClassicCounter(MapFactory<E,double[]> mapFactory) {
     this.mapFactory = mapFactory;
     this.map = mapFactory.newMap();
   }
@@ -113,7 +112,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
    * @param mapFactory The Map this factory vends will back your Counter.
    * @param initialCapacity initial capacity of the counter
    */
-  public ClassicCounter(MapFactory<E,MutableDouble> mapFactory, int initialCapacity) {
+  public ClassicCounter(MapFactory<E,double[]> mapFactory, int initialCapacity) {
     this.mapFactory = mapFactory;
     this.map = mapFactory.newMap(initialCapacity);
   }
@@ -153,7 +152,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
    *
    *  @return The MapFactory
    */
-  MapFactory<E,MutableDouble> getMapFactory() {
+  MapFactory<E,double[]> getMapFactory() {
     return mapFactory;
   }
 
@@ -170,9 +169,9 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
 
     private static final long serialVersionUID = 1L;
 
-    private final MapFactory<E,MutableDouble> mf;
+    private final MapFactory<E,double[]> mf;
 
-    private ClassicCounterFactory(MapFactory<E,MutableDouble> mf) {
+    private ClassicCounterFactory(MapFactory<E,double[]> mf) {
       this.mf = mf;
     }
 
@@ -194,11 +193,11 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   /** {@inheritDoc} */
   @Override
   public double getCount(Object key) {
-    Number count = map.get(key);
+    double[] count = map.get(key);
     if (count == null) {
       return defaultValue; // haven't seen this object before -> default count
     }
-    return count.doubleValue();
+    return count[0];
   }
 
   /** {@inheritDoc} */
@@ -206,17 +205,17 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   public void setCount(E key, double count) {
     if (tempMDouble == null) {
       //System.out.println("creating mdouble");
-      tempMDouble = new MutableDouble();
+      tempMDouble = new double[1];
     }
     //System.out.println("setting mdouble");
-    tempMDouble.set(count);
+    tempMDouble[0]=(count);
     //System.out.println("putting mdouble in map");
     tempMDouble = map.put(key, tempMDouble);
     //System.out.println("placed mDouble in map");
 
     totalCount += count;
     if (tempMDouble != null) {
-      totalCount -= tempMDouble.doubleValue();
+      totalCount -= tempMDouble[0];
     }
   }
 
@@ -225,14 +224,14 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   @Override
   public double incrementCount(E key, double count) {
     if (tempMDouble == null) {
-      tempMDouble = new MutableDouble();
+      tempMDouble = new double[1];
     }
-    MutableDouble oldMDouble = map.put(key, tempMDouble);
+    double[] oldMDouble = map.put(key, tempMDouble);
     totalCount += count;
     if (oldMDouble != null) {
-      count += oldMDouble.doubleValue();
+      count += oldMDouble[0];
     }
-    tempMDouble.set(count);
+    tempMDouble[0]=(count);
     tempMDouble = oldMDouble;
 
     return count;
@@ -260,16 +259,16 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   @Override
   public double logIncrementCount(E key, double count) {
     if (tempMDouble == null) {
-      tempMDouble = new MutableDouble();
+      tempMDouble = new double[]{0};
     }
-    MutableDouble oldMDouble = map.put(key, tempMDouble);
+    double[] oldMDouble = map.put(key, tempMDouble);
     if (oldMDouble != null) {
-      count = SloppyMath.logAdd(count, oldMDouble.doubleValue());
-      totalCount += count - oldMDouble.doubleValue();
+      count = SloppyMath.logAdd(count, oldMDouble[0]);
+      totalCount += count - oldMDouble[0];
     } else {
       totalCount += count;
     }
-    tempMDouble.set(count);
+    tempMDouble[0]=(count);
     tempMDouble = oldMDouble;
 
     return count;
@@ -285,9 +284,9 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   /** {@inheritDoc} */
   @Override
   public double remove(E key) {
-    MutableDouble d = mutableRemove(key); // this also updates totalCount
+    double[] d = mutableRemove(key); // this also updates totalCount
     if(d != null) {
-      return d.doubleValue();
+      return d[0];
     }
     return defaultValue;
   }
@@ -311,7 +310,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
       @Override
       public Iterator<Double> iterator() {
         return new Iterator<Double>() {
-          Iterator<MutableDouble> inner = map.values().iterator();
+          Iterator<double[]> inner = map.values().iterator();
 
           @Override
           public boolean hasNext() {
@@ -321,7 +320,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
           @Override
           public Double next() {
             // copy so as to give safety to mutable internal representation
-            return inner.next().doubleValue();
+            return inner.next()[0];
           }
 
           @Override
@@ -338,7 +337,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
 
       @Override
       public boolean contains(Object v) {
-        return v instanceof Double && map.values().contains(new MutableDouble((Double) v));
+        return v instanceof Double && map.values().contains(new double[]{(Double) v});
       }
 
     };
@@ -351,7 +350,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
       @Override
       public Iterator<Entry<E, Double>> iterator() {
         return new Iterator<Entry<E,Double>>() {
-          final Iterator<Entry<E,MutableDouble>> inner = map.entrySet().iterator();
+          final Iterator<Entry<E,double[]>> inner = map.entrySet().iterator();
 
           @Override
           public boolean hasNext() {
@@ -361,15 +360,15 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
           @Override
           public Entry<E, Double> next() {
             return new Entry<E,Double>() {
-              final Entry<E,MutableDouble> e = inner.next();
+              final Entry<E,double[]> e = inner.next();
 
               public double getDoubleValue() {
-                return e.getValue().doubleValue();
+                return e.getValue()[0];
               }
 
               public double setValue(double value) {
-                double old = e.getValue().doubleValue();
-                e.getValue().set(value);
+                double old = e.getValue()[0];
+                e.getValue()[0]=(value);
                 totalCount = totalCount - old + value;
                 return old;
               }
@@ -386,7 +385,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
 
               @Override
               public Double setValue(Double value) {
-                return setValue(value.doubleValue());
+                return setValue(value );
               }
             };
           }
@@ -441,15 +440,15 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
   }
 
   /** This is used internally to the class for getting back a
-   *  MutableDouble in a remove operation.  Not for public use.
+   *  double[] in a remove operation.  Not for public use.
    *
    *  @param key The key to remove
-   *  @return Its value as a MutableDouble
+   *  @return Its value as a double[]
    */
-  private MutableDouble mutableRemove(E key) {
-    MutableDouble md = map.remove(key);
+  private double[] mutableRemove(E key) {
+    double[] md = map.remove(key);
     if (md != null) {
-      totalCount -= md.doubleValue();
+      totalCount -= md[0];
     }
     return md;
   }

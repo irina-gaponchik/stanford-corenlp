@@ -29,7 +29,6 @@
 package edu.stanford.nlp.ie;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -56,7 +55,6 @@ import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.trees.international.pennchinese.RadicalMap;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.PaddedList;
-import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.Timing;
 
 
@@ -470,7 +468,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   // annotation as part of the ObjectBankWrapper.  But note that it is
   // serialized in this object currently and it would then need to be
   // serialized elsewhere or loaded each time
-  private Map<String,String> lexicon;
+  private Map<CharSequence, String> lexicon;
 
   private void initLexicon(SeqClassifierFlags flags) {
     if (flags.distSimLexicon == null) {
@@ -484,7 +482,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     boolean terryKoo = "terryKoo".equals(flags.distSimFileFormat);
     for (String line : ObjectBank.getLineIterator(flags.distSimLexicon,
                                                   flags.inputEncoding)) {
-      String word;
+      CharSequence word;
       String wordClass;
       if (terryKoo) {
         String[] bits = line.split("\\t");
@@ -500,7 +498,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
         wordClass = bits[1];
       }
       if ( ! flags.casedDistSim) {
-        word = word.toLowerCase();
+        word = String.valueOf(word).toLowerCase();
       }
       if (flags.numberEquivalenceDistSim) {
         word = WordShapeClassifier.wordShape(word, WordShapeClassifier.WORDSHAPEDIGITS);
@@ -514,9 +512,9 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   private void distSimAnnotate(PaddedList<IN> info) {
     for (CoreLabel fl : info) {
       if (fl.has(CoreAnnotations.DistSimAnnotation.class)) { return; }
-      String word = getWord(fl);
+      CharSequence word = getWord(fl);
       if ( ! flags.casedDistSim) {
-        word = word.toLowerCase();
+        word = String.valueOf(word).toLowerCase();
       }
       if (flags.numberEquivalenceDistSim) {
         word = WordShapeClassifier.wordShape(word, WordShapeClassifier.WORDSHAPEDIGITS);

@@ -24,8 +24,8 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.MapFactory;
-import edu.stanford.nlp.util.MutableDouble;
-import edu.stanford.nlp.util.MutableInteger;
+
+import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.ThreeDimensionalMap;
 import edu.stanford.nlp.util.Triple;
@@ -88,7 +88,7 @@ public class SplittingGrammarExtractor {
    * Note that this uses an identity hash map to map from tree pointer
    * to weight.
    */
-  Counter<Tree> treeWeights = new ClassicCounter<>(MapFactory.<Tree,MutableDouble>identityHashMapFactory());
+  Counter<Tree> treeWeights = new ClassicCounter<>(MapFactory.<Tree,double[]>identityHashMapFactory());
 
   /**
    * How many total weighted trees we have

@@ -3,7 +3,7 @@ package edu.stanford.nlp.trees;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.Generics;
-import edu.stanford.nlp.util.MutableInteger;
+import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.ling.*;
 
@@ -30,7 +30,7 @@ public class Trees {
    * material preceding <i>t</i>.
    */
   public static int leftEdge(Tree t, Tree root) {
-    MutableInteger i = new MutableInteger(0);
+    AtomicInteger i = new AtomicInteger(0);
     if (leftEdge(t, root, i)) {
       return i.intValue();
     } else {
@@ -39,7 +39,7 @@ public class Trees {
     }
   }
 
-  static boolean leftEdge(Tree t, Tree t1, MutableInteger i) {
+  static boolean leftEdge(Tree t, Tree t1, AtomicInteger i) {
     if (t.equals(t1)) {
       return true;
     } else if (t1.isLeaf()) {
@@ -63,7 +63,7 @@ public class Trees {
    * contained in <i>t</i>.
    */
   public static int rightEdge(Tree t, Tree root) {
-    MutableInteger i = new MutableInteger(root.yield().size());
+    AtomicInteger i = new AtomicInteger(root.yield().size());
     if (rightEdge(t, root, i)) {
       return i.intValue();
     } else {
@@ -72,7 +72,7 @@ public class Trees {
     }
   }
 
-  static boolean rightEdge(Tree t, Tree t1, MutableInteger i) {
+  static boolean rightEdge(Tree t, Tree t1, AtomicInteger i) {
     if (t.equals(t1)) {
       return true;
     } else if (t1.isLeaf()) {
@@ -230,10 +230,10 @@ public class Trees {
    * gets the {@code n}th terminal in {@code tree}.  The first terminal is number zero.
    */
   public static Tree getTerminal(Tree tree, int n) {
-    return getTerminal(tree, new MutableInteger(0), n);
+    return getTerminal(tree, new AtomicInteger(0), n);
   }
 
-  static Tree getTerminal(Tree tree, MutableInteger i, int n) {
+  static Tree getTerminal(Tree tree, AtomicInteger i, int n) {
     if (i.intValue() == n) {
         return tree.isLeaf() ? tree : getTerminal(tree.children()[0], i, n);
     } else {
@@ -256,10 +256,10 @@ public class Trees {
    * gets the {@code n}th preterminal in {@code tree}.  The first terminal is number zero.
    */
   public static Tree getPreTerminal(Tree tree, int n) {
-    return getPreTerminal(tree, new MutableInteger(0), n);
+    return getPreTerminal(tree, new AtomicInteger(0), n);
   }
 
-  static Tree getPreTerminal(Tree tree, MutableInteger i, int n) {
+  static Tree getPreTerminal(Tree tree, AtomicInteger i, int n) {
     if (i.intValue() == n) {
         return tree.isPreTerminal() ? tree : getPreTerminal(tree.children()[0], i, n);
     } else {

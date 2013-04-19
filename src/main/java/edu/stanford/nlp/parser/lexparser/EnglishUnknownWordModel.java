@@ -26,16 +26,9 @@
 
 package edu.stanford.nlp.parser.lexparser;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-
-import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.process.DistSimClassifier;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.util.Index;
-import edu.stanford.nlp.util.Timing;
 
 /**
  * This is a basic unknown word model for English.  It supports 5 different
