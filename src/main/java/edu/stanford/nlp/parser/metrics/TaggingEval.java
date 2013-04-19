@@ -25,6 +25,7 @@ import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.Treebank;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * Computes POS tagging P/R/F1 from guess/gold trees. This version assumes that the yields match. For
@@ -227,7 +228,7 @@ public class TaggingEval extends AbstractEval {
   }
 
   private static final int minArgs = 2;
-  private static final StringBuilder usage = new StringBuilder();
+  private static final TxtBuilder usage = new TxtBuilder();
   static {
     usage.append(String.format("Usage: java %s [OPTS] gold guess\n\n",TaggingEval.class.getName()));
     usage.append("Options:\n");

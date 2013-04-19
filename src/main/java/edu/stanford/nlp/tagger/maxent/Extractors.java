@@ -13,9 +13,9 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 /** Maintains a set of feature extractors and applies them.
  *
@@ -174,7 +174,7 @@ public class Extractors implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("Extractors[");
+    TxtBuilder sb = new TxtBuilder("Extractors[");
     for (int i = 0; i < v.length; i++) {
       sb.append(v[i].toString());
       if (i < v.length - 1) {

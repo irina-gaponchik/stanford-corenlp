@@ -9,6 +9,7 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.time.TimeAnnotations;
 import edu.stanford.nlp.time.Timex;
 import edu.stanford.nlp.util.*;
+import javolution.text.TxtBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -307,7 +308,7 @@ public class QuantifiableEntityNormalizer {
      */
     public static <E extends CoreMap> String singleEntityToString(List<E> l) {
         String entityType = l.get(0).get(CoreAnnotations.NamedEntityTagAnnotation.class);
-        StringBuilder sb = new StringBuilder();
+        TxtBuilder sb = new TxtBuilder();
         for (E w : l) {
             assert w.get(CoreAnnotations.NamedEntityTagAnnotation.class).equals(entityType);
             sb.append(w.get(CoreAnnotations.TextAnnotation.class));
@@ -338,7 +339,7 @@ public class QuantifiableEntityNormalizer {
 
         List<CoreLabel> s = new ArrayList<>();
         String lastEntity = BACKGROUND_SYMBOL;
-        StringBuilder entityStringCollector = null;
+        TxtBuilder entityStringCollector = null;
 
         //Iterate through each word....
         for (CoreLabel w : l) {
@@ -367,7 +368,7 @@ public class QuantifiableEntityNormalizer {
                     entityStringCollector.append(w.get(CoreAnnotations.TextAnnotation.class));
                 } else {
                     //and its NOT a continuation, make a new buffer.
-                    entityStringCollector = new StringBuilder();
+                    entityStringCollector = new TxtBuilder();
                     entityStringCollector.append(w.get(CoreAnnotations.TextAnnotation.class));
                 }
             } else {
@@ -593,7 +594,7 @@ public class QuantifiableEntityNormalizer {
     static <E extends CoreMap> void concatenateNumericString(List<E> words, List<E> toRemove) {
         if (words.size() <= 1) return;
         boolean first = true;
-        StringBuilder newText = new StringBuilder();
+        TxtBuilder newText = new TxtBuilder();
         E foundEntity = null;
         for (E word : words) {
             if (foundEntity == null && (word.get(CoreAnnotations.PartOfSpeechAnnotation.class).equals("CD") || word.get(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP"))) {
@@ -685,7 +686,7 @@ public class QuantifiableEntityNormalizer {
                 err.printf("timePattern matched groups: |%s| |%s| |%s| |%s|\n", m.group(0), m.group(1), m.group(2), m.group(3));
             }
             // group 1 is hours, group 2 is minutes and maybe seconds; group 3 is am/pm
-            StringBuilder sb = new StringBuilder();
+            TxtBuilder sb = new TxtBuilder();
             sb.append(m.group(1));
             if (m.group(2) == null || m.group(2) != null && m.group(2).isEmpty()) {
                 sb.append(":00");

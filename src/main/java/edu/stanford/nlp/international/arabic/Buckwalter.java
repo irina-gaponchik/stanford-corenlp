@@ -11,6 +11,7 @@ import edu.stanford.nlp.trees.international.arabic.ATBTreeUtils;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.process.SerializableFunction;
+import javolution.text.TxtBuilder;
 
 /** This class can convert between Unicode and Buckwalter encodings of
  *  Arabic.
@@ -159,7 +160,7 @@ public class Buckwalter implements SerializableFunction<String,String> {
 
 	private String convert(String in, boolean unicodeToBuckwalter) {
 		StringTokenizer st = new StringTokenizer(in);
-		StringBuilder result = new StringBuilder(in.length());
+		TxtBuilder result = new TxtBuilder(in.length());
 
 		while(st.hasMoreTokens()) {
 			String token = st.nextToken();
@@ -200,7 +201,7 @@ public class Buckwalter implements SerializableFunction<String,String> {
 	}
 
 
-	private static final StringBuilder usage = new StringBuilder();
+	private static final TxtBuilder usage = new TxtBuilder();
 	static {
 		usage.append("Usage: java Buckwalter [OPTS] file   (or < file)\n");
 		usage.append("Options:\n");

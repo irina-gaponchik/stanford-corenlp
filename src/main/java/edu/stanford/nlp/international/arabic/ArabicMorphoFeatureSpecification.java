@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification;
 import edu.stanford.nlp.international.morph.MorphoFeatures;
+import javolution.text.TxtBuilder;
 
 /**
  * Extracts morphosyntactic features from BAMA/SAMA analyses. Compatible with both the
@@ -255,7 +256,7 @@ public class ArabicMorphoFeatureSpecification extends MorphoFeatureSpecification
 
     @Override
     public String getTag(String basePartOfSpeech) {
-      StringBuilder sb = new StringBuilder(basePartOfSpeech);
+      TxtBuilder sb = new TxtBuilder(basePartOfSpeech);
       // Iterate over feature list so that features are added in the same order
       // for every feature spec.
       for (MorphoFeatureType feat : MorphoFeatureType.values()) {

@@ -42,6 +42,7 @@ import edu.stanford.nlp.trees.TreePrint;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.logging.Redwood;
 import edu.stanford.nlp.util.logging.StanfordRedwoodConfiguration;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.util.*;
@@ -339,7 +340,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       @Override
       public String signature() {
         // keep track of all relevant properties for this annotator here!
-        StringBuilder os = new StringBuilder();
+        TxtBuilder os = new TxtBuilder();
         os.append("tokenize.whitespace:").append(properties.getProperty("tokenize.whitespace", "false"));
         if (Boolean.valueOf(properties.getProperty("tokenize.whitespace",
                 "false"))) {
@@ -448,7 +449,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       @Override
       public String signature() {
         // keep track of all relevant properties for this annotator here!
-        StringBuilder os = new StringBuilder();
+        TxtBuilder os = new TxtBuilder();
         os.append(NEWLINE_SPLITTER_PROPERTY + ':').append(properties.getProperty(NEWLINE_SPLITTER_PROPERTY, "false"));
         if(Boolean.valueOf(properties.getProperty(NEWLINE_SPLITTER_PROPERTY,
                 "false"))) {
@@ -799,7 +800,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
             // keep track of all relevant properties for this annotator here!
             // since we don't know what props they need, let's copy all
             // TODO: can we do better here? maybe signature() should be a method in the Annotator?
-            StringBuilder os = new StringBuilder();
+            TxtBuilder os = new TxtBuilder();
             for(Object key: properties.keySet()) {
               String skey = (String) key;
               os.append(skey).append(':').append(properties.getProperty(skey));
@@ -1019,7 +1020,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
    */
   @Override
   public String timingInformation() {
-    StringBuilder sb = new StringBuilder(super.timingInformation());
+    TxtBuilder sb = new TxtBuilder(super.timingInformation());
     if (numWords >= 0) {
       long total = this.getTotalTime();
       sb.append(" for ").append(this.numWords).append(" tokens at ");

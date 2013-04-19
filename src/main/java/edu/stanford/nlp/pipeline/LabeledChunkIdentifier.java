@@ -2,6 +2,7 @@ package edu.stanford.nlp.pipeline;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.util.CoreMap;
+import javolution.text.TxtBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -221,7 +222,7 @@ public class LabeledChunkIdentifier {
 
     public String toString()
     {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       sb.append('(');
       sb.append(label).append(',');
       sb.append(tag).append(',');

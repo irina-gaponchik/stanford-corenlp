@@ -4,6 +4,7 @@ package edu.stanford.nlp.semgraph;
 import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 
@@ -41,7 +42,7 @@ public class SemanticGraphFormatter {
   private boolean showIndices = DEFAULT_SHOW_INDICES;
 
   // working variables -- not thread-safe!!!
-  private StringBuilder out;
+  private TxtBuilder out;
   private Set<IndexedWord> used;
 
 
@@ -84,7 +85,7 @@ public class SemanticGraphFormatter {
     if (sg.vertexSet().isEmpty()) {
       return "[]";
     }
-    out = new StringBuilder();           // not thread-safe!!!
+    out = new TxtBuilder();           // not thread-safe!!!
     used = Generics.newHashSet();
     if (sg.getRoots().size() == 1) {
       formatSGNode(sg, sg.getFirstRoot(), 1);
@@ -127,7 +128,7 @@ public class SemanticGraphFormatter {
 
   private String formatSGNodeOneline(SemanticGraph sg,
       IndexedWord node) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     Set<IndexedWord> usedOneline = Generics.newHashSet();
     formatSGNodeOnelineHelper(sg, node, sb, usedOneline);
     return sb.toString();
@@ -135,7 +136,7 @@ public class SemanticGraphFormatter {
 
   private void formatSGNodeOnelineHelper(SemanticGraph sg,
                                          IndexedWord node,
-                                         StringBuilder sb,
+                                         TxtBuilder sb,
                                          Set<IndexedWord> usedOneline) {
     usedOneline.add(node);
     boolean isntLeaf = sg.outDegree(node) > 0;

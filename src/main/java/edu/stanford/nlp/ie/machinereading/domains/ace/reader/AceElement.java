@@ -14,7 +14,7 @@ public class AceElement {
 
   public String getId() { return mId; }
 
-  public static void appendOffset(StringBuffer buffer,
+  public static void appendOffset(StringBuilder buffer,
 				  int offset) {
     for(int i = 0; i < offset; i ++){
       buffer.append(' ');

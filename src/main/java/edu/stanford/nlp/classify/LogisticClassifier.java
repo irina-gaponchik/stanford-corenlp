@@ -29,7 +29,6 @@
 package edu.stanford.nlp.classify;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.*;
 
 import edu.stanford.nlp.ling.Datum;
@@ -44,6 +43,7 @@ import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * A classifier for binary logistic regression problems.
@@ -79,7 +79,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, RVFClassifier
       return "";
     }
 
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (F f : featureIndex) {
       sb.append(classes[1]).append(" / ").append(f).append(" = ").append(weights[featureIndex.indexOf(f)]);
     }

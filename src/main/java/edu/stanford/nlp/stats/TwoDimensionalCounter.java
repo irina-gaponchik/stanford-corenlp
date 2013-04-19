@@ -17,6 +17,7 @@ import edu.stanford.nlp.util.MapFactory;
 
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * A class representing a mapping between pairs of typed objects and double
@@ -225,7 +226,7 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
    */
   @Override
   public String toString() {
-    StringBuilder buff = new StringBuilder();
+    TxtBuilder buff = new TxtBuilder();
     for (K1 key1 : map.keySet()) {
       ClassicCounter<K2> c = getCounter(key1);
       for (K2 key2 : c.keySet()) {
@@ -267,7 +268,7 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
     List<K2> secondKeys = new ArrayList<>(secondKeySet());
     Collections.sort((List<? extends Comparable>) firstKeys);
     Collections.sort((List<? extends Comparable>) secondKeys);
-    StringBuilder b = new StringBuilder();
+    TxtBuilder b = new TxtBuilder();
     String[] headerRow = new String[secondKeys.size() + 1];
     headerRow[0] = "";
     for (int j = 0; j < secondKeys.size(); j++) {

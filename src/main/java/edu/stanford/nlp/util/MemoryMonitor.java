@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util;
 
+import javolution.text.TxtBuilder;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -178,7 +180,7 @@ public class MemoryMonitor {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append("lastPoll:").append(lastPoll);
     sb.append(" pollEvery:").append(pollEvery);
     sb.append(" freeMem:").append(freeMem);

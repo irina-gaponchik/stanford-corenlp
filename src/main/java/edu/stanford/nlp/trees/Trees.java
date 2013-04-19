@@ -6,6 +6,7 @@ import edu.stanford.nlp.util.Generics;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.ling.*;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 import java.io.*;
@@ -375,7 +376,7 @@ public class Trees {
         throw new IllegalStateException("Bad tree state: " + t);
       }
     } // end for Tree st : this
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append("Tree with root of class ").append(tCl).append(" and factory ").append(tfCl);
     sb.append(" and root label class ").append(lCl).append(" and factory ").append(lfCl);
     if ( ! otherClasses.isEmpty()) {
@@ -427,15 +428,15 @@ public class Trees {
 
 
    public static String treeToLatex(Tree t) {
-     StringBuilder connections = new StringBuilder();
-     StringBuilder hierarchy = new StringBuilder();
+     TxtBuilder connections = new TxtBuilder();
+     TxtBuilder hierarchy = new TxtBuilder();
      treeToLatexHelper(t,connections,hierarchy,0,1,0);
      return "\\tree"+hierarchy+ '\n' +connections+ '\n';
    }
 
-  private static int treeToLatexHelper(Tree t, StringBuilder c, StringBuilder h,
+  private static int treeToLatexHelper(Tree t, TxtBuilder c, TxtBuilder h,
                                        int n, int nextN, int indent) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (int i=0; i<indent; i++)
       sb.append("  ");
     h.append('\n').append(sb);
@@ -452,16 +453,16 @@ public class Trees {
   }
 
   public static String treeToLatexEven(Tree t) {
-    StringBuilder connections = new StringBuilder();
-    StringBuilder hierarchy = new StringBuilder();
+    TxtBuilder connections = new TxtBuilder();
+    TxtBuilder hierarchy = new TxtBuilder();
     int maxDepth = t.depth();
     treeToLatexEvenHelper(t,connections,hierarchy,0,1,0,0,maxDepth);
     return "\\tree"+hierarchy+ '\n' +connections+ '\n';
   }
 
-  private static int treeToLatexEvenHelper(Tree t, StringBuilder c, StringBuilder h, int n,
+  private static int treeToLatexEvenHelper(Tree t, TxtBuilder c, TxtBuilder h, int n,
                                            int nextN, int indent, int curDepth, int maxDepth) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (int i=0; i<indent; i++)
       sb.append("  ");
     h.append('\n').append(sb);
@@ -493,7 +494,7 @@ public class Trees {
   }
 
   static String escape(String s) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (int i=0; i<s.length(); i++) {
       char c = s.charAt(i);
       if (c == '^')

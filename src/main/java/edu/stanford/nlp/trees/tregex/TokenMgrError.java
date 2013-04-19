@@ -2,6 +2,8 @@
 /* JavaCCOptions: */
 package edu.stanford.nlp.trees.tregex;
 
+import javolution.text.TxtBuilder;
+
 /** Token Manager Error. */
 class TokenMgrError extends Error
 {
@@ -48,7 +50,7 @@ class TokenMgrError extends Error
    * equivalents in the given string
    */
   protected static final String addEscapes(String str) {
-    StringBuilder retval = new StringBuilder();
+    TxtBuilder retval = new TxtBuilder();
     char ch;
     for (int i = 0; i < str.length(); i++) {
       switch (str.charAt(i))

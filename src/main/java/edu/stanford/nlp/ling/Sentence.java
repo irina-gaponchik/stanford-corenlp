@@ -1,5 +1,7 @@
 package edu.stanford.nlp.ling;
 
+import javolution.text.TxtBuilder;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -176,7 +178,7 @@ public class Sentence {
    */
   public static <T> String listToString(List<T> list, boolean justValue,
                                         String separator) {
-    StringBuilder s = new StringBuilder();
+    TxtBuilder s = new TxtBuilder();
     for (Iterator<T> wordIterator = list.iterator(); wordIterator.hasNext();) {
       T o = wordIterator.next();
       s.append(wordToString(o, justValue, separator));
@@ -233,7 +235,7 @@ public class Sentence {
    */
   public static <T> String extractNgram(List<T> list, int start, int end) {
     if (start < 0 || end > list.size() || start >= end) return null;
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     // TODO: iterator
     for (int i = start; i < end; i++) {
       T o = list.get(i);

@@ -20,6 +20,7 @@ import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 /**
  * A {@link TreebankLangParserParams} implementing class for
@@ -37,7 +38,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     private static final Pattern COMPILE = Pattern.compile("VB[^P].*PRD.*");
     private static final Pattern PATTERN = Pattern.compile(",");
 
-    private final StringBuilder optionsString;
+    private final TxtBuilder optionsString;
 
   private boolean retainNPTmp;
   private boolean retainNPSbj;
@@ -58,7 +59,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
   public ArabicTreebankParserParams() {
     super(new ArabicTreebankLanguagePack());
 
-    optionsString = new StringBuilder();
+    optionsString = new TxtBuilder();
     optionsString.append("ArabicTreebankParserParams\n");
 
     annotationPatterns = Generics.newHashMap();
@@ -234,7 +235,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
   public Tree transformTree(Tree t, Tree root) {
 
     String baseCat = t.value();
-    StringBuilder newCategory = new StringBuilder();
+    TxtBuilder newCategory = new TxtBuilder();
 
     //Add manual state splits
     for (Pair<TregexPattern,Function<TregexMatcher,String>> e : activeAnnotations) {

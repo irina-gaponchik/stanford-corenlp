@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 public class Lattice implements Serializable, Iterable<LatticeEdge> {
 
@@ -65,7 +66,7 @@ public class Lattice implements Serializable, Iterable<LatticeEdge> {
 	
 	@Override
 	public String toString() {
-	  StringBuilder sb = new StringBuilder();
+	  TxtBuilder sb = new TxtBuilder();
 	  sb.append(String.format("[ Lattice: %d edges  %d nodes ]\n",edges.size(), nodes.size()));
 	  for(LatticeEdge e : edges)
 	    sb.append("  ").append(e.toString()).append('\n');

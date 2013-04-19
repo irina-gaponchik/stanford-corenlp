@@ -7,6 +7,7 @@ import edu.stanford.nlp.ling.tokensregex.types.Value;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 import org.joda.time.*;
 import org.joda.time.format.*;
 
@@ -206,7 +207,7 @@ public class TimeFormatter {
         quantifier = quantifier != null ? quantifier + str : str;
     }
     
-    public StringBuilder appendRegex(StringBuilder sb) {
+    public TxtBuilder appendRegex(TxtBuilder sb) {
       if (group > 0) {
         sb.append('(');
       }
@@ -219,7 +220,7 @@ public class TimeFormatter {
       }
       return sb;
     }
-    abstract protected StringBuilder appendRegex0(StringBuilder sb);
+    abstract protected TxtBuilder appendRegex0(TxtBuilder sb);
 
     public SUTime.Temporal updateTemporal(SUTime.Temporal t, String fieldValueStr) { return t; }
     public int getGroup() { return group; }
@@ -266,7 +267,7 @@ public class TimeFormatter {
       maxValue = property.getMaximumValueOverall();
     }
 
-    protected StringBuilder appendRegex0(StringBuilder sb) {
+    protected TxtBuilder appendRegex0(TxtBuilder sb) {
       if (maxDigits > 5 || minDigits != maxDigits) {
         sb.append("\\d{").append(minDigits).append(',').append(maxDigits).append('}');
       } else {
@@ -299,7 +300,7 @@ public class TimeFormatter {
       }
     }
 
-    protected StringBuilder appendRegex0(StringBuilder sb) {
+    protected TxtBuilder appendRegex0(TxtBuilder sb) {
       if (maxDigits > 5 || minDigits != maxDigits) {
         sb.append("\\d{").append(minDigits).append(',').append(maxDigits).append('}');
       } else {
@@ -383,7 +384,7 @@ public class TimeFormatter {
       return v;
     }
 
-    protected StringBuilder appendRegex0(StringBuilder sb) {
+    protected TxtBuilder appendRegex0(TxtBuilder sb) {
       boolean first = true;
       for (String v:validValues) {
         if (first) {
@@ -399,7 +400,7 @@ public class TimeFormatter {
 
   private static class TimeZoneOffsetComponent extends FormatComponent
   {
-    String zeroOffsetParseText;  // Text indicating timezone offset is zero
+    String zeroOffsetParseText;  // Txt indicating timezone offset is zero
 
     // TimezoneOffset is + or - followed by
     // hh
@@ -414,7 +415,7 @@ public class TimeFormatter {
       this.zeroOffsetParseText = zeroOffsetParseText;
     }
 
-    protected StringBuilder appendRegex0(StringBuilder sb) {
+    protected TxtBuilder appendRegex0(TxtBuilder sb) {
       sb.append("[+-]\\d\\d(?::?\\d\\d(?::?\\d\\d(?:[.,]?\\d{1,3})?)?)?");
       if (zeroOffsetParseText != null) {
         sb.append('|').append(Pattern.quote(zeroOffsetParseText));
@@ -507,7 +508,7 @@ public class TimeFormatter {
       return v;
     }
 
-    protected StringBuilder appendRegex0(StringBuilder sb) {
+    protected TxtBuilder appendRegex0(TxtBuilder sb) {
       boolean first = true;
       for (String v:validValues) {
         if (first) {
@@ -537,7 +538,7 @@ public class TimeFormatter {
       this.text = str;
     }
     
-    protected StringBuilder appendRegex0(StringBuilder sb) {
+    protected TxtBuilder appendRegex0(TxtBuilder sb) {
       sb.append(Pattern.quote(text));
       return sb;
     }
@@ -551,7 +552,7 @@ public class TimeFormatter {
       this.regex = regex;
     }
 
-    protected StringBuilder appendRegex0(StringBuilder sb) {
+    protected TxtBuilder appendRegex0(TxtBuilder sb) {
       sb.append(regex);
       return sb;
     }
@@ -570,7 +571,7 @@ public class TimeFormatter {
     }
     
     public String toTextRegex() {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       sb.append("\\b");
       for (FormatComponent fc:pieces) {
         fc.appendRegex(sb);
@@ -963,7 +964,7 @@ public class TimeFormatter {
    * @return the parsed token
    */
   private static String parseToken(String pattern, int... indexRef) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
 
     int i = indexRef[0];
     int length = pattern.length();

@@ -9,6 +9,8 @@ import java.util.logging.Logger;
 
 import edu.stanford.nlp.process.data.*;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.Txt;
+import javolution.text.TxtBuilder;
 
 
 /**
@@ -281,7 +283,7 @@ public class Morpha {
     }
 
     private CharSequence common_noun_stem() {
-        return changeCase() ? yytext().toString().toLowerCase() : yytext();
+        return changeCase() ? yytext().toLowerCase() : yytext();
     }
 
     private CharSequence proper_name_stem() {
@@ -296,16 +298,16 @@ public class Morpha {
             return s;
         }
 
-        StringBuilder s1 = new StringBuilder(s);
+        TxtBuilder s1 = new TxtBuilder(s);
         if (Character.isLowerCase(s1.charAt(0))) {
             s1.setCharAt(0, Character.toUpperCase(s1.charAt(0)));
         }
-        for (int j = 1; j < s1.length(); j++) {
+        int length = s1.length();
+        for (int j = 1; j < length; j++)
             if (Character.isUpperCase(s1.charAt(j))) {
                 s1.setCharAt(j, Character.toLowerCase(s1.charAt(j)));
             }
-        }
-        return s1.toString();
+        return s1;
     }
 
     /**
@@ -318,7 +320,7 @@ public class Morpha {
     }
 
     CharSequence condub_stem(int del, CharSequence affix) {
-        StringBuilder yytextBuff = changeCase() ? new StringBuilder(yytext().toString().toLowerCase()) : new StringBuilder(yytext());
+        TxtBuilder yytextBuff = new TxtBuilder(changeCase() ? yytext().toLowerCase() : yytext());
         int stem_length = yylength() - del;
         char d = yytextBuff.charAt(stem_length - 1);
         if (del > 0) yytextBuff.setLength(stem_length - 1);
@@ -357,13 +359,10 @@ public class Morpha {
      */
     private CharSequence stem(int del, CharSequence add, CharSequence affix) {
         int stem_length = yylength() - del;
-        int i = 0;
-
-        CharSequence result = yytext().subSequence(0, stem_length);
-        if (changeCase()) result = result.toString().toLowerCase();
-        if (add.length() != 0) result = result + add.toString();
-        if (option(print_affixes)) result = result + ("+" + affix);
-        return result;
+        Txt result = yytext().subtext(0, stem_length);
+        if (changeCase()) result = result.toLowerCase();
+        if (add.length() != 0) result = result.plus(add);
+        return option(print_affixes) ? result.plus("+").plus(affix) : result;
     }
 
     private CharSequence semi_reg_stem(int del, CharSequence add) {
@@ -396,19 +395,15 @@ public class Morpha {
                 break;
         }
 
-        StringBuilder result;
+        Txt result;
         {
 
-            CharSequence seq = yytext().subSequence(0, stem_length);
-            result = changeCase() ? new StringBuilder(seq.toString().toLowerCase()) : new StringBuilder(seq);
+            Txt seq = yytext().subtext(0, stem_length);
+            result = changeCase() ? (seq.toLowerCase()) : (seq);
         }
 
-        result.append(result).append(add);
-        if (option(print_affixes)) {
-            result .append(result).append("+").append(affix).toString();
-        }
-
-        return result;
+        result.plus(result).plus(add);
+        return option(print_affixes) ? result.plus(result).plus("+").plus(affix) : result;
     }
 
     /**
@@ -557,8 +552,8 @@ public class Morpha {
     /**
      * Returns the text matched by the current regular expression.
      */
-    CharSequence yytext() {
-    return     CharBuffer.wrap(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
+    Txt yytext() {
+    return     Txt.valueOf(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
     }
 
     /**

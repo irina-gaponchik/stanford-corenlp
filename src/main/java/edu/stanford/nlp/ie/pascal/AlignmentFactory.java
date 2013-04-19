@@ -2,6 +2,7 @@ package edu.stanford.nlp.ie.pascal;
 
 import java.util.*;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * Generates {@link Alignment} objects for acronym alignment.
@@ -81,7 +82,7 @@ public class AlignmentFactory {
   }
 
   public static String dumpIntArray(int... a) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     buf.append('[');
     for (int anA : a) {
       buf.append(anA).append(' ');

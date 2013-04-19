@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import javolution.text.TxtBuilder;
 import org.xml.sax.SAXException;
 
 import edu.stanford.nlp.ie.machinereading.GenericDataSetReader;
@@ -182,7 +183,7 @@ public class AceReader extends GenericDataSetReader {
 
   // todo: Change to use a counters print method (get sorting for free!)
   private void printCounter(Counter<String> c, String h) {
-    StringBuilder b = new StringBuilder();
+    TxtBuilder b = new TxtBuilder();
     b.append(h).append(" counts:\n");
     Set<String> keys = c.keySet();
     for(String k: keys){
@@ -229,7 +230,7 @@ public class AceReader extends GenericDataSetReader {
     /*
     for (int sentenceIndex = 0; sentenceIndex < aceDocument.getSentenceCount(); sentenceIndex++) {
       List<AceToken> tokens = aceDocument.getSentence(sentenceIndex);
-      StringBuffer b = new StringBuffer();
+      StringBuilder b = new StringBuilder();
       for(AceToken t: tokens) b.append(t.getLiteral() + " " );
       logger.info("SENTENCE: " + b.toString());
     }
@@ -240,7 +241,7 @@ public class AceReader extends GenericDataSetReader {
       List<AceToken> tokens = aceDocument.getSentence(sentenceIndex);
 
       List<CoreLabel> words = new ArrayList<>();
-      StringBuilder textContent = new StringBuilder();
+      TxtBuilder textContent = new TxtBuilder();
       for(int i = 0; i < tokens.size(); i ++){
         CoreLabel l = new CoreLabel();
         l.setWord(tokens.get(i).getLiteral());

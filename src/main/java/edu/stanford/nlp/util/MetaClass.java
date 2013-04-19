@@ -1,5 +1,8 @@
 package edu.stanford.nlp.util;
 
+import javolution.text.Txt;
+import javolution.text.TxtBuilder;
+
 import java.io.File;
 import java.lang.reflect.*;
 import java.util.Arrays;
@@ -169,12 +172,12 @@ public class MetaClass {
       // (filter:min)
       this.constructor = (Constructor<T>) argmin(potentials, distances, 0);
       if (this.constructor == null) {
-        StringBuilder b = new StringBuilder();
-        b.append(classname).append('(');
+        Txt b =
+                Txt.valueOf(classname).plus('(');
         for (Class<?> c : params) {
-          b.append(c.getName()).append(", ");
+          b.plus(c.getName()).plus(", ");
         }
-        String target = b.substring(0, params.length==0 ? b.length() : b.length() - 2) + ')';
+          Txt target = b.subtext(0, params.length == 0 ? b.length() : b.length() - 2).plus(')');
         throw new ConstructorNotFoundException(
             "No constructor found to match: " + target);
       }
@@ -245,13 +248,12 @@ public class MetaClass {
 
     @Override
     public String toString() {
-      StringBuilder b = new StringBuilder();
-      b.append(cl.getName()).append('(');
+      Txt b = Txt.valueOf((cl.getName())).plus('(');
       for (Class<?> cl : classParams) {
-        b.append(' ').append(cl.getName()).append(',');
+        b.plus(' ').plus(cl.getName()).plus(',');
       }
-      b.replace(b.length() - 1, b.length(), " ");
-      b.append(')');
+      b= Txt.valueOf(new StringBuilder(b.toString()).replace(b.length() - 1, b.length(), " "));
+      b.plus(')');
       return b.toString();
     }
 
@@ -261,10 +263,9 @@ public class MetaClass {
         ClassFactory other = (ClassFactory) o;
         if (!this.cl.equals(other.cl))
           return false;
-        for (int i = 0; i < classParams.length; i++) {
-          if (!this.classParams[i].equals(other.classParams[i]))
-            return false;
-        }
+        for (int i = 0; i < classParams.length; i++)
+            if (!this.classParams[i].equals(other.classParams[i]))
+                return false;
         return true;
       } else {
         return false;
@@ -481,8 +482,8 @@ public class MetaClass {
 		//--Parse the String
 		//(state)
 		char quoteCloseChar = (char) 0;
-		List<StringBuilder> terms = new LinkedList<>();
-		StringBuilder current = new StringBuilder();
+		List<TxtBuilder> terms = new LinkedList<>();
+		TxtBuilder current = new TxtBuilder();
 		//(start/stop overhead)
 		int start = 0; int end = chars.length;
 		if(chars[0] == '('){ start += 1; end -= 1; if(chars[end] != ')') throw new IllegalArgumentException("Unclosed paren in encoded array: " + encoded); }
@@ -512,7 +513,7 @@ public class MetaClass {
           if (current.length() > 0) {
 					  terms.add(current);
           }
-					current = new StringBuilder();
+					current = new TxtBuilder();
 				}else{
 					current.append(chars[i]);
 				}
@@ -523,7 +524,7 @@ public class MetaClass {
 		if(current.length() > 0) terms.add(current);
 		String[] rtn = new String[terms.size()];
 		int i=0;
-		for(StringBuilder b : terms){
+		for(TxtBuilder b : terms){
 			rtn[i] = b.toString().trim();
 			i += 1;
 		}

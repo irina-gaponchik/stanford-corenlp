@@ -8,6 +8,7 @@ import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Triple;
+import javolution.text.TxtBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -312,7 +313,7 @@ public class MultiClassPrecisionRecallExtendedStats<L> extends MultiClassPrecisi
 
   private String getConllEvalString(List<L> orderedLabels, boolean ignoreNegLabel)
   {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     int correctPhrases = getCorrect() - getCorrect(negLabel);
     Triple<Double,Integer,Integer> accuracyInfo = getAccuracyInfo();
     int totalCount = accuracyInfo.second() + accuracyInfo.third();

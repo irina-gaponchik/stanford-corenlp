@@ -8,6 +8,7 @@ import edu.stanford.nlp.trees.international.pennchinese.ChineseUtils;
 import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Timing;
+import javolution.text.TxtBuilder;
 
 // TODO: put in a regexp for ordinals, fraction num/num and perhaps even 30-5/8
 
@@ -245,7 +246,7 @@ public class WordShapeClassifier {
    * @return The word shape
    */
   private static String wordShapeDan2(CharSequence s, Collection<String> knownLCWords) {
-    StringBuilder sb = new StringBuilder("WT-");
+    TxtBuilder sb = new TxtBuilder("WT-");
     char lastM = '~';
     boolean nonLetters = false;
     int len = s.length();
@@ -280,7 +281,7 @@ public class WordShapeClassifier {
   }
 
   private static String wordShapeJenny1(CharSequence s, Collection<String> knownLCWords) {
-    StringBuilder sb = new StringBuilder("WT-");
+    TxtBuilder sb = new TxtBuilder("WT-");
     char lastM = '~';
     boolean nonLetters = false;
     for (int i = 0; i < s.length(); i++) {
@@ -357,7 +358,7 @@ public class WordShapeClassifier {
   // Do the simple case of words <= BOUNDARY_SIZE * 2 (i.e., 4) with only 1 object allocation!
   private static String wordShapeChris2Short(CharSequence s, int len, Collection<String> knownLCWords) {
     int sbLen = knownLCWords != null ? len + 1: len;  // markKnownLC makes String 1 longer
-    StringBuilder sb = new StringBuilder(sbLen);
+    TxtBuilder sb = new TxtBuilder(sbLen);
     boolean nonLetters = false;
 
     for (int i = 0; i < len; i++) {
@@ -450,7 +451,7 @@ public class WordShapeClassifier {
     // Calculate size. This may be an upperbound, but is often correct
     int sbSize = beginUpto + endUpto + seenSet.size();
     if (knownLCWords != null) { sbSize++; }
-    StringBuilder sb = new StringBuilder(sbSize);
+    TxtBuilder sb = new TxtBuilder(sbSize);
     // put in the beginning chars
     sb.append(beginChars, 0, beginUpto);
     // put in the stored ones sorted
@@ -565,7 +566,7 @@ public class WordShapeClassifier {
   // Do the simple case of words <= BOUNDARY_SIZE * 2 (i.e., 4) with only 1 object allocation!
   private static String wordShapeChris4Short(CharSequence s, int len, Collection<String> knownLCWords) {
     int sbLen = knownLCWords != null ? len + 1: len;  // markKnownLC makes String 1 longer
-    StringBuilder sb = new StringBuilder(sbLen);
+    TxtBuilder sb = new TxtBuilder(sbLen);
     boolean nonLetters = false;
 
     for (int i = 0; i < len; i++) {
@@ -598,8 +599,8 @@ public class WordShapeClassifier {
 
 
   private static String wordShapeChris4Long(CharSequence s, boolean omitIfInBoundary, int len, Collection<String> knownLCWords) {
-    StringBuilder sb = new StringBuilder(s.length() + 1);
-    StringBuilder endSB = new StringBuilder(BOUNDARY_SIZE);
+    TxtBuilder sb = new TxtBuilder(s.length() + 1);
+    TxtBuilder endSB = new TxtBuilder(BOUNDARY_SIZE);
     Set<Character> boundSet = Generics.newHashSet(BOUNDARY_SIZE << 1);
     Set<Character> seenSet = new TreeSet<>();  // TreeSet guarantees stable ordering
     boolean nonLetters = false;

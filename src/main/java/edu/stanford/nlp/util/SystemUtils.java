@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util;
 
+import javolution.text.TxtBuilder;
+
 import java.util.*;
 import java.io.*;
 
@@ -175,11 +177,11 @@ public class SystemUtils {
   /**
    * Runs the shell command which is specified, along with its arguments, in the
    * given {@code String} array.  If there is any regular output or error
-   * output, it is appended to the given {@code StringBuilder}s.
+   * output, it is appended to the given {@code javolution.text.TxtBuilder}s.
    */
   public static void runShellCommand(String[] cmd,
-                                     StringBuilder outputLines,
-                                     StringBuilder errorLines)
+                                     TxtBuilder outputLines,
+                                     TxtBuilder errorLines)
     throws IOException {
     Process p = Runtime.getRuntime().exec(cmd);
     if (outputLines != null) {
@@ -204,11 +206,11 @@ public class SystemUtils {
   /**
    * Runs the shell command which is specified, along with its arguments, in the
    * given {@code String}.  If there is any regular output or error output,
-   * it is appended to the given {@code StringBuilder}s.
+   * it is appended to the given {@code javolution.text.TxtBuilder}s.
    */
   public static void runShellCommand(String cmd,
-                                     StringBuilder outputLines,
-                                     StringBuilder errorLines)
+                                     TxtBuilder outputLines,
+                                     TxtBuilder errorLines)
     throws IOException {
     runShellCommand(new String[] {cmd}, outputLines, errorLines);
   }
@@ -217,11 +219,11 @@ public class SystemUtils {
   /**
    * Runs the shell command which is specified, along with its arguments, in the
    * given {@code String} array.  If there is any regular output, it is
-   * appended to the given {@code StringBuilder}.  If there is any error
+   * appended to the given {@code javolution.text.TxtBuilder}.  If there is any error
    * output, it is swallowed (!).
    */
   public static void runShellCommand(String[] cmd,
-                                     StringBuilder outputLines)
+                                     TxtBuilder outputLines)
     throws IOException {
     runShellCommand(cmd, outputLines, null);
   }
@@ -230,11 +232,11 @@ public class SystemUtils {
   /**
    * Runs the shell command which is specified, along with its arguments, in the
    * given {@code String}.  If there is any regular output, it is appended
-   * to the given {@code StringBuilder}.  If there is any error output, it
+   * to the given {@code javolution.text.TxtBuilder}.  If there is any error output, it
    * is swallowed (!).
    */
   public static void runShellCommand(String cmd,
-                                     StringBuilder outputLines)
+                                     TxtBuilder outputLines)
     throws IOException {
     runShellCommand(new String[] {cmd}, outputLines, null);
   }
@@ -268,7 +270,7 @@ public class SystemUtils {
     // note that we ask Perl for "ppid" -- process ID of parent -- that's us
     String[] cmd =
             {"perl", "-e", "print getppid() . \"\\n\";"};
-    StringBuilder out = new StringBuilder();
+    TxtBuilder out = new TxtBuilder();
     runShellCommand(cmd, out);
     return Integer.parseInt(out.toString());
   }
@@ -299,7 +301,7 @@ public class SystemUtils {
 
 
   public static void main(String... args) throws Exception {
-    StringBuilder out = new StringBuilder();
+    TxtBuilder out = new TxtBuilder();
     runShellCommand("date", out);
     System.out.println("The date is " + out);
     int pid = getPID();

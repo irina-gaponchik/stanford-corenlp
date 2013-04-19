@@ -12,6 +12,7 @@ import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.stats.IntCounter;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.*;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.util.*;
@@ -241,7 +242,7 @@ public class CoNLL2011DocumentReader {
 
   private static String concatField(List<String[]> sentWords, int pos)
   {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (String[] fields:sentWords) {
       if (sb.length() > 0) {
         sb.append(' ');
@@ -293,7 +294,7 @@ public class CoNLL2011DocumentReader {
 
     private static Tree wordsToParse(List<String[]> sentWords)
     {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       for (String[] fields:sentWords) {
         if (sb.length() > 0) {
           sb.append(' ');
@@ -899,13 +900,13 @@ public class CoNLL2011DocumentReader {
       }
     }
 
-    private static void appendFrac(StringBuilder sb, String label, int num, int den)
+    private static void appendFrac(TxtBuilder sb, String label, int num, int den)
     {
       double frac = (double) num / den;
       sb.append(label).append('\t').append(frac).append("\t(").append(num).append('/').append(den).append(')');
     }
 
-    private static <E> void appendIntCountStats(StringBuilder sb, String label, IntCounter<E> counts)
+    private static <E> void appendIntCountStats(TxtBuilder sb, String label, IntCounter<E> counts)
     {
       sb.append(label).append('\n');
       List<E> sortedKeys = Counters.toSortedList(counts);
@@ -919,7 +920,7 @@ public class CoNLL2011DocumentReader {
 
     public String toString()
     {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       appendIntCountStats(sb, "Mention Tree Labels (no preterminals)", mentionTreeNonPretermLabelCounter);
       sb.append('\n');
       appendIntCountStats(sb, "Mention Tree Labels (with preterminals)", mentionTreeLabelCounter);

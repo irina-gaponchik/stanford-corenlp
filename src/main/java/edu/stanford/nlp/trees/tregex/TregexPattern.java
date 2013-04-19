@@ -42,6 +42,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.Timing;
+import javolution.text.TxtBuilder;
 
 
 /**
@@ -556,7 +557,7 @@ public abstract class TregexPattern implements Serializable {
   public static void main(String... args) throws IOException {
     Timing.startTime();
 
-    StringBuilder treePrintFormats = new StringBuilder();
+    TxtBuilder treePrintFormats = new TxtBuilder();
     String printNonMatchingTreesOption = "-v";
     String subtreeCodeOption = "-x";
     String extractSubtreesOption = "-extract";

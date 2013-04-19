@@ -7,6 +7,7 @@ import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.util.*;
@@ -1043,7 +1044,7 @@ public class Options implements Serializable {
 
   public void writeData(Writer w) {//throws IOException {
     PrintWriter out = new PrintWriter(w);
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append(lexOptions.toString());
     sb.append("parserParams ").append(tlpParams.getClass().getName()).append('\n');
     sb.append("forceCNF ").append(forceCNF).append('\n');

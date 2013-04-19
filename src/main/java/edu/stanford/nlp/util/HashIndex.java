@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util;
 
+import javolution.text.TxtBuilder;
+
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.Semaphore;
@@ -374,7 +376,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    *  @return A String showing some of the index contents
    */
   public String toString(int n) {
-    StringBuilder buff = new StringBuilder("[");
+    TxtBuilder buff = new TxtBuilder("[");
     int sz = objects.size();
     if (n > sz) {
       n = sz;
@@ -391,7 +393,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
   }
 
   public String toStringOneEntryPerLine(int n) {
-    StringBuilder buff = new StringBuilder();
+    TxtBuilder buff = new TxtBuilder();
     int sz = objects.size();
     if (n > sz) {
       n = sz;

@@ -16,6 +16,7 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 public class Dictionaries {
 
@@ -431,7 +432,7 @@ public class Dictionaries {
   }
 
   public static String signature(Properties props) {
-    StringBuilder os = new StringBuilder();
+    TxtBuilder os = new TxtBuilder();
     os.append(Constants.DEMONYM_PROP + ':').append(props.getProperty(Constants.DEMONYM_PROP,
             DefaultPaths.DEFAULT_DCOREF_DEMONYM));
     os.append(Constants.ANIMATE_PROP + ':').append(props.getProperty(Constants.ANIMATE_PROP,

@@ -7,6 +7,7 @@ import edu.stanford.nlp.util.BinaryHeapPriorityQueue;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.PriorityQueue;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 import java.text.NumberFormat;
 import java.util.List;
@@ -153,7 +154,7 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setMaximumFractionDigits(numDigits);
 
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     double confWeightedAccuracy = confidenceWeightedAccuracy();
     sb.append("--- Accuracy Stats ---").append('\n');
     sb.append("accuracy: ").append(nf.format(accuracy)).append(" (").append(correct).append('/').append(total).append(")\n");

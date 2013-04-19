@@ -27,8 +27,8 @@ import edu.stanford.nlp.util.IntPair;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.Scored;
-import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.XMLUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * The abstract class {@code Tree} is used to collect all of the
@@ -595,35 +595,35 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
   /**
    * Most instances of {@code Tree} will take a lot more than
-   * than the default {@code StringBuffer} size of 16 to print
+   * than the default {@code StringBuilder} size of 16 to print
    * as an indented list of the whole tree, so we enlarge the default.
    */
   private static final int initialPrintStringBuilderSize = 500;
 
   /**
    * Appends the printed form of a parse tree (as a bracketed String)
-   * to an {@code Appendable}, such as a {@code StringBuffer}.
+   * to an {@code Appendable}, such as a {@code StringBuilder}.
    * The implementation of this may be more efficient than for
    * {@code toString()} on complex trees.
    *
-   * @param sb The {@code StringBuilder} to which the tree will be appended
-   * @return Returns the {@code StringBuilder} passed in with extra stuff in it
+   * @param sb The {@code javolution.text.TxtBuilder} to which the tree will be appended
+   * @return Returns the {@code javolution.text.TxtBuilder} passed in with extra stuff in it
    */
-  public StringBuilder toStringBuilder(StringBuilder sb) {
+  public TxtBuilder toStringBuilder(TxtBuilder sb) {
     return toStringBuilder(sb, true);
   }
 
   /**
    * Appends the printed form of a parse tree (as a bracketed String)
-   * to an {@code Appendable}, such as a {@code StringBuffer}.
+   * to an {@code Appendable}, such as a {@code StringBuilder}.
    * The implementation of this may be more efficient than for
    * {@code toString()} on complex trees.
    *
-   * @param sb The {@code StringBuilder} to which the tree will be appended
+   * @param sb The {@code javolution.text.TxtBuilder} to which the tree will be appended
    * @param printOnlyLabelValue If true, print only the value() of each node's label
-   * @return Returns the {@code StringBuilder} passed in with extra stuff in it
+   * @return Returns the {@code javolution.text.TxtBuilder} passed in with extra stuff in it
    */
-  public StringBuilder toStringBuilder(StringBuilder sb, boolean printOnlyLabelValue) {
+  public TxtBuilder toStringBuilder(TxtBuilder sb, boolean printOnlyLabelValue) {
     if (isLeaf()) {
       if (label() != null) {
         if(printOnlyLabelValue) {
@@ -661,14 +661,14 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * Converts parse tree to string in Penn Treebank format.
    * <p>
    * Implementation note: Internally, the method gains
-   * efficiency by chaining use of a single {@code StringBuilder}
+   * efficiency by chaining use of a single {@code javolution.text.TxtBuilder}
    * through all the printing.
    *
    * @return the tree as a bracketed list on one line
    */
   @Override
   public String toString() {
-    return toStringBuilder(new StringBuilder(Tree.initialPrintStringBuilderSize)).toString();
+    return toStringBuilder(new TxtBuilder(Tree.initialPrintStringBuilderSize)).toString();
   }
 
 
@@ -676,7 +676,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
 
   private static String makeIndentString(int indent) {
-    StringBuilder sb = new StringBuilder(indent);
+    TxtBuilder sb = new TxtBuilder(indent);
     for (int i = 0; i < indentIncr; i++) {
       sb.append(' ');
     }
@@ -736,7 +736,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @param printScores Whether to print the scores (log probs) of tree nodes
    */
   private void indentedListPrint(String indent, String pad, PrintWriter pw, boolean printScores) {
-    StringBuilder sb = new StringBuilder(indent);
+    TxtBuilder sb = new TxtBuilder(indent);
     Label label = label();
     if (label != null) {
       sb.append(label.toString());
@@ -789,7 +789,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    */
   private void indentedXMLPrint(String indent, String pad,
                                 PrintWriter pw, boolean printScores) {
-    StringBuilder sb = new StringBuilder(indent);
+    TxtBuilder sb = new TxtBuilder(indent);
     Tree[] children = children();
     Label label = label();
     if (label != null) {
@@ -812,7 +812,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
             aChildren.indentedXMLPrint(newIndent, pad, pw, printScores);
         }
       if (label != null) {
-        sb = new StringBuilder(indent);
+        sb = new TxtBuilder(indent);
         sb.append("</");
         sb.append(XMLUtils.escapeXML(Sentence.wordToString(label, true)));
         sb.append('>');
@@ -868,7 +868,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
       }
     }
     if (isLeaf() || isPreTerminal()) {
-      String terminalString = toStringBuilder(new StringBuilder(), onlyLabelValue).toString();
+      String terminalString = toStringBuilder(new TxtBuilder(), onlyLabelValue).toString();
       pw.print(terminalString);
       pw.flush();
       return;

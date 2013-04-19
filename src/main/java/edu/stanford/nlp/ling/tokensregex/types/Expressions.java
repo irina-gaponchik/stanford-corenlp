@@ -8,6 +8,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.MetaClass;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
@@ -625,7 +626,7 @@ public class Expressions {
     }
 
     public String toString() {
-      StringBuilder sb = new StringBuilder("");
+      TxtBuilder sb = new TxtBuilder("");
       sb.append(function);
       sb.append('(');
       sb.append(StringUtils.join(params, ", "));
@@ -674,7 +675,7 @@ public class Expressions {
             return f.apply(env, evaled);
           }
         }
-        StringBuilder sb = new StringBuilder();
+        TxtBuilder sb = new TxtBuilder();
         sb.append("Cannot find function matching args: ").append(function).append(NEWLINE);
         sb.append("Args are: ").append(StringUtils.join(evaled, ",")).append(NEWLINE);
           if (fs.isEmpty()) {
@@ -757,7 +758,7 @@ public class Expressions {
     }
 
     public String toString() {
-      StringBuilder sb = new StringBuilder("");
+      TxtBuilder sb = new TxtBuilder("");
       sb.append(object);
       sb.append('.');
       sb.append(function);

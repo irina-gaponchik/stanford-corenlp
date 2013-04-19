@@ -1,6 +1,7 @@
 package edu.stanford.nlp.optimization;
 
 import edu.stanford.nlp.util.MemoryMonitor;
+import javolution.text.TxtBuilder;
 
 /**
  * Evaluate current memory usage
@@ -21,7 +22,7 @@ public class MemoryEvaluator implements Evaluator {
   }
 
   public double evaluate(double... x) {
-    StringBuilder sb = new StringBuilder("Memory Usage: ");
+    TxtBuilder sb = new TxtBuilder("Memory Usage: ");
     sb.append(" used(KB):").append(memMonitor.getUsedMemory(false));
     sb.append(" maxAvailable(KB):").append(memMonitor.getMaxAvailableMemory(false));
     sb.append(" max(KB):").append(memMonitor.getMaxMemory());

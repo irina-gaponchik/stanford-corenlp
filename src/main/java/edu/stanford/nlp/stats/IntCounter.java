@@ -22,6 +22,7 @@ import edu.stanford.nlp.util.MapFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
+import javolution.text.TxtBuilder;
 
 /**
  * A specialized kind of hash table (or map) for storing numeric counts for
@@ -504,7 +505,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
 
 
   public String toString(NumberFormat nf, String preAppend, String postAppend, String keyValSeparator, String itemSeparator) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append(preAppend);
     List<E> list = new ArrayList<>(map.keySet());
     try {
@@ -526,7 +527,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
 
 
   public String toString(NumberFormat nf) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append('{');
     List<E> list = new ArrayList<>(map.keySet());
     try {

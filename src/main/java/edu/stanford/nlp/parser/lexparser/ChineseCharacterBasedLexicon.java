@@ -8,10 +8,9 @@ import edu.stanford.nlp.stats.*;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.trees.international.pennchinese.RadicalMap;
 import edu.stanford.nlp.util.Generics;
-import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
-import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.Timing;
+import javolution.text.TxtBuilder;
 
 /**
  * @author Galen Andrew
@@ -304,7 +303,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
    * @return a sampled word
    */
   public String sampleFrom(String tag) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     List<Serializable> context = new ArrayList<>(CONTEXT_LENGTH + 1);
 
     // context must contain [tag prevChar prevPrevChar]

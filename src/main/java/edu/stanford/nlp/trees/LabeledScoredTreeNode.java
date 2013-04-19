@@ -7,6 +7,7 @@ import java.util.List;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.LabelFactory;
+import javolution.text.TxtBuilder;
 
 /**
  * A {@code LabeledScoredTreeNode} represents a tree composed of a root
@@ -188,7 +189,7 @@ public class LabeledScoredTreeNode extends Tree {
 
 	@Override
 	public String nodeString() {
-		StringBuilder buff = new StringBuilder();
+		TxtBuilder buff = new TxtBuilder();
 		buff.append(super.nodeString());
 		if ( ! Double.isNaN(score)) {
 			buff.append(" [").append(nf.format(-score)).append(']');

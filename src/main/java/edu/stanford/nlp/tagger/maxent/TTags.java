@@ -7,6 +7,7 @@ import edu.stanford.nlp.tagger.common.TaggerConstants;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
+import javolution.text.TxtBuilder;
 
 import java.io.IOException;
 import java.io.DataInputStream;
@@ -445,7 +446,7 @@ public class TTags {
 
   @Override
   public String toString() {
-    StringBuilder s = new StringBuilder();
+    TxtBuilder s = new TxtBuilder();
     s.append(index.toString());
     s.append(' ');
     if (openFixed) {

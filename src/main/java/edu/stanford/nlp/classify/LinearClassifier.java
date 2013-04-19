@@ -37,6 +37,7 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.stats.Distribution;
 import edu.stanford.nlp.stats.Counters;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -546,7 +547,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
 
     //print high weight features to a String
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (Triple<F,L,Double> t : topFeatures) {
       String key = "(" + t.first + ',' + t.second + ')';
       sb.append(StringUtils.pad(key, maxLeng));
@@ -635,7 +636,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
 
     //print high weight features to a String
-    StringBuilder sb = new StringBuilder("LinearClassifier [printing top " + numFeatures + " features]\n");
+    TxtBuilder sb = new TxtBuilder("LinearClassifier [printing top " + numFeatures + " features]\n");
     for (Pair<Integer, Integer> p : bigColl) {
       String key = "(" + featureIndex.get(p.first) + ',' + labelIndex.get(p.second) + ')';
       sb.append(StringUtils.pad(key, maxLeng));
@@ -659,7 +660,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
    */
   public String toDistributionString(int treshold) {
     Counter<Double> weightCounts = new ClassicCounter<>();
-    StringBuilder s = new StringBuilder();
+    TxtBuilder s = new TxtBuilder();
     s.append("Total number of weights: ").append(totalSize());
       for (double[] weight : weights) {
           for (double aWeight : weight) {
@@ -890,7 +891,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
       labelLength = Math.max(labelLength, l.toString().length());
     }
 
-    StringBuilder header = new StringBuilder("");
+    TxtBuilder header = new TxtBuilder("");
     for (int s = 0; s < featureLength; s++) {
       header.append(' ');
     }
@@ -901,7 +902,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     pw.println(header);
     for (F f : features.keySet()) {
       String fStr = f.toString();
-      StringBuilder line = new StringBuilder(fStr);
+      TxtBuilder line = new TxtBuilder(fStr);
       line.append('[').append(nf.format(features.getCount(f))).append(']');
       fStr = line.toString();
       for (int s = fStr.length(); s < featureLength; s++) {
@@ -918,7 +919,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
       pw.println(line);
     }
     Counter<L> scores = scoresOfRVFDatum(example);
-    StringBuilder footer = new StringBuilder("Total:");
+    TxtBuilder footer = new TxtBuilder("Total:");
     for (int s = footer.length(); s < featureLength; s++) {
       footer.append(' ');
     }
@@ -932,7 +933,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
     pw.println(footer);
     Distribution<L> distr = Distribution.distributionFromLogisticCounter(scores);
-    footer = new StringBuilder("Prob:");
+    footer = new TxtBuilder("Prob:");
     for (int s = footer.length(); s < featureLength; s++) {
       footer.append(' ');
     }
@@ -976,7 +977,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
       labelLength = Math.max(labelLength, l.toString().length());
     }
 
-    StringBuilder header = new StringBuilder("");
+    TxtBuilder header = new TxtBuilder("");
     for (int s = 0; s < featureLength; s++) {
       header.append(' ');
     }
@@ -987,7 +988,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     pw.println(header);
     for (F f : features.keySet()) {
       String fStr = f.toString();
-      StringBuilder line = new StringBuilder(fStr);
+      TxtBuilder line = new TxtBuilder(fStr);
       line.append('[').append(nf.format(features.getCount(f))).append(']');
       fStr = line.toString();
       for (int s = fStr.length(); s < featureLength; s++) {
@@ -1004,7 +1005,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
       pw.println(line);
     }
     Counter<L> scores = scoresOf(example);
-    StringBuilder footer = new StringBuilder("Total:");
+    TxtBuilder footer = new TxtBuilder("Total:");
     for (int s = footer.length(); s < featureLength; s++) {
       footer.append(' ');
     }
@@ -1018,7 +1019,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
     pw.println(footer);
     Distribution<L> distr = Distribution.distributionFromLogisticCounter(scores);
-    footer = new StringBuilder("Prob:");
+    footer = new TxtBuilder("Prob:");
     for (int s = footer.length(); s < featureLength; s++) {
       footer.append(' ');
     }
@@ -1088,7 +1089,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
 
     // print header row of output listing classes
-    StringBuilder header = new StringBuilder("");
+    TxtBuilder header = new TxtBuilder("");
     for (int s = 0; s < featureLength; s++) {
       header.append(' ');
     }
@@ -1106,7 +1107,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     for (F f : featColl) {
       String fStr;
         fStr = printer != null ? printer.apply(f).toString() : f.toString();
-      StringBuilder line = new StringBuilder(fStr);
+      TxtBuilder line = new TxtBuilder(fStr);
       for (int s = fStr.length(); s < featureLength; s++) {
         line.append(' ');
       }
@@ -1123,7 +1124,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
 
     // Print totals, probs, etc.
     Counter<L> scores = scoresOf(example);
-    StringBuilder footer = new StringBuilder("Total:");
+    TxtBuilder footer = new TxtBuilder("Total:");
     for (int s = footer.length(); s < featureLength; s++) {
       footer.append(' ');
     }
@@ -1137,7 +1138,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
     pw.println(footer);
     Distribution<L> distr = Distribution.distributionFromLogisticCounter(scores);
-    footer = new StringBuilder("Prob:");
+    footer = new TxtBuilder("Prob:");
     for (int s = footer.length(); s < featureLength; s++) {
       footer.append(' ');
     }

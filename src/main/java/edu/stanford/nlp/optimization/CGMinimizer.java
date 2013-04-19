@@ -1,5 +1,7 @@
 package edu.stanford.nlp.optimization;
 
+import javolution.text.TxtBuilder;
+
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
@@ -51,7 +53,7 @@ public class CGMinimizer implements Minimizer<DiffFunction> {
   //  }
 
   private static String arrayToString(double[] x, int num) {
-    StringBuilder sb = new StringBuilder("(");
+    TxtBuilder sb = new TxtBuilder("(");
     if (num > x.length) {
       num = x.length;
     }

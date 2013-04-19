@@ -4,6 +4,7 @@ import edu.stanford.nlp.ling.CategoryWordTag;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeTransformer;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 
@@ -45,7 +46,7 @@ public class CNFTransformers {
               }
               String conjoinedLabels;
               if (conjoinedList.size() > 1) {
-                  StringBuilder conjoinedLabelsBuilder = new StringBuilder();
+                  TxtBuilder conjoinedLabelsBuilder = new TxtBuilder();
                   for (String s : conjoinedList) {
                       conjoinedLabelsBuilder.append('&');
                       conjoinedLabelsBuilder.append(s);

@@ -2552,7 +2552,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
   public void loadTextClassifier(String text, Properties props) throws ClassCastException, IOException,
       ClassNotFoundException, InstantiationException, IllegalAccessException {
     // System.err.println("DEBUG: in loadTextClassifier");
-    System.err.println("Loading Text Classifier from " + text);
+    System.err.println("Loading Txt Classifier from " + text);
     BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(text))));
 
     String line = br.readLine();
@@ -2970,7 +2970,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
    *          File to write text format of classifier to.
    */
   public void serializeTextClassifier(String serializePath) {
-    System.err.print("Serializing Text classifier to " + serializePath + "...");
+    System.err.print("Serializing Txt classifier to " + serializePath + "...");
     try {
       PrintWriter pw = new PrintWriter(new GZIPOutputStream(new FileOutputStream(serializePath)));
 

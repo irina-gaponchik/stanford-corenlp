@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +72,7 @@ import edu.stanford.nlp.util.Sets;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
+import javolution.text.TxtBuilder;
 
 /**
  * Static methods for operating on {@link Counter}s.
@@ -1936,7 +1936,7 @@ public class Counters {
   }
 
   public static <E> String toString(Counter<E> counter, NumberFormat nf) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append('{');
     List<E> list = ErasureUtils.sortedIfPossible(counter.keySet());
     // */
@@ -1958,7 +1958,7 @@ public class Counters {
    * doesn't sort the keys.
    */
   public static <E> String toString(Counter<E> counter, NumberFormat nf, String preAppend, String postAppend, String keyValSeparator, String itemSeparator) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append(preAppend);
     // List<E> list = new ArrayList<E>(map.keySet());
     // try {
@@ -2044,7 +2044,7 @@ public class Counters {
   public static <E> String toVerticalString(Counter<E> c, int k, String fmt, boolean swap) {
     PriorityQueue<E> q = Counters.toPriorityQueue(c);
     List<E> sortedKeys = q.toSortedList();
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     int i = 0;
     for (Iterator<E> keyI = sortedKeys.iterator(); keyI.hasNext() && i < k; i++) {
       E key = keyI.next();

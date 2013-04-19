@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util;
 
+import javolution.text.TxtBuilder;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -375,10 +377,10 @@ public class ArrayUtils {
 //     for (int i = 1; i < orig.length; i++) {
 //       if (orig[i] < orig[i-1]) { throw new RuntimeException("Array must be sorted!"); }
 
-//       StringBuilder bits = new StringBuilder();
+//       javolution.text.TxtBuilder bits = new javolution.text.TxtBuilder();
 //       int prevNum = 0;
 //       for (int f : orig) {
-//         StringBuilder bits1 = new StringBuilder();
+//         javolution.text.TxtBuilder bits1 = new javolution.text.TxtBuilder();
 //               System.err.print(f+"\t");
 //               String n = Integer.toString(f-prevNum, 2);
 //               String n1 = Integer.toString(n.length(), 2);
@@ -476,7 +478,7 @@ public class ArrayUtils {
   }
 
   public static String toString(int[][] a) {
-    StringBuilder result = new StringBuilder("[");
+    TxtBuilder result = new TxtBuilder("[");
     for (int i = 0; i < a.length; i++) {
       result.append(Arrays.toString(a[i]));
       if(i < a.length-1)
@@ -731,7 +733,7 @@ public class ArrayUtils {
   }
 
   public static String toString(double[][] b) {
-    StringBuilder result = new StringBuilder("[");
+    TxtBuilder result = new TxtBuilder("[");
     for (int i = 0; i < b.length; i++) {
       result.append(Arrays.toString(b[i]));
       if(i < b.length-1)
@@ -742,7 +744,7 @@ public class ArrayUtils {
   }
 
   public static String toString(boolean[][] b) {
-    StringBuilder result = new StringBuilder("[");
+    TxtBuilder result = new TxtBuilder("[");
     for (int i = 0; i < b.length; i++) {
       result.append(Arrays.toString(b[i]));
       if(i < b.length-1)

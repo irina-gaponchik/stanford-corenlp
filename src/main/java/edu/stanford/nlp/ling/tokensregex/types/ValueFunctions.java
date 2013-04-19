@@ -5,6 +5,7 @@ import edu.stanford.nlp.ling.tokensregex.*;
 import edu.stanford.nlp.pipeline.ChunkAnnotationUtils;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.util.*;
+import javolution.text.TxtBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -44,7 +45,7 @@ public class ValueFunctions {
 
     public String toString() {
       if (signature == null) {
-        StringBuilder sb = new StringBuilder();
+        TxtBuilder sb = new TxtBuilder();
         sb.append(name);
         sb.append('(');
         sb.append(getParamDesc());
@@ -87,7 +88,7 @@ public class ValueFunctions {
 
     @Override
     public String getParamDesc() {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       for (ParamInfo p:paramInfos) {
         if (sb.length() > 0) {
           sb.append(", ");

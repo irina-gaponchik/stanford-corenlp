@@ -7,6 +7,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Sets;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.StringLabel;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.text.NumberFormat;
@@ -234,7 +235,7 @@ public abstract class Treebank extends AbstractCollection<Tree> {
    */
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
+    final TxtBuilder sb = new TxtBuilder();
     apply(new TreeVisitor() {
       public void visitTree(Tree t) {
         sb.append(t.toString());

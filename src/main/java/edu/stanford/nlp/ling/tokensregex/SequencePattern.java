@@ -1,6 +1,7 @@
 package edu.stanford.nlp.ling.tokensregex;
 
 import edu.stanford.nlp.util.*;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 
@@ -413,7 +414,7 @@ public class SequencePattern<T> {
     }
 
     public String toString() {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       if (captureGroupId >= 0) {
         sb.append('\\').append(captureGroupId);
       } else {
@@ -508,7 +509,7 @@ public class SequencePattern<T> {
     }
 
     public String toString() {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       sb.append('(');
       if (!capture) {
         sb.append("?: ");
@@ -613,7 +614,7 @@ public class SequencePattern<T> {
     }
 
     public String toString() {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       sb.append(pattern);
       sb.append('{').append(minMatch).append(',').append(maxMatch).append('}');
       if (!greedyMatch) {

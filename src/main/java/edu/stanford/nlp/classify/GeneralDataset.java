@@ -13,6 +13,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 /**
  * The purpose of this interface is to unify {@link Dataset} and {@link RVFDataset}.
@@ -437,7 +438,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
       }
       Integer[] features = printC.keySet().toArray(new Integer[printC.keySet().size()]);
       Arrays.sort(features);
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       sb.append(labelMap[labels[i]]).append(' ');
       // sb.append(labels[i]).append(' '); // commented out by mihai: labels[i] breaks svm_light conventions!
 

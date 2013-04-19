@@ -4,6 +4,7 @@ import java.util.*;
 import java.io.Serializable;
 
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 public class LatticeEdge implements Serializable {
 
@@ -34,7 +35,7 @@ public class LatticeEdge implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
+		TxtBuilder sb = new TxtBuilder();
 		sb.append("[ ").append(word);
 		sb.append(String.format(" start(%d) end(%d) wt(%f) ]", start,end,weight));
 		if(label != null)

@@ -24,6 +24,7 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.trees.HeadFinder;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
+import javolution.text.TxtBuilder;
 
 /**
  *
@@ -145,7 +146,7 @@ public class GenericDataSetReader {
   }
 
   private static String sentenceToString(List<CoreLabel> tokens) {
-    StringBuilder os = new StringBuilder();
+    TxtBuilder os = new TxtBuilder();
 
     //
     // Print text and tokens
@@ -291,7 +292,7 @@ public class GenericDataSetReader {
   }
 
   private static String printTree(Tree tree) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     return tree.toStringBuilder(sb, true).toString();
   }
 

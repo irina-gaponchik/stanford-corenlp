@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.process.AbstractTokenizer;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
 
@@ -360,7 +361,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
   private static <T extends WordToken> String concatenate(List<T> tokens,
       int start,
       int end) {
-    StringBuilder buffer = new StringBuilder();
+    TxtBuilder buffer = new TxtBuilder();
 
     for(; start < end; start ++){
       buffer.append(((WordToken) tokens.get(start)).getWord());
@@ -445,7 +446,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
     // replace illegal characters with SPACE
     //
     /*
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     for(int i = 0; i < originalString.length(); i ++){
     	int c = (int) originalString.charAt(i);
     	//
@@ -575,7 +576,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
    */
   public String tokenizeText() throws IOException{
     List<WordToken> tokenList = tokenizeToWordTokens();
-    StringBuilder strBuffer = new StringBuilder();
+    TxtBuilder strBuffer = new TxtBuilder();
     Iterator<WordToken> iter = tokenList.iterator();
     if (iter.hasNext()){
       strBuffer.append(iter.next());
@@ -1072,7 +1073,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
     }
 
     public String toString() {
-      StringBuilder buffer = new StringBuilder();
+      TxtBuilder buffer = new TxtBuilder();
       buffer.append('[');
       buffer.append(mWord);
       buffer.append(", ");
@@ -1132,7 +1133,7 @@ public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {
     // read the whole file in a buffer
     // XXX: for sure there are more efficient ways of reading a file...
     int ch;
-    StringBuilder buffer = new StringBuilder();
+    TxtBuilder buffer = new TxtBuilder();
     while((ch = is.read()) != -1) buffer.append((char) ch);
     
     // create the tokenizer object

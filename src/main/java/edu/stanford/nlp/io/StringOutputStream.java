@@ -1,5 +1,7 @@
 package edu.stanford.nlp.io;
 
+import javolution.text.TxtBuilder;
+
 import java.io.*;
 
 /**
@@ -9,7 +11,7 @@ import java.io.*;
  */
 public class StringOutputStream extends OutputStream {
 
-  StringBuilder sb = new StringBuilder();
+  TxtBuilder sb = new TxtBuilder();
 
     synchronized public void clear() {
     sb.setLength(0);

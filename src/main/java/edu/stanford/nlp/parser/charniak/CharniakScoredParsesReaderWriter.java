@@ -19,6 +19,7 @@ import edu.stanford.nlp.util.AbstractIterator;
 import edu.stanford.nlp.util.IterableIterator;
 import edu.stanford.nlp.util.ScoredObject;
 import edu.stanford.nlp.util.Timing;
+import javolution.text.TxtBuilder;
 
 /**
  * Utility routines for printing/reading scored parses for the Charniak Parser
@@ -190,7 +191,7 @@ public class CharniakScoredParsesReaderWriter {
               if (expectConsecutiveSentenceIds) {
                if (sentenceId != lastSentenceId+1) {
                   if (lastSentenceId < sentenceId) {
-                    StringBuilder sb = new StringBuilder("Missing sentences");
+                    TxtBuilder sb = new TxtBuilder("Missing sentences");
                     for (int i = lastSentenceId+1; i < sentenceId; i++) {
                       sb.append(' ').append(i);
                     }

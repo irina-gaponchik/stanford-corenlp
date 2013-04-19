@@ -4,6 +4,7 @@ import java.util.*;
 
 import edu.stanford.nlp.util.CollectionUtils;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * Simple graph library; this is directed for now. This class focuses on time
@@ -476,7 +477,7 @@ public class DirectedMultiGraph<V, E> implements Graph<V, E> /* Serializable */{
 
   @Override
   public String toString() {
-    StringBuilder s = new StringBuilder();
+    TxtBuilder s = new TxtBuilder();
     s.append("{\n");
     s.append("Vertices:\n");
     for (V vertex : outgoingEdges.keySet()) {

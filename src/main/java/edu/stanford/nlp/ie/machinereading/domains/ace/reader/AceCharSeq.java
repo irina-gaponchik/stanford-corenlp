@@ -32,7 +32,7 @@ public class AceCharSeq {
   }
 
   public String toXml(String label, int offset) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     AceElement.appendOffset(buffer, offset);
     buffer.append('<').append(label).append(">\n");
 
@@ -46,7 +46,7 @@ public class AceCharSeq {
   }
 
   public String toXml(int offset) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
 
     AceElement.appendOffset(buffer, offset + 2);
     buffer.append("<charseq START=\"").append(mByteOffset.start()).append("\" END=\"").append(mByteOffset.end()).append("\">").append(mText).append("</charseq>");
@@ -153,9 +153,9 @@ public class AceCharSeq {
 
   /*
    * private AceToken makePhrase(Vector<AceToken> tokens, Span span) {
-   * StringBuffer word = new StringBuffer(); StringBuffer lemma = new
-   * StringBuffer(); StringBuffer pos = new StringBuffer(); StringBuffer chunk =
-   * new StringBuffer(); StringBuffer nerc = new StringBuffer();
+   * StringBuilder word = new StringBuilder(); StringBuilder lemma = new
+   * StringBuilder(); StringBuilder pos = new StringBuilder(); StringBuilder chunk =
+   * new StringBuilder(); StringBuilder nerc = new StringBuilder();
    * 
    * for(int i = span.mStart; i <= span.mEnd; i ++){ if(i > span.mStart){
    * word.append("_"); lemma.append("_"); pos.append("_"); chunk.append("_");

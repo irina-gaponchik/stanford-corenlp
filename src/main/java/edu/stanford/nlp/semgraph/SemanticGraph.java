@@ -12,6 +12,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringParsingTask;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 import java.io.Serializable;
 import java.util.*;
@@ -1221,7 +1222,7 @@ public class SemanticGraph implements Serializable {
       return toString("readable");
     }
 
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     Set<IndexedWord> used = Generics.newHashSet();
     for (IndexedWord root : rootNodes) {
       sb.append("-> ").append(root).append(" (root)\n");
@@ -1239,7 +1240,7 @@ public class SemanticGraph implements Serializable {
   }
 
   // helper for toString()
-  private void recToString(IndexedWord curr, StringBuilder sb, int offset, Set<IndexedWord> used) {
+  private void recToString(IndexedWord curr, TxtBuilder sb, int offset, Set<IndexedWord> used) {
     used.add(curr);
     List<SemanticGraphEdge> edges = outgoingEdgeList(curr);
     Collections.sort(edges);
@@ -1253,7 +1254,7 @@ public class SemanticGraph implements Serializable {
   }
 
   private static String space(int width) {
-    StringBuilder b = new StringBuilder();
+    TxtBuilder b = new TxtBuilder();
     for (int i = 0; i < width; i++) {
       b.append(' ');
     }
@@ -1261,7 +1262,7 @@ public class SemanticGraph implements Serializable {
   }
 
   public String toRecoveredSentenceString() {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     boolean pastFirst = false;
     for (IndexedWord word : vertexListSorted()) {
       if (pastFirst) {
@@ -1274,7 +1275,7 @@ public class SemanticGraph implements Serializable {
   }
 
   public String toRecoveredSentenceStringWithIndexMarking() {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     boolean pastFirst = false;
     int index = 0;
     for (IndexedWord word : vertexListSorted()) {
@@ -1405,7 +1406,7 @@ public class SemanticGraph implements Serializable {
    *         dependencies
    */
   public String toList() {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     for (SemanticGraphEdge edge : this.edgeListSorted()) {
       buf.append(edge.getRelation().toString()).append('(');
       buf.append(toDepStyle(edge.getSource())).append(',');
@@ -1418,7 +1419,7 @@ public class SemanticGraph implements Serializable {
    * Similar to toList(), but uses POS tags instead of word and index.
    */
   public String toPOSList() {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     for (SemanticGraphEdge edge : this.edgeListSorted()) {
       buf.append(edge.getRelation().toString()).append('(');
       buf.append(toPOSStyle(edge.getSource())).append(',');
@@ -1428,7 +1429,7 @@ public class SemanticGraph implements Serializable {
   }
 
   private static String toDepStyle(IndexedWord fl) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     buf.append(fl.word());
     buf.append('-');
     buf.append(fl.index());
@@ -1436,7 +1437,7 @@ public class SemanticGraph implements Serializable {
   }
 
   private static String toPOSStyle(IndexedWord fl) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     buf.append(fl.word());
     buf.append('/');
     buf.append(fl.tag());
@@ -1446,7 +1447,7 @@ public class SemanticGraph implements Serializable {
   }
 
   private String toReadableString() {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     buf.append(String.format("%-20s%-20s%-20s%n", "dep", "reln", "gov"));
     buf.append(String.format("%-20s%-20s%-20s%n", "---", "----", "---"));
     for (IndexedWord root : roots) {
@@ -1460,7 +1461,7 @@ public class SemanticGraph implements Serializable {
   }
 
   private String toXMLString() {
-    StringBuilder buf = new StringBuilder("<dependencies style=\"typed\">\n");
+    TxtBuilder buf = new TxtBuilder("<dependencies style=\"typed\">\n");
     for (SemanticGraphEdge edge : this.edgeListSorted()) {
       String reln = edge.getRelation().toString();
       String gov = edge.getSource().word();
@@ -1481,7 +1482,7 @@ public class SemanticGraph implements Serializable {
   }
 
   public String toCompactString(boolean showTags) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     Set<IndexedWord> used = Generics.newHashSet();
     Collection<IndexedWord> roots = this.roots;
     if (roots.isEmpty()) {
@@ -1494,7 +1495,7 @@ public class SemanticGraph implements Serializable {
     return sb.toString();
   }
 
-  private void toCompactStringHelper(IndexedWord node, StringBuilder sb, Set<IndexedWord> used, boolean showTags) {
+  private void toCompactStringHelper(IndexedWord node, TxtBuilder sb, Set<IndexedWord> used, boolean showTags) {
     used.add(node);
     try {
       boolean isntLeaf = outDegree(node) > 0;
@@ -1579,7 +1580,7 @@ public class SemanticGraph implements Serializable {
   }
 
   public String toDotFormat(String graphname, String indexedWordFormat) {
-    StringBuilder output = new StringBuilder();
+    TxtBuilder output = new TxtBuilder();
     output.append("digraph ").append(graphname).append(" {\n");
     for (IndexedWord word : graph.getAllVertices()) {
       output.append("  N_").append(word.index()).append(" [label=\"").append(word.toString(indexedWordFormat)).append("\"];\n");

@@ -3,6 +3,7 @@ package edu.stanford.nlp.tagger.maxent;
 import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Timing;
+import javolution.text.TxtBuilder;
 
 import java.io.File;
 import java.util.Map;
@@ -68,7 +69,7 @@ public class ExtractorDistsim extends Extractor {
 
     @Override
     CharSequence extract(History h, PairsHolder pH) {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       for (int j = left; j <= right; j++) {
         String word = pH.getWord(h, j);
         String distSim = lexicon.get(word.toLowerCase());

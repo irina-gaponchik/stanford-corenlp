@@ -1,10 +1,11 @@
 package edu.stanford.nlp.util;
 
+import javolution.text.TxtBuilder;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +116,7 @@ public class Maps {
   /**
    * Stringifies a Map in a stable fashion.
    */
-  public static <K extends Comparable<K>, V> void toStringSorted(Map<K, V> map, StringBuilder builder) {
+  public static <K extends Comparable<K>, V> void toStringSorted(Map<K, V> map, TxtBuilder builder) {
     builder.append('{');
     List<Entry<K,V>> sortedProperties = Maps.sortedEntries(map);
     int index = 0;
@@ -133,7 +134,7 @@ public class Maps {
    * Stringifies a Map in a stable fashion.
    */
   public static <K extends Comparable<K>, V> String toStringSorted(Map<K, V> map) {
-    StringBuilder builder = new StringBuilder();
+    TxtBuilder builder = new TxtBuilder();
     toStringSorted(map, builder);
     return builder.toString();
   }

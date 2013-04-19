@@ -9,8 +9,8 @@ import edu.stanford.nlp.ling.tokensregex.MatchedExpression;
 import edu.stanford.nlp.pipeline.*;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.stats.PrecisionRecallStats;
-import edu.stanford.nlp.time.TimeAnnotations;
 import edu.stanford.nlp.util.*;
+import javolution.text.TxtBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -636,7 +636,7 @@ public class SUTimeMain {
         timex.text = StringUtils.joinWords(tokens, " ", timex.tokenStart, timex.tokenEnd);
         timex.context = joinWordTags(tokens, " ", timex.tokenStart - 3, timex.tokenEnd + 3);
 
-/*        StringBuilder sb = new StringBuilder("");
+/*        javolution.text.TxtBuilder sb = new javolution.text.TxtBuilder("");
         for (int i = timex.tokenStart; i < timex.tokenEnd; i++) {
           if (sb.length() > 0) { sb.append(" "); }
           sb.append(tokens.get(i).word());
@@ -852,7 +852,7 @@ public class SUTimeMain {
     if (!outDir.exists()) {
       outDir.mkdirs();
     }
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append("handlers=java.util.logging.ConsoleHandler, java.util.logging.FileHandler\n");
     sb.append(".level=SEVERE\n");
     sb.append("edu.stanford.nlp.level=INFO\n");

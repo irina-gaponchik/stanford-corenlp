@@ -10,7 +10,6 @@ import edu.stanford.nlp.international.french.FrenchMorphoFeatureSpecification;
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification;
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification.MorphoFeatureType;
 import edu.stanford.nlp.international.morph.MorphoFeatures;
-import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasTag;
 import edu.stanford.nlp.ling.HasWord;
@@ -34,6 +33,7 @@ import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 /**
  * TreebankLangParserParams for the Frenck Treebank corpus. This package assumes that the FTB
@@ -48,7 +48,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
   private static final long serialVersionUID = -6976724734594763986L;
 
-  private final StringBuilder optionsString;
+  private final TxtBuilder optionsString;
 
   private HeadFinder headFinder;
   private final Map<String,Pair<TregexPattern,Function<TregexMatcher,String>>> annotationPatterns;
@@ -73,7 +73,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
     setInputEncoding("UTF-8");
 
-    optionsString = new StringBuilder();
+    optionsString = new TxtBuilder();
     optionsString.append("FrenchTreebankParserParams\n");
 
     annotationPatterns = Generics.newHashMap();
@@ -461,7 +461,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
         throw new RuntimeException("Cannot enable POSSequence features without POS sequence map. Use option -frenchMWMap.");
 
       Tree t = m.getMatch();
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       for(Tree kid : t.children()) {
         if( ! kid.isPreTerminal())
           throw new RuntimeException("Not POS sequence for tree: " + t.toString());
@@ -569,7 +569,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
   public Tree transformTree(Tree t, Tree root) {
 
     String baseCat = t.value();
-    StringBuilder newCategory = new StringBuilder();
+    TxtBuilder newCategory = new TxtBuilder();
 
     //Add manual state splits
     for (Pair<TregexPattern,Function<TregexMatcher,String>> e : activeAnnotations) {

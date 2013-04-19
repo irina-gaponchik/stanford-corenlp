@@ -2,6 +2,8 @@
 
 package edu.stanford.nlp.process;
 
+import javolution.text.TxtBuilder;
+
 /** Undoes the more common cases of Penn Treebank quoting to producing
  *  something resembling normal text.  That is, it is an approximate inverse
  *  of PTBTokenizer.
@@ -859,7 +861,7 @@ class PTB2TextLexer {
 */
 
   private static String removeWhite(String in) {
-    StringBuilder out = new StringBuilder();
+    TxtBuilder out = new TxtBuilder();
     for (int i = 0, len = in.length(); i < len; i++) {
       char ch = in.charAt(i);
       if (ch != ' ') {

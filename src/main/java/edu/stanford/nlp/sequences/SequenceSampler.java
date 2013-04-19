@@ -1,6 +1,8 @@
 package edu.stanford.nlp.sequences;
 
 import edu.stanford.nlp.math.ArrayMath;
+import javolution.text.TxtBuilder;
+
 import java.util.Arrays;
 
 /**
@@ -63,7 +65,7 @@ public class SequenceSampler implements BestSequenceFinder {
 
 
   private static String arrayToString(int... x) {
-    StringBuilder sb = new StringBuilder("(");
+    TxtBuilder sb = new TxtBuilder("(");
     for (int j = 0; j < x.length; j++) {
       sb.append(x[j]);
       if (j != x.length - 1) {

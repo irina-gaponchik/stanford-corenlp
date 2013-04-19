@@ -1,6 +1,8 @@
 package edu.stanford.nlp.util;
 
 
+import javolution.text.TxtBuilder;
+
 /**
  * An instantiation of this abstract class parses a {@code String} and
  * returns an object of type {@code E}.  It's called a
@@ -48,7 +50,7 @@ public abstract class StringParsingTask<E> {
    */
   protected String readName() {
     readWhiteSpace();
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     char ch = read();
     while (!isWhiteSpace(ch) && !isPunct(ch) && !isEOF) {
       sb.append(ch);
@@ -61,7 +63,7 @@ public abstract class StringParsingTask<E> {
 
   protected String readJavaIdentifier() {
     readWhiteSpace();
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     char ch = read();
     if (Character.isJavaIdentifierStart(ch) && !isEOF) {
       sb.append(ch);

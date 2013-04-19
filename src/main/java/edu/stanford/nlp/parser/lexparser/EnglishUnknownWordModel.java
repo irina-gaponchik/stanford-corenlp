@@ -29,6 +29,7 @@ package edu.stanford.nlp.parser.lexparser;
 import edu.stanford.nlp.process.DistSimClassifier;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.util.Index;
+import javolution.text.TxtBuilder;
 
 /**
  * This is a basic unknown word model for English.  It supports 5 different
@@ -169,7 +170,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
    */
   @Override
   public String getSignature(String word, int loc) {
-    StringBuilder sb = new StringBuilder("UNK");
+    TxtBuilder sb = new TxtBuilder("UNK");
     switch (unknownLevel) {
       case 8: 
         getSignature8(word, sb);
@@ -204,7 +205,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
 
 
   @SuppressWarnings("MethodMayBeStatic")
-  private void getSignature7(String word, int loc, StringBuilder sb) {
+  private void getSignature7(String word, int loc, TxtBuilder sb) {
     // New Sep 2008. Like 2 but rely more on Caps somewhere than initial Caps
     // {-ALLC, -INIT, -UC somewhere, -LC, zero} +
     // {-DASH, zero} +
@@ -264,7 +265,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
   }
 
 
-  private void getSignature6(String word, int loc, StringBuilder sb) {
+  private void getSignature6(String word, int loc, TxtBuilder sb) {
     // New Sep 2008. Like 5 but rely more on Caps somewhere than initial Caps
     // { -INITC, -CAPS, (has) -CAP, -LC lowercase, 0 } +
     // { -KNOWNLC, 0 } + [only for INITC]
@@ -351,7 +352,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
   }
 
 
-  private void getSignature5(String word, int loc, StringBuilder sb) {
+  private void getSignature5(String word, int loc, TxtBuilder sb) {
     // Reformed Mar 2004 (cdm); hopefully better now.
     // { -CAPS, -INITC ap, -LC lowercase, 0 } +
     // { -KNOWNLC, 0 } + [only for INITC]
@@ -440,7 +441,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
 
 
   @SuppressWarnings("MethodMayBeStatic")
-  private void getSignature4(String word, int loc, StringBuilder sb) {
+  private void getSignature4(String word, int loc, TxtBuilder sb) {
     boolean hasDigit = false;
     boolean hasNonDigit = false;
     boolean hasLetter = false;
@@ -516,7 +517,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
 
 
   @SuppressWarnings("MethodMayBeStatic")
-  private void getSignature3(String word, int loc, StringBuilder sb) {
+  private void getSignature3(String word, int loc, TxtBuilder sb) {
     // This basically works right, except note that 'S' is applied to all
     // capitalized letters in first word of sentence, not just first....
     sb.append('-');
@@ -556,7 +557,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
 
 
   @SuppressWarnings("MethodMayBeStatic")
-  private void getSignature2(String word, int loc, StringBuilder sb) {
+  private void getSignature2(String word, int loc, TxtBuilder sb) {
     // {-ALLC, -INIT, -UC, -LC, zero} +
     // {-DASH, zero} +
     // {-NUM, -DIG, zero} +
@@ -611,7 +612,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
 
 
   @SuppressWarnings("MethodMayBeStatic")
-  private void getSignature1(String word, int loc, StringBuilder sb) {
+  private void getSignature1(String word, int loc, TxtBuilder sb) {
     sb.append('-');
     sb.append(word.substring(Math.max(word.length() - 2, 0), word.length()));
     sb.append('-');
@@ -630,7 +631,7 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
     }
   }
 
-  private void getSignature8(String word, StringBuilder sb) {
+  private void getSignature8(String word, TxtBuilder sb) {
     sb.append('-');
     boolean digit = true;
     for (int i = 0; i < word.length(); i++) {

@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import edu.stanford.nlp.ie.machinereading.common.SimpleTokenize;
 import edu.stanford.nlp.ie.machinereading.domains.ace.AceReader;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * Stores the ACE elements annotated in this document
@@ -225,7 +226,7 @@ public class AceDocument extends AceElement {
   }
 
   public String toXml(int offset) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     appendOffset(buffer, offset);
     buffer.append("<?xml version=\"1.0\"?>\n");
     appendOffset(buffer, offset);
@@ -263,7 +264,7 @@ public class AceDocument extends AceElement {
   }
 
   private String tokensWithByteSpan(int start, int end) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     boolean doPrint = false;
     buf.append("...");
       for (AceToken mToken : mTokens) {
@@ -732,7 +733,7 @@ public class AceDocument extends AceElement {
 
   private void readRawBytes(String fileName) throws IOException {
     BufferedReader in = new BufferedReader(new FileReader(fileName));
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     int c;
     while ((c = in.read()) >= 0)
       buf.append((char) c);
@@ -806,7 +807,7 @@ public class AceDocument extends AceElement {
 
   public AceCharSeq makeCharSeq(int startToken, int endToken) {
     /*
-     * StringBuffer buf = new StringBuffer(); for(int i = startToken; i <
+     * StringBuilder buf = new StringBuilder(); for(int i = startToken; i <
      * endToken; i ++){ if(i > startToken) buf.append(" ");
      * buf.append(mTokens.get(i).getLiteral()); }
      */

@@ -9,6 +9,6 @@ package edu.stanford.nlp.trees;
  */
 public interface WordNetConnection {
 
-  // Used String arg version, instead of StringBuffer - EY 02/02/07
+  // Used String arg version, instead of StringBuilder - EY 02/02/07
   public boolean wordNetContains(String s);
 }

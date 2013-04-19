@@ -1,7 +1,6 @@
 package edu.stanford.nlp.parser.metrics;
 
 import java.io.PrintWriter;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Filters;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /** 
  *  Dependency unlabeled attachment score.
@@ -100,7 +100,7 @@ public class UnlabeledAttachmentEval extends AbstractEval {
   }
   
   private static final int minArgs = 2;
-  private static final StringBuilder usage = new StringBuilder();
+  private static final TxtBuilder usage = new TxtBuilder();
   static {
     usage.append(String.format("Usage: java %s [OPTS] gold guess\n\n", UnlabeledAttachmentEval.class.getName()));
     usage.append("Options:\n");

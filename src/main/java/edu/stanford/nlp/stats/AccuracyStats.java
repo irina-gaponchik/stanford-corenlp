@@ -9,6 +9,7 @@ import edu.stanford.nlp.classify.ProbabilisticClassifier;
 import edu.stanford.nlp.ling.Datum;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * Utility class for aggregating counts of true positives, false positives, and
@@ -70,7 +71,7 @@ public class AccuracyStats<L> implements Scorer<L> {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setMaximumFractionDigits(numDigits);
 
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append("--- Accuracy Stats ---").append('\n');
     sb.append("accuracy: ").append(nf.format(accuracy)).append('\n');
     sb.append("optimal fn accuracy: ").append(nf.format(optAccuracy)).append('\n');
@@ -91,7 +92,7 @@ public class AccuracyStats<L> implements Scorer<L> {
   }
 
   public static String toStringArr(int... acc) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     int total = acc.length;
     for (int i = 0; i < acc.length; i++) {
       double coverage = (i + 1) / (double) total;

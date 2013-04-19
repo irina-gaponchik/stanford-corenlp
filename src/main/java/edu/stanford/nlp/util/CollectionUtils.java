@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +20,7 @@ import java.util.Set;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.stats.Counters;
+import javolution.text.TxtBuilder;
 
 /**
  * Collection of useful static methods for working with Collections. Includes
@@ -437,7 +436,7 @@ public class CollectionUtils {
   }
 
   public static <K, V> String toVerticalString(Map<K, V> m) {
-    StringBuilder b = new StringBuilder();
+    TxtBuilder b = new TxtBuilder();
     Set<Map.Entry<K, V>> entries = m.entrySet();
     for (Map.Entry<K, V> e : entries) {
       b.append(e.getKey()).append('=').append(e.getValue()).append('\n');

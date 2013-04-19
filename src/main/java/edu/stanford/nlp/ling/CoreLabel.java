@@ -9,6 +9,7 @@ import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 
 /**
@@ -567,7 +568,7 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
    */
   @SuppressWarnings("unchecked")
   public String toString(String format) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
       switch (format) {
           case "value":
               buf.append(value());

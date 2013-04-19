@@ -2,6 +2,7 @@ package edu.stanford.nlp.sequences;
 
 import edu.stanford.nlp.util.ArrayUtils;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.util.*;
@@ -152,7 +153,7 @@ public class Clique implements Serializable {
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append('[');
     for (int i = 0; i < relativeIndices.length; i++) {
       sb.append(relativeIndices[i]);

@@ -50,7 +50,7 @@ public class AceRelation extends AceElement {
   public void setSubtype(String s) { mSubtype = s; }
 
   public String toXml(int offset) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     appendOffset(buffer, offset);
     buffer.append("<relation ID=\"").append(getId()).append("\" TYPE =\"").append(mType).append("\" SUBTYPE=\"").append(mSubtype).append("\" MODALITY=\"").append(mModality).append("\" TENSE=\"").append(mTense).append("\">\n");
 

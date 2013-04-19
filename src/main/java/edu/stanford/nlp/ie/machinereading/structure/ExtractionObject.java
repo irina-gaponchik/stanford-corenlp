@@ -15,6 +15,7 @@ import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 /**
  * Represents any object that can be extracted - entity, relation, event
@@ -98,7 +99,7 @@ public class ExtractionObject implements Serializable {
   
   public String getExtentString() {
     List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (int i = extentTokenSpan.start(); i < extentTokenSpan.end(); i ++){
       CoreLabel token = tokens.get(i);
       if(i > extentTokenSpan.start()) sb.append(' ');
@@ -167,7 +168,7 @@ public class ExtractionObject implements Serializable {
    */
   final public String getFullValue() {
     List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     if(tokens != null && extentTokenSpan != null){
       for(int i = extentTokenSpan.start(); i < extentTokenSpan.end(); i ++){
         if(i > extentTokenSpan.start()) sb.append(' ');
@@ -197,7 +198,7 @@ public class ExtractionObject implements Serializable {
     String [] types = new String[uniqueTypes.size()];
     uniqueTypes.toArray(types);
     Arrays.sort(types);
-    StringBuilder os = new StringBuilder();
+    TxtBuilder os = new TxtBuilder();
     for(int i = 0; i < types.length; i ++){
       if(i > 0) os.append(TYPE_SEP);
       os.append(types[i]);
@@ -220,7 +221,7 @@ public class ExtractionObject implements Serializable {
   }
   String probsToString() {
     List<Pair<String, Double>> sorted = Counters.toDescendingMagnitudeSortedListWithCounts(typeProbabilities);
-    StringBuilder os = new StringBuilder();
+    TxtBuilder os = new TxtBuilder();
     os.append('{');
     boolean first = true;
     for(Pair<String, Double> lv: sorted) {

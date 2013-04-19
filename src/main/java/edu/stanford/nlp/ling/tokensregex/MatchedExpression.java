@@ -20,7 +20,7 @@ import java.util.*;
  * @author Angel Chang
  */
 public class MatchedExpression {
-  /** Text representing the matched expression */
+  /** Txt representing the matched expression */
   protected String text;
 
   /** Character offsets (relative to original text) */

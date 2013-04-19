@@ -12,13 +12,15 @@ package edu.stanford.nlp.parser.lexparser;
 //  Roger
 
 
+import javolution.text.TxtBuilder;
+
 /** @author Dan Klein */
 class TestTagProjection implements TagProjection {
 
   private static final long serialVersionUID = 9161675508802284114L;
 
   public String project(String tagStr) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     boolean good = true;
     for (int pos = 0, len = tagStr.length(); pos < len; pos++) {
       char c = tagStr.charAt(pos);

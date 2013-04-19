@@ -12,6 +12,7 @@ import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.XMLUtils;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.lang.reflect.Method;
@@ -112,7 +113,7 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
     // PTBTokenizer.newPTBTokenizer(r, false, true);
     List<IN> words = new ArrayList<>();
     IN previous = null;
-    StringBuilder prepend = new StringBuilder();
+    TxtBuilder prepend = new TxtBuilder();
 
     /*
      * This changes SGML tags into whitespace -- it should maybe be moved
@@ -139,7 +140,7 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
           // todo: change to prepend.append(before); w.set(CoreAnnotations.BeforeAnnotation.class, prepend.toString());
           w.set(CoreAnnotations.BeforeAnnotation.class, prepend + before);
           // w.prependBefore(prepend.toString());
-          prepend = new StringBuilder();
+          prepend = new TxtBuilder();
         }
         words.add(w);
         previous = w;

@@ -16,6 +16,7 @@ import edu.stanford.nlp.util.ArrayUtils;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * Finds WordNet collocations in parse trees.  It can restructure
@@ -117,9 +118,9 @@ public class CollocationFinder {
       Tree[] allChildren = t.children();
       // get the earliest child in the collocation and store it as first child.
       // delete the rest.
-      StringBuffer mutatedString = new StringBuffer(160);
+      StringBuilder mutatedString = new StringBuilder(160);
       for (int i : matchingColl.indicesOfConstituentChildren) {
-        String strToAppend = mergeLeavesIntoCollocatedString(allChildren[i]);
+        CharSequence strToAppend = mergeLeavesIntoCollocatedString(allChildren[i]);
         mutatedString.append(strToAppend);
         mutatedString.append('_');
       }
@@ -193,7 +194,7 @@ public class CollocationFinder {
     // - this is problematic for the collocationFinder which assigns this head
     // as the POS for the collocation "World_Trade_Organization"!
     Label headLabel= hf.determineHead(t).label();
-    StringBuffer testString = null;
+    StringBuilder testString = null;
     Integer leftSistersBuffer=0;//measures the length of sisters in words when reading
     for (int i = 0; i < children.size();i++){
       ArrayList<Integer> childConstituents = new ArrayList<>();
@@ -201,12 +202,12 @@ public class CollocationFinder {
       Tree subtree = children.get(i);
       Integer currWindowLength=0; //measures the length in words of the current collocation.
       getCollocationsList(subtree, threadSafe); //recursive call to get colls in subtrees.
-      testString = new StringBuffer(160);
+      testString = new StringBuilder(160);
       testString.append(treeAsStemmedCollocation(subtree, threadSafe));
       testString.append('_');
       Integer thisSubtreeLength = subtree.yield().size();
       currWindowLength+=thisSubtreeLength;
-      StringBuilder testStringNonStemmed = new StringBuilder(160);
+      TxtBuilder testStringNonStemmed = new TxtBuilder(160);
       testStringNonStemmed.append(treeAsNonStemmedCollocation(subtree));
       testStringNonStemmed.append('_');
 
@@ -267,7 +268,7 @@ public class CollocationFinder {
   private static String treeAsStemmedCollocation(Tree t, boolean threadSafe) {
     List<WordTag> list= getStemmedWordTagsFromTree(t, threadSafe);
     // err.println(list.size());
-    StringBuilder s = new StringBuilder(160);
+    TxtBuilder s = new TxtBuilder(160);
     WordTag firstWord = list.remove(0);
     s.append(firstWord.word());
     for(WordTag wt : list) {
@@ -281,7 +282,7 @@ public class CollocationFinder {
   private static String treeAsNonStemmedCollocation(Tree t) {
     List<WordTag> list= getNonStemmedWordTagsFromTree(t);
 
-    StringBuilder s = new StringBuilder(160);
+    TxtBuilder s = new TxtBuilder(160);
     WordTag firstWord = list.remove(0);
     s.append(firstWord.word());
     for(WordTag wt : list) {
@@ -291,24 +292,24 @@ public class CollocationFinder {
     return s.toString();
   }
 
-  private static String mergeLeavesIntoCollocatedString(Tree t) {
-    StringBuilder sb = new StringBuilder(160);
+  private static CharSequence mergeLeavesIntoCollocatedString(Tree t) {
+    TxtBuilder sb = new TxtBuilder(160);
     ArrayList<TaggedWord> sent = t.taggedYield();
     for (TaggedWord aSent : sent) {
       sb.append(aSent.word()).append('_');
     }
-    return sb.substring(0,sb.length() -1);
+    return sb.subSequence(0, sb.length() - 1);
   }
 
-  private static String mergeLeavesIntoCollocatedString(Tree... trees) {
-    StringBuilder sb = new StringBuilder(160);
+  private static CharSequence mergeLeavesIntoCollocatedString(Tree... trees) {
+    TxtBuilder sb = new TxtBuilder(160);
     for (Tree t: trees) {
       ArrayList<TaggedWord> sent = t.taggedYield();
       for (TaggedWord aSent : sent) {
         sb.append(aSent.word()).append('_');
       }
     }
-    return sb.substring(0,sb.length() -1);
+    return sb.subSequence(0, sb.length() - 1);
   }
 
   /**
@@ -338,7 +339,7 @@ public class CollocationFinder {
     return wordTags;
   }
 
-  // Convert arg from StringBuffer to String - EY 02/02/07
+  // Convert arg from StringBuilder to String - EY 02/02/07
   /**
    * Checks to see if WordNet contains the given word in its lexicon.
    * @param s Token

@@ -44,6 +44,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.IntPair;
 import edu.stanford.nlp.util.IntTuple;
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 public class Document implements Serializable {
 
@@ -230,7 +231,7 @@ public class Document implements Serializable {
       for(Mention g : golds) {
         IntPair ip = new IntPair(g.startIndex, g.endIndex);
         if (goldMentionPositions.containsKey(ip)) {
-          StringBuilder existingMentions = new StringBuilder();
+          TxtBuilder existingMentions = new TxtBuilder();
           for (Mention eg: goldMentionPositions.get(ip)) {
             if (existingMentions.length() > 0) {
               existingMentions.append(',');

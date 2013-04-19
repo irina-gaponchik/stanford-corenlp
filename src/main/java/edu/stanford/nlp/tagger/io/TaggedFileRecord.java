@@ -12,6 +12,7 @@ import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.TreeNormalizer;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.ReflectionLoading;
+import javolution.text.TxtBuilder;
 
 public class TaggedFileRecord {
     private static final Pattern COMPILE = Pattern.compile(",");
@@ -66,7 +67,7 @@ public class TaggedFileRecord {
   static public final String TAG_COLUMN = "tagColumn";
 
   public String toString() {
-    StringBuilder s = new StringBuilder();
+    TxtBuilder s = new TxtBuilder();
     s.append(FORMAT + '=').append(format);
     s.append(',' + ENCODING + '=').append(encoding);
     s.append(',' + TAG_SEPARATOR + '=').append(tagSeparator);

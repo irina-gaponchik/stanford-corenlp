@@ -17,6 +17,7 @@ import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.WhitespaceTokenizer;
 import edu.stanford.nlp.trees.GrammaticalRelation.GrammaticalRelationAnnotation;
 import edu.stanford.nlp.util.*;
+import javolution.text.TxtBuilder;
 
 import static edu.stanford.nlp.trees.GrammaticalRelation.DEPENDENT;
 import static edu.stanford.nlp.trees.GrammaticalRelation.GOVERNOR;
@@ -218,7 +219,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
 
   // @Override
   // public String toString() {
-    // StringBuilder sb = new StringBuilder(super.toString());
+    // javolution.text.TxtBuilder sb = new javolution.text.TxtBuilder(super.toString());
     //    sb.append("Dependencies:");
     //    sb.append("\n" + dependencies);
     //    sb.append("Typed Dependencies:");
@@ -775,7 +776,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
       TreeGraphNode gov = getGovernor(node);
       // System.out.println("Governor for \"" + node.value() + "\": \"" + gov.value() + "\"");
       List<GrammaticalRelation> relations = getListGrammaticalRelation(gov, node);
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       for (GrammaticalRelation relation : relations) {
         //if (!arcLabel.equals(GOVERNOR))
         sb.append(sb.length() == 0 ? "" : "+").append(relation.toString());
@@ -881,7 +882,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
   }
 
   public static String dependenciesToString(GrammaticalStructure gs, Collection<TypedDependency> deps, Tree tree, boolean conllx, boolean extraSep) {
-    StringBuilder bf = new StringBuilder();
+    TxtBuilder bf = new TxtBuilder();
 
     Map<Integer, Integer> indexToPos = Generics.newHashMap();
     indexToPos.put(0,0); // to deal with the special node "ROOT"

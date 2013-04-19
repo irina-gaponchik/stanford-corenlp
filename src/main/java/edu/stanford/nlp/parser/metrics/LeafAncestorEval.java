@@ -21,6 +21,7 @@ import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.Treebank;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * Implementation of the Leaf Ancestor metric first described by Sampson and Babarczy (2003) and
@@ -196,7 +197,7 @@ public class LeafAncestorEval {
   }
 
   private static String toString(List<CoreLabel> lineage) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for(CoreLabel cl : lineage) {
       sb.append(cl.value());
       sb.append(" <-- ");
@@ -250,7 +251,7 @@ public class LeafAncestorEval {
   }
 
 
-  private static StringBuilder usage = new StringBuilder();
+  private static TxtBuilder usage = new TxtBuilder();
   static {
     usage.append(String.format("Usage: java %s [OPTS] goldFile guessFile\n\n",LeafAncestorEval.class.getName()));
     usage.append("Options:\n");

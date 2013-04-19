@@ -627,7 +627,7 @@ public class AcronymModel implements RelationalModel {
     }
 
     private static char[] allLetters(String... acronym) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (String acr : acronym) {
             for (int c = 0; c < acr.length(); ++c) {
                 char ch = acr.charAt(c);
@@ -640,7 +640,7 @@ public class AcronymModel implements RelationalModel {
     }
 
     private static char[] firstLetters(String... name) {
-        StringBuffer sb = new StringBuffer(name.length);
+        StringBuilder sb = new StringBuilder(name.length);
         for (String aName : name) {
             char c = aName.charAt(0);
             if (Character.isLetter(c)) {
@@ -650,7 +650,7 @@ public class AcronymModel implements RelationalModel {
         return sbToChars(sb);
     }
 
-    private static char[] sbToChars(StringBuffer sb) {
+    private static char[] sbToChars(StringBuilder sb) {
         char[] letters = new char[sb.length()];
         sb.getChars(0, sb.length(), letters, 0);
         return letters;

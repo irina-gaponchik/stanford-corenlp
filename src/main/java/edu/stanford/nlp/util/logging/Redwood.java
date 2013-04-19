@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * A hierarchical channel based logger. Log messages are arranged hierarchically by depth
@@ -757,7 +758,7 @@ public class Redwood {
    * @param diff Time difference in milliseconds
    * @param b The string builder to append to
    */
-  protected static void formatTimeDifference(long diff, StringBuilder b){
+  protected static void formatTimeDifference(long diff, TxtBuilder b){
     //--Get Values
     int mili = (int) diff % 1000;
     long rest = diff / 1000;
@@ -1025,7 +1026,7 @@ public class Redwood {
       }
     }
 
-    private StringBuilder toStringHelper(StringBuilder b, int depth){
+    private TxtBuilder toStringHelper(TxtBuilder b, int depth){
       for(int i=0; i<depth; i++){
         b.append("  ");
       }
@@ -1037,7 +1038,7 @@ public class Redwood {
     }
     @Override
     public String toString(){
-      return toStringHelper(new StringBuilder(), 0).toString();
+      return toStringHelper(new TxtBuilder(), 0).toString();
     }
   }
 

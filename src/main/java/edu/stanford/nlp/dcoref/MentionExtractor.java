@@ -45,6 +45,7 @@ import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 /**
  * Generic mention extractor from a corpus.
@@ -374,7 +375,7 @@ public class MentionExtractor {
     boolean replicateCoNLL = Boolean.parseBoolean(props.getProperty(Constants.REPLICATECONLL_PROP, "false"));
 
     Properties pipelineProps = new Properties(props);
-    StringBuilder annoSb = new StringBuilder("");
+    TxtBuilder annoSb = new TxtBuilder("");
       if (replicateCoNLL) {
           annoSb.append("lemma");
       } else {

@@ -2,6 +2,7 @@ package edu.stanford.nlp.trees.tregex;
 
 import edu.stanford.nlp.stats.IntCounter;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 import java.util.Map;
 
@@ -43,7 +44,7 @@ class VariableStrings {
 
   @Override
   public String toString() {
-    StringBuilder s = new StringBuilder();
+    TxtBuilder s = new TxtBuilder();
     s.append('{');
     boolean appended = false;
     for (Map.Entry<String, String> stringStringEntry : varsToStrings.entrySet()) {

@@ -42,6 +42,7 @@ import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.PropertiesUtils;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 
 /**
@@ -210,7 +211,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
                        boolean invertible,
                        boolean suppressEscaping,
                        LexedTokenFactory<T> tokenFactory) {
-    StringBuilder options = new StringBuilder();
+    TxtBuilder options = new TxtBuilder();
     if (suppressEscaping) {
       options.append("ptb3Escaping=false");
     } else {
@@ -295,7 +296,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * @return An approximation to the original String
    */
   public static String ptb2Text(String ptbText) {
-    StringBuilder sb = new StringBuilder(ptbText.length()); // probably an overestimate
+    TxtBuilder sb = new TxtBuilder(ptbText.length()); // probably an overestimate
     PTB2TextLexer lexer = new PTB2TextLexer(new StringReader(ptbText));
     try {
       for (String token; (token = lexer.next()) != null; ) {
@@ -568,7 +569,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
     // This one is historical
     private PTBTokenizerFactory(boolean tokenizeNLs, boolean invertible, boolean suppressEscaping, LexedTokenFactory<T> factory) {
       this.factory = factory;
-      StringBuilder optionsSB = new StringBuilder();
+      TxtBuilder optionsSB = new TxtBuilder();
       if (suppressEscaping) {
         optionsSB.append("ptb3Escaping=false");
       } else {
@@ -681,7 +682,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
       System.exit(0);
     }
 
-    StringBuilder optionsSB = new StringBuilder();
+    TxtBuilder optionsSB = new TxtBuilder();
     String tokenizerOptions = options.getProperty("options", null);
     if (tokenizerOptions != null) {
       optionsSB.append(tokenizerOptions);

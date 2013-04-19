@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util.logging;
 
+import javolution.text.TxtBuilder;
+
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
@@ -11,7 +13,7 @@ public class NewlineLogFormatter extends Formatter {
 
   @Override
   public String format(LogRecord rec) {
-    StringBuilder buf = new StringBuilder(1000);
+    TxtBuilder buf = new TxtBuilder(1000);
     buf.append(formatMessage(rec));
     buf.append('\n');
     return buf.toString();

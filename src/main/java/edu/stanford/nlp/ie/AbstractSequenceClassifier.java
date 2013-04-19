@@ -46,6 +46,7 @@ import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.stats.Sampler;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.concurrent.*;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.text.DecimalFormat;
@@ -516,7 +517,7 @@ public abstract class AbstractSequenceClassifier<IN extends CoreMap> implements 
     ObjectBank<List<IN>> documents =
       makeObjectBankFromString(sentences, plainTextReaderAndWriter);
 
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (List<IN> doc : documents) {
       List<IN> docOutput = classify(doc);
       if (plainTextReaderAndWriter instanceof PlainTextDocumentReaderAndWriter) {

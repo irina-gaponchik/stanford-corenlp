@@ -1,6 +1,7 @@
 package edu.stanford.nlp.io;
 
 import edu.stanford.nlp.util.*;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -805,7 +806,7 @@ public class IOUtils {
     }
     BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding));
     String temp;
-    StringBuilder buff = new StringBuilder(16000); // make biggish
+    TxtBuilder buff = new TxtBuilder(16000); // make biggish
     while ((temp = br.readLine()) != null) {
       buff.append(temp);
       buff.append(lineSeparator);
@@ -823,7 +824,7 @@ public class IOUtils {
     InputStream is = uc.getInputStream();
     BufferedReader br = new BufferedReader(new InputStreamReader(is));
     String temp;
-    StringBuilder buff = new StringBuilder(16000); // make biggish
+    TxtBuilder buff = new TxtBuilder(16000); // make biggish
     while ((temp = br.readLine()) != null) {
       buff.append(temp);
       buff.append(lineSeparator);
@@ -905,7 +906,7 @@ public class IOUtils {
    */
   public static String slurpReader(Reader reader) {
     BufferedReader r = new BufferedReader(reader);
-    StringBuilder buff = new StringBuilder();
+    TxtBuilder buff = new TxtBuilder();
     try {
       char[] chars = new char[SLURPBUFFSIZE];
       while (true) {
@@ -980,8 +981,8 @@ public class IOUtils {
    */
   public static LinkedList<String[]> readCSVStrictly(char[] csvContents, int numColumns){
     //--Variables
-    StringBuilder[] buffer = new StringBuilder[numColumns];
-    buffer[0] = new StringBuilder();
+    TxtBuilder[] buffer = new TxtBuilder[numColumns];
+    buffer[0] = new TxtBuilder();
     LinkedList<String[]> lines = new LinkedList<>();
     //--State
     boolean inQuotes = false;
@@ -1007,7 +1008,7 @@ public class IOUtils {
               if(columnI >= numColumns){
                 throw new IllegalArgumentException("Too many columns: "+columnI+ '/' +numColumns+" (offset: " + offset + ')');
               }
-              buffer[columnI] = new StringBuilder();
+              buffer[columnI] = new TxtBuilder();
             }
             break;
           case '\n':
@@ -1025,7 +1026,7 @@ public class IOUtils {
               lines.add(rtn);
               //((update state))
               columnI = 0;
-              buffer[columnI] = new StringBuilder();
+              buffer[columnI] = new TxtBuilder();
             }
             break;
           case '\\':
@@ -1229,7 +1230,7 @@ public class IOUtils {
    */
   public static String stringFromFile(String filename, String encoding) {
     try {
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       BufferedReader in = new BufferedReader(new EncodingFileReader(filename,encoding));
       String line;
       while ((line = in.readLine()) != null) {

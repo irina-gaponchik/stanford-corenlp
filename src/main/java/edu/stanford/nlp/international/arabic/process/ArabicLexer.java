@@ -12,6 +12,7 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.process.LexedTokenFactory;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.PropertiesUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * Tokenizer for UTF-8 Arabic. Supports raw text and both sections
@@ -782,7 +783,7 @@ class ArabicLexer {
      text = segmentationMarker.matcher(text).replaceAll("");
    }
    int len = text.length();
-   StringBuilder sb = new StringBuilder(len);
+   TxtBuilder sb = new TxtBuilder(len);
    for (int i = 0; i < len; ++i) {
      String thisChar = String.valueOf(text.charAt(i));
      // Remove morpheme markers from the ATB vocalized section

@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +29,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.PropertiesUtils;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.Triple;
+import javolution.text.TxtBuilder;
 
 /**
  * A Java re-implementation of the evalb bracket scoring metric (Collins, 1997) that accepts Unicode input.
@@ -131,7 +131,7 @@ public class Evalb extends AbstractEval {
 
   private static final int minArgs = 2;
   private static String usage() {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     String nl = System.getProperty("line.separator");
     sb.append(String.format("Usage: java %s [OPTS] gold guess%n%n",Evalb.class.getName()));
     sb.append("Options:").append(nl);

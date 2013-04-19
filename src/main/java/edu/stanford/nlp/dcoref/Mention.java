@@ -54,6 +54,7 @@ import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * One mention for the SieveCoreferenceSystem.
@@ -153,7 +154,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
   }
 
   public String spanToString() {
-    StringBuilder os = new StringBuilder();
+    TxtBuilder os = new TxtBuilder();
     for(int i = 0; i < originalSpan.size(); i ++){
       if(i > 0) os.append(' ');
       os.append(originalSpan.get(i).get(CoreAnnotations.TextAnnotation.class));
@@ -766,7 +767,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
       if(posWH == -1 && !w.get(CoreAnnotations.PartOfSpeechAnnotation.class).isEmpty() && w.get(CoreAnnotations.PartOfSpeechAnnotation.class).charAt(0) == 'W') posWH = this.startIndex + i;
     }
     if(posComma!=-1 && this.headIndex < posComma){
-      StringBuilder os = new StringBuilder();
+      TxtBuilder os = new TxtBuilder();
       for(int i = 0; i < posComma-this.startIndex; i++){
         if(i > 0) os.append(' ');
         os.append(this.originalSpan.get(i).get(CoreAnnotations.TextAnnotation.class));
@@ -774,7 +775,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
       removed = os.toString();
     }
     if(posComma==-1 && posWH != -1 && this.headIndex < posWH){
-      StringBuilder os = new StringBuilder();
+      TxtBuilder os = new TxtBuilder();
       for(int i = 0; i < posWH-this.startIndex; i++){
         if(i > 0) os.append(' ');
         os.append(this.originalSpan.get(i).get(CoreAnnotations.TextAnnotation.class));

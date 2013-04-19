@@ -18,7 +18,7 @@ public class AceMentionArgument {
   public String getRole() { return mRole; }
 
   public String toXml(int offset) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     AceElement.appendOffset(buffer, offset);
     buffer.append('<').append(mentionType).append("_mention_argument REFID=\"").append(mContent.getId()).append("\" ROLE=\"").append(mRole).append("\">\n");
   
@@ -34,7 +34,7 @@ public class AceMentionArgument {
   }
 
   public String toXmlShort(int offset) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     AceElement.appendOffset(buffer, offset);
     buffer.append('<').append(mentionType).append("_argument REFID=\"").append(mContent.getParent().getId()).append("\" ROLE=\"").append(mRole).append("\"/>");
     return buffer.toString();

@@ -48,6 +48,7 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * Extracts {@literal <COREF>} mentions from a file annotated in MUC format.
@@ -213,7 +214,7 @@ public class MUCMentionExtractor extends MentionExtractor {
           sentence.add(word);
         }
       }
-      StringBuilder textContent = new StringBuilder();
+      TxtBuilder textContent = new TxtBuilder();
       for (int i=0 ; i<sentence.size(); i++){
         CoreLabel w = sentence.get(i);
         w.set(CoreAnnotations.IndexAnnotation.class, i+1);

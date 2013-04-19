@@ -4,6 +4,7 @@ import edu.stanford.nlp.ling.tokensregex.types.Expressions;
 import edu.stanford.nlp.util.*;
 
 import edu.stanford.nlp.util.Interval;
+import javolution.text.TxtBuilder;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -1974,7 +1975,7 @@ public class SUTime {
       if ((flags & FORMAT_TIMEX3_VALUE) != 0) {
         return null;
       } // TODO: is there timex3 standard?
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       sb.append("~(");
       if (base != null) {
         sb.append(base.toFormattedString(flags));
@@ -2068,7 +2069,7 @@ public class SUTime {
             if ((flags & FORMAT_ISO) != 0 || (flags & FORMAT_TIMEX3_VALUE) != 0) return null;
 // TODO: is there iso standard?
             // TODO: is there timex3 standard?
-            StringBuilder sb = new StringBuilder();
+            TxtBuilder sb = new TxtBuilder();
             if (base != null && !base.equals(TIME_REF)) sb.append(base.toFormattedString(flags));
             if (tempOp != null) {
                 if (sb.length() > 0) {
@@ -2806,7 +2807,7 @@ public class SUTime {
 
     public String toString() {
       // TODO: is the right way to print this object?
-      StringBuilder os = new StringBuilder();
+      TxtBuilder os = new TxtBuilder();
       if (era == ERA_BC) {
         os.append('-');
       } else if (era == ERA_AD) {
@@ -3618,7 +3619,7 @@ public class SUTime {
         // return super.toFormattedString(flags);
         return null;
       }
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       if (minDuration != null)
         sb.append(minDuration.toFormattedString(flags));
       sb.append('/');
@@ -3779,7 +3780,7 @@ public class SUTime {
     // public boolean includeTimexAltValue() { return true; }
     public String toFormattedString(int flags) {
         if ((flags & (FORMAT_ISO | FORMAT_TIMEX3_VALUE)) == 0) {
-            StringBuilder sb = new StringBuilder();
+            TxtBuilder sb = new TxtBuilder();
             sb.append('(');
             if (begin != null)
                 sb.append(begin);

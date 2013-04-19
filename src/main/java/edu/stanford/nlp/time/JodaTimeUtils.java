@@ -1,5 +1,6 @@
 package edu.stanford.nlp.time;
 
+import javolution.text.TxtBuilder;
 import org.joda.time.*;
 import org.joda.time.chrono.ISOChronology;
 import org.joda.time.field.DividedDateTimeField;
@@ -682,13 +683,13 @@ public class JodaTimeUtils {
     return false;
   }
 
-  private static String zeroPad(int value, int padding){
-    StringBuilder b = new StringBuilder();
+  private static CharSequence zeroPad(int value, int padding){
+    TxtBuilder b = new TxtBuilder();
     b.append(value);
     while(b.length() < padding){
-      b.insert(0, '0');
+      b.insert(0, "0");
     }
-    return b.toString();
+    return b;
   }
 
   private static boolean noFurtherFields(DateTimeFieldType smallestFieldSet, ReadableDateTime begin, ReadableDateTime end){
@@ -796,7 +797,7 @@ public class JodaTimeUtils {
       if(begin.equals(end)){
         return timexTimeValue(begin);
       }
-      StringBuilder value = new StringBuilder();
+      TxtBuilder value = new TxtBuilder();
     boolean shouldBeDone = false;
     //--Differences
     int monthDiff = end.getMonthOfYear() - begin.getMonthOfYear() + (end.getYear()-begin.getYear())*12;
@@ -977,7 +978,7 @@ public class JodaTimeUtils {
    * @return The string representation of a DURATION type Timex3 expression
    */
   public static String timexDurationValue(ReadablePeriod duration, ConversionOptions opts){
-    StringBuilder b = new StringBuilder().append('P');
+    TxtBuilder b = new TxtBuilder().append('P');
     boolean seenTime = false;
     int years = duration.get(years());
     //(millenia)

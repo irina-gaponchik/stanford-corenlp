@@ -76,6 +76,7 @@ import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.SystemUtils;
 import edu.stanford.nlp.util.logging.NewlineLogFormatter;
+import javolution.text.TxtBuilder;
 
 /**
  * Multi-pass Sieve coreference resolution system (see EMNLP 2010 paper).
@@ -296,7 +297,7 @@ public class SieveCoreferenceSystem {
   }
 
   public static String signature(Properties props) {
-    StringBuilder os = new StringBuilder();
+    TxtBuilder os = new TxtBuilder();
     os.append(Constants.SIEVES_PROP + ':').append(props.getProperty(Constants.SIEVES_PROP,
             Constants.SIEVEPASSES));
     os.append(Constants.SINGLETON_PROP + ':').append(props.getProperty(Constants.SINGLETON_PROP,
@@ -1178,7 +1179,7 @@ public class SieveCoreferenceSystem {
   }
 
   protected static void printList(Logger logger, String... args)  {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (String arg : args) {
       sb.append(arg);
       sb.append('\t');
@@ -1228,7 +1229,7 @@ public class SieveCoreferenceSystem {
     }
     logger.fine(p);
 
-    StringBuilder golds = new StringBuilder();
+    TxtBuilder golds = new TxtBuilder();
     golds.append("Gold mentions in the sentence:\n");
     Counter<Integer> mBegin = new ClassicCounter<>();
     Counter<Integer> mEnd = new ClassicCounter<>();
@@ -1275,7 +1276,7 @@ public class SieveCoreferenceSystem {
     }
     logger.fine(p);
 
-    golds = new StringBuilder();
+    golds = new TxtBuilder();
     golds.append("Gold mentions in the sentence:\n");
     mBegin = new ClassicCounter<>();
     mEnd = new ClassicCounter<>();
@@ -1365,7 +1366,7 @@ public class SieveCoreferenceSystem {
     logger.finer("doc type: "+document.docType);
     int previousUtterIndex = -1;
     String previousSpeaker = "";
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for(CoreMap s : document.annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
       for(CoreLabel l : s.get(CoreAnnotations.TokensAnnotation.class)) {
         int utterIndex = l.get(CoreAnnotations.UtteranceAnnotation.class);
@@ -1401,7 +1402,7 @@ public class SieveCoreferenceSystem {
   private static void printScoreSummary(String summary, Logger logger, boolean afterPostProcessing) {
     String[] lines = COMPILE2.split(summary);
       if (afterPostProcessing) {
-          StringBuilder sb = new StringBuilder();
+          TxtBuilder sb = new TxtBuilder();
           for (String line : lines) {
               if (line.startsWith("METRIC")) sb.append(line);
               if (!line.startsWith("Identification of Mentions") && line.contains("Recall")) {
@@ -1513,7 +1514,7 @@ public class SieveCoreferenceSystem {
     Annotation anno = document.annotation;
     List<List<String[]>> conllDocSentences = document.conllDoc.sentenceWordLists;
     String docID = anno.get(CoreAnnotations.DocIDAnnotation.class);
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append("#begin document ").append(docID).append('\n');
     List<CoreMap> sentences = anno.get(CoreAnnotations.SentencesAnnotation.class);
     for(int sentNum = 0 ; sentNum < sentences.size() ; sentNum++){
@@ -1539,7 +1540,7 @@ public class SieveCoreferenceSystem {
       }
 
       for(int i=0 ; i<sentence.size(); i++){
-        StringBuilder sb2 = new StringBuilder();
+        TxtBuilder sb2 = new TxtBuilder();
         for(Mention m : mentionBeginOnly.get(i)){
           if (sb2.length() > 0) {
             sb2.append('|');
@@ -1587,7 +1588,7 @@ public class SieveCoreferenceSystem {
       allMentions = gold ? document.goldOrderedMentionsBySentence : document.predictedOrderedMentionsBySentence;
     //    String filename = document.annotation.get()
 
-    StringBuilder doc = new StringBuilder();
+    TxtBuilder doc = new TxtBuilder();
     int previousOffset = 0;
 
     for(int i = 0 ; i<sentences.size(); i++) {

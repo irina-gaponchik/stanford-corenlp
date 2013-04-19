@@ -8,6 +8,7 @@ import edu.stanford.nlp.ling.BasicDocument;
 import edu.stanford.nlp.ling.Document;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Word;
+import javolution.text.TxtBuilder;
 
 import java.io.File;
 import java.net.URL;
@@ -137,7 +138,7 @@ public class PTBEscapingProcessor<IN extends HasWord, L, F> extends AbstractList
 
 
   public String escapeString(String s) {
-    StringBuilder buff = new StringBuilder();
+    TxtBuilder buff = new TxtBuilder();
     for (int i = 0; i < s.length(); i++) {
       char curChar = s.charAt(i);
       // run through all the chars we need to replace
@@ -182,7 +183,7 @@ public class PTBEscapingProcessor<IN extends HasWord, L, F> extends AbstractList
     return buff.toString();
   }
 
-  private boolean maybeAppendOneMore(int pos, String s, StringBuilder buff) {
+  private boolean maybeAppendOneMore(int pos, String s, TxtBuilder buff) {
     if (pos >= s.length()) {
       return false;
     }

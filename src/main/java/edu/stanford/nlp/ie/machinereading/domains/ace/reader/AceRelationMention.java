@@ -74,7 +74,7 @@ public class AceRelationMention extends AceMention {
   }
 
   public String toXml(int offset) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     appendOffset(buffer, offset);
     buffer.append("<relation_mention ID=\"").append(getId()).append('"');
     if(mLexicalCondition != null)

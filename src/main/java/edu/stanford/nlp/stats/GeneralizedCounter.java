@@ -12,6 +12,7 @@ import java.util.Set;
 
 import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 
 /**
@@ -673,7 +674,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("{");
+      TxtBuilder sb = new TxtBuilder("{");
       for (Iterator<Map.Entry<List<K>, Double>> i = entrySet().iterator(); i.hasNext();) {
         Map.Entry<List<K>, Double> e = i.next();
         sb.append(e.toString());
@@ -787,7 +788,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("{");
+      TxtBuilder sb = new TxtBuilder("{");
       for (Iterator<Map.Entry<K, Double>> i = entrySet().iterator(); i.hasNext();) {
         Map.Entry<K, Double> e = i.next();
         sb.append(e.toString());
@@ -810,7 +811,7 @@ public class GeneralizedCounter<K> implements Serializable {
   public String toString(String param) {
       switch (param) {
           case "contingency": {
-              StringBuilder sb = new StringBuilder();
+              TxtBuilder sb = new TxtBuilder();
               for (K obj : ErasureUtils.sortedIfPossible(topLevelKeySet())) {
                   sb.append(obj);
                   sb.append(" = ");
@@ -821,7 +822,7 @@ public class GeneralizedCounter<K> implements Serializable {
               return sb.toString();
           }
           case "sorted":
-              StringBuilder sb = new StringBuilder();
+              TxtBuilder sb = new TxtBuilder();
               sb.append("{\n");
               for (K obj : ErasureUtils.sortedIfPossible(topLevelKeySet())) {
                   sb.append(obj);

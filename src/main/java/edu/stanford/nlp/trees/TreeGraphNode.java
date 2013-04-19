@@ -3,11 +3,9 @@ package edu.stanford.nlp.trees;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import edu.stanford.nlp.ling.CoreAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.Label;
@@ -17,6 +15,7 @@ import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 
 /**
@@ -704,7 +703,7 @@ public class TreeGraphNode extends Tree implements HasParent {
    * @return {@code String} representation of this subtree
    */
   public String toPrettyString(int indentLevel) {
-    StringBuilder buf = new StringBuilder("\n");
+    TxtBuilder buf = new TxtBuilder("\n");
     for (int i = 0; i < indentLevel; i++) {
       buf.append("  ");
     }
@@ -727,7 +726,7 @@ public class TreeGraphNode extends Tree implements HasParent {
    * @return {@code String} representation of this subtree
    */
   public String toOneLineString() {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     if (children == null || children.length == 0) {
       buf.append(label);
     } else {

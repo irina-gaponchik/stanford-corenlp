@@ -48,10 +48,6 @@ import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.BasicDatum;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.Datum;
-import edu.stanford.nlp.ling.Document;
-import edu.stanford.nlp.ling.HasTag;
-import edu.stanford.nlp.ling.HasWord;
-import edu.stanford.nlp.ling.WordTag;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.math.SloppyMath;
@@ -73,6 +69,7 @@ import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.PaddedList;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 
 /**
@@ -396,7 +393,7 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
 
               // make sure the score is greater than all its neighbors (one add or subtract)
               if (score >= flags.newgeneThreshold && (!prevScores.containsKey(al) || score > prevScores.getCount(al)) && (!prevScores.containsKey(ar) || score > prevScores.getCount(ar)) && (!prevScores.containsKey(sl) || score > prevScores.getCount(sl)) && (!prevScores.containsKey(sr) || score > prevScores.getCount(sr))) {
-                StringBuilder sb = new StringBuilder();
+                TxtBuilder sb = new TxtBuilder();
                 wordInfo = document.get(j);
                 String docId = wordInfo.get(CoreAnnotations.IDAnnotation.class);
                 String startIndex = wordInfo.get(CoreAnnotations.PositionAnnotation.class);

@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  *  A class to redirect the output of Redwood to another logging mechanism,
@@ -103,7 +104,7 @@ public class RedirectOutputHandler<LoggerClass, ChannelEquivalent> extends Outpu
    * @inheritDoc
    */
   @Override
-  protected boolean formatChannel(StringBuilder b, String channelStr, Object channel){
+  protected boolean formatChannel(TxtBuilder b, String channelStr, Object channel){
     return !(channelMapping != null && channelMapping.containsKey(channel));
   }
 

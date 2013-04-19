@@ -5,6 +5,7 @@ import edu.stanford.nlp.util.ArrayMap;
 import edu.stanford.nlp.util.CollectionUtils;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -152,7 +153,7 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
   }
 
   public String toString() {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (Map.Entry<Class, NodePattern> classNodePatternEntry : annotationPatterns.entrySet()) {
       if (sb.length() > 0) {
         sb.append(", ");

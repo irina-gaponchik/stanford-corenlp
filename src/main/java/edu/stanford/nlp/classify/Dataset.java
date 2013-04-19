@@ -27,6 +27,7 @@ import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.ScoredComparator;
 import edu.stanford.nlp.util.ScoredObject;
+import javolution.text.TxtBuilder;
 
 
 /**
@@ -423,7 +424,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
   }
 
   public String toSummaryStatistics() {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append("numDatums: ").append(size).append('\n');
     sb.append("numLabels: ").append(labelIndex.size()).append(" [");
     Iterator<L> iter = labelIndex.iterator();
@@ -746,7 +747,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
   public static void printSVMLightFormat(PrintWriter pw, ClassicCounter<Integer> c, int classNo) {
     Integer[] features = c.keySet().toArray(new Integer[c.keySet().size()]);
     Arrays.sort(features);
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append(classNo);
     sb.append(' ');
     for (int f: features) {

@@ -2,6 +2,7 @@ package edu.stanford.nlp.objectbank;
 
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.AbstractIterator;
+import javolution.text.TxtBuilder;
 
 import java.io.BufferedReader;
 import java.io.Reader;
@@ -35,7 +36,7 @@ public class DelimitRegExIterator<T> extends AbstractIterator<T> {
     BufferedReader in = new BufferedReader(r);
     try {
       String line;
-      StringBuilder input = new StringBuilder();
+      TxtBuilder input = new TxtBuilder();
       while ((line = in.readLine()) != null) {
         input.append(line).append('\n');
       }

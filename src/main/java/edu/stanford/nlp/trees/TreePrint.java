@@ -5,6 +5,7 @@ import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseEnglishWordMap;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.XMLUtils;
+import javolution.text.TxtBuilder;
 
 import java.io.*;
 import java.util.*;
@@ -881,7 +882,7 @@ public class TreePrint {
    *         typed dependencies
    */
   private static String toString(Collection<TypedDependency> dependencies, boolean extraSep) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     if (extraSep) {
       List<TypedDependency> extraDeps =  new ArrayList<>();
       for (TypedDependency td : dependencies) {
@@ -909,7 +910,7 @@ public class TreePrint {
 
   // NO OUTSIDE USE
   private static String toReadableString(Collection<TypedDependency> dependencies) {
-    StringBuilder buf = new StringBuilder();
+    TxtBuilder buf = new TxtBuilder();
     buf.append(String.format("%-20s%-20s%-20s%n", "dep", "reln", "gov"));
     buf.append(String.format("%-20s%-20s%-20s%n", "---", "----", "---"));
     for (TypedDependency td : dependencies) {
@@ -920,7 +921,7 @@ public class TreePrint {
 
   // NO OUTSIDE USE
   private static String toXMLString(Collection<TypedDependency> dependencies) {
-    StringBuilder buf = new StringBuilder("<dependencies style=\"typed\">\n");
+    TxtBuilder buf = new TxtBuilder("<dependencies style=\"typed\">\n");
     for (TypedDependency td : dependencies) {
       String reln = td.reln().toString();
       String gov = td.gov().value();

@@ -5,6 +5,7 @@ import edu.stanford.nlp.optimization.StochasticCalculateMethods;
 import edu.stanford.nlp.process.WordShapeClassifier;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.ReflectionLoading;
+import javolution.text.TxtBuilder;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -972,7 +973,7 @@ public class SeqClassifierFlags implements Serializable {
    */
   public void setProperties(Properties props, boolean printProps) {
     this.props = props;
-    StringBuilder sb = new StringBuilder(stringRep);
+    TxtBuilder sb = new TxtBuilder(stringRep);
     for (Enumeration e = props.propertyNames(); e.hasMoreElements();) {
       String key = (String) e.nextElement();
       String val = props.getProperty(key);

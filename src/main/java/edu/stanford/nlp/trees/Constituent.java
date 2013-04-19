@@ -2,6 +2,7 @@ package edu.stanford.nlp.trees;
 
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.util.Scored;
+import javolution.text.TxtBuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -102,9 +103,9 @@ public abstract class Constituent implements Labeled, Scored, Label {
    */
   @Override
   public String toString() {
-    StringBuffer sb;
+    StringBuilder sb;
     Label lab = label();
-      sb = lab != null ? new StringBuffer(lab.toString()) : new StringBuffer();
+      sb = lab != null ? new StringBuilder(lab.toString()) : new StringBuilder();
     sb.append('(').append(start()).append(',').append(end()).append(')');
     return sb.toString();
   }
@@ -283,7 +284,7 @@ public abstract class Constituent implements Labeled, Scored, Label {
    */
   // TODO: genericize this!
   public String toSentenceString(ArrayList s) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (int wordNum = start(), end = end(); wordNum <= end; wordNum++) {
       sb.append(s.get(wordNum));
       if (wordNum != end) {

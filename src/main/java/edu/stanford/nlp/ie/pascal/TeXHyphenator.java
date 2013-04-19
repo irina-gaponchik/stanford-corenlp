@@ -3,6 +3,7 @@ package edu.stanford.nlp.ie.pascal;
 import java.io.*;
 import java.util.*;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 /**
  * Hyphenates words according to the TeX algorithm.
@@ -64,7 +65,7 @@ public class TeXHyphenator {
   private Node head = new Node();
 
   public static String toString(int... i) {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
       for (int anI : i) {
           sb.append(anI);
       }
@@ -174,7 +175,7 @@ public class TeXHyphenator {
           char[] chars = arg.toLowerCase().toCharArray();
           boolean[] breakPoints = hyphenator.findBreakPoints(chars);
           System.out.println(arg);
-          StringBuilder sb = new StringBuilder();
+          TxtBuilder sb = new TxtBuilder();
           for (boolean breakPoint : breakPoints) {
               if (breakPoint) {
                   sb.append('^');

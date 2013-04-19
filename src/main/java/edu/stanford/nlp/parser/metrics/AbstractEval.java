@@ -10,6 +10,7 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * A framework for Set-based precision/recall/F1 evaluation.
@@ -235,7 +236,7 @@ public abstract class AbstractEval {
       if (tree.isLeaf()) {
         return "";
       }
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       sb.append(tree.label());
       sb.append(" ->");
       for (int i = 0; i < tree.children().length; i++) {

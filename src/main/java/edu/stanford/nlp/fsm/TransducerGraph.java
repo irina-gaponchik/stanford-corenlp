@@ -16,6 +16,9 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Maps;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.Txt;
+import javolution.text.TxtBuilder;
+import javolution.util.FastSet;
 
 /**
  * TransducerGraph
@@ -512,8 +515,8 @@ public class TransducerGraph implements Cloneable {
 
   @Override
   public String toString() {
-    StringBuffer sb = new StringBuffer();
-    depthFirstSearch(true, sb);
+    StringBuilder sb = new StringBuilder();
+    depthFirstSearch(true, Txt.valueOf(sb));
     return sb.toString();
   }
 
@@ -528,7 +531,7 @@ public class TransducerGraph implements Cloneable {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setMaximumFractionDigits(3);
     nf.setMinimumFractionDigits(1);
-    StringBuilder result = new StringBuilder();
+    TxtBuilder result = new TxtBuilder();
     Set nodes = getNodes();
     result.append("digraph G {\n");
     //    result.append("page = \"8.5,11\";\n");
@@ -837,12 +840,12 @@ public class TransducerGraph implements Cloneable {
     return pathList;
   }
 
-  public void depthFirstSearch(boolean forward, StringBuffer b) {
+  public void depthFirstSearch(boolean forward, Txt b) {
     if (forward) {
-      depthFirstSearchHelper(startNode, new HashSet(), 0, true, b);
+      depthFirstSearchHelper(startNode, new FastSet(), 0, true, b);
     } else {
         for (Object o : endNodes) {
-            depthFirstSearchHelper(o, new HashSet(), 0, false, b);
+            depthFirstSearchHelper(o, new FastSet(), 0, false, b);
         }
     }
   }
@@ -850,7 +853,7 @@ public class TransducerGraph implements Cloneable {
   /**
    * For testing only.
    */
-  private void depthFirstSearchHelper(Object node, Set marked, int level, boolean forward, StringBuffer b) {
+  private void depthFirstSearchHelper(Object node, Set marked, int level, boolean forward, Txt b) {
     if (marked.contains(node)) {
       return;
     }
@@ -864,12 +867,12 @@ public class TransducerGraph implements Cloneable {
           Arc newArc = (Arc) arc;
           // print it out
           for (int i = 0; i < level; i++) {
-              b.append("  ");
+              b.plus("  ");
           }
           if (endNodes.contains(newArc.getTargetNode())) {
-              b.append(newArc).append(" END\n");
+              b.plus(newArc).plus(" END\n");
           } else {
-              b.append(newArc).append('\n');
+              b.plus(newArc).plus('\n');
           }
           if (forward) {
               depthFirstSearchHelper(newArc.getTargetNode(), marked, level + 1, forward, b);
@@ -888,10 +891,10 @@ public class TransducerGraph implements Cloneable {
     System.out.println("Done creating random graph");
     printPathOutputs(pathList, graph, true);
     System.out.println("Depth first search from start node");
-    StringBuffer b = new StringBuffer();
+    Txt b =   Txt.EMPTY;
     graph.depthFirstSearch(true, b);
     System.out.println(b.toString());
-    b = new StringBuffer();
+    b = Txt.EMPTY;
     System.out.println("Depth first search back from end node");
     graph.depthFirstSearch(false, b);
     System.out.println(b.toString());

@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import javolution.text.TxtBuilder;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.ErrorHandler;
@@ -119,7 +118,7 @@ public class XMLUtils {
     if (mapBack != null) {
       mapBack.clear(); // just in case it has something in it!
     }
-    StringBuilder result = new StringBuilder();
+    TxtBuilder result = new TxtBuilder();
     String text;
     String tag;
     int position = 0;
@@ -174,7 +173,7 @@ public class XMLUtils {
     if (!r.ready()) {
       return "";
     }
-    StringBuilder b = new StringBuilder();
+    TxtBuilder b = new TxtBuilder();
     int c = r.read();
     while (c >= 0 && c != '<') {
       b.append((char) c);
@@ -207,7 +206,7 @@ public class XMLUtils {
   static final Pattern xmlEscapingPattern = Pattern.compile("\\&.+?;");
 
   public static String unescapeStringForXML(String s) {
-    StringBuilder result = new StringBuilder();
+    TxtBuilder result = new TxtBuilder();
     Matcher m = xmlEscapingPattern.matcher(s);
     int end = 0;
     while (m.find()) {
@@ -737,7 +736,7 @@ public class XMLUtils {
    */
   public static String escapeXML(String in) {
     int leng = in.length();
-    StringBuilder sb = new StringBuilder(leng);
+    TxtBuilder sb = new TxtBuilder(leng);
     for (int i = 0; i < leng; i++) {
       char c = in.charAt(i);
       if (c == '&') {
@@ -766,7 +765,7 @@ public class XMLUtils {
    */
   public static String escapeElementXML(String in) {
     int leng = in.length();
-    StringBuilder sb = new StringBuilder(leng);
+    TxtBuilder sb = new TxtBuilder(leng);
     for (int i = 0; i < leng; i++) {
       char c = in.charAt(i);
       if (c == '&') {
@@ -793,7 +792,7 @@ public class XMLUtils {
    */
   public static String escapeAttributeXML(String in) {
     int leng = in.length();
-    StringBuilder sb = new StringBuilder(leng);
+    TxtBuilder sb = new TxtBuilder(leng);
     for (int i = 0; i < leng; i++) {
       char c = in.charAt(i);
       if (c == '&') {
@@ -809,7 +808,7 @@ public class XMLUtils {
 
 
   public static String escapeTextAroundXMLTags(String s) {
-    StringBuilder result = new StringBuilder();
+    TxtBuilder result = new TxtBuilder();
     Reader r = new StringReader(s);
     try {
       do {
@@ -951,7 +950,7 @@ public class XMLUtils {
     if ( ! r.ready()) {
       return null;
     }
-    StringBuilder b = new StringBuilder("<");
+    TxtBuilder b = new TxtBuilder("<");
     int c = r.read();
     while (c >= 0) {
       b.append((char) c);
@@ -992,7 +991,7 @@ public class XMLUtils {
 
     public static String makeBetterErrorString(String msg,
                                                SAXParseException ex) {
-      StringBuilder sb = new StringBuilder(msg);
+      TxtBuilder sb = new TxtBuilder(msg);
       sb.append(": ");
       String str = ex.getMessage();
       if (str.lastIndexOf('.') == str.length() - 1) {

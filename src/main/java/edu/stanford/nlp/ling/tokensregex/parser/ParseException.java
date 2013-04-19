@@ -2,6 +2,8 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package edu.stanford.nlp.ling.tokensregex.parser;
 
+import javolution.text.TxtBuilder;
+
 /**
  * This exception is thrown when parse errors are encountered.
  * You can explicitly create objects of this exception type by
@@ -88,7 +90,7 @@ public class ParseException extends Exception {
                            int[][] expectedTokenSequences,
                            String... tokenImage) {
     String eol = System.getProperty("line.separator", "\n");
-    StringBuilder expected = new StringBuilder();
+    TxtBuilder expected = new TxtBuilder();
     int maxSize = 0;
       for (int[] expectedTokenSequence : expectedTokenSequences) {
           if (maxSize < expectedTokenSequence.length) {
@@ -134,7 +136,7 @@ public class ParseException extends Exception {
    * string literal.
    */
   static String add_escapes(String str) {
-      StringBuilder retval = new StringBuilder();
+      TxtBuilder retval = new TxtBuilder();
       char ch;
       for (int i = 0; i < str.length(); i++) {
         switch (str.charAt(i))

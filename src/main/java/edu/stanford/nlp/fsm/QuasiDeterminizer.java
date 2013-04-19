@@ -1,6 +1,9 @@
 package edu.stanford.nlp.fsm;
 
 import edu.stanford.nlp.stats.ClassicCounter;
+import javolution.text.Txt;
+import javolution.text.TxtBuilder;
+
 import java.util.*;
 
 /**
@@ -126,8 +129,8 @@ public class QuasiDeterminizer implements TransducerGraph.GraphProcessor {
     TransducerGraph.GraphProcessor qd = new QuasiDeterminizer();
     List pathList = new ArrayList();
     TransducerGraph graph = TransducerGraph.createRandomGraph(1000, 10, 1.0, 10, pathList);
-    StringBuffer b = new StringBuffer();
-    graph.depthFirstSearch(true, b);
+      Txt b = Txt.EMPTY;
+      graph.depthFirstSearch(true, b);
     System.out.println(b.toString());
     System.out.println("Done creating random graph");
     //    TransducerGraph.printPathOutputs(pathList, graph, false);

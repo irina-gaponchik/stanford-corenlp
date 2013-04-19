@@ -1,6 +1,7 @@
 package edu.stanford.nlp.io;
 
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -138,8 +139,8 @@ public class NumberRangesFileFilter implements FileFilter {
 
   @Override
   public String toString() {
-    StringBuilder sb;
-      sb = recursively ? new StringBuilder("recursively ") : new StringBuilder();
+    TxtBuilder sb;
+      sb = recursively ? new TxtBuilder("recursively ") : new TxtBuilder();
     for (Iterator<Pair<Integer,Integer>> it = ranges.iterator(); it.hasNext(); ) {
       Pair<Integer,Integer> p = it.next();
       int low = p.first();

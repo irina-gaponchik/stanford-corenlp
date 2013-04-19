@@ -77,7 +77,7 @@ public class AceEntityMention extends AceMention {
   }
 
   public String toXml(int offset) {
-    StringBuffer buffer = new StringBuffer();
+    StringBuilder buffer = new StringBuilder();
     String mentionType = mType;
 
     appendOffset(buffer, offset);

@@ -9,6 +9,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
+import javolution.text.TxtBuilder;
 
 /**
  * Each entity mention is described by a type (possibly subtype) and a span of text
@@ -183,7 +184,7 @@ public class EntityMention extends ExtractionObject {
   public String getValue() {
     List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
     // int lastEnd = -1;
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (int i = headTokenSpan.start(); i < headTokenSpan.end(); i ++){
       CoreLabel token = tokens.get(i);
 

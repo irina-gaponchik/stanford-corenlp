@@ -9,6 +9,7 @@ import java.util.Stack;
 
 import edu.stanford.nlp.util.logging.Redwood.Record;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * An abstract handler incorporating the logic of outputing a log message,
@@ -120,7 +121,7 @@ public abstract class OutputHandler extends LogRecordHandler{
    * @param style The style to use
    * @return The SringBuilder b
    */
-  protected static StringBuilder style(StringBuilder b, String line, Color color, Style style){
+  protected static TxtBuilder style(TxtBuilder b, String line, Color color, Style style){
     if(color != Color.NONE || style != Style.NONE){
       b.append(color.ansiCode);
       b.append(style.ansiCode);
@@ -134,13 +135,13 @@ public abstract class OutputHandler extends LogRecordHandler{
 
   /**
    *  Format a channel
-   * @param b The StringBuilder to append to
+   * @param b The javolution.text.TxtBuilder to append to
    * @param channelStr The [possibly truncated and/or modified] string
-   *                   to actually print to the StringBuilder
+   *                   to actually print to the javolution.text.TxtBuilder
    * @param channel The original channel
-   * @return |true| if the channel was printed (that is, appended to the StringBuilder)
+   * @return |true| if the channel was printed (that is, appended to the javolution.text.TxtBuilder)
    */
-  protected boolean formatChannel(StringBuilder b, String channelStr, Object channel){
+  protected boolean formatChannel(TxtBuilder b, String channelStr, Object channel){
     if(this.channelColors == null && this.channelStyles == null){
       //(regular concat)
       b.append(channelStr);
@@ -178,7 +179,7 @@ public abstract class OutputHandler extends LogRecordHandler{
   }
 
 
-  private void writeContent(int depth, Object content, StringBuilder b){
+  private void writeContent(int depth, Object content, TxtBuilder b){
     if(leftMargin > 2){ b.append(tab); }
     //(write tabs)
     for(int i=0; i<depth; i++){
@@ -194,7 +195,7 @@ public abstract class OutputHandler extends LogRecordHandler{
       Record signal = queuedTracks.removeFirst();
       if(signal.depth >= untilDepth){ queuedTracks.add(signal); return; }
       //(begin record message)
-      StringBuilder b = new StringBuilder();
+      TxtBuilder b = new TxtBuilder();
       if(missingOpenBracket){
         b.append("{\n");
       }
@@ -206,7 +207,7 @@ public abstract class OutputHandler extends LogRecordHandler{
       writeContent(signal.depth,signal.content,b);
       if(!signal.content.toString().isEmpty()){ b.append(' '); }
       //(print)
-      print(null, style(new StringBuilder(), b.toString(), trackColor, trackStyle).toString() );
+      print(null, style(new TxtBuilder(), b.toString(), trackColor, trackStyle).toString() );
       this.missingOpenBracket = true;  //only set to false if actually updated track state
       //(update lines printed)
       if(info != null){
@@ -217,7 +218,7 @@ public abstract class OutputHandler extends LogRecordHandler{
 
   /** {@inheritDoc} */
   public List<Record> handle(Record record) {
-    StringBuilder b = new StringBuilder();
+    TxtBuilder b = new TxtBuilder();
     
     //--Special case for Exceptions
     String[] content;
@@ -298,7 +299,7 @@ public abstract class OutputHandler extends LogRecordHandler{
           //(case: doesn't fit)
           while(cursorPos < leftMargin){ b.append(' '); cursorPos += 1; }
           if(contentLinesPrinted < content.length){
-            writeContent(record.depth, style(new StringBuilder(),content[contentLinesPrinted],color,style).toString(), b);
+            writeContent(record.depth, style(new TxtBuilder(),content[contentLinesPrinted],color,style).toString(), b);
             contentLinesPrinted += 1;
           }
           b.append("\n ");
@@ -322,7 +323,7 @@ public abstract class OutputHandler extends LogRecordHandler{
     //(write content)
     while(contentLinesPrinted < content.length) {
       while(cursorPos < leftMargin){ b.append(' '); cursorPos += 1; }
-      writeContent(record.depth, style(new StringBuilder(),content[contentLinesPrinted],color,style).toString(), b);
+      writeContent(record.depth, style(new TxtBuilder(),content[contentLinesPrinted],color,style).toString(), b);
       contentLinesPrinted += 1;
       if(contentLinesPrinted < content.length){ b.append('\n'); cursorPos = 0; }
     }
@@ -375,7 +376,7 @@ public abstract class OutputHandler extends LogRecordHandler{
     }
     //(handle track)
     if(this.queuedTracks.isEmpty()){
-      StringBuilder b = new StringBuilder();
+      TxtBuilder b = new TxtBuilder();
       if(!this.missingOpenBracket){
         //(write margin)
         for(int i=0; i<this.leftMargin; i++){
@@ -399,7 +400,7 @@ public abstract class OutputHandler extends LogRecordHandler{
       }
       //(print)
       b.append('\n');
-      print(null, style(new StringBuilder(), b.toString(), trackColor, trackStyle).toString());
+      print(null, style(new TxtBuilder(), b.toString(), trackColor, trackStyle).toString());
     } else {
       this.queuedTracks.removeLast();
     }

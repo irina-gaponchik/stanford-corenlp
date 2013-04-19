@@ -2,6 +2,8 @@ package edu.stanford.nlp.ling.tokensregex;
 
 import edu.stanford.nlp.util.CacheMap;
 import edu.stanford.nlp.util.IntPair;
+import javolution.text.Txt;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -59,7 +61,7 @@ public class MultiWordStringMatcher {
 
   protected static String markTargetString(String text, String targetString, String beginMark, String endMark, boolean markOnlyIfSpace)
   {
-    StringBuilder sb = new StringBuilder(text);
+    Txt sb = new Txt(text);
     int i = sb.indexOf(targetString);
     while (i >= 0) {
       boolean matched = true;
@@ -165,7 +167,7 @@ public class MultiWordStringMatcher {
     List<String> strings = Arrays.asList(targetStrings);
     // Sort by longest string first
     Collections.sort(strings, LONGEST_STRING_COMPARATOR);
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (String s:strings) {
       if (sb.length() > 0) {
         sb.append('|');
@@ -211,7 +213,7 @@ public class MultiWordStringMatcher {
   private static final Pattern punctWhitespacePattern = Pattern.compile("\\s*(\\p{Punct})\\s*");
   public static String getExctWsRegex(String targetString)
   {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     String[] fields = whitespacePattern.split(targetString);
     for (String field:fields) {
       // require at least one whitespace if there is whitespace in target string
@@ -234,7 +236,7 @@ public class MultiWordStringMatcher {
 
   public String getLWsRegex(String targetString)
   {
-    StringBuilder sb = new StringBuilder("(?u)(?i)");
+    TxtBuilder sb = new TxtBuilder("(?u)(?i)");
     sb.append(getExctWsRegex(targetString));
     return sb.toString();
   }
@@ -243,7 +245,7 @@ public class MultiWordStringMatcher {
   private static final Pattern lnrmDelimPattern = Pattern.compile("(?:\\p{Punct}|\\s)+");
   public static String getLnrmRegex(String targetString)
   {
-    StringBuilder sb = new StringBuilder("(?u)(?i)");
+    TxtBuilder sb = new TxtBuilder("(?u)(?i)");
     String[] fields = lnrmDelimPattern.split(targetString);
     boolean first = true;
     for (String field:fields) {

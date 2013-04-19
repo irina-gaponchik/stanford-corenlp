@@ -22,6 +22,7 @@ import edu.stanford.nlp.tagger.common.TaggerConstants;
 import edu.stanford.nlp.util.ArrayUtils;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.text.TxtBuilder;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -158,7 +159,7 @@ public class TestSentence implements SequenceModel {
    * @return tagged sentence
    */
   String getTaggedNice() {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     // size - 1 means to exclude the EOS (end of string) symbol
     for (int i = 0; i < size - 1; i++) {
       sb.append(toNice(sent.get(i))).append(tagSeparator).append(toNice(finalTags[i]));

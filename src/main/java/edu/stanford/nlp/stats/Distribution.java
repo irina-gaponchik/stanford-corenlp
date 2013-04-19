@@ -5,7 +5,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -13,6 +12,7 @@ import java.util.Random;
 import java.util.Set;
 
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * Immutable class for representing normalized, smoothed discrete distributions
@@ -754,7 +754,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
           return probabilityOf(o1) < probabilityOf(o2) ? 1 : -1;
       }
     });
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     sb.append('[');
     for (int i = 0; i < NUM_ENTRIES_IN_STRING; i++) {
       if (keyList.size() <= i) {

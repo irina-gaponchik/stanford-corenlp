@@ -27,16 +27,13 @@
 package edu.stanford.nlp.dcoref;
 
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.stanford.nlp.dcoref.CorefCoreAnnotations;
 import edu.stanford.nlp.dcoref.Dictionaries.Animacy;
 import edu.stanford.nlp.dcoref.Dictionaries.Gender;
 import edu.stanford.nlp.dcoref.Dictionaries.MentionType;
@@ -44,6 +41,7 @@ import edu.stanford.nlp.dcoref.Dictionaries.Number;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.IntPair;
 import edu.stanford.nlp.util.IntTuple;
+import javolution.text.TxtBuilder;
 
 /**
  * Output of coref system.  Each CorefChain represents a set of
@@ -231,7 +229,7 @@ public class CorefChain implements Serializable {
 
     @Override
     public String toString(){
-      StringBuilder s = new StringBuilder();
+      TxtBuilder s = new TxtBuilder();
       s.append('"').append(mentionSpan).append('"').append(" in sentence ").append(sentNum);
       return s.toString();
       //      return "(sentence:" + sentNum + ", startIndex:" + startIndex + "-endIndex:" + endIndex + ")";

@@ -55,6 +55,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Generics;
+import javolution.text.TxtBuilder;
 
 /**
  * Extracts {@code <COREF>} mentions from a file annotated in ACE format (ACE2004, ACE2005).
@@ -214,7 +215,7 @@ public class ACEMentionExtractor extends MentionExtractor {
   }
 
   private static void printRawDoc(List<CoreMap> sentences, List<List<Mention>> allMentions, String filename, boolean gold) throws FileNotFoundException {
-    StringBuilder doc = new StringBuilder();
+    TxtBuilder doc = new TxtBuilder();
     int previousOffset = 0;
     Counter<Integer> mentionCount = new ClassicCounter<>();
     for(List<Mention> l : allMentions) {

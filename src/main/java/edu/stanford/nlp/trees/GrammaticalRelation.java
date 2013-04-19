@@ -6,6 +6,7 @@ import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.trees.tregex.TregexPatternCompiler;
 import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 import java.io.Serializable;
 import java.util.*;
@@ -405,7 +406,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
    *         {@code GrammaticalRelation}
    */
   public String toPrettyString() {
-    StringBuilder buf = new StringBuilder("\n");
+    TxtBuilder buf = new TxtBuilder("\n");
     toPrettyString(0, buf);
     return buf.toString();
   }
@@ -419,7 +420,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
    * @param indentLevel how many levels to indent (0 for root node)
    *
    */
-  private void toPrettyString(int indentLevel, StringBuilder buf) {
+  private void toPrettyString(int indentLevel, TxtBuilder buf) {
     for (int i = 0; i < indentLevel; i++) {
       buf.append("  ");
     }

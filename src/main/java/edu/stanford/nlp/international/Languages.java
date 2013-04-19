@@ -7,6 +7,7 @@ import edu.stanford.nlp.parser.lexparser.FrenchTreebankParserParams;
 import edu.stanford.nlp.parser.lexparser.HebrewTreebankParserParams;
 import edu.stanford.nlp.parser.lexparser.NegraPennTreebankParserParams;
 import edu.stanford.nlp.parser.lexparser.TreebankLangParserParams;
+import javolution.text.TxtBuilder;
 
 /**
  * Constants and parameters for multilingual parsing.
@@ -22,7 +23,7 @@ public class Languages {
   
   private static String langList;
   static {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for(Language lang : Language.values()) {
       sb.append(lang.toString());
       sb.append(' ');

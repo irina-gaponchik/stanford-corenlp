@@ -40,6 +40,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.PriorityQueue;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -354,7 +355,7 @@ public class ExhaustivePCFGParser implements Scorer, KBestViterbiParser {
             originalCoreLabels = new CoreLabel[length];
             originalTags = new HasTag[length];
             int unk = 0;
-            StringBuilder unkWords = new StringBuilder("[");
+            TxtBuilder unkWords = new TxtBuilder("[");
             // int unkIndex = wordIndex.size();
 
             for (int i = 0; i < length; i++) {
@@ -566,7 +567,7 @@ public class ExhaustivePCFGParser implements Scorer, KBestViterbiParser {
 //
 //    int unk = 0;
 //    int i = 0;
-//    StringBuilder unkWords = new StringBuilder("[");
+//    javolution.text.TxtBuilder unkWords = new javolution.text.TxtBuilder("[");
 //    for (LatticeEdge edge : lr) {
 //      String s = edge.word;
 //      if (op.testOptions.verbose && !lex.isKnown(wordNumberer.number(s))) {
@@ -1261,7 +1262,7 @@ oScore[split][end][br.rightChild] = totR;
         // todo [cdm 2012]: This case seems buggy in never doing unaries over span 1 items
         // note we don't look for "words" including the end symbol!
         for (int end = start + 1; end < length - 1 && end - start <= op.testOptions.maxSpanForTags || start + 1 == end; end++) {
-          StringBuilder word = new StringBuilder();
+          TxtBuilder word = new TxtBuilder();
           //wsg: Feb 2010 - Appears to support character-level parsing
           for (int i = start; i < end; i++) {
             if (sentence.get(i) instanceof HasWord) {
@@ -1538,7 +1539,7 @@ oScore[split][end][br.rightChild] = totR;
       if (op.testOptions.maxSpanForTags > 1) {
         Tree wordNode = null;
         if (sentence != null) {
-          StringBuilder word = new StringBuilder();
+          TxtBuilder word = new TxtBuilder();
           for (int i = start; i < end; i++) {
             if (sentence.get(i) instanceof HasWord) {
               HasWord cl = (HasWord) sentence.get(i);

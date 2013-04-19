@@ -122,7 +122,7 @@ import java.util.regex.Pattern;
  *   <tr><th>Field</th><th>Values</th><th>Example</th><th>Description</th></tr>
  *   <tr><td>{@code ruleType}</td><td>{@code "tokens" | "text" | "composite" | "filter" }</td>
  *      <td>{@code tokens}</td><td>Type of the rule</td></tr>
- *   <tr><td>{@code pattern}</td><td>{@code &lt;Token Sequence Pattern&gt;&lt; = (...) | &lt;Text Pattern&gt; = /.../}</td>
+ *   <tr><td>{@code pattern}</td><td>{@code &lt;Token Sequence Pattern&gt;&lt; = (...) | &lt;Txt Pattern&gt; = /.../}</td>
  *      <td>{@code ( /winter/ /of/ $YEAR)}</td><td>Pattern to match against.
  *      See {@link TokenSequencePattern} and {@link Pattern} for
  *      how to specify patterns over tokens and strings</td></tr>

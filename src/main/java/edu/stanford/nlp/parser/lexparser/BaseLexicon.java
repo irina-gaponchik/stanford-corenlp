@@ -15,6 +15,7 @@ import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -608,8 +609,8 @@ public class BaseLexicon implements Lexicon {
         if (iTW.word != debugLastWord) {
           debugLastWord = iTW.word;
           debugLoc = loc;
-          debugProbs = new StringBuilder();
-          debugNoProbs = new StringBuilder("impossible: ");
+          debugProbs = new TxtBuilder();
+          debugNoProbs = new TxtBuilder("impossible: ");
           debugPrefix = "Lexicon: " + wordIndex.get(debugLastWord) + " (known): ";
         }
         if (pb_W_T > Double.NEGATIVE_INFINITY) {
@@ -650,9 +651,9 @@ public class BaseLexicon implements Lexicon {
 
   private transient int debugLoc = -1;
 
-  private transient StringBuilder debugProbs;
+  private transient TxtBuilder debugProbs;
 
-  private transient StringBuilder debugNoProbs;
+  private transient TxtBuilder debugNoProbs;
 
   private transient String debugPrefix;
 

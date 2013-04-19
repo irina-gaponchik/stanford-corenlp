@@ -6,7 +6,7 @@ import edu.stanford.nlp.stats.IntCounter;
 import edu.stanford.nlp.util.ArrayMap;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Generics;
-import edu.stanford.nlp.util.TypesafeMap;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 
@@ -133,7 +133,7 @@ public abstract class CoreMapAttributeAggregator
     }
     public Object aggregate(Class key, List<? extends CoreMap> in) {
       if (in == null) return null;
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       for (CoreMap cm:in) {
         Object obj = cm.get(key);
         if (obj != null) {

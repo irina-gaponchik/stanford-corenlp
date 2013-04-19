@@ -37,6 +37,7 @@ import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.text.TxtBuilder;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -378,7 +379,7 @@ public class Tsurgeon {
    * @return tregex pattern string
    */
   public static String getTregexPatternFromReader(BufferedReader reader) throws IOException {
-    StringBuilder matchString = new StringBuilder();
+    TxtBuilder matchString = new TxtBuilder();
     for (String thisLine; (thisLine = reader.readLine()) != null; ) {
       if (matchString.length() > 0 && emptyLinePattern.matcher(thisLine).matches()) {
         // A blank line after getting some real content (not just comments or nothing)
@@ -436,7 +437,7 @@ public class Tsurgeon {
    * @throws IOException
    */
   public static String getTsurgeonTextFromReader(BufferedReader reader) throws IOException {
-    StringBuilder sb = new StringBuilder();
+    TxtBuilder sb = new TxtBuilder();
     for (String thisLine; (thisLine = reader.readLine()) != null; ) {
       thisLine = removeComments(thisLine);
       if (emptyLinePattern.matcher(thisLine).matches()) {

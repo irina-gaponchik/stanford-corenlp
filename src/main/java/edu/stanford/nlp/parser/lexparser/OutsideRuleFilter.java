@@ -3,6 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.*;
 
 import edu.stanford.nlp.util.Index;
+import javolution.text.TxtBuilder;
 
 public class OutsideRuleFilter {
 
@@ -114,7 +115,7 @@ public class OutsideRuleFilter {
       boolean foundSemi = false;
       boolean foundDots = false;
       List<String> array = left;
-      StringBuilder sb = new StringBuilder();
+      TxtBuilder sb = new TxtBuilder();
       for (int c = 0; c < stateStr.length(); c++) {
         if (stateStr.charAt(c) == ':') {
           foundSemi = true;
@@ -130,7 +131,7 @@ public class OutsideRuleFilter {
               str = null;
             }
             array.add(str);
-            sb = new StringBuilder();
+            sb = new TxtBuilder();
           }
           continue;
         }
