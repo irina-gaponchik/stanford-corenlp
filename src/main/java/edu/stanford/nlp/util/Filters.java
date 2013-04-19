@@ -93,8 +93,8 @@ public class Filters {
     private final Collection<E> args;
     private final boolean judgment;
 
-    protected CollectionAcceptFilter(Collection<E> c, boolean judgment) {
-        this.args = new FastSet<>((Set<? extends E>) c);
+    protected CollectionAcceptFilter(final Collection<E> c, boolean judgment) {
+        this.args = new FastSet<E>(){{addAll(c);}};
       this.judgment = judgment;
     }
 
