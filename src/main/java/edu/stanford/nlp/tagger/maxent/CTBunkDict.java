@@ -1,5 +1,6 @@
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.RuntimeIOException;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
@@ -15,7 +16,7 @@ public class CTBunkDict {
   private final static String defaultFilename = "ctb_amb";
   private static CTBunkDict CTBunkDictSingleton;
 
-  private static Map<String, Set<String>> CTBunk_dict;
+  private static RadixTree< Set<String>> CTBunk_dict;
 
 
   private static CTBunkDict getInstance() {
@@ -33,7 +34,7 @@ public class CTBunkDict {
 
 
   private static void readCTBunkDict(String filename)   {
-      CTBunk_dict = new FastMap<>();
+      CTBunk_dict = new RadixTree<>();
 
     try{
 

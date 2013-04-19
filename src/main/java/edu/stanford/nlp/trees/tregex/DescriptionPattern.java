@@ -1,5 +1,6 @@
 package edu.stanford.nlp.trees.tregex;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.ArrayStringFilter;
@@ -171,7 +172,7 @@ class DescriptionPattern extends TregexPattern {
   @Override
   public TregexMatcher matcher(Tree root, Tree tree,
                                IdentityHashMap<Tree, Tree> nodesToParents,
-                               Map<String, Tree> namesToNodes,
+                               RadixTree<Tree> namesToNodes,
                                VariableStrings variableStrings) {
     return new DescriptionMatcher(this, root, tree, nodesToParents,
                                   namesToNodes, variableStrings);
@@ -199,7 +200,7 @@ class DescriptionPattern extends TregexPattern {
 
     public DescriptionMatcher(DescriptionPattern n, Tree root, Tree tree,
                               IdentityHashMap<Tree, Tree> nodesToParents,
-                              Map<String, Tree> namesToNodes,
+                              RadixTree<Tree> namesToNodes,
                               VariableStrings variableStrings) {
       super(root, tree, nodesToParents, namesToNodes, variableStrings);
       myNode = n;

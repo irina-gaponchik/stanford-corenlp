@@ -1,5 +1,6 @@
 package edu.stanford.nlp.time;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.ReaderInputStream;
 import edu.stanford.nlp.io.TeeStream;
@@ -399,7 +400,7 @@ public class SUTimeMain {
   }
 
   private static void processTempEval2Doc(AnnotationPipeline pipeline, Annotation docAnnotation,
-                                          Map<String, List<TimexAttributes>> timexMap,
+                                          Map<String,List<TimexAttributes>> timexMap,
                                           PrintWriter extPw, PrintWriter attrPw, PrintWriter debugPw,
                                           PrintWriter attrDebugPwGold, PrintWriter attrDebugPw)
   {
@@ -612,7 +613,7 @@ public class SUTimeMain {
     }
   }
 
-  private static TimexAttributes findTimex(Map<String,List<TimexAttributes>> timexMap, String docId, String tid)
+  private static TimexAttributes findTimex(Map<String, List<TimexAttributes>> timexMap, String docId, String tid)
   {
     // Find entry
     List<TimexAttributes> list = timexMap.get(docId);
@@ -624,7 +625,7 @@ public class SUTimeMain {
     return null;
   }
 
-  private static List<TimexAttributes> updateTimexText(Map<String,List<TimexAttributes>> timexMap, Annotation docAnnotation)
+  private static List<TimexAttributes> updateTimexText(Map<String, List<TimexAttributes>> timexMap, Annotation docAnnotation)
   {
     // Find entry
     String docId = docAnnotation.get(CoreAnnotations.DocIDAnnotation.class);
@@ -660,7 +661,7 @@ public class SUTimeMain {
     return null;
   }
 
-  private static Map<String,List<TimexAttributes>> readTimexAttrExts(String extentsFile, String attrsFile) throws IOException
+  private static Map<String, List<TimexAttributes>> readTimexAttrExts(String extentsFile, String attrsFile) throws IOException
   {
       Map<String,List<TimexAttributes>> timexMap = new FastMap<>();
     BufferedReader extBr = IOUtils.getBufferedFileReader(extentsFile);
@@ -727,9 +728,9 @@ public class SUTimeMain {
     return timexMap;
   }
 
-  public static void processTempEval2Tab(AnnotationPipeline pipeline, String in, String out, Map<String,String> docDates) throws IOException
+  public static void processTempEval2Tab(AnnotationPipeline pipeline, String in, String out, RadixTree<String> docDates) throws IOException
   {
-    Map<String,List<TimexAttributes>> timexMap = readTimexAttrExts(in  + "/timex-extents.tab", in  + "/timex-attributes.tab");
+    Map<String, List<TimexAttributes>> timexMap = readTimexAttrExts(in + "/timex-extents.tab", in + "/timex-attributes.tab");
     BufferedReader br = IOUtils.getBufferedFileReader(in  + "/base-segmentation.tab");
     PrintWriter debugPw = IOUtils.getPrintWriter(out + "/timex-debug.out");
     PrintWriter attrPw = IOUtils.getPrintWriter(out + "/timex-attrs.res.tab");
@@ -790,7 +791,7 @@ public class SUTimeMain {
 
   public static void processTempEval2(AnnotationPipeline pipeline, String in, String out, String eval, String dct) throws IOException, ParseException
   {
-    Map<String,String> docDates = dct != null ? IOUtils.readMap(dct):IOUtils.readMap(in + "/dct.txt");
+    RadixTree<String> docDates = dct != null ? IOUtils.readMap(dct):IOUtils.readMap(in + "/dct.txt");
     if (requiredDocDateFormat != null) {
       // convert from yyyMMdd to requiredDocDateFormat
       DateFormat defaultFormatter = new SimpleDateFormat("yyyyMMdd");

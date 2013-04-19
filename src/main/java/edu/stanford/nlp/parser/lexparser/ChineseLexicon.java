@@ -1,12 +1,6 @@
 package edu.stanford.nlp.parser.lexparser;
 
-import edu.stanford.nlp.ling.TaggedWord;
-import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.Index;
-import edu.stanford.nlp.util.Pair;
-
-import java.util.Collection;
-import java.util.Collections;
 
 
 /**
@@ -47,7 +41,7 @@ public class ChineseLexicon extends BaseLexicon {
 
   @Override
   public float score(IntTaggedWord iTW, int loc, String word, String featureSpec) {
-    double c_W = seenCounter.getCount(iTW);
+    double c_W = seenCounter.get(iTW);
     boolean seen = c_W > 0.0;
 
     if (seen) {

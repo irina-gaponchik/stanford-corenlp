@@ -837,7 +837,7 @@ public class SemanticGraph implements Serializable {
     for (IndexedWord outer : nodesList) {
       for (IndexedWord inner : nodesList) {
         Pair<IndexedWord, IndexedWord> key = new Pair<>(outer, inner);
-        dominatedEdgeCount.incrementCount(outer, nodeDists.getCount(key));
+        dominatedEdgeCount.incrementCount(outer, nodeDists.get(key));
       }
     }
 

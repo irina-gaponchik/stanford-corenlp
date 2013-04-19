@@ -1,5 +1,6 @@
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.InDataStreamFile;
 import edu.stanford.nlp.io.OutDataStreamFile;
 import edu.stanford.nlp.io.RuntimeIOException;
@@ -281,7 +282,7 @@ public class TTags {
   }
 
   protected void save(String filename,
-                      Map<String, Set<String>> tagTokens) {
+                      RadixTree< Set<String>> tagTokens) {
     try {
       DataOutputStream out = new OutDataStreamFile(filename);
       save(out, tagTokens);
@@ -292,7 +293,7 @@ public class TTags {
   }
 
   protected void save(DataOutputStream file,
-                      Map<String, Set<String>> tagTokens) {
+                      RadixTree< Set<String>> tagTokens) {
     try {
       file.writeInt(index.size());
       for (String item : index) {

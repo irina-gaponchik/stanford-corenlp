@@ -89,7 +89,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
    *     been seen before
    */
   public double getCount(E key) {
-    return counter.getCount(key);
+    return counter.get(key);
   }
 
   //---- end cdm added
@@ -158,7 +158,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     double totalCount = wordCounter.totalCount();
     double stdev = 1.0 / norm.numberOfKeys / 1000.0; // tiny relative to average value
     for (E key : wordCounter.keySet()) {
-      double prob = wordCounter.getCount(key) / totalCount;
+      double prob = wordCounter.get(key) / totalCount;
       double perturbedProb = prob + r.nextGaussian() * stdev;
       if (perturbedProb < 0.0) {
         perturbedProb = 0.0;
@@ -188,7 +188,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
       total = 1.0;
     }
     for (E key : counter.keySet()) {
-      double count = counter.getCount(key) / total;
+      double count = counter.get(key) / total;
       //      if (Double.isNaN(count) || count < 0.0 || count> 1.0 ) throw new RuntimeException("count=" + counter.getCount(key) + " total=" + total);
       norm.counter.setCount(key, count);
     }
@@ -207,7 +207,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     // shift all by max so as to minimize the possibility of underflow
     double max = Counters.max(counter); // Thang 17Feb12: max should operate on counter instead of c, fixed!
     for (E key : counter.keySet()) {
-      double count = Math.exp(counter.getCount(key) - max);
+      double count = Math.exp(counter.get(key) - max);
       c.setCount(key, count);
     }
     return getDistribution(c);
@@ -219,7 +219,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     double total = counter.totalCount();
     double reservedMass = 0.0;
     for (E key : counter.keySet()) {
-      double count = counter.getCount(key);
+      double count = counter.get(key);
       if (count > discount) {
         double newCount = (count - discount) / total;
         norm.counter.setCount(key, newCount); // a positive count left over
@@ -287,7 +287,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
       System.err.println("reserved mass=" + reservedMass);
     }
     for (E key : counter.keySet()) {
-      double count = counter.getCount(key);
+      double count = counter.get(key);
       norm.counter.setCount(key, (count + lambda) / newTotal);
     }
     if (verbose) {
@@ -318,9 +318,9 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     norm.reservedMass = 0.0;
     for (E key : counter.keySet()) {
       if (key.equals(UNK)) {
-        norm.counter.setCount(key, counter.getCount(key) / total);
+        norm.counter.setCount(key, counter.get(key) / total);
       } else {
-        norm.counter.setCount(key, (counter.getCount(key) + lambda) / total);
+        norm.counter.setCount(key, (counter.get(key) + lambda) / total);
       }
     }
     return norm;
@@ -361,7 +361,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
 
     // fill in the new Distribution, renormalizing as we go
     for (E key : counter.keySet()) {
-      int origFreq = (int) Math.round(counter.getCount(key));
+      int origFreq = (int) Math.round(counter.get(key));
       if (origFreq < 10) {
         norm.counter.setCount(key, adjustedFreq[origFreq] * normFactor);
       } else {
@@ -411,7 +411,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
 
     // fill in the new Distribution, renormalizing as we go
     for (E key : counter.keySet()) {
-      int origFreq = (int) Math.round(counter.getCount(key));
+      int origFreq = (int) Math.round(counter.get(key));
       if (origFreq < 10) {
         norm.counter.setCount(key, adjustedFreq[origFreq] / observedMass);
       } else {
@@ -431,7 +431,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
       countCounts[i] = 0;
     }
     for (E key : counter.keySet()) {
-      int count = (int) Math.round(counter.getCount(key));
+      int count = (int) Math.round(counter.get(key));
       if (count <= 10) {
         countCounts[count]++;
       }
@@ -475,7 +475,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     for (Map.Entry<E, Double> entry : counter.entrySet()) {
       E item = entry.getKey();
       Integer count = (int) Math.round(entry.getValue());
-      dist.counter.setCount(item, probsByCount.getCount(count));
+      dist.counter.setCount(item, probsByCount.get(count));
     }
     dist.numberOfKeys = numberOfKeys;
     dist.reservedMass = sgt.getProbabilityForUnseen();
@@ -518,7 +518,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     int i = 0;
     while (!q.isEmpty()) {
       Integer count = q.poll();
-      Integer countCount = (int) Math.round(countCounts.getCount(count));
+      Integer countCount = (int) Math.round(countCounts.get(count));
       arrays[0][i] = count;
       arrays[1][i] = countCount;
       i++;
@@ -573,7 +573,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     // this might be done more efficiently with entrySet but there isn't a way to get
     // the entrySet from a Counter now.  In most cases c will be small(-ish) anyway
     for (E key : c.keySet()) {
-      double count = c.getCount(key) / totalWeight;
+      double count = c.get(key) / totalWeight;
       prior.addToKeySet(key);
       norm.counter.setCount(key, count);
     }
@@ -596,7 +596,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
 
     @Override
     public double probabilityOf(E o) {
-      return this.counter.getCount(o) + prior.probabilityOf(o) * priorMultiplier;
+      return this.counter.get(o) + prior.probabilityOf(o) * priorMultiplier;
     }
 
     @Override
@@ -647,7 +647,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     double expSum = 0.0;
     int numKeys = 0;
     for (E key : cntr.keySet()) {
-      expSum += Math.exp(cntr.getCount(key));
+      expSum += Math.exp(cntr.get(key));
       numKeys++;
     }
     Distribution<E> probs = new Distribution<>();
@@ -655,7 +655,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     probs.reservedMass = 0.0;
     probs.numberOfKeys = numKeys;
     for (E key : cntr.keySet()) {
-      probs.counter.setCount(key, Math.exp(cntr.getCount(key)) / expSum);
+      probs.counter.setCount(key, Math.exp(cntr.get(key)) / expSum);
     }
     return probs;
   }
@@ -686,7 +686,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
    */
   public double probabilityOf(E key) {
     if (counter.containsKey(key)) {
-      return counter.getCount(key);
+      return counter.get(key);
     } else {
       int remainingKeys = numberOfKeys - counter.size();
         return remainingKeys <= 0 ? 0.0 : reservedMass / remainingKeys;

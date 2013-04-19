@@ -1,5 +1,6 @@
 package edu.stanford.nlp.parser.lexparser;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.io.NumberRangesFileFilter;
 import edu.stanford.nlp.io.EncodingPrintWriter;
@@ -112,7 +113,7 @@ public class BaseLexicon implements Lexicon {
    * Only used when training, specifically when training on sentenes
    * that weren't part of annotated (eg markovized, etc) data
    */
-  private Map<String, Counter<String>> baseTagCounts = new FastMap<>();
+  private RadixTree< Counter<String>> baseTagCounts = new RadixTree<>();
 
     public BaseLexicon(Index<String> wordIndex, Index<String> tagIndex) {
     this(new Options(), wordIndex, tagIndex);
@@ -165,7 +166,7 @@ public class BaseLexicon implements Lexicon {
     if (!wordIndex.contains(word))
       return false;
     IntTaggedWord iW = new IntTaggedWord(wordIndex.indexOf(word), nullTag);
-    return seenCounter.getCount(iW) > 0.0;
+    return seenCounter.get(iW) > 0.0;
   }
 
   /**
@@ -204,7 +205,7 @@ public class BaseLexicon implements Lexicon {
         /* Allow all tags with same basicCategory */
         /* Allow all scored taggings, unless very common */
             IntTaggedWord iW = new IntTaggedWord(word, nullTag);
-            if (seenCounter.getCount(iW) > smoothInUnknownsThreshold) {
+            if (seenCounter.get(iW) > smoothInUnknownsThreshold) {
                 return rulesWithWord[word].iterator();
             } else {
                 // give it flexible tagging not just lexicon
@@ -268,8 +269,8 @@ public class BaseLexicon implements Lexicon {
     if (DEBUG_LEXICON) System.err.println("unSeenCounter is: " + uwModel.unSeenCounter());
     if (DEBUG_LEXICON) System.err.println("Train.openClassTypesThreshold is " + trainOptions.openClassTypesThreshold);
     for (IntTaggedWord iT : tags) {
-      if (DEBUG_LEXICON) System.err.println("Entry for " + iT + " is " + uwModel.unSeenCounter().getCount(iT));
-      double types = uwModel.unSeenCounter().getCount(iT);
+      if (DEBUG_LEXICON) System.err.println("Entry for " + iT + " is " + uwModel.unSeenCounter().get(iT));
+      double types = uwModel.unSeenCounter().get(iT);
       if (types > trainOptions.openClassTypesThreshold) {
         // Number of types before it's treated as open class
         IntTaggedWord iTW = new IntTaggedWord(unkWord, iT.tag);
@@ -283,7 +284,7 @@ public class BaseLexicon implements Lexicon {
         if (DEBUG_LEXICON) {
           IntTaggedWord iTprint = new IntTaggedWord(nullWord, item.tag);
           System.err.print(" (tag " + item.tag() + ", type count is " +
-                           uwModel.unSeenCounter().getCount(iTprint) + ')');
+                           uwModel.unSeenCounter().get(iTprint) + ')');
         }
       }
       System.err.println(" ] ");
@@ -386,7 +387,7 @@ public class BaseLexicon implements Lexicon {
       }
       for (String tag : counts.keySet()) {
         TaggedWord newTW = new TaggedWord(tw.word(), tag);
-        train(newTW, loc, weight * counts.getCount(tag) / totalCount);
+        train(newTW, loc, weight * counts.get(tag) / totalCount);
       }
       ++loc;
     }
@@ -467,7 +468,7 @@ public class BaseLexicon implements Lexicon {
       double tot = 0.0;
       for (int t = 0; t < numTags; t++) {
         IntTaggedWord iTW = new IntTaggedWord(word.word, t);
-        tmp[t] = seenCounter.getCount(iTW);
+        tmp[t] = seenCounter.get(iTW);
         tot += tmp[t];
       }
         if (tot >= 10) {
@@ -516,22 +517,22 @@ public class BaseLexicon implements Lexicon {
    */
   public float score(IntTaggedWord iTW, int loc, String word, String featureSpec) {
     // both actual
-    double c_TW = seenCounter.getCount(iTW);
+    double c_TW = seenCounter.get(iTW);
     // double x_TW = xferCounter.getCount(iTW);
 
     IntTaggedWord temp = new IntTaggedWord(iTW.word, nullTag);
     // word counts
-    double c_W = seenCounter.getCount(temp);
+    double c_W = seenCounter.get(temp);
     // double x_W = xferCounter.getCount(temp);
 
     // totals
-    double total = seenCounter.getCount(NULL_ITW);
-    double totalUnseen = uwModel.unSeenCounter().getCount(NULL_ITW);
+    double total = seenCounter.get(NULL_ITW);
+    double totalUnseen = uwModel.unSeenCounter().get(NULL_ITW);
 
     temp = new IntTaggedWord(nullWord, iTW.tag);
     // tag counts
-    double c_T = seenCounter.getCount(temp);
-    double c_Tunseen = uwModel.unSeenCounter().getCount(temp);
+    double c_T = seenCounter.get(temp);
+    double c_Tunseen = uwModel.unSeenCounter().get(temp);
 
     double pb_W_T; // always set below
 
@@ -585,7 +586,7 @@ public class BaseLexicon implements Lexicon {
           // System.out.println("Checking "+iTW);
           for (int t = 0; t < numTags; t++) {
             IntTaggedWord iTW2 = new IntTaggedWord(iTW.word, t);
-            double p_T_W2 = seenCounter.getCount(iTW2) / c_W;
+            double p_T_W2 = seenCounter.get(iTW2) / c_W;
             if (p_T_W2 > 0) {
               // System.out.println(" Observation of "+tagIndex.get(t)+"
               // ("+seenCounter.getCount(iTW2)+") mutated to
@@ -751,10 +752,10 @@ public class BaseLexicon implements Lexicon {
     PrintWriter out = new PrintWriter(w);
 
     for (IntTaggedWord itw : seenCounter.keySet()) {
-      out.println(itw.toLexicalEntry(wordIndex, tagIndex) + " SEEN " + seenCounter.getCount(itw));
+      out.println(itw.toLexicalEntry(wordIndex, tagIndex) + " SEEN " + seenCounter.get(itw));
     }
     for (IntTaggedWord itw : uwModel.unSeenCounter().keySet()) {
-      out.println(itw.toLexicalEntry(wordIndex, tagIndex) + " UNSEEN " + uwModel.unSeenCounter().getCount(itw));
+      out.println(itw.toLexicalEntry(wordIndex, tagIndex) + " UNSEEN " + uwModel.unSeenCounter().get(itw));
     }
     for (int i = 0; i < smooth.length; i++) {
       out.println("smooth[" + i + "] = " + smooth[i]);
@@ -883,7 +884,7 @@ public class BaseLexicon implements Lexicon {
         missingTags.add(tagIndex.get(itw.tag()));
       }
       // if (!rules.contains(itw)) {
-      if (seenCounter.getCount(itw) == 0.0) {
+      if (seenCounter.get(itw) == 0.0) {
         unseen++;
         missingTW.add(itw);
       }

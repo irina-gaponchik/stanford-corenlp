@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.StringLabelFactory;
 import edu.stanford.nlp.trees.*;
@@ -396,7 +397,7 @@ public abstract class TregexPattern implements Serializable {
 
   abstract TregexMatcher matcher(Tree root, Tree tree,
                                  IdentityHashMap<Tree, Tree> nodesToParents,
-                                 Map<String, Tree> namesToNodes,
+                                 RadixTree< Tree> namesToNodes,
                                  VariableStrings variableStrings);
 
   /**
@@ -406,7 +407,7 @@ public abstract class TregexPattern implements Serializable {
    * @return a TregexMatcher
    */
   public TregexMatcher matcher(Tree t) {
-      return matcher(t, t, null, new FastMap<String, Tree>(), new VariableStrings());
+      return matcher(t, t, null, new RadixTree< Tree>(), new VariableStrings());
   }
 
   /**
@@ -575,7 +576,7 @@ public abstract class TregexPattern implements Serializable {
     String encoding = "UTF-8";
     String macroOption = "-macros";
     String macroFilename = "";
-      Map<String,Integer> flagMap = new FastMap<>();
+      RadixTree<Integer> flagMap = new RadixTree<>();
     flagMap.put(extractSubtreesOption,2);
     flagMap.put(extractSubtreesFileOption,2);
     flagMap.put(subtreeCodeOption,0);
@@ -588,7 +589,7 @@ public abstract class TregexPattern implements Serializable {
     flagMap.put(headFinderArgOption,1);
     flagMap.put(trfOption,1);
     flagMap.put(macroOption, 1);
-    Map<String, String[]> argsMap = StringUtils.argsToMap(args, flagMap);
+    RadixTree< String[]> argsMap = StringUtils.argsToMap(args, flagMap);
     args = argsMap.get(null);
 
     if (argsMap.containsKey(encodingOption)) {

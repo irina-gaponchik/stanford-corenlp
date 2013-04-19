@@ -1,5 +1,6 @@
 package edu.stanford.nlp.trees.international.pennchinese;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.trees.AbstractCollinsHeadFinder;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
 import javolution.util.FastMap;
@@ -29,7 +30,7 @@ public class ChineseHeadFinder extends AbstractCollinsHeadFinder {
   public ChineseHeadFinder(TreebankLanguagePack tlp) {
     super(tlp);
 
-      nonTerminalInfo = new FastMap<>();
+      nonTerminalInfo = new RadixTree<>();
     // these are first-cut rules
 
     String left = coordSwitch ? "right" : "left";

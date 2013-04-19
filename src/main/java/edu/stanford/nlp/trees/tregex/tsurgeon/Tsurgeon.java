@@ -28,6 +28,7 @@
 
 package edu.stanford.nlp.trees.tregex.tsurgeon;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.trees.tregex.Macros;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
@@ -272,7 +273,7 @@ public class Tsurgeon {
     String trfOption = "-trf";
     String macroOption = "-macros";
     String macroFilename = "";
-      Map<String,Integer> flagMap = new FastMap<>();
+      RadixTree<Integer> flagMap = new RadixTree<>();
     flagMap.put(patternOperationOption,2);
     flagMap.put(treeFileOption,1);
     flagMap.put(trfOption,1);
@@ -280,7 +281,7 @@ public class Tsurgeon {
     flagMap.put(encodingOption,1);
     flagMap.put(headFinderOption,1);
     flagMap.put(macroOption, 1);
-    Map<String,String[]> argsMap = StringUtils.argsToMap(args,flagMap);
+    RadixTree<String[]> argsMap = StringUtils.argsToMap(args,flagMap);
     args = argsMap.get(null);
 
     if(argsMap.containsKey(headFinderOption)) headFinderClassName = argsMap.get(headFinderOption)[0];

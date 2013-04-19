@@ -109,7 +109,7 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
           for(int c = 0; c < numClasses; c++) {
             int wtIndex = indexOf(f,c);
             for(int cPrime = 0;  cPrime < numClasses; cPrime++){
-              derivative[wtIndex] += feature2classPairDerivatives.getCount(new Triple<>(f,c,cPrime))*geFeature2EmpiricalDist[n][cPrime]/modelDist[cPrime];
+              derivative[wtIndex] += feature2classPairDerivatives.get(new Triple<>(f, c, cPrime))*geFeature2EmpiricalDist[n][cPrime]/modelDist[cPrime];
             }
             derivative[wtIndex] /= activeData.size();
           }
@@ -140,7 +140,7 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
     * This method assumes the feature already exists in the datum.
     */
    private double valueOfFeature(F feature, Datum<L,F> datum){
-       return datum instanceof RVFDatum ? ((RVFDatum<L, F>) datum).asFeaturesCounter().getCount(feature) : 1.0;
+       return datum instanceof RVFDatum ? ((RVFDatum<L, F>) datum).asFeaturesCounter().get(feature) : 1.0;
     }
 
     private void computeEmpiricalStatistics(List<F> geFeatures){
@@ -200,7 +200,7 @@ public class GeneralizedExpectationObjectiveFunction<L,F> extends AbstractCachin
       Counter<L> probCounter = classifier.probabilityOf(datum);
       for(L label : probCounter.keySet()){
         int labelID = labeledDataset.labelIndex.indexOf(label);
-        condDist[labelID] = probCounter.getCount(label);
+        condDist[labelID] = probCounter.get(label);
       }
       return condDist;
     }

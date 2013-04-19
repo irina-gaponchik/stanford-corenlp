@@ -1,5 +1,6 @@
 package edu.stanford.nlp.time;
 
+import ca.gedge.radixtree.RadixTree;
 import de.jollyday.HolidayManager;
 import de.jollyday.config.Configuration;
 import de.jollyday.config.Holidays;
@@ -26,8 +27,8 @@ import java.util.*;
  */
 public class JollyDayHolidays implements Env.Binder {
   HolidayManager holidayManager;
-  //CollectionValuedMap<String, JollyHoliday> holidays;
-  Map<String, JollyHoliday> holidays;
+  //CollectionValuedRadixTree< JollyHoliday> holidays;
+  RadixTree< JollyHoliday> holidays;
   String varPrefix = "JH_";
 
   @Override
@@ -58,9 +59,9 @@ public class JollyDayHolidays implements Env.Binder {
     }
   }
 
-  public Map<String, JollyHoliday> getAllHolidaysMap(Set<de.jollyday.config.Holiday> allHolidays)
+  public RadixTree< JollyHoliday> getAllHolidaysMap(Set<de.jollyday.config.Holiday> allHolidays)
   {
-      Map<String, JollyHoliday> map = new FastMap<>();
+      RadixTree< JollyHoliday> map = new RadixTree<>();
     for (de.jollyday.config.Holiday h:allHolidays) {
       String descKey = h.getDescriptionPropertiesKey();
       if (descKey != null) {
@@ -72,7 +73,7 @@ public class JollyDayHolidays implements Env.Binder {
     return map;
   }
 
-  public Map<String, JollyHoliday> getAllHolidaysMap(Configuration config)
+  public RadixTree< JollyHoliday> getAllHolidaysMap(Configuration config)
   {
     Set<de.jollyday.config.Holiday> s = getAllHolidays(config);
     return getAllHolidaysMap(s);

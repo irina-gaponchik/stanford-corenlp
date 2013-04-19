@@ -28,6 +28,7 @@
 
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.OutDataStreamFile;
 import edu.stanford.nlp.io.PrintFile;
@@ -293,13 +294,13 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
   LambdaSolveTagger prob;
   // For each extractor index, we have a map from possible extracted
   // feature to an array which maps from tag number to feature index.
-  List <Map<CharSequence,int[]>>fAssociations = new ArrayList<>();
+  List <RadixTree<int[]>>fAssociations = new ArrayList<>();
   //PairsHolder pairs = new PairsHolder();
   Extractors extractors;
   Extractors extractorsRare;
   AmbiguityClasses ambClasses;
   static final boolean alltags = false;
-  final Map<String, Set<String>> tagTokens = new FastMap<>();
+  final RadixTree< Set<String>> tagTokens = new RadixTree<>();
 
     static final int RARE_WORD_THRESH = Integer.valueOf(TaggerConfig.RARE_WORD_THRESH);
   static final int MIN_FEATURE_THRESH = Integer.valueOf(TaggerConfig.MIN_FEATURE_THRESH);
@@ -594,7 +595,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       saveExtractors(file);
 
       int sizeAssoc = 0;
-      for (Map<CharSequence, int[]> fValueAssociations : fAssociations) {
+      for (RadixTree<int[]> fValueAssociations : fAssociations) {
 
         for (int[] fTagAssociations : fValueAssociations.values()) {
           for (int association : fTagAssociations) {
@@ -606,15 +607,15 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       }
       file.writeInt(sizeAssoc);
       for (int i = 0; i < fAssociations.size(); ++i) {
-          Map<CharSequence, int[]> fValueAssociations = fAssociations.get(i);
-          for (Map.Entry<CharSequence, int[]> item: fValueAssociations.entrySet()) {
-            CharSequence featureValue = (CharSequence) item.getKey();
+          RadixTree<int[]> fValueAssociations = fAssociations.get(i);
+          for (Map.Entry<String, int[]> item: fValueAssociations.entrySet()) {
+              String featureValue = item.getKey();
           int[] fTagAssociations = (int[]) item.getValue();
           for (int j = 0; j < fTagAssociations.length; ++j) {
             int association = fTagAssociations[j];
             if (association >= 0) {
               file.writeInt(association);
-              FeatureKey fk = new FeatureKey(i, (CharSequence) featureValue, tags.getTag(j));
+              FeatureKey fk = new FeatureKey(i, featureValue, tags.getTag(j));
               fk.save(file);
             }
           }
@@ -705,7 +706,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       int sizeAssoc = rf.readInt();
       fAssociations = new ArrayList<>();
       for (int i = 0; i < extractors.getSize() + extractorsRare.getSize(); ++i) {
-          fAssociations.add(new FastMap<CharSequence, int[]>());
+          fAssociations.add(new RadixTree<int[]>());
       }
       if (VERBOSE) System.err.printf("Reading %d feature keys...\n",sizeAssoc);
       PrintFile pfVP = null;
@@ -722,7 +723,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
         // fAssociations in a cleaner manner?  Only do this when
         // rebuilding all the tagger models anyway.  When we do that, we
         // can get rid of FeatureKey
-          Map<CharSequence, int[]> fValueAssociations = fAssociations.get(fK.num);
+          RadixTree<int[]> fValueAssociations = fAssociations.get(fK.num);
         int[] fTagAssociations = (int[]) fValueAssociations.get(fK.val);
         if (fTagAssociations == null) {
           fTagAssociations = new int[ySize];
@@ -754,10 +755,10 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
 
   protected void dumpModel(PrintStream out) {
     for (int i = 0; i < fAssociations.size(); ++i) {
-        Map<CharSequence, int[]> fValueAssociations = fAssociations.get(i);
-        for (Map.Entry<CharSequence, int[]> item : fValueAssociations.entrySet()) {
+        RadixTree<int[]> fValueAssociations = fAssociations.get(i);
+        for (Map.Entry<String, int[]> item : fValueAssociations.entrySet()) {
 
-        CharSequence featureValue = (CharSequence) item.getKey();
+        String featureValue =  item.getKey();
         int[] fTagAssociations = (int[]) item.getValue();
         for (int j = 0; j < fTagAssociations.length; ++j) {
           int association = fTagAssociations[j];

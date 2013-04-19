@@ -51,7 +51,7 @@ public class AccuracyStats<L> implements Scorer<L> {
       Datum<L,F> d = data.getRVFDatum(i);
       Counter<L> scores = classifier.logProbabilityOf(d);
       int labelD = d.label().equals(posLabel) ? 1 : 0;
-      dataScores.add(new Pair<>(Math.exp(scores.getCount(posLabel)), labelD));
+      dataScores.add(new Pair<>(Math.exp(scores.get(posLabel)), labelD));
     }
 
     PRCurve prc = new PRCurve(dataScores);

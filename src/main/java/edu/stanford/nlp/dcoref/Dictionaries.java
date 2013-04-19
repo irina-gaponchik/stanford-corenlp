@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.pipeline.DefaultPaths;
@@ -174,8 +175,8 @@ public class Dictionaries {
     public final Set<String> personPronouns = new FastSet<>();
     public final Set<String> allPronouns = new FastSet<>();
 
-    public final Map<String, String> statesAbbreviation = new FastMap<>();
-    public final Map<String, Set<String>> demonyms = new FastMap<>();
+    public final RadixTree< String> statesAbbreviation = new RadixTree<>();
+    public final RadixTree< Set<String>> demonyms = new RadixTree<>();
     public final Set<String> demonymSet = new FastSet<>();public final Set<String> adjectiveNation = new FastSet<>();
 
     public final Set<String> countries = new FastSet<>();
@@ -195,7 +196,7 @@ public class Dictionaries {
 
     public final ArrayList<Counter<Pair<String, String>>> corefDict = new ArrayList<>(4);
   public final Counter<Pair<String, String>> corefDictPMI = new ClassicCounter<>();
-  public final Map<String,Counter<String>> NE_signatures = new FastMap<>();
+  public final RadixTree<Counter<String>> NE_signatures = new RadixTree<>();
 
     private void setPronouns() {
     for(String s: animatePronouns){
@@ -388,7 +389,7 @@ public class Dictionaries {
       }
   }
 
-  private static void loadSignatures(String file, Map<String,Counter<String>> sigs) {
+  private static void loadSignatures(String file, RadixTree<Counter<String>> sigs) {
     BufferedReader reader = null;
     try {
       reader = IOUtils.readerFromString(file);

@@ -1,5 +1,6 @@
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.Timing;
 import javolution.text.TextBuilder;
@@ -18,31 +19,31 @@ public class ExtractorDistsim extends Extractor {
   private static final long serialVersionUID = 1L;
 
   // avoid loading the same lexicon twice but allow different lexicons
-  private static final Map<String,Map<String,String>> lexiconMap = new FastMap<>();
+  private static final RadixTree<RadixTree<String>> lexiconMap = new RadixTree<>();
 
-    private final Map<String,String> lexicon;
+    private final RadixTree<String> lexicon;
 
-  private static Map<String,String> initLexicon(String path) {
+  private static RadixTree<String> initLexicon(String path) {
     synchronized (lexiconMap) {
-      Map<String,String> lex = lexiconMap.get(path);
+        RadixTree<String> lex = lexiconMap.get(path);
       if (lex != null) {
         return lex;
       } else {
         Timing.startDoing("Loading distsim lexicon from " + path);
-          Map<String,String> lexic = new FastMap<>();
+          RadixTree<String> lexic = new RadixTree<>();
         for (String word : ObjectBank.getLineIterator(new File(path))) {
           String[] bits = word.split("\\s+");
           lexic.put(bits[0].toLowerCase(), bits[1]);
         }
-        lexiconMap.put(path, lexic);
+        lexiconMap.put(path, (RadixTree<String>) lexic);
         Timing.endDoing();
-        return lexic;
+        return (RadixTree<String>) lexic;
       }
     }
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     CharSequence word = super.extract(h, pH);
     String distSim = lexicon.get(String.valueOf(word).toLowerCase());
     if (distSim == null) distSim = "null";
@@ -62,13 +63,13 @@ public class ExtractorDistsim extends Extractor {
 
     private static final long serialVersionUID = 1L;
 
-    private final Map<String,String> lexicon;
+    private final RadixTree<String> lexicon;
     private final int left;
     private final int right;
     private String name;
 
     @Override
-    CharSequence extract(History h, PairsHolder pH) {
+    String extract(History h, PairsHolder pH) {
       TextBuilder sb = new TextBuilder();
       for (int j = left; j <= right; j++) {
         String word = pH.getWord(h, j);
@@ -83,7 +84,7 @@ public class ExtractorDistsim extends Extractor {
     }
 
     ExtractorDistsimConjunction(String distSimPath, int left, int right) {
-        lexicon = initLexicon(distSimPath);
+        lexicon = (RadixTree<String>) initLexicon(distSimPath);
       this.left = left;
       this.right = right;
       name = "ExtractorDistsimConjunction(" + left + ',' + right + ')';

@@ -104,7 +104,7 @@ public class ArabicHeadFinder extends AbstractCollinsHeadFinder {
     this.tagSet = tagSet;
     //System.err.println("##testing: noun tag is " + tagSet.noun());
 
-      nonTerminalInfo = new FastMap<>();
+      nonTerminalInfo = new ca.gedge.radixtree.RadixTree<>();
 
     nonTerminalInfo.put("NX", new String[][]{{"left", "DT","DTNN","DTNNS","DTNNP", "DTNNPS", "DTJJ", "DTNOUN_QUANT", "NOUN_QUANT", "MWNP"}});
     nonTerminalInfo.put("ADJP", new String[][]{{"rightdis", tagSet.adj(), "DTJJ", "ADJ_NUM", "DTADJ_NUM", "JJR", "DTJJR", "MWADJP"}, {"right", "ADJP", "VN", tagSet.noun(), "MWNP", "NNP", "NNPS", "NNS", "DTNN", "DTNNS","DTNNP","DTNNPS","DTJJ", "DTNOUN_QUANT", "NOUN_QUANT"}, {"right", "RB", "MWADVP", "CD","DTRB","DTCD"}, {"right", "DT"}}); // sometimes right, sometimes left headed??

@@ -1,5 +1,6 @@
 package edu.stanford.nlp.ie;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ie.regexp.NumberSequenceClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -110,7 +111,7 @@ public class NumberNormalizer {
   //       QuantifiableEntityNormalizer also has bn (for billion)
   //       should consolidate
   //       here we use Number representation instead of double...
-  private static final  Map<String,Number> word2NumMap = new FastMap<>();
+  private static final RadixTree<Number> word2NumMap = new RadixTree<>();
 
     static
   {
@@ -161,7 +162,7 @@ public class NumberNormalizer {
   }
 
   // similar to QuantifiableEntityNormalizer.ordinalsToValues
-  private static final Map<String,Number> ordWord2NumMap = new FastMap<>();
+  private static final RadixTree<Number> ordWord2NumMap = new RadixTree<>();
 
     static {
     ordWord2NumMap.put("zeroth", 0);

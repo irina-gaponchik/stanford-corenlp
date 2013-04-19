@@ -758,7 +758,7 @@ public class TransducerGraph implements Cloneable {
   public static <T> TransducerGraph createGraphFromPaths(ClassicCounter<List<T>> pathCounter, int markovOrder) {
     TransducerGraph graph = new TransducerGraph(); // empty
       for (List<T> path : pathCounter.keySet()) {
-          double count = pathCounter.getCount(path);
+          double count = pathCounter.get(path);
           addOnePathToGraph(path, count, markovOrder, graph);
       }
     return graph;

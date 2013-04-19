@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.international.french.FrenchMorphoFeatureSpecification;
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification;
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification.MorphoFeatureType;
@@ -48,11 +49,11 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
   private static final long serialVersionUID = -6976724734594763986L;
 
-  private final TextBuilder optionsString;
+  private final TextBuilder optionsString = new TextBuilder("FrenchTreebankParserParams\n");
 
   private HeadFinder headFinder;
-  private final Map<String,Pair<TregexPattern,Function<TregexMatcher,String>>> annotationPatterns;
-  private final List<Pair<TregexPattern,Function<TregexMatcher,String>>> activeAnnotations;
+  private final RadixTree<Pair<TregexPattern,Function<TregexMatcher,String>>> annotationPatterns = new RadixTree<>();
+  private final List<Pair<TregexPattern,Function<TregexMatcher,String>>> activeAnnotations = new ArrayList<>();
 
   //The treebank is distributed in XML format.
   //Use -xmlFormat below to enable reading the raw files.
@@ -73,13 +74,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
     setInputEncoding("UTF-8");
 
-    optionsString = new TextBuilder();
-    optionsString.append("FrenchTreebankParserParams\n");
-
-      annotationPatterns = new FastMap<>();
-    activeAnnotations = new ArrayList<>();
-
-    initializeAnnotationPatterns();
+      initializeAnnotationPatterns();
   }
 
   private final List<String> baselineFeatures = new ArrayList<>();

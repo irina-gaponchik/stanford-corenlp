@@ -279,7 +279,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     for (F feature : datum.asFeatures()) {
       int fID = this.featureIndex.indexOf(feature);
       if (fID >= 0) {
-        double oldVal = datum.asFeaturesCounter().getCount(feature);
+        double oldVal = datum.asFeaturesCounter().get(feature);
         double newVal;
           newVal = minValues[fID] != maxValues[fID] ? (oldVal - minValues[fID]) / (maxValues[fID] - minValues[fID]) : oldVal;
         scaledFeatures.incrementCount(feature, newVal);
@@ -305,7 +305,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     for (F feature : datum.asFeatures()) {
       int fID = this.featureIndex.indexOf(feature);
       if (fID >= 0) {
-        double oldVal = datum.asFeaturesCounter().getCount(feature);
+        double oldVal = datum.asFeaturesCounter().get(feature);
         double newVal;
           newVal = stdevs[fID] != 0 ? (oldVal - means[fID]) / stdevs[fID] : oldVal;
         scaledFeatures.incrementCount(feature, newVal);
@@ -434,7 +434,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
       int fID = featureIndex.indexOf(feature, true);
       if (fID >= 0) {
         data[size][i] = fID;
-        values[size][i] = features.getCount(feature);
+        values[size][i] = features.get(feature);
       } else {
         // Usually a feature present at test but not training time.
         assert featureIndex.isLocked() : "Could not add feature to index: " + feature;
@@ -796,7 +796,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
       writer.print(this.labelIndex.indexOf(datum.label()));
       Counter<F> features = datum.asFeaturesCounter();
       for (F feature : features.keySet()) {
-        double count = features.getCount(feature);
+        double count = features.get(feature);
         writer.format(" %s:%f", this.featureIndex.indexOf(feature), count);
       }
       writer.println();

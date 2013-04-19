@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.IOUtils;
 import javolution.util.FastMap;
 
@@ -28,19 +29,16 @@ public class StringDictionary {
    * Access type: If true, create a dictionary entry if the entry does not exist
    * in get Otherwise, return -1 if the entry does not exist in get
    */
-  private boolean mCreate;
+  private boolean mCreate = false;
 
   /** The actual dictionary */
-  private Map<String, IndexAndCount> mDict;
+  private RadixTree< IndexAndCount> mDict = new RadixTree<>();
 
   /** Inverse mapping from integer keys to the string values */
-  private Map<Integer, String> mInverse;
+  private Map<Integer, String> mInverse = new FastMap<>();
 
   public StringDictionary(String name) {
     mName = name;
-    mCreate = false;
-      mDict = new FastMap<>();
-      mInverse = new FastMap<>();
   }
 
   public void setMode(boolean mode) {

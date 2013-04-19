@@ -279,7 +279,7 @@ public abstract class AbstractEval {
         num = rSize;
       }
       for (int i = 0; i < num; i++) {
-        pw.println(rules.get(i) + " " + c.getCount(rules.get(i)));
+        pw.println(rules.get(i) + " " + c.get(rules.get(i)));
       }
     }
 
@@ -343,7 +343,7 @@ public abstract class AbstractEval {
       List<T> cats = new ArrayList<>(c.keySet());
       Collections.sort(cats, Counters.toComparatorDescending(c));
       for (T ob : cats) {
-        pw.println(ob + " " + c.getCount(ob));
+        pw.println(ob + " " + c.get(ob));
       }
     }
 

@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.HasWord;
@@ -970,7 +971,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
    *
    * @throws IOException
    */
-  public static List<GrammaticalStructure> readCoNLLXGrammaticStructureCollection(String fileName, Map<String, GrammaticalRelation> shortNameToGRel, GrammaticalStructureFromDependenciesFactory factory) throws IOException {
+  public static List<GrammaticalStructure> readCoNLLXGrammaticStructureCollection(String fileName, RadixTree< GrammaticalRelation> shortNameToGRel, GrammaticalStructureFromDependenciesFactory factory) throws IOException {
     LineNumberReader reader = new LineNumberReader(new FileReader(fileName));
     List<GrammaticalStructure> gsList = new LinkedList<>();
 
@@ -999,7 +1000,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
 
   public static GrammaticalStructure
   buildCoNNLXGrammaticStructure(List<List<String>> tokenFields,
-                                Map<String, GrammaticalRelation> shortNameToGRel,
+                                RadixTree< GrammaticalRelation> shortNameToGRel,
                                 GrammaticalStructureFromDependenciesFactory factory) {
     List<TreeGraphNode> tgWordNodes =
       new ArrayList<>(tokenFields.size());

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
@@ -13,6 +12,7 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import ca.gedge.radixtree.RadixTree;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
 import org.xml.sax.SAXException;
@@ -187,7 +187,7 @@ public class AceReader extends GenericDataSetReader {
     b.append(h).append(" counts:\n");
     Set<String> keys = c.keySet();
     for(String k: keys){
-      b.append('\t').append(k).append(": ").append(c.getCount(k)).append('\n');
+      b.append('\t').append(k).append(": ").append(c.get(k)).append('\n');
     }
     logger.info(b.toString());
   }
@@ -225,7 +225,7 @@ public class AceReader extends GenericDataSetReader {
     String docId = aceDocument.getId();
 
     // map entity mention ID strings to their EntityMention counterparts
-      Map<String, EntityMention> entityMentionMap = new FastMap<>();
+      RadixTree< EntityMention> entityMentionMap = new RadixTree<>();
 
     /*
     for (int sentenceIndex = 0; sentenceIndex < aceDocument.getSentenceCount(); sentenceIndex++) {
@@ -293,7 +293,7 @@ public class AceReader extends GenericDataSetReader {
 
       // convert relation mentions
       for (AceRelationMention aceRelationMention : relationMentions) {
-        RelationMention convertedMention = convertAceRelationMention(aceRelationMention, docId, sentence, entityMentionMap);
+        RelationMention convertedMention = convertAceRelationMention(aceRelationMention, sentence, entityMentionMap);
         if(convertedMention != null){
           relationCounts.incrementCount(convertedMention.getType());
           logger.info("CONVERTED RELATION MENTION: " + convertedMention);
@@ -323,7 +323,7 @@ public class AceReader extends GenericDataSetReader {
 
   private EventMention convertAceEventMention(
       AceEventMention aceEventMention, String docId,
-      CoreMap sentence, Map<String, EntityMention> entityMap,
+      CoreMap sentence, RadixTree< EntityMention> entityMap,
       int tokenOffset) {
     Set<String> roleSet = aceEventMention.getRoles();
     List<String> roles = new ArrayList<>();
@@ -365,8 +365,8 @@ public class AceReader extends GenericDataSetReader {
     return em;
   }
 
-  private RelationMention convertAceRelationMention(AceRelationMention aceRelationMention, String docId,
-      CoreMap sentence, Map<String, EntityMention> entityMap) {
+  private RelationMention convertAceRelationMention(AceRelationMention aceRelationMention,
+                                                    CoreMap sentence, RadixTree<EntityMention> entityMap) {
     List<AceRelationMentionArgument> args = Arrays.asList(aceRelationMention.getArgs());
     List<ExtractionObject> convertedArgs = new ArrayList<>();
     List<String> argNames = new ArrayList<>();

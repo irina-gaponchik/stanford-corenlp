@@ -30,6 +30,7 @@ package edu.stanford.nlp.trees.tregex;
 
 import java.util.*;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.trees.HasParent;
 import edu.stanford.nlp.trees.Tree;
 
@@ -44,7 +45,7 @@ public abstract class TregexMatcher {
   final Tree root;
   Tree tree;
   IdentityHashMap<Tree, Tree> nodesToParents;
-  final Map<String, Tree> namesToNodes;
+  final RadixTree< Tree> namesToNodes;
   final VariableStrings variableStrings;
 
   // these things are used by "find"
@@ -52,7 +53,7 @@ public abstract class TregexMatcher {
   Tree findCurrent;
 
 
-  TregexMatcher(Tree root, Tree tree, IdentityHashMap<Tree, Tree> nodesToParents, Map<String, Tree> namesToNodes, VariableStrings variableStrings) {
+  TregexMatcher(Tree root, Tree tree, IdentityHashMap<Tree, Tree> nodesToParents, RadixTree<Tree> namesToNodes, VariableStrings variableStrings) {
     this.root = root;
     this.tree = tree;
     this.nodesToParents = nodesToParents;

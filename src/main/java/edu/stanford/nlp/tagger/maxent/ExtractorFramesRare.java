@@ -652,7 +652,7 @@ class CompanyNameDetector extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if ( ! startsUpperCase(s)) {
       return "0";
@@ -691,7 +691,7 @@ class CaselessCompanyNameDetector extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
 
     for (int i = 0; i <= CompanyNameDetector.COMPANY_NAME_WINDOW; i++) {
@@ -716,7 +716,7 @@ class ExtractorUCase extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (containsUpperCase(s)) {
       return "1";
@@ -738,7 +738,7 @@ class ExtractorLetterDigitDash extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (containsLetter(s) && containsDash(s) && containsNumber(s)) {
       return "1";
@@ -760,7 +760,7 @@ class ExtractorUpperDigitDash extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (containsUpperCase(s) && containsDash(s) && containsNumber(s)) {
       return "1";
@@ -783,7 +783,7 @@ class ExtractorLetterDashDigit extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (s == null) return "0";
     boolean seenLetter = false;
@@ -828,7 +828,7 @@ class ExtractorCapDistLC extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String word = pH.getWord(h, 0);
     String ret;
     if (!startsUpperCase(word)) {
@@ -901,8 +901,8 @@ class ExtractorCapLCSeen extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
-    CharSequence res = cCapDist.extract(h, pH);
+  String extract(History h, PairsHolder pH) {
+    String res = cCapDist.extract(h, pH);
     if (res.equals("0")) {
       return res;
     }
@@ -928,7 +928,7 @@ class ExtractorMidSentenceCap extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String prevTag = pH.getTag(h, -1);
     if(prevTag == null) { return "0"; }
     if (prevTag.equals(naTag)) {
@@ -965,7 +965,7 @@ class ExtractorStartSentenceCap extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String prevTag = pH.getTag(h, -1);
     if(prevTag == null) { return zeroSt; }
     if (!prevTag.equals(naTag)) {
@@ -1007,7 +1007,7 @@ class ExtractorMidSentenceCapC extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String prevTag = pH.getTag(h, -1);
     if (prevTag == null) { return zeroSt; }
     if (prevTag.equals(naTag)) {
@@ -1044,7 +1044,7 @@ class ExtractorCapC extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (startsUpperCase(s)) {
       String s1 = s.toLowerCase();
@@ -1072,7 +1072,7 @@ class ExtractorAllCap extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (noneLowerCase(s)) {
       return "1";
@@ -1093,7 +1093,7 @@ class ExtractorAllCapitalized extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (allUpperCase(s)) {
       return "1";
@@ -1114,7 +1114,7 @@ class ExtractorCNumber extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (containsNumber(s)) {
       return "1";
@@ -1135,7 +1135,7 @@ class ExtractorDash extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (containsDash(s)) {
       return "1";
@@ -1160,7 +1160,7 @@ class ExtractorWordSuff extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     // String word = TestSentence.toNice(pH.getWord(h, 0));
     String word = pH.getWord(h, position);
     if (word.length() < num) {
@@ -1192,7 +1192,7 @@ class ExtractorWordPref extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     // String word = TestSentence.toNice(pH.getWord(h, 0));
     String word = pH.getWord(h, position);
       return word.length() < num ? "######" : word.substring(0, num);
@@ -1231,7 +1231,7 @@ class ExtractorsConjunction extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     CharSequence ex1 = extractor1.extract(h, pH);
     if (ex1.equals(zeroSt)) {
       return zeroSt;
@@ -1270,7 +1270,7 @@ class PluralAcronymDetector extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
     if (pluralAcronym(s)) {
       return "1";
@@ -1296,7 +1296,7 @@ class CtbPreDetector extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s = TestSentence.toNice(pH.getWord(h, position));
 
     if (!s.isEmpty() && CtbDict.getTagPre(t1, s.substring(0, 1)).equals("1"))
@@ -1327,7 +1327,7 @@ class CtbSufDetector extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s=TestSentence.toNice(pH.getWord(h, position));
 
     if(!s.isEmpty() && CtbDict.getTagSuf(t1, s.substring(s.length()-1, s.length())).equals("1"))
@@ -1397,7 +1397,7 @@ class ASBCunkDetector extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s=TestSentence.toNice(pH.getWord(h,n1));
 
     if (ASBCunkDict.getTag(t1, s).equals("1"))
@@ -1423,7 +1423,7 @@ class CTBunkDictDetector extends RareExtractor {
   }
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String s=TestSentence.toNice(pH.getWord(h,n1));
 
     if (CTBunkDict.getTag(t1, s).equals("1"))
@@ -1441,7 +1441,7 @@ class CTBunkDictDetector extends RareExtractor {
 
 abstract class CWordBooleanExtractor extends RareExtractor {
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String cword = pH.getWord(h, 0);
     return extractFeature(cword) ? "1" : "0";
   }

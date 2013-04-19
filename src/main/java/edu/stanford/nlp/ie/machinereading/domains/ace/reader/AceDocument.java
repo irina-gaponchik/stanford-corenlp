@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ie.machinereading.common.SimpleTokenize;
 import edu.stanford.nlp.ie.machinereading.domains.ace.AceReader;
 import javolution.text.TextBuilder;
@@ -28,28 +29,28 @@ public class AceDocument extends AceElement {
   private String mSource;
 
   /** All entities */
-  private Map<String, AceEntity> mEntities;
+  private RadixTree< AceEntity> mEntities = new RadixTree<>();
   /** All entity mentions */
-  private Map<String, AceEntityMention> mEntityMentions;
+  private RadixTree< AceEntityMention> mEntityMentions = new RadixTree<>();
   /** All entity mentions in a given sentence, sorted in textual order */
-  private ArrayList<ArrayList<AceEntityMention>> mSentenceEntityMentions;
+  private List<ArrayList<AceEntityMention>> mSentenceEntityMentions = new ArrayList<>();
 
   /** All relations */
-  private Map<String, AceRelation> mRelations;
+  private RadixTree< AceRelation> mRelations = new RadixTree<>();
   /** All relation mentions */
-  private Map<String, AceRelationMention> mRelationMentions;
+  private RadixTree< AceRelationMention> mRelationMentions = new RadixTree<>();
   /** All relation mentions in a given sentence, sorted in textual order */
-  private ArrayList<ArrayList<AceRelationMention>> mSentenceRelationMentions;
+  private List<ArrayList<AceRelationMention>> mSentenceRelationMentions = new ArrayList<>();
 
   /** All events */
-  private Map<String, AceEvent> mEvents;
+  private RadixTree< AceEvent> mEvents = new RadixTree<>();
   /** All event mentions */
-  private Map<String, AceEventMention> mEventMentions;
+  private RadixTree< AceEventMention> mEventMentions = new RadixTree<>();
   /** All event mentions in a given sentence, sorted in textual order */
-  private ArrayList<ArrayList<AceEventMention>> mSentenceEventMentions;
+  private List<ArrayList<AceEventMention>> mSentenceEventMentions = new ArrayList<>();
   
   /** The list of all tokens in the document, sorted in textual order */
-  private Vector<AceToken> mTokens;
+  private List<AceToken> mTokens = new Vector<>();
   
   /** List of all sentences in the document */
   private List<List<AceToken>> mSentences;
@@ -62,19 +63,6 @@ public class AceDocument extends AceElement {
   public AceDocument(String id) {
     super(id);
 
-      mEntities = new FastMap<>();
-      mEntityMentions = new FastMap<>();
-    mSentenceEntityMentions = new ArrayList<>();
-
-      mRelations = new FastMap<>();
-      mRelationMentions = new FastMap<>();
-    mSentenceRelationMentions = new ArrayList<>();
-
-      mEvents = new FastMap<>();
-      mEventMentions = new FastMap<>();
-    mSentenceEventMentions = new ArrayList<>();
-    
-    mTokens = new Vector<>();
   }
 
   public void setPrefix(String p) {
@@ -109,31 +97,23 @@ public class AceDocument extends AceElement {
     return mSentenceEntityMentions.size();
   }
 
-  public ArrayList<AceEntityMention> getEntityMentions(int sent) {
+  public List<AceEntityMention> getEntityMentions(int sent) {
     return mSentenceEntityMentions.get(sent);
   }
 
-  public ArrayList<ArrayList<AceEntityMention>> getAllEntityMentions() {
-    return mSentenceEntityMentions;
-  }
-
-  public ArrayList<AceRelationMention> getRelationMentions(int sent) {
+    public List<AceRelationMention> getRelationMentions(int sent) {
     return mSentenceRelationMentions.get(sent);
   }
 
-  public ArrayList<ArrayList<AceRelationMention>> getAllRelationMentions() {
+  public List<ArrayList<AceRelationMention>> getAllRelationMentions() {
     return mSentenceRelationMentions;
   }
   
-  public ArrayList<AceEventMention> getEventMentions(int sent) {
+  public List<AceEventMention> getEventMentions(int sent) {
     return mSentenceEventMentions.get(sent);
   }
 
-  public ArrayList<ArrayList<AceEventMention>> getAllEventMentions() {
-    return mSentenceEventMentions;
-  }
-
-  public AceEntity getEntity(String id) {
+    public AceEntity getEntity(String id) {
     return mEntities.get(id);
   }
 
@@ -145,11 +125,7 @@ public class AceDocument extends AceElement {
     mEntities.put(e.getId(), e);
   }
 
-  public Map<String, AceEntityMention> getEntityMentions() {
-    return mEntityMentions;
-  }
-
-  public AceEntityMention getEntityMention(String id) {
+    public AceEntityMention getEntityMention(String id) {
     return mEntityMentions.get(id);
   }
 
@@ -165,7 +141,7 @@ public class AceDocument extends AceElement {
     mRelations.put(r.getId(), r);
   }
 
-  public Map<String, AceRelationMention> getRelationMentions() {
+  public RadixTree< AceRelationMention> getRelationMentions() {
     return mRelationMentions;
   }
 
@@ -185,7 +161,7 @@ public class AceDocument extends AceElement {
     mEvents.put(r.getId(), r);
   }
 
-  public Map<String, AceEventMention> getEventMentions() {
+  public RadixTree< AceEventMention> getEventMentions() {
     return mEventMentions;
   }
 

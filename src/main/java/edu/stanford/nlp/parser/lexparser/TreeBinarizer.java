@@ -219,7 +219,7 @@ public class TreeBinarizer implements TreeTransformer {
     Label label;
       label = starting ? t.label() : makeSyntheticLabel(t, left, right, headLoc, markovOrder);
     if (doSelectiveSplit) {
-      double stateCount = stateCounter.getCount(label.value());
+      double stateCount = stateCounter.get(label.value());
       if (stateCount < selectiveSplitThreshold) { // too sparse, so
           label = starting && !unaryAtTop ? t.label() : makeSyntheticLabel(t, left, right, headLoc, markovOrder - 1);
       }

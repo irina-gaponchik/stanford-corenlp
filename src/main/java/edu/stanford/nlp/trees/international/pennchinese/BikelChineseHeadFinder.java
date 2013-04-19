@@ -26,7 +26,7 @@ public class BikelChineseHeadFinder extends AbstractCollinsHeadFinder {
   public BikelChineseHeadFinder(TreebankLanguagePack tlp) {
     super(tlp);
 
-      nonTerminalInfo = new FastMap<>();
+      nonTerminalInfo = new ca.gedge.radixtree.RadixTree<>();
     // these are first-cut rules
 
     defaultRule = new String[]{"right"};

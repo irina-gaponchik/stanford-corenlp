@@ -28,12 +28,12 @@ public class FrenchHeadFinder extends AbstractCollinsHeadFinder {
     // D (determiner), ET (foreign word), I (interjection), N (noun),
     // P (preposition), PREF (prefix), PRO (strong pronoun -- very confusing), V (verb), PUNC (punctuation)
 
-      nonTerminalInfo = new FastMap<>();
+      nonTerminalInfo = new ca.gedge.radixtree.RadixTree<>();
 
     // "sentence"
     nonTerminalInfo.put(tlp.startSymbol(), new String[][]{{"left", "VN", "NP"}, {"left"}});
     nonTerminalInfo.put("SENT", new String[][]{{"left", "VN", "NP"}, {"left"}});
-    
+
     // adjectival phrases
     nonTerminalInfo.put("AP", new String[][]{{"left", "A", "V"}, {"rightdis", "N", "ET"}, {"left"}});
 

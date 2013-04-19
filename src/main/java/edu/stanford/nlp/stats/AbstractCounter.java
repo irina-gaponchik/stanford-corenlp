@@ -11,17 +11,17 @@ import edu.stanford.nlp.math.SloppyMath;
 public abstract class AbstractCounter<E> implements Counter<E> {
 
   public double logIncrementCount(E key, double amount) {
-    double count = SloppyMath.logAdd(getCount(key), amount);
+    double count = SloppyMath.logAdd(get(key), amount);
     setCount(key, count);
-    return getCount(key);
+    return get(key);
   }
 
   public double incrementCount(E key, double amount) {
-    double count = getCount(key) + amount;
+    double count = get(key) + amount;
     setCount(key, count);
     // get the value just to make sure it agrees with what is in the counter
     // (in case it's a float or int)
-    return getCount(key);
+    return get(key);
   }
 
   public double incrementCount(E key) {

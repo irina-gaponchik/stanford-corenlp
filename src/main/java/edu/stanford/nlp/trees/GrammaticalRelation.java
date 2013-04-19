@@ -1,5 +1,6 @@
 package edu.stanford.nlp.trees;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreAnnotation;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
@@ -99,7 +100,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
     annotationsToRelations = new FastMap<>();
     private static Map<GrammaticalRelation, Class<? extends GrammaticalRelationAnnotation>>
     relationsToAnnotations = new FastMap<>();
-    private static EnumMap<Language, Map<String, GrammaticalRelation>>
+    private static EnumMap<Language, RadixTree< GrammaticalRelation>>
     stringsToRelations = new EnumMap<>(Language.class);
 
   /**
@@ -288,9 +289,9 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
       }
     }
 
-    Map<String, GrammaticalRelation> sToR = stringsToRelations.get(language);
+    RadixTree< GrammaticalRelation> sToR = stringsToRelations.get(language);
     if (sToR == null) {
-        sToR = new FastMap<>();
+        sToR = new RadixTree<>();
       stringsToRelations.put(language, sToR);
     }
     GrammaticalRelation previous = sToR.put(toString(), this);

@@ -3,6 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.*;
 import java.util.regex.*;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.international.arabic.ArabicMorphoFeatureSpecification;
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification;
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification.MorphoFeatureType;
@@ -50,7 +51,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
   private boolean discardX;
 
   private HeadFinder headFinder;
-  private final Map<String,Pair<TregexPattern,Function<TregexMatcher,String>>> annotationPatterns;
+  private final RadixTree<Pair<TregexPattern,Function<TregexMatcher,String>>> annotationPatterns;
   private final List<Pair<TregexPattern,Function<TregexMatcher,String>>> activeAnnotations;
 
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
@@ -63,7 +64,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     optionsString = new TextBuilder();
     optionsString.append("ArabicTreebankParserParams\n");
 
-      annotationPatterns = new FastMap<>();
+      annotationPatterns = new RadixTree<>();
     activeAnnotations = new ArrayList<>();
 
     //Initialize the headFinder here

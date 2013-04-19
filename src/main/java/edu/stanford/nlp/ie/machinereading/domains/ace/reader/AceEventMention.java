@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import javolution.util.FastMap;
 
 /**
@@ -13,7 +14,7 @@ import javolution.util.FastMap;
 public class AceEventMention extends AceMention {
 
   /** Maps argument roles to argument mentions */
-  private Map<String, AceEventMentionArgument> mRolesToArguments;
+  private RadixTree< AceEventMentionArgument> mRolesToArguments;
 
   /** the parent event */
   private AceEvent mParent;
@@ -23,7 +24,7 @@ public class AceEventMention extends AceMention {
 
   public AceEventMention(String id, AceCharSeq extent, AceCharSeq anchor) {
     super(id, extent);
-      mRolesToArguments = new FastMap<>();
+      mRolesToArguments = new RadixTree<>();
     this.mAnchor = anchor;
   }
 

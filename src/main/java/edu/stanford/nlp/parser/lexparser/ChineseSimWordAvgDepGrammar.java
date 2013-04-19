@@ -156,21 +156,21 @@ public class ChineseSimWordAvgDepGrammar extends MLEDependencyGrammar {
     // ds     distance
 
     IntDependency temp = new IntDependency(dependency.head, dependency.arg, leftHeaded, valenceBinDistance);
-    double c_aTW_hTWd = argCounter.getCount(temp);
+    double c_aTW_hTWd = argCounter.get(temp);
     temp = new IntDependency(dependency.head, unknownArg, leftHeaded, valenceBinDistance);
-    double c_aT_hTWd = argCounter.getCount(temp);
+    double c_aT_hTWd = argCounter.get(temp);
     temp = new IntDependency(dependency.head, wildTW, leftHeaded, valenceBinDistance);
-    double c_hTWd = argCounter.getCount(temp);
+    double c_hTWd = argCounter.get(temp);
     temp = new IntDependency(unknownHead, dependency.arg, leftHeaded, valenceBinDistance);
-    double c_aTW_hTd = argCounter.getCount(temp);
+    double c_aTW_hTd = argCounter.get(temp);
     temp = new IntDependency(unknownHead, unknownArg, leftHeaded, valenceBinDistance);
-    double c_aT_hTd = argCounter.getCount(temp);
+    double c_aT_hTd = argCounter.get(temp);
     temp = new IntDependency(unknownHead, wildTW, leftHeaded, valenceBinDistance);
-    double c_hTd = argCounter.getCount(temp);
+    double c_hTd = argCounter.get(temp);
     temp = new IntDependency(wildTW, dependency.arg, false, -1);
-    double c_aTW = argCounter.getCount(temp);
+    double c_aTW = argCounter.get(temp);
     temp = new IntDependency(wildTW, unknownArg, false, -1);
-    double c_aT = argCounter.getCount(temp);
+    double c_aT = argCounter.get(temp);
 
     // do the magic
     double p_aTW_hTd = c_hTd > 0.0 ? c_aTW_hTd / c_hTd : 0.0;
@@ -212,10 +212,10 @@ public class ChineseSimWordAvgDepGrammar extends MLEDependencyGrammar {
     for (int h : simHead) {
       IntTaggedWord hWord = new IntTaggedWord(h, dependency.head.tag);
       temp = new IntDependency(hWord, dependency.arg, dependency.leftHeaded, dependency.distance);
-      cSim_aTW_hTd += argCounter.getCount(temp);
+      cSim_aTW_hTd += argCounter.get(temp);
 
       temp = new IntDependency(hWord, wildTW, dependency.leftHeaded, dependency.distance);
-      cSim_hTd += argCounter.getCount(temp);
+      cSim_hTd += argCounter.get(temp);
     }
     double pSim_aTW_hTd = cSim_hTd > 0.0 ? cSim_aTW_hTd / cSim_hTd : 0.0;  // P(Wa,Ta|Th)
 
@@ -359,7 +359,7 @@ public class ChineseSimWordAvgDepGrammar extends MLEDependencyGrammar {
     }
 
     IntDependency temp = new IntDependency(dep.head, wildTW, dep.leftHeaded, dep.distance);
-    double countHead = argCounter.getCount(temp);
+    double countHead = argCounter.get(temp);
 
     double simProb;
     if (sim2arg == null) {

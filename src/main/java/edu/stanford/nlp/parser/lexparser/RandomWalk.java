@@ -25,7 +25,7 @@ class RandomWalk implements Serializable {
    * Uses the initialized values
    */
   public double score(Object hidden, Object seen) {
-    return model.get(hidden).getCount(seen) / model.get(hidden).totalCount();
+    return model.get(hidden).get(seen) / model.get(hidden).totalCount();
   }
 
   /* score with flexible number of steps */
@@ -41,12 +41,12 @@ class RandomWalk implements Serializable {
    * random walk steps */
   public double step(Object hidden, Object seen, int steps) {
     if (steps < 1) {
-      return hiddenToSeen.get(hidden).getCount(seen) / hiddenToSeen.get(hidden).totalCount();
+      return hiddenToSeen.get(hidden).get(seen) / hiddenToSeen.get(hidden).totalCount();
     } else {
       double total = 0;
       for (Map.Entry<Object, Counter> objectCounterEntry : seenToHidden.entrySet()) {
         for (Object hidden1 : hiddenToSeen.keySet()) {
-          double subtotal = hiddenToSeen.get(hidden).getCount(objectCounterEntry.getKey()) / hiddenToSeen.get(hidden).totalCount() * objectCounterEntry.getValue().getCount(hidden1) / objectCounterEntry.getValue().totalCount();
+          double subtotal = hiddenToSeen.get(hidden).get(objectCounterEntry.getKey()) / hiddenToSeen.get(hidden).totalCount() * objectCounterEntry.getValue().get(hidden1) / objectCounterEntry.getValue().totalCount();
           subtotal += score(hidden1, seen, steps - 1);
           total += subtotal;
         }

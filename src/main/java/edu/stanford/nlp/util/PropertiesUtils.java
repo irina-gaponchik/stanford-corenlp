@@ -1,5 +1,6 @@
 package edu.stanford.nlp.util;
 
+import ca.gedge.radixtree.RadixTree;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 
@@ -60,10 +61,10 @@ public class PropertiesUtils {
   }
   
   /**
-   * Tired of Properties not behaving like Map<String,String>s?  This method will solve that problem for you.
+   * Tired of Properties not behaving like RadixTree<String>s?  This method will solve that problem for you.
    */
-  public static Map<String, String> asMap(Properties properties) {
-      Map<String, String> map = new FastMap<>();
+  public static RadixTree< String> asMap(Properties properties) {
+      RadixTree< String> map = new RadixTree<>();
     for (Entry<Object, Object> entry : properties.entrySet()) {
       map.put((String)entry.getKey(), (String)entry.getValue());
     }

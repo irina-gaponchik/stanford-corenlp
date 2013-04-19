@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ie.crf.CRFBiasedClassifier;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -25,7 +26,7 @@ public class TrueCaseAnnotator implements Annotator {
     private static final Pattern COMPILE = Pattern.compile("\\s+");
     private CRFBiasedClassifier trueCaser;
   
-  private Map<String,String> mixedCaseMap = new FastMap<>();
+  private RadixTree<String> mixedCaseMap = new RadixTree<>();
 
     private boolean VERBOSE = true;
   
@@ -124,8 +125,8 @@ public class TrueCaseAnnotator implements Annotator {
     l.set(CoreAnnotations.TrueCaseTextAnnotation.class, trueCaseText);
   }
   
-  public static Map<String,String> loadMixedCaseMap(String mapFile) {
-      Map<String,String> map = new FastMap<>();
+  public static RadixTree<String> loadMixedCaseMap(String mapFile) {
+      RadixTree<String> map = new RadixTree<>();
     try {
       InputStream is = IOUtils.getInputStreamFromURLOrClasspathOrFileSystem(mapFile);
       BufferedReader br = new BufferedReader(new InputStreamReader(is));

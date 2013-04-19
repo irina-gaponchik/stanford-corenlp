@@ -1,5 +1,6 @@
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.util.StringUtils;
 
 import java.io.*;
@@ -76,7 +77,7 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
   TAG_SEPARATOR_PROPERTY = "tagSeparator";
 
 
-  private static final Map<String, String> defaultValues = new FastMap<>();
+  private static final RadixTree< String> defaultValues = new RadixTree<>();
 
     static {
     defaultValues.put("arch", ARCH);

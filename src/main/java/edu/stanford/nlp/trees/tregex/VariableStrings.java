@@ -12,16 +12,16 @@ import java.util.Map;
  */
 class VariableStrings {
 
-  private final Map<String, String> varsToStrings;
+  private final FastMap<String, String> varsToStrings;
   private final IntCounter<String> numVarsSet;
 
   public VariableStrings() {
-      varsToStrings = new FastMap<>();
+      varsToStrings = new FastMap<String, String>();
     numVarsSet = new IntCounter<>();
   }
 
   public boolean isSet(String o) {
-    return numVarsSet.getCount(o) >= 1;
+    return numVarsSet.get(o) >= 1;
   }
 
   public void setVar(String var, String string) {
@@ -32,9 +32,9 @@ class VariableStrings {
   }
 
   public void unsetVar(String var) {
-    if(numVarsSet.getCount(var) > 0)
+    if(numVarsSet.get(var) > 0)
       numVarsSet.decrementCount(var);
-    if(numVarsSet.getCount(var)==0)
+    if(numVarsSet.get(var)==0)
       varsToStrings.put(var,null);
   }
 
@@ -57,7 +57,7 @@ class VariableStrings {
       s.append("=(");
       s.append(stringStringEntry.getValue());
       s.append(':');
-      s.append(numVarsSet.getCount(stringStringEntry.getKey()));
+      s.append(numVarsSet.get(stringStringEntry.getKey()));
       s.append(')');
     }
     s.append('}');

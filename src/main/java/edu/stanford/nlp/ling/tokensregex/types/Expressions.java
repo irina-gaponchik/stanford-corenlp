@@ -1,5 +1,6 @@
 package edu.stanford.nlp.ling.tokensregex.types;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.tokensregex.Env;
 import edu.stanford.nlp.ling.tokensregex.EnvLookup;
 import edu.stanford.nlp.ling.tokensregex.SequenceMatchResult;
@@ -848,12 +849,12 @@ public class Expressions {
   /**
   * A composite value with field names and values for each field
   */
-  public static class CompositeValue extends SimpleCachedExpression<Map<String,Expression>> implements Value<Map<String,Expression>>{
+  public static class CompositeValue extends SimpleCachedExpression<RadixTree<Expression>> implements Value<RadixTree<Expression>>{
     public CompositeValue(String... tags) {
-        super(TYPE_COMPOSITE, new FastMap<String, Expression>(), tags);
+        super(TYPE_COMPOSITE, new RadixTree< Expression>(), tags);
     }
 
-    public CompositeValue(Map<String, Expression> m, boolean isEvaluated, String... tags) {
+    public CompositeValue(RadixTree< Expression> m, boolean isEvaluated, String... tags) {
       super(TYPE_COMPOSITE, m, tags);
       if (isEvaluated) {
         evaluated = this;
@@ -1004,8 +1005,8 @@ public class Expressions {
     }
 
     public CompositeValue simplifyNoTypeConversion(Env env, Object... args) {
-      Map<String, Expression> m = value;
-        Map<String, Expression> res = new FastMap<>(m.size());
+      RadixTree< Expression> m = value;
+        RadixTree< Expression> res = new RadixTree<>( );
       for (Map.Entry<String, Expression> stringExpressionEntry : m.entrySet()) {
         res.put(stringExpressionEntry.getKey(), stringExpressionEntry.getValue().simplify(env));
       }
@@ -1013,8 +1014,8 @@ public class Expressions {
     }
 
     private CompositeValue evaluateNoTypeConversion(Env env, Object... args) {
-      Map<String, Expression> m = value;
-        Map<String, Expression> res = new FastMap<>(m.size());
+      RadixTree< Expression> m = value;
+        RadixTree< Expression> res = new RadixTree<>();
       for (Map.Entry<String, Expression> stringExpressionEntry : m.entrySet()) {
         res.put(stringExpressionEntry.getKey(), stringExpressionEntry.getValue().evaluate(env, args));
       }
@@ -1024,11 +1025,10 @@ public class Expressions {
     public Value doEvaluation(Env env, Object... args) {
       Value v = attemptTypeConversion(this, env, args);
       if (v != null) return v;
-      Map<String, Expression> m = value;
-        Map<String, Expression> res = new FastMap<>(m.size());
-      for (Map.Entry<String, Expression> stringExpressionEntry : m.entrySet()) {
-        res.put(stringExpressionEntry.getKey(), stringExpressionEntry.getValue().evaluate(env, args));
-      }
+      RadixTree< Expression> m = value;
+        RadixTree< Expression> res = new RadixTree<>();
+      for (Map.Entry<String, Expression> stringExpressionEntry : m.entrySet())
+          res.put(stringExpressionEntry.getKey(), stringExpressionEntry.getValue().evaluate(env, args));
       disableCaching = !checkValue();
       return new CompositeValue(res, true);
     }

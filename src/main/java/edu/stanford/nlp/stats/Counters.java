@@ -199,7 +199,7 @@ public class Counters {
     double max = Double.NEGATIVE_INFINITY;
     E argmax = null;
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       if (argmax == null || count > max) {// || (count == max &&
                                           // tieBreaker.compare(key, argmax) <
                                           // 0)) {
@@ -222,7 +222,7 @@ public class Counters {
     E argmin = null;
 
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       if (argmin == null || count < min) {// || (count == min &&
                                           // tieBreaker.compare(key, argmin) <
                                           // 0)) {
@@ -245,7 +245,7 @@ public class Counters {
     double max = Double.NEGATIVE_INFINITY;
     E argmax = null;
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       if (argmax == null || count > max || count == max && tieBreaker.compare(key, argmax) < 0) {
         max = count;
         argmax = key;
@@ -266,7 +266,7 @@ public class Counters {
     E argmin = null;
 
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       if (argmin == null || count < min || count == min && tieBreaker.compare(key, argmin) < 0) {
         min = count;
         argmin = key;
@@ -313,7 +313,7 @@ public class Counters {
   // TODO: Rewrite to use arg.entrySet()
   public static <E> void addInPlace(Counter<E> target, Counter<E> arg, double scale) {
     for (E key : arg.keySet()) {
-      target.incrementCount(key, scale * arg.getCount(key));
+      target.incrementCount(key, scale * arg.get(key));
     }
   }
 
@@ -415,7 +415,7 @@ public class Counters {
    */
   public static <E> void subtractInPlace(Counter<E> target, Counter<E> arg) {
     for (E key : arg.keySet()) {
-      target.decrementCount(key, arg.getCount(key));
+      target.decrementCount(key, arg.get(key));
     }
   }
 
@@ -437,7 +437,7 @@ public class Counters {
    */
   public static <E> void divideInPlace(Counter<E> target, Counter<E> denominator) {
     for (E key : target.keySet()) {
-      target.setCount(key, target.getCount(key) / denominator.getCount(key));
+      target.setCount(key, target.get(key) / denominator.get(key));
     }
   }
 
@@ -447,7 +447,7 @@ public class Counters {
    */
   public static <E> void dotProductInPlace(Counter<E> target, Counter<E> term) {
     for (E key : target.keySet()) {
-      target.setCount(key, target.getCount(key) * term.getCount(key));
+      target.setCount(key, target.get(key) * term.get(key));
     }
   }
 
@@ -490,7 +490,7 @@ public class Counters {
    */
   public static <E> Counter<E> multiplyInPlace(Counter<E> target, Counter<E> mult) {
     for (Entry<E, Double> entry : target.entrySet()) {
-      target.setCount(entry.getKey(), entry.getValue() * mult.getCount(entry.getKey()));
+      target.setCount(entry.getKey(), entry.getValue() * mult.get(entry.getKey()));
     }
     Counters.retainNonZeros(target);
     return target;
@@ -519,7 +519,7 @@ public class Counters {
 
   public static <E> void logInPlace(Counter<E> target) {
     for (E key : target.keySet()) {
-      target.setCount(key, Math.log(target.getCount(key)));
+      target.setCount(key, Math.log(target.get(key)));
     }
   }
 
@@ -607,7 +607,7 @@ public class Counters {
   public static <E> Set<E> retainNonZeros(Counter<E> counter) {
       Set<E> removed = new FastSet<>();
     for (E key : counter.keySet()) {
-      if (counter.getCount(key) == 0.0) {
+      if (counter.get(key) == 0.0) {
         removed.add(key);
       }
     }
@@ -631,7 +631,7 @@ public class Counters {
   public static <E> Set<E> retainAbove(Counter<E> counter, double countThreshold) {
       Set<E> removed = new FastSet<>();
     for (E key : counter.keySet()) {
-      if (counter.getCount(key) < countThreshold) {
+      if (counter.get(key) < countThreshold) {
         removed.add(key);
       }
     }
@@ -655,7 +655,7 @@ public class Counters {
   public static <E> Set<E> retainBelow(Counter<E> counter, double countMaxThreshold) {
       Set<E> removed = new FastSet<>();
     for (E key : counter.keySet()) {
-      if (counter.getCount(key) > countMaxThreshold) {
+      if (counter.get(key) > countMaxThreshold) {
         removed.add(key);
       }
     }
@@ -744,7 +744,7 @@ public class Counters {
   public static <E> Set<E> keysAbove(Counter<E> c, double countThreshold) {
       Set<E> keys = new FastSet<>()    ;
     for (E key : c.keySet()) {
-      if (c.getCount(key) >= countThreshold) {
+      if (c.get(key) >= countThreshold) {
         keys.add(key);
       }
     }
@@ -758,7 +758,7 @@ public class Counters {
   public static <E> Set<E> keysBelow(Counter<E> c, double countThreshold) {
       Set<E> keys = new FastSet<>();
     for (E key : c.keySet()) {
-      if (c.getCount(key) <= countThreshold) {
+      if (c.get(key) <= countThreshold) {
         keys.add(key);
       }
     }
@@ -772,7 +772,7 @@ public class Counters {
   public static <E> Set<E> keysAt(Counter<E> c, double count) {
       Set<E> keys = new FastSet<>();
     for (E key : c.keySet()) {
-      if (c.getCount(key) == count) {
+      if (c.get(key) == count) {
         keys.add(key);
       }
     }
@@ -790,7 +790,7 @@ public class Counters {
   public static <T1, T2> Counter<T2> transform(Counter<T1> c, Function<T1, T2> f) {
     Counter<T2> c2 = new ClassicCounter<>();
     for (T1 key : c.keySet()) {
-      c2.setCount(f.apply(key), c.getCount(key));
+      c2.setCount(f.apply(key), c.get(key));
     }
     return c2;
   }
@@ -813,7 +813,7 @@ public class Counters {
   public static <E> Comparator<E> toComparator(final Counter<E> counter) {
     return new Comparator<E>() {
       public int compare(E o1, E o2) {
-        return Double.compare(counter.getCount(o1), counter.getCount(o2));
+        return Double.compare(counter.get(o1), counter.get(o2));
       }
     };
   }
@@ -832,7 +832,7 @@ public class Counters {
   public static <E extends Comparable<E>> Comparator<E> toComparatorWithKeys(final Counter<E> counter) {
     return new Comparator<E>() {
       public int compare(E o1, E o2) {
-        int res = Double.compare(counter.getCount(o1), counter.getCount(o2));
+        int res = Double.compare(counter.get(o1), counter.get(o2));
           return res == 0 ? o1.compareTo(o2) : res;
       }
     };
@@ -852,7 +852,7 @@ public class Counters {
   public static <E> Comparator<E> toComparatorDescending(final Counter<E> counter) {
     return new Comparator<E>() {
       public int compare(E o1, E o2) {
-        return Double.compare(counter.getCount(o2), counter.getCount(o1));
+        return Double.compare(counter.get(o2), counter.get(o1));
       }
     };
   }
@@ -878,10 +878,10 @@ public class Counters {
     return new Comparator<E>() {
       public int compare(E o1, E o2) {
         if (ascending) {
-            return useMagnitude ? Double.compare(Math.abs(counter.getCount(o1)), Math.abs(counter.getCount(o2))) : Double.compare(counter.getCount(o1), counter.getCount(o2));
+            return useMagnitude ? Double.compare(Math.abs(counter.get(o1)), Math.abs(counter.get(o2))) : Double.compare(counter.get(o1), counter.get(o2));
         } else {
           // Descending
-            return useMagnitude ? Double.compare(Math.abs(counter.getCount(o2)), Math.abs(counter.getCount(o1))) : Double.compare(counter.getCount(o2), counter.getCount(o1));
+            return useMagnitude ? Double.compare(Math.abs(counter.get(o2)), Math.abs(counter.get(o1))) : Double.compare(counter.get(o2), counter.get(o1));
         }
       }
     };
@@ -993,7 +993,7 @@ public class Counters {
     List<Pair<E, Double>> l = new ArrayList<>(keys.size());
 
     for (E key : keys) {
-      l.add(new Pair<>(key, c.getCount(key)));
+      l.add(new Pair<>(key, c.get(key)));
     }
 
     return l;
@@ -1008,7 +1008,7 @@ public class Counters {
   public static <E> List<Pair<E, Double>> toSortedListWithCounts(Counter<E> c) {
     List<Pair<E, Double>> l = new ArrayList<>(c.size());
     for (E e : c.keySet()) {
-      l.add(new Pair<>(e, c.getCount(e)));
+      l.add(new Pair<>(e, c.get(e)));
     }
     // descending order
     Collections.sort(l, new Comparator<Pair<E, Double>>() {
@@ -1031,7 +1031,7 @@ public class Counters {
   public static <E> edu.stanford.nlp.util.PriorityQueue<E> toPriorityQueue(Counter<E> c) {
     edu.stanford.nlp.util.PriorityQueue<E> queue = new BinaryHeapPriorityQueue<>();
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       queue.add(key, count);
     }
     return queue;
@@ -1065,8 +1065,8 @@ public class Counters {
   public static <E> Counter<E> intersection(Counter<E> c1, Counter<E> c2) {
     Counter<E> result = c1.getFactory().create();
     for (E key : Sets.union(c1.keySet(), c2.keySet())) {
-      double count1 = c1.getCount(key);
-      double count2 = c2.getCount(key);
+      double count1 = c1.get(key);
+      double count2 = c2.get(key);
       double minCount = count1 < count2 ? count1 : count2;
       if (minCount > 0) {
         result.setCount(key, minCount);
@@ -1084,8 +1084,8 @@ public class Counters {
   public static <E> double jaccardCoefficient(Counter<E> c1, Counter<E> c2) {
     double minCount = 0.0, maxCount = 0.0;
     for (E key : Sets.union(c1.keySet(), c2.keySet())) {
-      double count1 = c1.getCount(key);
-      double count2 = c2.getCount(key);
+      double count1 = c1.get(key);
+      double count2 = c2.get(key);
       minCount += count1 < count2 ? count1 : count2;
       maxCount += count1 > count2 ? count1 : count2;
     }
@@ -1100,7 +1100,7 @@ public class Counters {
   public static <E> Counter<E> product(Counter<E> c1, Counter<E> c2) {
     Counter<E> result = c1.getFactory().create();
     for (E key : Sets.intersection(c1.keySet(), c2.keySet())) {
-      result.setCount(key, c1.getCount(key) * c2.getCount(key));
+      result.setCount(key, c1.get(key) * c2.get(key));
     }
     return result;
   }
@@ -1118,14 +1118,14 @@ public class Counters {
       c2 = tmpCnt;
     }
     for (E key : c1.keySet()) {
-      double count1 = c1.getCount(key);
+      double count1 = c1.get(key);
       if (Double.isNaN(count1) || Double.isInfinite(count1)) {
-        throw new RuntimeException("Counters.dotProduct infinite or NaN value for key: " + key + '\t' + c1.getCount(key) + '\t' + c2.getCount(key));
+        throw new RuntimeException("Counters.dotProduct infinite or NaN value for key: " + key + '\t' + c1.get(key) + '\t' + c2.get(key));
       }
       if (count1 != 0.0) {
-        double count2 = c2.getCount(key);
+        double count2 = c2.get(key);
         if (Double.isNaN(count2) || Double.isInfinite(count2)) {
-          throw new RuntimeException("Counters.dotProduct infinite or NaN value for key: " + key + '\t' + c1.getCount(key) + '\t' + c2.getCount(key));
+          throw new RuntimeException("Counters.dotProduct infinite or NaN value for key: " + key + '\t' + c1.get(key) + '\t' + c2.get(key));
         }
         if (count2 != 0.0) {
           // this is the inner product
@@ -1156,7 +1156,7 @@ public class Counters {
   public static <E> double sumEntries(Counter<E> c1, Collection<E> entries) {
     double dotProd = 0.0;
     for (E entry : entries) {
-      dotProd += c1.getCount(entry);
+      dotProd += c1.get(entry);
     }
     return dotProd;
   }
@@ -1164,7 +1164,7 @@ public class Counters {
   public static <E> Counter<E> add(Counter<E> c1, Counter<E> c2) {
     Counter<E> result = c1.getFactory().create();
     for (E key : Sets.union(c1.keySet(), c2.keySet())) {
-      result.setCount(key, c1.getCount(key) + c2.getCount(key));
+      result.setCount(key, c1.get(key) + c2.get(key));
     }
     retainNonZeros(result);
     return result;
@@ -1173,7 +1173,7 @@ public class Counters {
   public static <E> Counter<E> add(Counter<E> c1, double value) {
     Counter<E> result = c1.getFactory().create();
     for (E key : c1.keySet()) {
-      result.setCount(key, c1.getCount(key) + value);
+      result.setCount(key, c1.get(key) + value);
     }
     return result;
   }
@@ -1196,18 +1196,18 @@ public class Counters {
     int size2 = c2.size();
     if (size1 < size2) {
       for (E key : c1.keySet()) {
-        double count1 = c1.getCount(key);
+        double count1 = c1.get(key);
         if (count1 != 0.0) {
-          double count2 = c2.getCount(key);
+          double count2 = c2.get(key);
           if (count2 != 0.0)
             dotProd += count1 * count2;
         }
       }
     } else {
       for (E key : c2.keySet()) {
-        double count2 = c2.getCount(key);
+        double count2 = c2.get(key);
         if (count2 != 0.0) {
-          double count1 = c1.getCount(key);
+          double count1 = c1.get(key);
           if (count1 != 0.0)
             dotProd += count1 * count2;
         }
@@ -1225,7 +1225,7 @@ public class Counters {
   public static <E> Counter<E> absoluteDifference(Counter<E> c1, Counter<E> c2) {
     Counter<E> result = c1.getFactory().create();
     for (E key : Sets.union(c1.keySet(), c2.keySet())) {
-      double newCount = Math.abs(c1.getCount(key) - c2.getCount(key));
+      double newCount = Math.abs(c1.get(key) - c2.get(key));
       if (newCount > 0) {
         result.setCount(key, newCount);
       }
@@ -1242,7 +1242,7 @@ public class Counters {
   public static <E> Counter<E> division(Counter<E> c1, Counter<E> c2) {
     Counter<E> result = c1.getFactory().create();
     for (E key : Sets.union(c1.keySet(), c2.keySet())) {
-      result.setCount(key, c1.getCount(key) / c2.getCount(key));
+      result.setCount(key, c1.get(key) / c2.get(key));
     }
     return result;
   }
@@ -1258,7 +1258,7 @@ public class Counters {
     double entropy = 0.0;
     double total = c.totalCount();
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       if (count == 0) {
         continue; // 0.0 doesn't add entropy but may cause -Inf
       }
@@ -1279,11 +1279,11 @@ public class Counters {
     double tot2 = to.totalCount();
     double result = 0.0;
     for (E key : from.keySet()) {
-      double count1 = from.getCount(key);
+      double count1 = from.get(key);
       if (count1 == 0.0) {
         continue;
       }
-      double count2 = to.getCount(key);
+      double count2 = to.get(key);
       double logFract = Math.log(count2 / tot2);
       if (logFract == Double.NEGATIVE_INFINITY) {
         return Double.NEGATIVE_INFINITY; // can't recover
@@ -1309,12 +1309,12 @@ public class Counters {
     double tot2 = to.totalCount();
     // System.out.println("tot is " + tot + " tot2 is " + tot2);
     for (E key : from.keySet()) {
-      double num = from.getCount(key);
+      double num = from.get(key);
       if (num == 0) {
         continue;
       }
       num /= tot;
-      double num2 = to.getCount(key);
+      double num2 = to.get(key);
       num2 /= tot2;
       // System.out.println("num is " + num + " num2 is " + num2);
       double logFract = Math.log(num / num2);
@@ -1373,7 +1373,7 @@ public class Counters {
   public static <E, C extends Counter<E>> double sumSquares(C c) {
     double lenSq = 0.0;
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       lenSq += count * count;
     }
     return lenSq;
@@ -1391,7 +1391,7 @@ public class Counters {
   public static <E, C extends Counter<E>> double L1Norm(C c) {
     double sumAbs = 0.0;
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       if (count != 0.0) {
         sumAbs += Math.abs(count);
       }
@@ -1433,13 +1433,13 @@ public class Counters {
   public static <E, C extends Counter<E>> double saferL2Norm(C c) {
     double maxVal = 0.0;
     for (E key : c.keySet()) {
-      double value = Math.abs(c.getCount(key));
+      double value = Math.abs(c.get(key));
       if (value > maxVal)
         maxVal = value;
     }
     double sqrSum = 0.0;
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       sqrSum += Math.pow(count / maxVal, 2);
     }
     return maxVal * Math.sqrt(sqrSum);
@@ -1461,10 +1461,10 @@ public class Counters {
     double lsq1 = 0.0;
     double lsq2 = 0.0;
     for (E key : c1.keySet()) {
-      double count1 = c1.getCount(key);
+      double count1 = c1.get(key);
       if (count1 != 0.0) {
         lsq1 += count1 * count1;
-        double count2 = c2.getCount(key);
+        double count2 = c2.get(key);
         if (count2 != 0.0) {
           // this is the inner product
           dotProd += count1 * count2;
@@ -1472,7 +1472,7 @@ public class Counters {
       }
     }
     for (E key : c2.keySet()) {
-      double count2 = c2.getCount(key);
+      double count2 = c2.get(key);
       if (count2 != 0.0) {
         lsq2 += count2 * count2;
       }
@@ -1498,7 +1498,7 @@ public class Counters {
       Set<E> allKeys = new FastSet<>(c1.keySet());
     allKeys.addAll(c2.keySet());
     for (E key : allKeys) {
-      average.setCount(key, (c1.getCount(key) + c2.getCount(key)) * 0.5);
+      average.setCount(key, (c1.get(key) + c2.get(key)) * 0.5);
     }
     return average;
   }
@@ -1510,18 +1510,18 @@ public class Counters {
   public static <E> Counter<E> linearCombination(Counter<E> c1, double w1, Counter<E> c2, double w2) {
     Counter<E> result = c1.getFactory().create();
     for (E o : c1.keySet()) {
-      result.incrementCount(o, c1.getCount(o) * w1);
+      result.incrementCount(o, c1.get(o) * w1);
     }
     for (E o : c2.keySet()) {
-      result.incrementCount(o, c2.getCount(o) * w2);
+      result.incrementCount(o, c2.get(o) * w2);
     }
     return result;
   }
 
   public static <T1, T2> double pointwiseMutualInformation(Counter<T1> var1Distribution, Counter<T2> var2Distribution, Counter<Pair<T1, T2>> jointDistribution, Pair<T1, T2> values) {
-    double var1Prob = var1Distribution.getCount(values.first);
-    double var2Prob = var2Distribution.getCount(values.second);
-    double jointProb = jointDistribution.getCount(values);
+    double var1Prob = var1Distribution.get(values.first);
+    double var2Prob = var2Distribution.get(values.second);
+    double jointProb = jointDistribution.get(values);
     double pmi = Math.log(jointProb) - Math.log(var1Prob) - Math.log(var2Prob);
     return pmi / LOG_E_2;
   }
@@ -1547,7 +1547,7 @@ public class Counters {
     List<Integer> citationCountValues = CollectionUtils.sorted(countCounts.keySet());
     Collections.reverse(citationCountValues);
     for (int citationCount : citationCountValues) {
-      double occurrences = countCounts.getCount(citationCount);
+      double occurrences = countCounts.get(citationCount);
       if (occurrences >= citationCount) {
         return citationCount;
       }
@@ -1559,7 +1559,7 @@ public class Counters {
   public static <E, C extends Counter<E>> C perturbCounts(C c, Random random, double p) {
     C result = (C) c.getFactory().create();
     for (E key : c.keySet()) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       double noise = -Math.log(1.0 - random.nextDouble()); // inverse of CDF for
                                                            // exponential
                                                            // distribution
@@ -1597,10 +1597,10 @@ public class Counters {
       return;
     }
     for (E key : a.keySet()) {
-      double aCount = a.getCount(key);
-      double bCount = b.getCount(key);
+      double aCount = a.get(key);
+      double bCount = b.get(key);
       if (Math.abs(aCount - bCount) > 1.0e-5) {
-        out.println("Counters differ on key " + key + '\t' + a.getCount(key) + " vs. " + b.getCount(key));
+        out.println("Counters differ on key " + key + '\t' + a.get(key) + " vs. " + b.get(key));
       }
     }
     // left overs
@@ -1608,10 +1608,10 @@ public class Counters {
     rest.removeAll(a.keySet());
 
     for (E key : rest) {
-      double aCount = a.getCount(key);
-      double bCount = b.getCount(key);
+      double aCount = a.get(key);
+      double bCount = b.get(key);
       if (Math.abs(aCount - bCount) > 1.0e-5) {
-        out.println("Counters differ on key " + key + '\t' + a.getCount(key) + " vs. " + b.getCount(key));
+        out.println("Counters differ on key " + key + '\t' + a.get(key) + " vs. " + b.get(key));
       }
     }
   }
@@ -1638,7 +1638,7 @@ public class Counters {
   public static <E, C extends Counter<E>> C scale(C c, double s) {
     C scaled = (C) c.getFactory().create();
     for (E key : c.keySet()) {
-      scaled.setCount(key, c.getCount(key) * s);
+      scaled.setCount(key, c.get(key) * s);
     }
     return scaled;
   }
@@ -1657,7 +1657,7 @@ public class Counters {
   public static <E, C extends Counter<E>> C tfLogScale(C c, double base) {
     C scaled = (C) c.getFactory().create();
     for (E key : c.keySet()) {
-      double cnt = c.getCount(key);
+      double cnt = c.get(key);
       double scaledCnt = 0.0;
       if (cnt > 0) {
         scaledCnt = 1.0 + SloppyMath.log(cnt, base);
@@ -1671,7 +1671,7 @@ public class Counters {
     List<E> keyList = new ArrayList<>(c.keySet());
     Collections.sort(keyList);
     for (E o : keyList) {
-      System.out.println(o + ":" + c.getCount(o));
+      System.out.println(o + ":" + c.get(o));
     }
   }
 
@@ -1735,7 +1735,7 @@ public class Counters {
   public static <E> void saveCounter(Counter<E> c, OutputStream stream) {
     PrintStream out = new PrintStream(stream);
     for (E key : c.keySet()) {
-      out.println(key + " " + c.getCount(key));
+      out.println(key + " " + c.get(key));
     }
   }
 
@@ -1816,7 +1816,7 @@ public class Counters {
       Counter<T2> c = tdc.getCounter(outer);
       List<T2> keys = Counters.toSortedList(c);
       for (T2 inner : keys) {
-        out.println(outer + "\t" + inner + '\t' + c.getCount(inner));
+        out.println(outer + "\t" + inner + '\t' + c.get(inner));
       }
     }
     out.close();
@@ -1869,7 +1869,7 @@ public class Counters {
     List<String> strings = new ArrayList<>();
     for (int rank = 0; rank < k && !queue.isEmpty(); ++rank) {
       T key = queue.removeFirst();
-      double value = counter.getCount(key);
+      double value = counter.get(key);
       strings.add(String.format(itemFormat, key, value));
     }
     return String.format(wrapperFormat, StringUtils.join(strings, joiner));
@@ -1916,7 +1916,7 @@ public class Counters {
   public static <T extends Comparable<T>> String toSortedByKeysString(Counter<T> counter, String itemFormat, String joiner, String wrapperFormat) {
     List<String> strings = new ArrayList<>();
     for (T key : CollectionUtils.sorted(counter.keySet())) {
-      strings.add(String.format(itemFormat, key, counter.getCount(key)));
+      strings.add(String.format(itemFormat, key, counter.get(key)));
     }
     return String.format(wrapperFormat, StringUtils.join(strings, joiner));
   }
@@ -1945,7 +1945,7 @@ public class Counters {
       E key = iter.next();
       sb.append(key);
       sb.append('=');
-      sb.append(nf.format(counter.getCount(key)));
+      sb.append(nf.format(counter.get(key)));
       if (iter.hasNext()) {
         sb.append(", ");
       }
@@ -1968,7 +1968,7 @@ public class Counters {
     // }
     for (Iterator<E> iter = counter.keySet().iterator(); iter.hasNext();) {
       E key = iter.next();
-      double d = counter.getCount(key);
+      double d = counter.get(key);
       sb.append(key);
       sb.append(keyValSeparator);
       sb.append(nf.format(d));
@@ -2071,7 +2071,7 @@ public class Counters {
     E maxKey = null;
     double max = Double.NEGATIVE_INFINITY;
     for (E key : restriction) {
-      double count = c.getCount(key);
+      double count = c.get(key);
       if (count > max) {
         max = count;
         maxKey = key;
@@ -2130,7 +2130,7 @@ public class Counters {
     for (E key : keys) {
       int i = index.indexOf(key);
       if (i >= 0) {
-        array[i] = counter.getCount(key);
+        array[i] = counter.get(key);
       }
     }
     return array;
@@ -2144,7 +2144,7 @@ public class Counters {
     double[] array = new double[counter.size()];
     int i = 0;
     for (E key : keys) {
-      array[i] = counter.getCount(key);
+      array[i] = counter.get(key);
       i++;
     }
     return array;
@@ -2185,7 +2185,7 @@ public class Counters {
     double total = 0.0;
 
     for (T t : c.keySet()) { // arbitrary ordering, but presumably stable
-      total += c.getCount(t);
+      total += c.get(t);
       if (total >= r)
         return t;
     }
@@ -2212,7 +2212,7 @@ public class Counters {
     Counter<E> d = c.getFactory().create();
     double total = c.totalCount();
     for (E e : c.keySet()) {
-      d.setCount(e, Math.pow(c.getCount(e) / total, temp));
+      d.setCount(e, Math.pow(c.get(e) / total, temp));
     }
     return d;
   }
@@ -2220,35 +2220,35 @@ public class Counters {
   public static <T> Counter<T> pow(Counter<T> c, double temp) {
     Counter<T> d = c.getFactory().create();
     for (T t : c.keySet()) {
-      d.setCount(t, Math.pow(c.getCount(t), temp));
+      d.setCount(t, Math.pow(c.get(t), temp));
     }
     return d;
   }
 
   public static <T> void powInPlace(Counter<T> c, double temp) {
     for (T t : c.keySet()) {
-      c.setCount(t, Math.pow(c.getCount(t), temp));
+      c.setCount(t, Math.pow(c.get(t), temp));
     }
   }
 
   public static <T> Counter<T> exp(Counter<T> c) {
     Counter<T> d = c.getFactory().create();
     for (T t : c.keySet()) {
-      d.setCount(t, Math.exp(c.getCount(t)));
+      d.setCount(t, Math.exp(c.get(t)));
     }
     return d;
   }
 
   public static <T> void expInPlace(Counter<T> c) {
     for (T t : c.keySet()) {
-      c.setCount(t, Math.exp(c.getCount(t)));
+      c.setCount(t, Math.exp(c.get(t)));
     }
   }
 
   public static <T> Counter<T> diff(Counter<T> goldFeatures, Counter<T> guessedFeatures) {
     Counter<T> result = goldFeatures.getFactory().create();
     for (T key : Sets.union(goldFeatures.keySet(), guessedFeatures.keySet())) {
-      result.setCount(key, goldFeatures.getCount(key) - guessedFeatures.getCount(key));
+      result.setCount(key, goldFeatures.get(key) - guessedFeatures.get(key));
     }
     retainNonZeros(result);
     return result;
@@ -2272,7 +2272,7 @@ public class Counters {
     }
 
     for (E key : o1.keySet()) {
-      if (o1.getCount(key) != o2.getCount(key)) {
+      if (o1.get(key) != o2.get(key)) {
         return false;
       }
     }
@@ -2300,8 +2300,8 @@ public class Counters {
         return counter.containsKey(key);
       }
 
-      public double getCount(Object key) {
-        return counter.getCount(key);
+      public double get(Object key) {
+        return counter.get(key);
       }
 
       public Factory<Counter<T>> getFactory() {
@@ -2562,7 +2562,7 @@ public class Counters {
         };
       }
 
-      public double getCount(Object key) {
+      public double get(Object key) {
         Number value = map.get(key);
         return value != null ? value.doubleValue() : defRV;
       }
@@ -2720,12 +2720,12 @@ public class Counters {
       @Override
       @SuppressWarnings("unchecked")
       public Double get(Object key) {
-        return counter.getCount((E) key);
+        return counter.get((E) key);
       }
 
       @Override
       public Double put(E key, Double value) {
-        double last = counter.getCount(key);
+        double last = counter.get(key);
         counter.setCount(key, value);
         return last;
       }
@@ -2798,7 +2798,7 @@ public class Counters {
    */
   public static <E> void maxInPlace(Counter<E> target, Counter<E> other) {
    for(E e: CollectionUtils.union(other.keySet(), target.keySet())){
-     target.setCount(e, Math.max(target.getCount(e), other.getCount(e)));
+     target.setCount(e, Math.max(target.get(e), other.get(e)));
    }
   }
 
@@ -2808,7 +2808,7 @@ public class Counters {
    */
   public static <E> void minInPlace(Counter<E> target, Counter<E> other){
    for(E e: CollectionUtils.union(other.keySet(), target.keySet())){
-     target.setCount(e, Math.min(target.getCount(e), other.getCount(e)));
+     target.setCount(e, Math.min(target.get(e), other.get(e)));
    }
   }
   
@@ -2884,7 +2884,7 @@ public class Counters {
     while(!q.isEmpty() && num < topNum){
      num++;
      E k = q.removeFirst();
-     list.add(new Pair<>(k, t.getCount(k)));
+     list.add(new Pair<>(k, t.get(k)));
     }
     return list;
   }

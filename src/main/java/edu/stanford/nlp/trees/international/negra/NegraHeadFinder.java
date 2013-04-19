@@ -44,7 +44,7 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
   public NegraHeadFinder(TreebankLanguagePack tlp) {
     super(tlp);
 
-      nonTerminalInfo = new FastMap<>();
+      nonTerminalInfo = new ca.gedge.radixtree.RadixTree<>();
 
     left = coordSwitch ? "right" : "left";
     right = coordSwitch ? "left" : "right";

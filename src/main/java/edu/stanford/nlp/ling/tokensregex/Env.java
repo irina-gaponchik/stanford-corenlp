@@ -1,11 +1,11 @@
 package edu.stanford.nlp.ling.tokensregex;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.tokensregex.types.Expressions;
 import edu.stanford.nlp.ling.tokensregex.types.Tags;
 import edu.stanford.nlp.pipeline.CoreMapAttributeAggregator;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.Pair;
-import javolution.util.FastMap;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -33,7 +33,7 @@ public class Env {
   /**
    * Mapping of variable names to their values
    */
-  Map<String, Object> variables = new FastMap<>();
+  RadixTree<Object> variables = new RadixTree<>();
     /**
    * Mapping of variables that can be expanded in a regular expression for strings,
    *   to their regular expressions.
@@ -43,12 +43,12 @@ public class Env {
    *   the name of the variable to be replaced, and a {@code String} representing the
    *   regular expression (escaped) that is used to replace the name of the variable.
    */
-  Map<String, Pair<Pattern,String>> stringRegexVariables = new FastMap<>();
+  RadixTree< Pair<Pattern,String>> stringRegexVariables = new RadixTree<>();
 
     /**
    * Default parameters (used when reading in rules for {@link SequenceMatchRules}.
    */
-  public Map<String, Object> defaults = new FastMap<>();
+  public RadixTree< ?> defaults = new RadixTree<>();
 
     public int defaultStringPatternFlags;
   public Class sequenceMatchResultExtractor;
@@ -77,11 +77,11 @@ public class Env {
     bind("tags", Tags.TagsAnnotation.class);
   }
 
-  public Map<String, Object> getDefaults() {
+  public RadixTree<?> getDefaults() {
     return defaults;
   }
 
-  public void setDefaults(Map<String, Object> defaults) {
+  public void setDefaults(RadixTree< Object> defaults) {
     this.defaults = defaults;
   }
 
@@ -166,11 +166,11 @@ public class Env {
     this.stringMatchResultExtractor = stringMatchResultExtractor;
   }
 
-  public Map<String, Object> getVariables() {
+  public RadixTree<?> getVariables() {
     return variables;
   }
 
-  public void setVariables(Map<String, Object> variables) {
+  public void setVariables(RadixTree< Object> variables) {
     this.variables = variables;
   }
 

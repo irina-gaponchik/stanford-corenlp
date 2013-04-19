@@ -32,6 +32,7 @@
 
 package edu.stanford.nlp.trees.international.pennchinese;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.util.StringUtils;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
@@ -107,11 +108,11 @@ public class RadicalMap {
     if (args.length == 0) {
       System.out.println("usage: RadicalMap [-rebuild <dict_file>] [-infile <file>] [-encoding <encoding>] [char]+");
     }
-      Map<String, Integer> flagsToNumArgs = new FastMap<>();
+      RadixTree< Integer> flagsToNumArgs = new RadixTree<>();
     flagsToNumArgs.put("-infile", 1);
     flagsToNumArgs.put("-encoding", 1);
     flagsToNumArgs.put("-rebuild", 1);
-    Map<String, String[]> argMap = StringUtils.argsToMap(args, flagsToNumArgs);
+    RadixTree< String[]> argMap = StringUtils.argsToMap(args, flagsToNumArgs);
 
     String encoding = "UTF-8";
     if (argMap.containsKey("-encoding")) {

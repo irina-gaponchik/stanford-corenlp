@@ -1,5 +1,6 @@
 package edu.stanford.nlp.sequences;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
@@ -54,8 +55,8 @@ public class PlainTextDocumentReaderAndWriter<IN extends CoreMap> implements Doc
       this.shortName = shortName;
     }
 
-    private static final Map<String, OutputStyle> shortNames =
-            new FastMap<>();
+    private static final RadixTree< OutputStyle> shortNames =
+            new RadixTree<>();
 
       static {
       for (OutputStyle style : OutputStyle.values())

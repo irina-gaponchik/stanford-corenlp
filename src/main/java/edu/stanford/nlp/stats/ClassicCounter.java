@@ -192,7 +192,7 @@ public class ClassicCounter<E> implements Serializable, Counter<E>, Iterable<E> 
 
   /** {@inheritDoc} */
   @Override
-  public double getCount(Object key) {
+  public double get(Object key) {
     double[] count = map.get(key);
     if (count == null) {
       return defaultValue; // haven't seen this object before -> default count

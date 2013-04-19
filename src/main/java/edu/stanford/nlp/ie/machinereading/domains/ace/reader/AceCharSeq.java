@@ -1,6 +1,7 @@
 
 package edu.stanford.nlp.ie.machinereading.domains.ace.reader;
 
+import java.util.List;
 import java.util.Vector;
 
 import edu.stanford.nlp.trees.Span;
@@ -91,8 +92,9 @@ public class AceCharSeq {
   /**
    * Matches this char seq against the full token stream As a result of this
    * method mTokenOffset is initialized
+   * @param tokens
    */
-  public void match(Vector<AceToken> tokens) throws MatchException {
+  public void match(List<AceToken> tokens) throws MatchException {
     int start = -1;
     int end = -1;
 

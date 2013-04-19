@@ -1,5 +1,6 @@
 package edu.stanford.nlp.parser.lexparser;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.fsm.TransducerGraph;
 import edu.stanford.nlp.fsm.TransducerGraph.Arc;
 import edu.stanford.nlp.stats.ClassicCounter;
@@ -49,7 +50,7 @@ public abstract class GrammarCompactor {
   protected abstract TransducerGraph doCompaction(TransducerGraph graph, List<List<String>> trainPaths, List<List<String>> testPaths);
 
   public Triple<Index<String>, UnaryGrammar, BinaryGrammar> compactGrammar(Pair<UnaryGrammar,BinaryGrammar> grammar, Index<String> originalStateIndex) {
-      return compactGrammar(grammar, new FastMap<String, List<List<String>>>(), new FastMap<String, List<List<String>>>(), originalStateIndex);
+      return compactGrammar(grammar, new RadixTree< List<List<String>>>(), new  RadixTree< List<List<String>>>(), originalStateIndex);
   }
 
   /**
@@ -60,14 +61,14 @@ public abstract class GrammarCompactor {
    * @param allTestPaths  a Map from String passive constituents to Lists of paths
    * @return a Pair of grammars, ordered UnaryGrammar BinaryGrammar.
    */
-  public Triple<Index<String>, UnaryGrammar, BinaryGrammar> compactGrammar(Pair<UnaryGrammar,BinaryGrammar> grammar, Map<String, List<List<String>>> allTrainPaths, Map<String, List<List<String>>> allTestPaths, Index<String> originalStateIndex) {
+  public Triple<Index<String>, UnaryGrammar, BinaryGrammar> compactGrammar(Pair<UnaryGrammar,BinaryGrammar> grammar, RadixTree< List<List<String>>> allTrainPaths, RadixTree< List<List<String>>> allTestPaths, Index<String> originalStateIndex) {
     inputPrior = computeInputPrior(allTrainPaths); // computed once for the whole grammar
     // BinaryGrammar bg = grammar.second;
     this.stateIndex = originalStateIndex;
     List<List<String>> trainPaths, testPaths;
       Set<UnaryRule> unaryRules =   new FastSet<>();
       Set<BinaryRule> binaryRules = new FastSet<>();
-    Map<String, TransducerGraph> graphs = convertGrammarToGraphs(grammar, unaryRules, binaryRules);
+    RadixTree< TransducerGraph> graphs = convertGrammarToGraphs(grammar, unaryRules, binaryRules);
       compactedGraphs = new FastSet<>();
     if (verbose) {
       System.out.println("There are " + graphs.size() + " categories to compact.");
@@ -100,7 +101,7 @@ public abstract class GrammarCompactor {
     return new Triple<>(newStateIndex, ugbg.first(), ugbg.second());
   }
 
-  protected static Distribution<String> computeInputPrior(Map<String, List<List<String>>> allTrainPaths) {
+  protected static Distribution<String> computeInputPrior(RadixTree< List<List<String>>> allTrainPaths) {
     ClassicCounter<String> result = new ClassicCounter<>();
     for (List<List<String>> pathList : allTrainPaths.values()) {
       for (List<String> path : pathList) {
@@ -156,11 +157,11 @@ public abstract class GrammarCompactor {
   /**
    *
    */
-  protected Map<String, TransducerGraph> convertGrammarToGraphs(Pair<UnaryGrammar,BinaryGrammar> grammar, Set<UnaryRule> unaryRules, Set<BinaryRule> binaryRules) {
+  protected RadixTree< TransducerGraph> convertGrammarToGraphs(Pair<UnaryGrammar,BinaryGrammar> grammar, Set<UnaryRule> unaryRules, Set<BinaryRule> binaryRules) {
     int numRules = 0;
     UnaryGrammar ug = grammar.first;
     BinaryGrammar bg = grammar.second;
-      Map<String, TransducerGraph> graphs = new FastMap<>();
+      RadixTree< TransducerGraph> graphs = new RadixTree<>();
     // go through the BinaryGrammar and add everything
     for (BinaryRule rule : bg) {
       numRules++;
@@ -189,7 +190,7 @@ public abstract class GrammarCompactor {
     return graphs;
   }
 
-  protected static TransducerGraph getGraphFromMap(Map<String, TransducerGraph> m, String o) {
+  protected static TransducerGraph getGraphFromMap(RadixTree< TransducerGraph> m, String o) {
     TransducerGraph graph = m.get(o);
     if (graph == null) {
       graph = new TransducerGraph();
@@ -211,7 +212,7 @@ public abstract class GrammarCompactor {
     return topcat;
   }
 
-  protected boolean addOneUnaryRule(UnaryRule rule, Map<String, TransducerGraph> graphs) {
+  protected boolean addOneUnaryRule(UnaryRule rule, RadixTree< TransducerGraph> graphs) {
     String parentString = stateIndex.get(rule.parent);
     String childString = stateIndex.get(rule.child);
     if (isSyntheticState(parentString)) {
@@ -232,7 +233,7 @@ public abstract class GrammarCompactor {
     }
   }
 
-  protected boolean addOneBinaryRule(BinaryRule rule, Map<String, TransducerGraph> graphs) {
+  protected boolean addOneBinaryRule(BinaryRule rule, RadixTree< TransducerGraph> graphs) {
     // parent has to be synthetic in BinaryRule
     String parentString = stateIndex.get(rule.parent);
     String leftString = stateIndex.get(rule.leftChild);
@@ -349,7 +350,7 @@ public abstract class GrammarCompactor {
     BinaryGrammar bg = new BinaryGrammar(newStateIndex);
     for (UnaryRule rule : unaryRules) {
       if (outputType == RAW_COUNTS) {
-        double count = symbolCounter.getCount(newStateIndex.get(rule.parent));
+        double count = symbolCounter.get(newStateIndex.get(rule.parent));
         rule.score = (float) Math.log(rule.score / count);
       }
       ug.addRule(rule);
@@ -357,7 +358,7 @@ public abstract class GrammarCompactor {
     }
     for (BinaryRule rule : binaryRules) {
       if (outputType == RAW_COUNTS) {
-        double count = symbolCounter.getCount(newStateIndex.get(rule.parent));
+        double count = symbolCounter.get(newStateIndex.get(rule.parent));
         rule.score = (float) Math.log((rule.score - op.trainOptions.ruleDiscount) / count);
       }
       bg.addRule(rule);

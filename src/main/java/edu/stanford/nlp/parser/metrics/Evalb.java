@@ -14,6 +14,7 @@ import java.util.PriorityQueue;
 import java.util.Properties;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.international.Languages;
 import edu.stanford.nlp.international.Languages.Language;
 import edu.stanford.nlp.ling.Label;
@@ -145,8 +146,8 @@ public class Evalb extends AbstractEval {
     sb.append("  -e         : Input encoding.").append(nl);
     return sb.toString();
   }
-  private static Map<String,Integer> optionArgDefs() {
-      Map<String,Integer> optionArgDefs = new FastMap<>();
+  private static RadixTree<Integer> optionArgDefs() {
+      RadixTree<Integer> optionArgDefs = new RadixTree<>();
     optionArgDefs.put("v", 0);
     optionArgDefs.put("l", 1);
     optionArgDefs.put("y", 1);

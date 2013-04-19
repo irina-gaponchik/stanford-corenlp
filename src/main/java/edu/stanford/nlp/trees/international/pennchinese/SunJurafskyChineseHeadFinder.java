@@ -26,7 +26,7 @@ public class SunJurafskyChineseHeadFinder extends AbstractCollinsHeadFinder {
 
     defaultRule = new String[]{"right"};
 
-      nonTerminalInfo = new FastMap<>();
+      nonTerminalInfo = new ca.gedge.radixtree.RadixTree<>();
 
     nonTerminalInfo.put("ROOT", new String[][]{{"left", "IP"}});
     nonTerminalInfo.put("PAIR", new String[][]{{"left", "IP"}});

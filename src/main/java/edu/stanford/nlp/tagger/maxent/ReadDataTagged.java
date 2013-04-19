@@ -6,6 +6,7 @@
  */
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.ling.WordTag;
 import edu.stanford.nlp.stats.IntCounter;
@@ -51,14 +52,14 @@ public class ReadDataTagged {
     this.maxentTagger = maxentTagger;
     this.pairs = pairs;
     fileRecords = TaggedFileRecord.createRecords(config, config.getFile());
-      Map<String, IntCounter<String>> wordTagCounts = new FastMap<>();
+      RadixTree<IntCounter<String>> wordTagCounts = new RadixTree<>();
     for (TaggedFileRecord record : fileRecords) {
       loadFile(record.reader(), wordTagCounts);
     }
     // By counting the words and then filling the Dictionary, we can
     // make it so there are no calls that mutate the Dictionary or its
     // TagCount objects later
-    maxentTagger.dict.fillWordTagCounts(wordTagCounts);
+    maxentTagger.dict.fillWordTagCounts((RadixTree<IntCounter<String>>) wordTagCounts);
   }
 
 
@@ -73,7 +74,7 @@ public class ReadDataTagged {
     return v.get(index);
   }
 
-  private void loadFile(TaggedFileReader reader, Map<String, IntCounter<String>> wordTagCounts) {
+  private void loadFile(TaggedFileReader reader, RadixTree<IntCounter<String>> wordTagCounts) {
     System.err.println("Loading tagged words from " + reader.filename());
 
     ArrayList<String> words = new ArrayList<>();
@@ -87,12 +88,12 @@ public class ReadDataTagged {
       if (maxentTagger.wordFunction != null) {
         List<TaggedWord> newSentence = 
           new ArrayList<>(sentence.size());
-        for (TaggedWord word : sentence) {
-          TaggedWord newWord = 
-            new TaggedWord(maxentTagger.wordFunction.apply(word.word()), 
-                           word.tag());
-          newSentence.add(newWord);
-        }
+          for (int i = 0, sentenceSize = sentence.size(); i < sentenceSize; i++) {
+              TaggedWord word = sentence.get(i);
+              TaggedWord newWord =
+                      new TaggedWord(maxentTagger.wordFunction.apply(word.word()), word.tag());
+              newSentence.add(newWord);
+          }
         sentence = newSentence;
       }
       for (TaggedWord tw : sentence) {

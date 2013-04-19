@@ -3,6 +3,7 @@ package edu.stanford.nlp.process;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import edu.stanford.nlp.trees.international.pennchinese.ChineseUtils;
 
 import edu.stanford.nlp.objectbank.ObjectBank;
@@ -120,7 +121,7 @@ public class WordShapeClassifier {
    * @param wordShaper Constant for which shaping formula to use
    * @return The wordshape String
    */
-  public static CharSequence wordShape(CharSequence inStr, int wordShaper) {
+  public static String wordShape(String inStr, int wordShaper) {
     return wordShape(inStr, wordShaper, null);
   }
 
@@ -140,7 +141,7 @@ public class WordShapeClassifier {
    *           version of the String has been seen).
    * @return The wordshape String
    */
-  public static CharSequence wordShape(CharSequence inStr, int wordShaper, Collection<String> knownLCWords) {
+  public static String wordShape(String inStr, int wordShaper, Collection<String> knownLCWords) {
     // this first bit is for backwards compatibility with how things were first
     // implemented, where the word shaper name encodes whether to useLC.
     // If the shaper is in the old compatibility list, then a specified
@@ -812,7 +813,7 @@ public class WordShapeClassifier {
    * @param s String to find word shape of
    * @return The same string except digits are equivalence classed to 9.
    */
-  private static CharSequence wordShapeDigits(CharSequence s) {
+  private static String wordShapeDigits(CharSequence s) {
     char[] outChars = null;
 
     for (int i = 0; i < s.length(); i++) {
@@ -824,7 +825,7 @@ public class WordShapeClassifier {
         outChars[i] = '9';
       }
     }
-      return outChars == null ? s : new String(outChars);
+      return String.valueOf(outChars == null ? s : new String(outChars));
   }
 
 
@@ -847,7 +848,7 @@ public class WordShapeClassifier {
     if (digit) {
       return "NUMBER";
     } else {
-      String cluster = DistributionalClusters.cluster1.get(s);
+      String cluster = String.valueOf(DistributionalClusters.cluster1.get(s));
       if (cluster == null) {
         cluster = "NULL";
       }
@@ -865,23 +866,27 @@ public class WordShapeClassifier {
       private static final Pattern COMPILE = Pattern.compile("\\t");
       private static final Pattern PATTERN = Pattern.compile("\\s+");
 
-      public static Map<String,String> cluster1  = loadWordClusters("/u/nlp/data/pos_tags_are_useless/egw.bnc.200",
-                                                           "alexClark");
+      public static LcMap<String, String> cluster1  = loadWordClusters("/u/nlp/data/pos_tags_are_useless/egw.bnc.200",
+              "alexClark");
 
     private static class LcMap<K,V> extends HashMap<K,V> {
 
       private static final long serialVersionUID = -457913281600751901L;
 
-      @Override
+        LcMap() {
+        }
+
+        @Override
       public V get(Object key) {
         return super.get(key.toString().toLowerCase());
       }
     }
 
-    public static Map<String,String> loadWordClusters(String file, String format) {
+    public static LcMap<String,String> loadWordClusters(String file, String format) {
       Timing.startDoing("Loading distsim lexicon from " + file);
-      Map<String,String> lexicon = new LcMap<>();
-      if ("terryKoo".equals(format)) {
+      LcMap<String,String> lexicon = new LcMap<>();
+        // "alexClark"
+        if ("terryKoo".equals(format)) {
         for (String line : ObjectBank.getLineIterator(file)) {
           String[] bits = COMPILE.split(line);
           String word = bits[1];
@@ -890,16 +895,13 @@ public class WordShapeClassifier {
           String wordClass = bits[0];
           lexicon.put(word, wordClass);
         }
-      } else {
-        // "alexClark"
-        for (String line : ObjectBank.getLineIterator(file)) {
-          String[] bits = PATTERN.split(line);
-          String word = bits[0];
-          // for now, always lowercase, but should revisit this
-          word = word.toLowerCase();
-          lexicon.put(word, bits[1]);
+      } else for (String line : ObjectBank.getLineIterator(file)) {
+            String[] bits = PATTERN.split(line);
+            String word = bits[0];
+            // for now, always lowercase, but should revisit this
+            word = word.toLowerCase();
+            lexicon.put(word, bits[1]);
         }
-      }
       Timing.endDoing();
       return lexicon;
     }

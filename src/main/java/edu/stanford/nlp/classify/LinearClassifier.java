@@ -210,7 +210,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     double score = 0.0;
     Counter<F> features = example.asFeaturesCounter();
     for (F f : features.keySet()) {
-      score += weight(f, iLabel) * features.getCount(f);
+      score += weight(f, iLabel) * features.get(f);
     }
     return score + thresholds[iLabel];
   }
@@ -223,7 +223,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     double score = 0.0;
     Counter<F> features = example.asFeaturesCounter();
     for (F f : features.keySet()) {
-      score += weight(f, iLabel) * features.getCount(f);
+      score += weight(f, iLabel) * features.get(f);
     }
     return score + thresholds[iLabel];
   }
@@ -252,7 +252,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     if(example instanceof RVFDatum<?, ?>)return probabilityOfRVFDatum((RVFDatum<L,F>)example);
     Counter<L> scores = logProbabilityOf(example);
     for (L label : scores.keySet()) {
-      scores.setCount(label, Math.exp(scores.getCount(label)));
+      scores.setCount(label, Math.exp(scores.get(label)));
     }
     return scores;
   }
@@ -267,7 +267,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     // with a RVFDatum signature
     Counter<L> scores = logProbabilityOfRVFDatum(example);
     for (L label : scores.keySet()) {
-      scores.setCount(label, Math.exp(scores.getCount(label)));
+      scores.setCount(label, Math.exp(scores.get(label)));
     }
     return scores;
   }
@@ -283,7 +283,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     // with a RVFDatum signature
     Counter<L> scores = logProbabilityOf(example);
     for (L label : scores.keySet()) {
-      scores.setCount(label, Math.exp(scores.getCount(label)));
+      scores.setCount(label, Math.exp(scores.get(label)));
     }
     return scores;
   }
@@ -314,7 +314,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
   public Counter<L> probabilityOf(int... features) {
     Counter<L> scores = logProbabilityOf(features);
     for (L label : scores.keySet()) {
-      scores.setCount(label, Math.exp(scores.getCount(label)));
+      scores.setCount(label, Math.exp(scores.get(label)));
     }
     return scores;
   }
@@ -882,7 +882,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     Counter<F> features = example.asFeaturesCounter();
     for (F f : features.keySet()) {
       featureLength = Math.max(featureLength, f.toString().length() + 2 +
-          nf.format(features.getCount(f)).length());
+          nf.format(features.get(f)).length());
     }
     // make as wide as total printout
     featureLength = Math.max(featureLength, "Total:".length());
@@ -905,7 +905,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     for (F f : features.keySet()) {
       String fStr = f.toString();
       TextBuilder line = new TextBuilder(fStr);
-      line.append('[').append(nf.format(features.getCount(f))).append(']');
+      line.append('[').append(nf.format(features.get(f))).append(']');
       fStr = line.toString();
       for (int s = fStr.length(); s < featureLength; s++) {
         line.append(' ');
@@ -927,7 +927,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
     for (L l : labels()) {
       footer.append(' ');
-      String str = nf.format(scores.getCount(l));
+      String str = nf.format(scores.get(l));
       footer.append(str);
       for (int s = str.length(); s < labelLength; s++) {
         footer.append(' ');
@@ -968,7 +968,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     Counter<F> features = example.asFeaturesCounter();
     for (F f : features.keySet()) {
       featureLength = Math.max(featureLength, f.toString().length() + 2 +
-          nf.format(features.getCount(f)).length());
+          nf.format(features.get(f)).length());
     }
     // make as wide as total printout
     featureLength = Math.max(featureLength, "Total:".length());
@@ -991,7 +991,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     for (F f : features.keySet()) {
       String fStr = f.toString();
       TextBuilder line = new TextBuilder(fStr);
-      line.append('[').append(nf.format(features.getCount(f))).append(']');
+      line.append('[').append(nf.format(features.get(f))).append(']');
       fStr = line.toString();
       for (int s = fStr.length(); s < featureLength; s++) {
         line.append(' ');
@@ -1013,7 +1013,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
     for (L l : labels()) {
       footer.append(' ');
-      String str = nf.format(scores.getCount(l));
+      String str = nf.format(scores.get(l));
       footer.append(str);
       for (int s = str.length(); s < labelLength; s++) {
         footer.append(' ');
@@ -1132,7 +1132,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
     for (L l : labels()) {
       footer.append(' ');
-      String str = nf.format(scores.getCount(l));
+      String str = nf.format(scores.get(l));
       footer.append(str);
       for (int s = str.length(); s < labelLength; s++) {
         footer.append(' ');
@@ -1319,7 +1319,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
     }
     thresholds = new double[labelIndex.size()];
     for (L label : labelIndex) {
-      thresholds[labelIndex.indexOf(label)] = thresholdsC.getCount(label);
+      thresholds[labelIndex.indexOf(label)] = thresholdsC.get(label);
     }
     weights = new double[featureIndex.size()][labelIndex.size()];
     Pair<F, L> tempPair = new Pair<>();
@@ -1327,7 +1327,7 @@ public class LinearClassifier<L, F> implements ProbabilisticClassifier<L, F>, RV
       for (int l = 0; l < weights[f].length; l++) {
         tempPair.first = featureIndex.get(f);
         tempPair.second = labelIndex.get(l);
-        weights[f][l] = weightCounter.getCount(tempPair);
+        weights[f][l] = weightCounter.get(tempPair);
       }
     }
   }

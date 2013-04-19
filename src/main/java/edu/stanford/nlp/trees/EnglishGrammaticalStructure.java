@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.util.*;
@@ -1877,11 +1878,11 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
 
 
   public static List<GrammaticalStructure> readCoNLLXGrammaticStructureCollection(String fileName) throws IOException {
-    return readCoNLLXGrammaticStructureCollection(fileName, EnglishGrammaticalRelations.shortNameToGRel, new FromDependenciesFactory());
+    return readCoNLLXGrammaticStructureCollection(fileName, (RadixTree<GrammaticalRelation>) EnglishGrammaticalRelations.shortNameToGRel, new FromDependenciesFactory());
   }
 
   public static EnglishGrammaticalStructure buildCoNNLXGrammaticStructure(List<List<String>> tokenFields) {
-    return (EnglishGrammaticalStructure) buildCoNNLXGrammaticStructure(tokenFields, EnglishGrammaticalRelations.shortNameToGRel, new FromDependenciesFactory());
+    return (EnglishGrammaticalStructure) buildCoNNLXGrammaticStructure(tokenFields, (RadixTree<GrammaticalRelation>) EnglishGrammaticalRelations.shortNameToGRel, new FromDependenciesFactory());
   }
 
   public static class FromDependenciesFactory

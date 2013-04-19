@@ -3,6 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.Map;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.util.Index;
@@ -29,7 +30,7 @@ public class GermanUnknownWordModel extends BaseUnknownWordModel {
                                 Index<String> tagIndex,
                                 ClassicCounter<IntTaggedWord> unSeenCounter,
                                 Map<Label,ClassicCounter<String>> tagHash,
-                                Map<String,Float> unknownGT,
+                                RadixTree<Float> unknownGT,
                                 Set<String> seenEnd) {
     super(op, lex, wordIndex, tagIndex, 
           unSeenCounter, tagHash, unknownGT, seenEnd);
@@ -47,7 +48,7 @@ public class GermanUnknownWordModel extends BaseUnknownWordModel {
       this(op, lex, wordIndex, tagIndex,
          new ClassicCounter<IntTaggedWord>(),
               new FastMap<Label, ClassicCounter<String>>(),
-              new FastMap<String, Float>(),
+              new  RadixTree< Float>(),
               (Set<String>) new FastMap<>());
   }
 

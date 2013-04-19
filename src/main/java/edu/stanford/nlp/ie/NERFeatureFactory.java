@@ -40,6 +40,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.CoreAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -469,7 +470,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   // annotation as part of the ObjectBankWrapper.  But note that it is
   // serialized in this object currently and it would then need to be
   // serialized elsewhere or loaded each time
-  private Map<CharSequence, String> lexicon;
+  private RadixTree< String> lexicon;
 
   private void initLexicon(SeqClassifierFlags flags) {
     if (flags.distSimLexicon == null) {
@@ -479,11 +480,11 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       return;
     }
     Timing.startDoing("Loading distsim lexicon from " + flags.distSimLexicon);
-      lexicon = new FastMap<>();
+      lexicon = new RadixTree<>();
     boolean terryKoo = "terryKoo".equals(flags.distSimFileFormat);
     for (String line : ObjectBank.getLineIterator(flags.distSimLexicon,
                                                   flags.inputEncoding)) {
-      CharSequence word;
+      String word;
       String wordClass;
       if (terryKoo) {
         String[] bits = line.split("\\t");
@@ -513,7 +514,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   private void distSimAnnotate(PaddedList<IN> info) {
     for (CoreLabel fl : info) {
       if (fl.has(CoreAnnotations.DistSimAnnotation.class)) { return; }
-      CharSequence word = getWord(fl);
+      String word = getWord(fl);
       if ( ! flags.casedDistSim) {
         word = String.valueOf(word).toLowerCase();
       }
@@ -529,14 +530,9 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   }
 
 
-  private Map<String,Collection<String>> wordToSubstrings = new FastMap<>();
+  private RadixTree<Collection<String>> wordToSubstrings = new RadixTree<>();
 
-    public void clearMemory() {
-        wordToSubstrings = new FastMap<>();
-    lexicon = null;
-  }
-
-  private static String dehyphenate(String str) {
+    private static String dehyphenate(String str) {
     // don't take out leading or ending ones, just internal
     // and remember padded with < > characters
     String retStr = str;
@@ -684,8 +680,8 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     }
   } // end class GazetteInfo
 
-  private Map<String,Collection<String>> wordToGazetteEntries = new FastMap<>();
-    private Map<String,Collection<GazetteInfo>> wordToGazetteInfos = new FastMap<>();
+  private RadixTree<Collection<String>> wordToGazetteEntries = new RadixTree<>();
+    private RadixTree<Collection<GazetteInfo>> wordToGazetteInfos = new RadixTree<>();
 
     /** Reads a gazette file.  Each line of it consists of a class name
    *  (a String not containing whitespace characters), followed by whitespace

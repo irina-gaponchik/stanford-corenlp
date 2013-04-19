@@ -1,5 +1,6 @@
 package edu.stanford.nlp.ling.tokensregex;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.util.ArrayMap;
 import edu.stanford.nlp.util.CollectionUtils;
@@ -37,7 +38,7 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
     return p;
   }
 
-  public static CoreMapNodePattern valueOf(Map<String, String> attributes) {
+  public static CoreMapNodePattern valueOf(RadixTree< String> attributes) {
     return valueOf(null, attributes);
   }
 

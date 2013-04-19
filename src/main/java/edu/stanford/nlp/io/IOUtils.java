@@ -1,5 +1,6 @@
 package edu.stanford.nlp.io;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.util.*;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
@@ -953,9 +954,9 @@ public class IOUtils {
    * @return a list of maps representing the rows of the csv. The maps' keys are the header strings and their values are the row contents
    * @throws IOException
    */
-  public static List<Map<String,String>> readCSVWithHeader(String path, char quoteChar, char escapeChar) throws IOException {
+  public static List<RadixTree<String>> readCSVWithHeader(String path, char quoteChar, char escapeChar) throws IOException {
     String[] labels = null;
-      List<Map<String,String>> rows = new ArrayList<>();
+      List<RadixTree<String>> rows = new ArrayList<>();
     for (String line : IOUtils.readLines(path)) {
       System.out.println("Splitting "+line);
       if (labels == null) {
@@ -963,14 +964,14 @@ public class IOUtils {
       } else {
         String[] cells = StringUtils.splitOnCharWithQuoting(line,',',quoteChar,escapeChar);
         assert cells.length == labels.length;
-          Map<String,String> cellMap = new FastMap<>();
+          RadixTree<String> cellMap = new RadixTree<>();
         for (int i=0; i<labels.length; i++) cellMap.put(labels[i],cells[i]);
         rows.add(cellMap);
       }
     }
     return rows;
   }
-  public static List<Map<String,String>> readCSVWithHeader(String path) throws IOException {
+  public static List<RadixTree<String>> readCSVWithHeader(String path) throws IOException {
     return readCSVWithHeader(path, '"', '"');
   }
 
@@ -1198,9 +1199,9 @@ public class IOUtils {
     return list;
   }
 
-  public static Map<String,String> readMap(String filename) throws IOException
+  public static RadixTree<String> readMap(String filename) throws IOException
   {
-      Map<String,String> map = new FastMap<>();
+      RadixTree<String> map = new RadixTree<>();
     try {
       BufferedReader br = IOUtils.getBufferedFileReader(filename);
       String line;

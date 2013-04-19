@@ -133,7 +133,7 @@ public class TreeAnnotatorAndBinarizer implements TreeTransformer {
   public void printRuleCounts() {
     System.err.println();
     for (Tree t : annotatedRuleCounts.keySet()) {
-      System.err.print(annotatedRuleCounts.getCount(t) + "\t" +
+      System.err.print(annotatedRuleCounts.get(t) + "\t" +
                        t.label().value() + " -->");
       for (Tree dtr : t.getChildrenAsList()) {
         System.err.print(" ");
@@ -150,7 +150,7 @@ public class TreeAnnotatorAndBinarizer implements TreeTransformer {
     List<String> keyList = new ArrayList<>(keys);
     Collections.sort(keyList);
     for (String s : keyList) {
-      System.err.println(s + '\t' + annotatedStateCounts.getCount(s));
+      System.err.println(s + '\t' + annotatedStateCounts.get(s));
     }
   }
 

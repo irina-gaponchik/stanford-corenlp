@@ -35,7 +35,7 @@ public class MatchedExpression {
   protected SingleAnnotationExtractor extractFunc;
 
   public Value value;
-  //protected Map<String,String> attributes;
+  //protected RadixTree<String> attributes;
 
   // Used to disambiguate matched expressions
   double priority;
@@ -243,7 +243,7 @@ public class MatchedExpression {
     return chunkOffsets;
   }
 
- /* public Map<String, String> getAttributes() {
+ /* public RadixTree< String> getAttributes() {
     return attributes;
   }*/
 

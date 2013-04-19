@@ -3,6 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.*;
 import java.io.Serializable;
 
+import ca.gedge.radixtree.RadixTree;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
 
@@ -14,7 +15,7 @@ public class LatticeEdge implements Serializable {
 	public final int start;
 	public final int end;
 	
-	public final Map<String,String> attrs;
+	public final RadixTree<String> attrs = new RadixTree<>();
 
 	public LatticeEdge(String word, double weight, int start, int end) {
 		this.word = word;
@@ -22,18 +23,11 @@ public class LatticeEdge implements Serializable {
 		this.start = start;
 		this.end = end;
 
-        attrs = new FastMap<>();
-	}
+    }
 
-	public void setAttr(String key, String value) { attrs.put(key, value); }
-	
-	public String getAttr(String key) { return attrs.get(key); }
-	
-	public void setLabel(String l) { label = l; }
-	
-	public void setWeight(double w) { weight = w; }
+    public void setLabel(String l) { label = l; }
 
-	@Override
+    @Override
 	public String toString() {
 		TextBuilder sb = new TextBuilder();
 		sb.append("[ ").append(word);

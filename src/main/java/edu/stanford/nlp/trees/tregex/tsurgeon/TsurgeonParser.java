@@ -35,7 +35,7 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       jj_consume_token(25);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-        if (true) return result;
+        return result;
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -44,18 +44,18 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-        if (true) throw (RuntimeException)jjte000;
+        throw (RuntimeException) jjte000;
     }
     if (jjte000 instanceof ParseException) {
-        if (true) throw (ParseException)jjte000;
+        throw (ParseException) jjte000;
     }
-        if (true) throw (Error)jjte000;
+        throw (Error) jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
   final public TsurgeonPattern Operation() throws ParseException {
@@ -78,23 +78,23 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
         nodeSelections = NodeSelectionList(new ArrayList<TsurgeonPattern>());
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-          if (true) return new DeleteNode(nodeSelections);
-          break;
+          return new DeleteNode(nodeSelections);
+          //break;
       case TsurgeonParserConstants.PRUNE:
         operator = jj_consume_token(TsurgeonParserConstants.PRUNE);
         nodeSelections = NodeSelectionList(new ArrayList<TsurgeonPattern>());
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-          if (true) return new PruneNode(nodeSelections);
-          break;
+          return new PruneNode(nodeSelections);
+//          break;
       case TsurgeonParserConstants.EXCISE:
         operator = jj_consume_token(TsurgeonParserConstants.EXCISE);
         child1 = NodeSelection();
         child2 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-          if (true) return new ExciseNode(child1,child2);
-          break;
+          return new ExciseNode(child1, child2);
+//          break;
       default:
         jj_la1[0] = jj_gen;
         if (jj_2_1(3)) {
@@ -103,42 +103,42 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
           newLabel = jj_consume_token(TsurgeonParserConstants.IDENTIFIER);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-            if (true) return new RelabelNode(child1,newLabel.image);
+            return new RelabelNode(child1, newLabel.image);
         } else if (jj_2_2(3)) {
           operator = jj_consume_token(TsurgeonParserConstants.RELABEL);
           child1 = NodeSelection();
           newLabel = jj_consume_token(TsurgeonParserConstants.QUOTEX);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-            if (true) return new RelabelNode(child1, newLabel.image);
+            return new RelabelNode(child1, newLabel.image);
         } else if (jj_2_3(3)) {
           operator = jj_consume_token(TsurgeonParserConstants.RELABEL);
           child1 = NodeSelection();
           regex = jj_consume_token(TsurgeonParserConstants.REGEX);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-            if (true) return new RelabelNode(child1, regex.image);
+            return new RelabelNode(child1, regex.image);
         } else if (jj_2_4(3)) {
           operator = jj_consume_token(TsurgeonParserConstants.RELABEL);
           child1 = NodeSelection();
           newLabel = jj_consume_token(TsurgeonParserConstants.GENERAL_RELABEL);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-            if (true) return new RelabelNode(child1, newLabel.image);
+            return new RelabelNode(child1, newLabel.image);
         } else if (jj_2_5(3)) {
           operator = jj_consume_token(TsurgeonParserConstants.REPLACE);
           child1 = NodeSelection();
           child2 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-            if (true) return new ReplaceNode(child1,child2);
+            return new ReplaceNode(child1, child2);
         } else if (jj_2_6(3)) {
           operator = jj_consume_token(TsurgeonParserConstants.REPLACE);
           child1 = NodeSelection();
           tree = TreeRoot(false);
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-            if (true) return new ReplaceNode(child1,tree);
+            return new ReplaceNode(child1, tree);
         } else {
           switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
           case TsurgeonParserConstants.MOVE:
@@ -147,8 +147,8 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
             loc = Location();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-              if (true) return new MoveNode(child1, loc);
-              break;
+              return new MoveNode(child1, loc);
+//              break;
           default:
             jj_la1[1] = jj_gen;
             if (jj_2_7(3)) {
@@ -157,14 +157,14 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
               loc = Location();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-                if (true) return new InsertNode(child1, loc);
+                return new InsertNode(child1, loc);
             } else if (jj_2_8(3)) {
               operator = jj_consume_token(TsurgeonParserConstants.INSERT);
               tree = TreeRoot(false);
               loc = Location();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-                if (true) return new InsertNode(tree, loc);
+                return new InsertNode(tree, loc);
             } else {
               switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
               case TsurgeonParserConstants.ADJOIN:
@@ -173,31 +173,31 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
                 child1 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-                  if (true) return new AdjoinNode(tree, child1);
-                  break;
+                  return new AdjoinNode(tree, child1);
+//                  break;
               case TsurgeonParserConstants.ADJOIN_TO_HEAD:
                 operator = jj_consume_token(TsurgeonParserConstants.ADJOIN_TO_HEAD);
                 tree = TreeRoot(true);
                 child1 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-                  if (true) return new AdjoinToHeadNode(tree, child1);
-                  break;
+                  return new AdjoinToHeadNode(tree, child1);
+//                  break;
               case TsurgeonParserConstants.ADJOIN_TO_FOOT:
                 operator = jj_consume_token(TsurgeonParserConstants.ADJOIN_TO_FOOT);
                 tree = TreeRoot(true);
                 child1 = NodeSelection();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-                  if (true) return new AdjoinToFootNode(tree, child1);
-                  break;
+                  return new AdjoinToFootNode(tree, child1);
+//                  break;
               case TsurgeonParserConstants.COINDEX:
                 operator = jj_consume_token(TsurgeonParserConstants.COINDEX);
                 nodeSelections = NodeSelectionList(new ArrayList<TsurgeonPattern>());
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-                  if (true) return new CoindexNodes(nodeSelections.toArray(new TsurgeonPattern[nodeSelections.size()]));
-                  break;
+                  return new CoindexNodes(nodeSelections.toArray(new TsurgeonPattern[nodeSelections.size()]));
+//                  break;
               default:
                 jj_la1[2] = jj_gen;
                 jj_consume_token(-1);
@@ -215,18 +215,18 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-        if (true) throw (RuntimeException)jjte000;
+        throw (RuntimeException) jjte000;
     }
     if (jjte000 instanceof ParseException) {
-        if (true) throw (ParseException)jjte000;
+        throw (ParseException) jjte000;
     }
-        if (true) throw (Error)jjte000;
+        throw (Error) jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
   final public TreeLocation Location() throws ParseException {
@@ -240,7 +240,7 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       child = NodeSelection();
      jjtree.closeNodeScope(jjtn000, true);
      jjtc000 = false;
-        if (true) return new TreeLocation(rel.image, child);
+        return new TreeLocation(rel.image, child);
     } catch (Throwable jjte000) {
    if (jjtc000) {
      jjtree.clearNodeScope(jjtn000);
@@ -249,18 +249,18 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
      jjtree.popNode();
    }
    if (jjte000 instanceof RuntimeException) {
-       if (true) throw (RuntimeException)jjte000;
+       throw (RuntimeException) jjte000;
    }
    if (jjte000 instanceof ParseException) {
-       if (true) throw (ParseException)jjte000;
+       throw (ParseException) jjte000;
    }
-        if (true) throw (Error)jjte000;
+        throw (Error) jjte000;
     } finally {
    if (jjtc000) {
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
   final public List<TsurgeonPattern> NodeSelectionList(List<TsurgeonPattern> l) throws ParseException {
@@ -285,7 +285,7 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       }
      jjtree.closeNodeScope(jjtn000, true);
      jjtc000 = false;
-        if (true) return l;
+        return l;
     } catch (Throwable jjte000) {
    if (jjtc000) {
      jjtree.clearNodeScope(jjtn000);
@@ -294,18 +294,18 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
      jjtree.popNode();
    }
    if (jjte000 instanceof RuntimeException) {
-       if (true) throw (RuntimeException)jjte000;
+       throw (RuntimeException) jjte000;
    }
    if (jjte000 instanceof ParseException) {
-       if (true) throw (ParseException)jjte000;
+       throw (ParseException) jjte000;
    }
-        if (true) throw (Error)jjte000;
+        throw (Error) jjte000;
     } finally {
    if (jjtc000) {
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
 // we'll also put in a way to use a SELECTION with a list of nodes.
@@ -318,7 +318,7 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       result = NodeName();
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-        if (true) return result;
+        return result;
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -327,18 +327,18 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-        if (true) throw (RuntimeException)jjte000;
+        throw (RuntimeException) jjte000;
     }
     if (jjte000 instanceof ParseException) {
-        if (true) throw (ParseException)jjte000;
+        throw (ParseException) jjte000;
     }
-        if (true) throw (Error)jjte000;
+        throw (Error) jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
   final public TsurgeonPattern NodeName() throws ParseException {
@@ -350,13 +350,13 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       t = jj_consume_token(TsurgeonParserConstants.IDENTIFIER);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-        if (true) return new FetchNode(t.image);
+        return new FetchNode(t.image);
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
 // the argument says whether there must be a foot node on the aux tree.
@@ -369,7 +369,7 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       t = TreeNode();
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-        if (true) return new AuxiliaryTree(t,requiresFoot);
+        return new AuxiliaryTree(t, requiresFoot);
     } catch (Throwable jjte000) {
     if (jjtc000) {
       jjtree.clearNodeScope(jjtn000);
@@ -378,18 +378,18 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-        if (true) throw (RuntimeException)jjte000;
+        throw (RuntimeException) jjte000;
     }
     if (jjte000 instanceof ParseException) {
-        if (true) throw (ParseException)jjte000;
+        throw (ParseException) jjte000;
     }
-        if (true) throw (Error)jjte000;
+        throw (Error) jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
   final public Tree TreeNode() throws ParseException {
@@ -405,8 +405,8 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
         dtrs = TreeDtrs(new ArrayList<Tree>());
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-          if (true) return treeFactory.newTreeNode(label.image.substring(1),dtrs);
-          break;
+          return treeFactory.newTreeNode(label.image.substring(1), dtrs);
+//          break;
       case TsurgeonParserConstants.IDENTIFIER:
       case TsurgeonParserConstants.TREE_NODE_TERMINAL_LABEL:
         switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
@@ -423,8 +423,8 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
         }
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
-          if (true) return treeFactory.newTreeNode(label.image,new ArrayList<Tree>());
-          break;
+          return treeFactory.newTreeNode(label.image, new ArrayList<Tree>());
+//          break;
       default:
         jj_la1[5] = jj_gen;
         jj_consume_token(-1);
@@ -438,18 +438,18 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
      jjtree.popNode();
    }
    if (jjte000 instanceof RuntimeException) {
-       if (true) throw (RuntimeException)jjte000;
+       throw (RuntimeException) jjte000;
    }
    if (jjte000 instanceof ParseException) {
-       if (true) throw (ParseException)jjte000;
+       throw (ParseException) jjte000;
    }
-        if (true) throw (Error)jjte000;
+        throw (Error) jjte000;
     } finally {
    if (jjtc000) {
      jjtree.closeNodeScope(jjtn000, true);
    }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
   final public List<Tree> TreeDtrs(List<Tree> dtrs) throws ParseException {
@@ -467,14 +467,14 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       jjtree.closeNodeScope(jjtn000, true);
       jjtc000 = false;
      dtrs.add(0,tree);
-          if (true) return dtrs;
-          break;
+          return dtrs;
+//          break;
       case 26:
         jj_consume_token(26);
     jjtree.closeNodeScope(jjtn000, true);
     jjtc000 = false;
-          if (true) return dtrs;
-          break;
+          return dtrs;
+//          break;
       default:
         jj_la1[6] = jj_gen;
         jj_consume_token(-1);
@@ -488,18 +488,18 @@ class TsurgeonParser/*@bgen(jjtree)*/ {/*@bgen(jjtree)*/
       jjtree.popNode();
     }
     if (jjte000 instanceof RuntimeException) {
-        if (true) throw (RuntimeException)jjte000;
+        throw (RuntimeException) jjte000;
     }
     if (jjte000 instanceof ParseException) {
-        if (true) throw (ParseException)jjte000;
+        throw (ParseException) jjte000;
     }
-        if (true) throw (Error)jjte000;
+        throw (Error) jjte000;
     } finally {
     if (jjtc000) {
       jjtree.closeNodeScope(jjtn000, true);
     }
     }
-    throw new Error("Missing return statement in function");
+
   }
 
   private boolean jj_2_1(int xla) {

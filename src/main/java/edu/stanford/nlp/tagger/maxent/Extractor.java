@@ -151,7 +151,7 @@ public class Extractor implements Serializable {
    * @param h The history to extract from
    *  @return The feature value
    */
-  final CharSequence extract(History h) {
+  final String extract(History h) {
     return extract(h, h.pairs);
   }
 
@@ -171,7 +171,7 @@ public class Extractor implements Serializable {
     return !isTag && position == 0;
   }
 
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     return isTag ? pH.getTag(h, position) : pH.getWord(h, position);
   }
 

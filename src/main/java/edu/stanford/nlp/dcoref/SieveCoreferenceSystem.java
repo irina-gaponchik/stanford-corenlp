@@ -53,6 +53,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.pipeline.DefaultPaths;
 import edu.stanford.nlp.classify.LogisticClassifier;
 import edu.stanford.nlp.dcoref.CorefChain.CorefMention;
@@ -564,8 +565,8 @@ public class SieveCoreferenceSystem {
     cmd.add(propsFile);
     ProcessBuilder pb = new ProcessBuilder(cmd);
     // Copy environment variables over
-    Map<String,String> curEnv = System.getenv();
-    Map<String,String> pbEnv = pb.environment();
+      Map<String, String> curEnv = System.getenv();
+      Map<String, String> pbEnv = pb.environment();
     pbEnv.putAll(curEnv);
 
     logger.info("Running distributed coref:" + StringUtils.join(pb.command(), " "));
@@ -1241,10 +1242,10 @@ public class SieveCoreferenceSystem {
     }
     List<CoreLabel> l = document.annotation.get(CoreAnnotations.SentencesAnnotation.class).get(src.get(0)).get(CoreAnnotations.TokensAnnotation.class);
     for(int i = 0 ; i < l.size() ; i++){
-      for(int j = 0; j < mEnd.getCount(i); j++){
+      for(int j = 0; j < mEnd.get(i); j++){
         golds.append(']');
       }
-      for(int j = 0; j < mBegin.getCount(i); j++){
+      for(int j = 0; j < mBegin.get(i); j++){
         golds.append('[');
       }
       golds.append(l.get(i).get(CoreAnnotations.TextAnnotation.class));
@@ -1288,10 +1289,10 @@ public class SieveCoreferenceSystem {
     }
     l = document.annotation.get(CoreAnnotations.SentencesAnnotation.class).get(dst.get(0)).get(CoreAnnotations.TokensAnnotation.class);
     for(int i = 0 ; i < l.size() ; i++){
-      for(int j = 0; j < mEnd.getCount(i); j++){
+      for(int j = 0; j < mEnd.get(i); j++){
         golds.append(']');
       }
-      for(int j = 0; j < mBegin.getCount(i); j++){
+      for(int j = 0; j < mBegin.get(i); j++){
         golds.append('[');
       }
       golds.append(l.get(i).get(CoreAnnotations.TextAnnotation.class));
@@ -1621,7 +1622,7 @@ public class SieveCoreferenceSystem {
             doc.append("]_").append(corefChainId);
           }
         }
-        for (int k = 0 ; k < startCounts.getCount(j) ; k++) {
+        for (int k = 0 ; k < startCounts.get(j) ; k++) {
           if (doc.length() > 0 && doc.charAt(doc.length()-1) != '[') doc.append(' ');
           doc.append('[');
         }

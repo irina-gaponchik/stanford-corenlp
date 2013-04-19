@@ -47,8 +47,8 @@ class TregexParser {
   TregexPattern node;
     node = SubNode(Relation.ROOT);
     jj_consume_token(11);
-      if (true) return node;
-      throw new Error("Missing return statement in function");
+      return node;
+
   }
 
 // passing arguments down the tree - in this case the relation that
@@ -75,8 +75,8 @@ class TregexParser {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return node;
-      throw new Error("Missing return statement in function");
+      return node;
+
   }
 
   final public DescriptionPattern SubNode(Relation r) throws ParseException {
@@ -104,8 +104,8 @@ class TregexParser {
         newChildren.add(child);
         result.setChild(new CoordinationPattern(newChildren,true));
       }
-        if (true) return result;
-        break;
+        return result;
+//        break;
     case TregexParserConstants.IDENTIFIER:
     case TregexParserConstants.BLANK:
     case TregexParserConstants.REGEX:
@@ -126,14 +126,13 @@ class TregexParser {
         jj_la1[2] = jj_gen;
       }
       if (child != null) result.setChild(child);
-        if (true) return result;
-        break;
-    default:
+        return result;
+     default:
       jj_la1[3] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
   final public DescriptionPattern ModDescription(Relation r) throws ParseException {
@@ -156,8 +155,8 @@ class TregexParser {
       jj_la1[5] = jj_gen;
     }
     node = Description(r, neg, cat);
-      if (true) return node;
-      throw new Error("Missing return statement in function");
+      return node;
+
   }
 
   final public DescriptionPattern Description(Relation r, boolean negateDesc, boolean cat) throws ParseException {
@@ -207,11 +206,13 @@ class TregexParser {
         jj_consume_token(18);
         name = jj_consume_token(TregexParserConstants.IDENTIFIER);
           if (knownVariables.contains(name.image)) {
-              if (true) throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");
+              throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");
           }
           knownVariables.add(name.image);
           if (underNegation)
-            {if (true) throw new ParseException("No named tregex nodes allowed in the scope of negation.");}
+            {
+                throw new ParseException("No named tregex nodes allowed in the scope of negation.");
+            }
         break;
       default:
         jj_la1[8] = jj_gen;
@@ -229,12 +230,12 @@ class TregexParser {
         jj_la1[9] = jj_gen;
       }
         if (!knownVariables.contains(linkedName.image)) {
-            if (true) throw new ParseException("Variable " + linkedName.image +
-                                     " was referenced before it was declared");
+            throw new ParseException("Variable " + linkedName.image +
+                    " was referenced before it was declared");
         }
         if (name != null) {
           if (knownVariables.contains(name.image)) {
-              if (true) throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");
+              throw new ParseException("Variable " + name.image + " has been declared twice, which makes no sense");
           } else {
             knownVariables.add(name.image);
           }
@@ -245,8 +246,8 @@ class TregexParser {
       jj_consume_token(18);
       name = jj_consume_token(TregexParserConstants.IDENTIFIER);
         if (!knownVariables.contains(name.image)) {
-            if (true) throw new ParseException("Variable " + name.image +
-                                     " was referenced before it was declared");
+            throw new ParseException("Variable " + name.image +
+                    " was referenced before it was declared");
         }
       break;
     default:
@@ -255,8 +256,8 @@ class TregexParser {
       throw new ParseException();
     }
     DescriptionPattern ret = new DescriptionPattern(r, negateDesc, desc != null ? desc.image : null, name != null ? name.image : null, cat, basicCatFunction, varGroups, link, linkedName != null ? linkedName.image : null);
-      if (true) return ret;
-      throw new Error("Missing return statement in function");
+      return ret;
+
   }
 
   final public TregexPattern ChildrenDisj() throws ParseException {
@@ -290,8 +291,8 @@ class TregexParser {
       allKnownVariables.addAll(knownVariables);
     }
     knownVariables = allKnownVariables;
-      if (true) return child;
-      throw new Error("Missing return statement in function");
+      return child;
+
   }
 
   final public TregexPattern ChildrenConj() throws ParseException {
@@ -323,8 +324,8 @@ class TregexParser {
       child = ModChild();
                                       children.add(child);
     }
-      if (true) return child;
-      throw new Error("Missing return statement in function");
+      return child;
+
   }
 
   final public TregexPattern ModChild() throws ParseException {
@@ -354,8 +355,8 @@ class TregexParser {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return child;
-      throw new Error("Missing return statement in function");
+      return child;
+
   }
 
   final public TregexPattern Child() throws ParseException {
@@ -375,8 +376,8 @@ class TregexParser {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return child;
-      throw new Error("Missing return statement in function");
+      return child;
+
   }
 
   final public TregexPattern Relation() throws ParseException {
@@ -470,8 +471,8 @@ class TregexParser {
         r = Relation.getRelation(t.image, basicCatFunction, headFinder);
       }
     child = Node(r);
-      if (true) return child;
-      throw new Error("Missing return statement in function");
+      return child;
+
   }
 
   /** Generated Token Manager. */

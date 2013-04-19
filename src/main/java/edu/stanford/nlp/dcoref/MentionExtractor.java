@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.classify.LogisticClassifier;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -167,7 +168,7 @@ public class MentionExtractor {
       List<CoreLabel> sentence = words.get(sent);
       Tree tree = trees.get(sent);
       List<Mention> mentions = unorderedMentions.get(sent);
-        Map<String, List<Mention>> mentionsToTrees = new FastMap<>();
+        RadixTree< List<Mention>> mentionsToTrees = new RadixTree<>();
 
       // merge the parse tree of the entire sentence with the sentence words
       if(doMergeLabels) mergeLabels(tree, sentence);

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.IntPair;
@@ -1245,8 +1246,8 @@ public class CoreAnnotations {
   /**
    * Used in propbank.srl
    */
-  public static class PriorAnnotation implements CoreAnnotation<Map<String, Double>> {
-    public Class<Map<String, Double>> getType() {
+  public static class PriorAnnotation implements CoreAnnotation<RadixTree< Double>> {
+    public Class<RadixTree< Double>> getType() {
       return ErasureUtils.uncheckedCast(Map.class);
     }
   }

@@ -99,8 +99,8 @@ public class LinearGrammarSmoother implements Function<Pair<UnaryGrammar,BinaryG
     String label = stateIndex.get(rule.parent());
     String basicCat = basicCategory(label);
 
-    double pSum = symWeights.getCount(basicCat);
-    double n = symCounts.getCount(basicCat);
+    double pSum = symWeights.get(basicCat);
+    double n = symCounts.get(basicCat);
 
     double pRule = Math.exp(rule.score());
 

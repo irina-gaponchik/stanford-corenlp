@@ -1,5 +1,6 @@
 package edu.stanford.nlp.ling.tokensregex;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.pipeline.ChunkAnnotationUtils;
 import edu.stanford.nlp.pipeline.CoreMapAggregator;
 import edu.stanford.nlp.util.CollectionUtils;
@@ -18,7 +19,7 @@ import java.util.Map;
 public abstract class CoreMapSequenceMatchAction<T extends CoreMap> implements SequenceMatchAction<T> {
 
   public final static class AnnotateAction<T extends CoreMap> extends CoreMapSequenceMatchAction<T> {
-    Map<String,String> attributes;   // TODO: Preconvert, handle when to overwrite existing attributes
+    Map<String, String> attributes;   // TODO: Preconvert, handle when to overwrite existing attributes
 
     public AnnotateAction(Map<String, String> attributes) {
       this.attributes = attributes;

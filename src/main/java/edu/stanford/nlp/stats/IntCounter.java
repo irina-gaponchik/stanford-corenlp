@@ -61,7 +61,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    * Constructs a new (empty) Counter.
    */
   public IntCounter() {
-    this(MapFactory.<E,AtomicInteger>hashMapFactory());
+    this(MapFactory.<E, AtomicInteger>hashMapFactory());
   }
 
   /**
@@ -149,7 +149,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    * seen before. This is a convenient version of {@code get} that casts
    * and extracts the primitive value.
    */
-  public double getCount(Object key) {
+  public double get(Object key) {
     return getIntCount(key);
   }
 
@@ -176,7 +176,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    * really you should create a {@link edu.stanford.nlp.stats.Distribution} instead of using this method.
    */
   public double getNormalizedCount(E key) {
-    return getCount(key) / totalCount();
+    return get(key) / totalCount();
   }
 
   /**
@@ -395,7 +395,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    * will no longer be considered previously seen.
    */
   public double remove(E key) {
-    totalCount -= getCount(key); // subtract removed count from total (may be 0)
+    totalCount -= get(key); // subtract removed count from total (may be 0)
     AtomicInteger val = map.remove(key);
       return val == null ? Double.NaN : val.doubleValue();
   }
@@ -567,7 +567,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    */
   public void removeZeroCounts() {
     for (Iterator<E> iter = map.keySet().iterator(); iter.hasNext();) {
-      if (getCount(iter.next()) == 0) {
+      if (get(iter.next()) == 0) {
         iter.remove();
       }
     }
@@ -711,7 +711,10 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
    * Returns 0 if o1 is not Comparable.
    */
   private static class NaturalComparator<T> implements Comparator<T> {
-    public int compare(T o1, T o2) {
+      NaturalComparator() {
+      }
+
+      public int compare(T o1, T o2) {
       if (o1 instanceof Comparable) {
         return ErasureUtils.<Comparable<T>>uncheckedCast(o1).compareTo(o2);
       }
@@ -740,7 +743,7 @@ public class IntCounter<E> extends AbstractCounter<E> implements Serializable {
   @Override
   public double incrementCount(E key, double value) {
     incrementCount(key, (int)value);
-    return getCount(key);
+    return get(key);
   }
 
   public double totalCount() {

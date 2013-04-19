@@ -97,7 +97,7 @@ class PostSplitter implements TreeTransformer {
     List<String> biggestCounts = new ArrayList<>(nonTerms.keySet());
     Collections.sort(biggestCounts, Counters.toComparatorDescending(nonTerms));
     for (String str : biggestCounts) {
-      System.out.println(str + ": " + nonTerms.getCount(str));
+      System.out.println(str + ": " + nonTerms.get(str));
     }
   }
 

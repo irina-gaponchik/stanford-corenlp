@@ -3,9 +3,10 @@ package edu.stanford.nlp.trees;
 import edu.stanford.nlp.trees.GrammaticalRelation.GrammaticalRelationAnnotation;
 import edu.stanford.nlp.trees.GrammaticalRelation.Language;
 import edu.stanford.nlp.trees.tregex.TregexPatternCompiler;
+import javolution.util.FastMap;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -112,10 +113,6 @@ public class EnglishGrammaticalRelations {
     new GrammaticalRelation(Language.English, "pred", "predicate",
         PredicateGRAnnotation.class, DEPENDENT, "S|SINV", tregexCompiler,
             "S|SINV <# VP=target");
-
-    public static <K,V> ConcurrentHashMap<K,V> newConcurrentHashMap() {
-    return new ConcurrentHashMap<>();
-  }
 
     public static class PredicateGRAnnotation extends GrammaticalRelationAnnotation { }
 
@@ -1482,7 +1479,7 @@ public class EnglishGrammaticalRelations {
 
   // Map from English GrammaticalRelation short names to their corresponding
   // GrammaticalRelation objects
-  public static final Map<String, GrammaticalRelation> shortNameToGRel = new ConcurrentHashMap<>();
+  public static final Map <String, GrammaticalRelation> shortNameToGRel = new FastMap<>();
   static {
     for (GrammaticalRelation gr : values()) {
       shortNameToGRel.put(gr.toString().toLowerCase(), gr);
@@ -1523,9 +1520,9 @@ public class EnglishGrammaticalRelations {
 
 
   // the exhaustive list of conjunction relations
-  private static final Map<String, GrammaticalRelation> conjs = newConcurrentHashMap();
+  private static final Map<String, GrammaticalRelation> conjs = new FastMap<>();
 
-  public static Collection<GrammaticalRelation> getConjs() {
+    public static Collection<GrammaticalRelation> getConjs() {
     return conjs.values();
   }
 
@@ -1555,11 +1552,11 @@ public class EnglishGrammaticalRelations {
   }
 
   // the exhaustive list of preposition relations
-  private static final Map<String, GrammaticalRelation> preps = newConcurrentHashMap();
-  private static final Map<String, GrammaticalRelation> prepsC = newConcurrentHashMap();
+  private static final Map<String, GrammaticalRelation> preps = new FastMap<>();
+    private static final Map<String, GrammaticalRelation> prepsC = new FastMap<>();
 
 
-  public static Collection<GrammaticalRelation> getPreps() {
+    public static Collection<GrammaticalRelation> getPreps() {
     return preps.values();
   }
 

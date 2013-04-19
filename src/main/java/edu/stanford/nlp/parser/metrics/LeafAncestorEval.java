@@ -10,6 +10,7 @@ import java.util.Random;
 import java.util.Stack;
 import java.util.TreeMap;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.international.Languages;
 import edu.stanford.nlp.international.Languages.Language;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -270,7 +271,7 @@ public class LeafAncestorEval {
   private static File guessFile;
   private static File goldFile;
 
-  public static final Map<String,Integer> optionArgDefs = new FastMap<>();
+  public static final RadixTree<Integer> optionArgDefs = new RadixTree<>();
 
     static {
     optionArgDefs.put("-y", 1);
@@ -279,7 +280,7 @@ public class LeafAncestorEval {
   }
   
   private static boolean validateCommandLine(String... args) {
-    Map<String, String[]> argsMap = StringUtils.argsToMap(args,optionArgDefs);
+    RadixTree< String[]> argsMap = StringUtils.argsToMap(args,optionArgDefs);
     
     for(Map.Entry<String, String[]> opt : argsMap.entrySet()) {
       String key = opt.getKey();

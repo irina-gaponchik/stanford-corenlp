@@ -56,7 +56,6 @@ import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
-import javolution.util.FastSet;
 
 /**
  * Extracts {@code <COREF>} mentions from a file annotated in ACE format (ACE2004, ACE2005).
@@ -246,17 +245,17 @@ public class ACEMentionExtractor extends MentionExtractor {
       for (int j = 0 ; j < tokens.length; j++){
         if(endID.containsKey(j)) {
           for(Integer id : endID.get(j)){
-              sent += mentionCount.getCount(id) != 1 && gold ? "]_" + id : "]";
+              sent += mentionCount.get(id) != 1 && gold ? "]_" + id : "]";
           }
         }
-        for (int k = 0 ; k < startCounts.getCount(j) ; k++) {
+        for (int k = 0 ; k < startCounts.get(j) ; k++) {
           if(!(!sent.isEmpty() && sent.charAt(sent.length() - 1) == '[')) sent += " ";
           sent += "[";
         }
         sent += " ";
         sent = sent + tokens[j];
       }
-      for(int k = 0 ; k <endCounts.getCount(tokens.length); k++) {
+      for(int k = 0 ; k <endCounts.get(tokens.length); k++) {
         sent += "]";
       }
       sent += "\n";

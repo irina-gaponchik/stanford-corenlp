@@ -4,7 +4,6 @@ import edu.stanford.nlp.ie.NumberNormalizer;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.tokensregex.*;
 import edu.stanford.nlp.pipeline.ChunkAnnotationUtils;
-import edu.stanford.nlp.time.TimeAnnotations;
 import edu.stanford.nlp.util.*;
 
 import java.util.*;
@@ -88,7 +87,7 @@ public class TimeExpressionExtractorImpl implements TimeExpressionExtractor {
           ChunkAnnotationUtils.annotateChunkText(cm, annotation);
           text = cm.get(CoreAnnotations.TextAnnotation.class);
         }
-        Map<String,String> timexAttributes;
+        Map<String, String> timexAttributes;
         try {
           timexAttributes = temporal.getTimexAttributes(timeIndex);
           if (options.includeRange) {

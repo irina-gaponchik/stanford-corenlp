@@ -31,6 +31,7 @@
 
 package edu.stanford.nlp.trees.international.pennchinese;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.util.StringUtils;
 import javolution.util.FastMap;
@@ -54,7 +55,7 @@ public class ChineseEnglishWordMap implements Serializable {
   private static final long serialVersionUID = 7655332268578049993L;
     private static final Pattern COMPILE = Pattern.compile("\\s");
 
-    private Map<String, Set<String>> map = new FastMap<>(10000); // large dictionary!
+    private RadixTree< Set<String>> map = new RadixTree<>( ); // large dictionary!
 
 
     private static final String defaultPattern = "[^ ]+ ([^ ]+)[^/]+/(.+)/";
@@ -257,9 +258,9 @@ public class ChineseEnglishWordMap implements Serializable {
    *
    * @return A reversed map of the current map.
    */
-  public Map<String, Set<String>> getReverseMap() {
+  public RadixTree< Set<String>> getReverseMap() {
     Set<Map.Entry<String,Set<String>>> entries = map.entrySet();
-      Map<String, Set<String>> rMap = new FastMap<>(entries.size());
+      RadixTree< Set<String>> rMap = new RadixTree<>( );
     for (Map.Entry<String,Set<String>> me : entries) {
       String k = me.getKey();
       Set<String> transList = me.getValue();
@@ -281,7 +282,7 @@ public class ChineseEnglishWordMap implements Serializable {
   /**
    * Add all of the mappings from the specified map to the current map.
    */
-  public int addMap(Map<String, Set<String>> addM) {
+  public int addMap(RadixTree< Set<String>> addM) {
     int newTrans = 0;
 
     for (Map.Entry<String,Set<String>> me : addM.entrySet()) {
@@ -333,10 +334,10 @@ public class ChineseEnglishWordMap implements Serializable {
    * Otherwise UTF-8 is assumed.
    */
   public static void main(String... args) throws IOException {
-      Map<String, Integer> flagsToNumArgs = new FastMap<>();
+      RadixTree< Integer> flagsToNumArgs = new RadixTree<>();
     flagsToNumArgs.put("-dictPath" , 1);
     flagsToNumArgs.put("-encoding" , 1);
-    Map<String, String[]> argMap = StringUtils.argsToMap(args, flagsToNumArgs);
+    RadixTree< String[]> argMap = StringUtils.argsToMap(args, flagsToNumArgs);
     String[] otherArgs = argMap.get(null);
     if (otherArgs.length < 1) {
       System.err.println("usage: ChineseEnglishWordMap [-all] [-dictPath path] [-encoding enc_string] inputFile");

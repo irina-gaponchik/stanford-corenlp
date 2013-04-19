@@ -1,5 +1,6 @@
 package edu.stanford.nlp.ling.tokensregex.types;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreAnnotation;
 import javolution.util.FastMap;
 
@@ -17,11 +18,11 @@ public class Tags implements Serializable {
     }
   }
 
-  Map<String, Value> tags;
+  RadixTree< Value> tags;
 
   public Tags(String... tags) {
     if (tags != null) {
-        this.tags = new FastMap<>();
+        this.tags = new RadixTree<>();
       for (String tag:tags) {
         this.tags.put(tag, null);
       }
@@ -42,7 +43,7 @@ public class Tags implements Serializable {
 
   public void addTag(String tag, Value v) {
     if (tags == null) {
-        tags = new FastMap<>(1); }
+        tags = new RadixTree<>(); }
     tags.put(tag, v);
   }
 

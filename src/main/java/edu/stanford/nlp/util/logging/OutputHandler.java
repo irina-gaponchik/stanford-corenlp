@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.util.logging.Redwood.Record;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
@@ -63,14 +64,14 @@ public abstract class OutputHandler extends LogRecordHandler{
    * The color to use for track beginning and ends
    */
   protected Color trackColor = Color.NONE;
-  protected Map<String,Color> channelColors;
+  protected RadixTree<Color> channelColors;
   protected boolean addRandomColors;
 
   /**
    * The style to use for track beginning and ends
    */
   protected Style trackStyle = Style.NONE;
-  protected Map<String,Style> channelStyles;
+  protected RadixTree<Style> channelStyles;
 
   /**
    * Print a string to an output without the trailing newline.
@@ -91,7 +92,7 @@ public abstract class OutputHandler extends LogRecordHandler{
    */
   public void colorChannel(String channel, Color color){
     if(this.channelColors == null){
-        this.channelColors = new FastMap<>();
+        this.channelColors = new RadixTree<>();
     }
     this.channelColors.put(channel.toLowerCase(),color);
   }
@@ -103,7 +104,7 @@ public abstract class OutputHandler extends LogRecordHandler{
    */
   public void styleChannel(String channel, Style style){
     if(this.channelStyles == null){
-        this.channelStyles = new FastMap<>();
+        this.channelStyles = new RadixTree<>();
     }
     this.channelStyles.put(channel.toLowerCase(),style);
   }
@@ -111,7 +112,7 @@ public abstract class OutputHandler extends LogRecordHandler{
   public void setColorChannels(boolean colorChannels){
     this.addRandomColors = colorChannels;
     if(colorChannels){
-        this.channelColors = new FastMap<>(); }
+        this.channelColors = new RadixTree<>(); }
   }
 
   /**

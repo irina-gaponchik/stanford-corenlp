@@ -1,11 +1,11 @@
 package edu.stanford.nlp.ling.tokensregex;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.tokensregex.types.AssignableExpression;
 import edu.stanford.nlp.ling.tokensregex.types.Expression;
 import edu.stanford.nlp.ling.tokensregex.types.Expressions;
 import edu.stanford.nlp.ling.tokensregex.types.Value;
 import edu.stanford.nlp.util.*;
-import javolution.util.FastMap;
 
 import java.util.*;
 import java.util.regex.MatchResult;
@@ -275,16 +275,16 @@ public class SequenceMatchRules {
   }
 
   public static Rule createRule(Env env, Expressions.CompositeValue cv) {
-    Map<String, Object> attributes;
+    RadixTree< Object> attributes;
     cv = cv.simplifyNoTypeConversion(env);
-      attributes = new FastMap<>();
+      attributes = new RadixTree<>();
     for (String s:cv.getAttributes()) {
       attributes.put(s, cv.getExpression(s));
     }
     return createExtractionRule(env, attributes);
   }
 
-  protected static AnnotationExtractRule createExtractionRule(Env env, Map<String,Object> attributes)
+  protected static AnnotationExtractRule createExtractionRule(Env env, RadixTree<Object> attributes)
   {
     String ruleType = (String) Expressions.asObject(env, attributes.get("ruleType"));
     if (ruleType == null && env != null) {
@@ -305,7 +305,7 @@ public class SequenceMatchRules {
     }
     AnnotationExtractRuleCreator ruleCreator = lookupExtractRuleCreator(env, ruleType);
     if (ruleCreator != null) {
-        Map<String,Object> attributes = new FastMap<>();
+        RadixTree<Object> attributes = new RadixTree<>();
       attributes.put("ruleType", ruleType);
       attributes.put("pattern", pattern);
       attributes.put("result", result);
@@ -323,7 +323,7 @@ public class SequenceMatchRules {
   public final static CompositeExtractRuleCreator COMPOSITE_EXTRACT_RULE_CREATOR = new CompositeExtractRuleCreator();
   public final static TextPatternExtractRuleCreator TEXT_PATTERN_EXTRACT_RULE_CREATOR = new TextPatternExtractRuleCreator();
   public final static AnnotationExtractRuleCreator DEFAULT_EXTRACT_RULE_CREATOR = TOKEN_PATTERN_EXTRACT_RULE_CREATOR;
-  final static Map<String, AnnotationExtractRuleCreator> registeredRuleTypes = new FastMap<>();
+  final static RadixTree< AnnotationExtractRuleCreator> registeredRuleTypes = new RadixTree<>();
 
     static {
     registeredRuleTypes.put(TOKEN_PATTERN_RULE_TYPE, TOKEN_PATTERN_EXTRACT_RULE_CREATOR);
@@ -365,7 +365,7 @@ public class SequenceMatchRules {
       return r;
     }
 
-    public AnnotationExtractRule create(Env env, Map<String,Object> attributes) {
+    public AnnotationExtractRule create(Env env, Map<String, Object> attributes) {
       // Get default annotation extract rule from env
       AnnotationExtractRule r = create(env);
       if (attributes != null) {
@@ -431,7 +431,7 @@ public class SequenceMatchRules {
       return r;
     }
 
-    public AnnotationExtractRule create(Env env, Map<String,Object> attributes) {
+    public AnnotationExtractRule create(Env env, Map<String, Object> attributes) {
       AnnotationExtractRule r = super.create(env, attributes);
       r.isComposite = true;
       if (r.annotationField == null) { r.annotationField = r.resultNestedAnnotationField;  }
@@ -499,7 +499,7 @@ public class SequenceMatchRules {
       return r;
     }
 
-    public AnnotationExtractRule create(Env env, Map<String,Object> attributes) {
+    public AnnotationExtractRule create(Env env, Map<String, Object> attributes) {
       AnnotationExtractRule r = super.create(env, attributes);
       if (r.annotationField == null) { r.annotationField = r.tokensAnnotationField;  }
       if (r.ruleType == null) { r.ruleType = TOKEN_PATTERN_RULE_TYPE; }
@@ -543,7 +543,7 @@ public class SequenceMatchRules {
       return r;
     }
 
-    public AnnotationExtractRule create(Env env, Map<String,Object> attributes) {
+    public AnnotationExtractRule create(Env env, Map<String, Object> attributes) {
       AnnotationExtractRule r = super.create(env, attributes);
       if (r.annotationField == null) { r.annotationField = EnvLookup.getDefaultTextAnnotationKey(env);  }
       if (r.ruleType == null) { r.ruleType = TEXT_PATTERN_RULE_TYPE; }

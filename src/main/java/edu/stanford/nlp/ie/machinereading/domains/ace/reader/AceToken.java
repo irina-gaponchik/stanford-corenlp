@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ie.machinereading.common.SimpleTokenize;
 import edu.stanford.nlp.ie.machinereading.common.StringDictionary;
 import edu.stanford.nlp.trees.Span;
@@ -70,16 +71,16 @@ public class AceToken {
   private static final int PROXIMITY_CLASS_SIZE = 5;
 
   /** The location gazetteer */
-  private static Map<String, String> LOC_GAZ;
+  private static RadixTree< String> LOC_GAZ;
 
   /** The person first name dictionary */
-  private static Map<String, String> FIRST_GAZ;
+  private static RadixTree< String> FIRST_GAZ;
 
   /** The person last name dictionary */
-  private static Map<String, String> LAST_GAZ;
+  private static RadixTree< String> LAST_GAZ;
 
   /** List of trigger words */
-  private static Map<String, String> TRIGGER_GAZ;
+  private static RadixTree< String> TRIGGER_GAZ;
 
   private final static Pattern SGML_PATTERN;
 
@@ -98,28 +99,28 @@ public class AceToken {
   public static void loadGazetteers(String dataPath) throws IOException {
 
     System.err.print("Loading location gazetteer... ");
-      LOC_GAZ = new FastMap<>();
+      LOC_GAZ = new RadixTree<>();
     loadDictionary(LOC_GAZ, dataPath + File.separator + "world_small.gaz.nonambiguous");
     System.err.println("done.");
 
     System.err.print("Loading first-name gazetteer... ");
-      FIRST_GAZ = new FastMap<>();
+      FIRST_GAZ = new RadixTree<>();
     loadDictionary(FIRST_GAZ, dataPath + File.separator + "per_first.gaz");
     System.err.println("done.");
 
     System.err.print("Loading last-name gazetteer... ");
-      LAST_GAZ = new FastMap<>();
+      LAST_GAZ = new RadixTree<>();
     loadDictionary(LAST_GAZ, dataPath + File.separator + "per_last.gaz");
     System.err.println("done.");
 
     System.err.print("Loading trigger-word gazetteer... ");
-      TRIGGER_GAZ = new FastMap<>();
+      TRIGGER_GAZ = new RadixTree<>();
     loadDictionary(TRIGGER_GAZ, dataPath + File.separator + "triggers.gaz");
     System.err.println("done.");
   }
 
   /** Loads one dictionary from disk */
-  private static void loadDictionary(Map<String, String> dict, String file) throws
+  private static void loadDictionary(RadixTree< String> dict, String file) throws
           IOException {
 
     BufferedReader in = new BufferedReader(new FileReader(file));
@@ -156,7 +157,7 @@ public class AceToken {
   /**
    * Verifies if the given string exists in the given dictionary
    */
-  public static boolean exists(Map<String, String> dict, String elem) {
+  public static boolean exists(RadixTree< String> dict, String elem) {
       return dict.get(elem) != null;
   }
 

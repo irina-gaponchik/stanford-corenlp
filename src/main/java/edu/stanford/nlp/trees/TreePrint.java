@@ -1,5 +1,6 @@
 package edu.stanford.nlp.trees;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseEnglishWordMap;
@@ -756,12 +757,12 @@ public class TreePrint {
     String options = "";
     String tlpName = "edu.stanford.nlp.trees.PennTreebankLanguagePack";
     String hfName = null;
-      Map<String,Integer> flagMap = new FastMap<>();
+      RadixTree<Integer> flagMap = new RadixTree<>();
     flagMap.put("-format", 1);
     flagMap.put("-options", 1);
     flagMap.put("-tLP", 1);
     flagMap.put("-hf", 1);
-    Map<String,String[]> argsMap = StringUtils.argsToMap(args,flagMap);
+    RadixTree<String[]> argsMap = StringUtils.argsToMap(args,flagMap);
     args = argsMap.get(null);
     if(argsMap.keySet().contains("-format")) {
       format = argsMap.get("-format")[0];

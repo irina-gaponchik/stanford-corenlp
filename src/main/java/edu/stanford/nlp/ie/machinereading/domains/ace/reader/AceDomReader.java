@@ -237,7 +237,7 @@ public class AceDomReader extends DomReader {
     File f = new File(argv[0]);
     AceDocument doc = parseDocument(f);
     System.out.println("Processed ACE document:\n" + doc);
-    ArrayList<ArrayList<AceRelationMention>> r = doc.getAllRelationMentions();
+      List<ArrayList<AceRelationMention>> r = doc.getAllRelationMentions();
     System.out.println("size: " + r.size());
   }
 }

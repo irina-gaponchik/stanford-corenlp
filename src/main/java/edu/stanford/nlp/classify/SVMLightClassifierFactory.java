@@ -192,7 +192,7 @@ public class SVMLightClassifierFactory<L, F> implements ClassifierFactory<L, F, 
     ClassicCounter<Pair<F, L>> newWeights = new ClassicCounter<>();
     for (int i : weights.keySet()) {
       F f = featureIndex.get(i-1);
-      double w = weights.getCount(i);
+      double w = weights.get(i);
       // the first guy in the labelIndex was the +1 class and the second guy
       // was the -1 class
       newWeights.incrementCount(new Pair<>(f, labelIndex.get(0)),w);
@@ -213,7 +213,7 @@ public class SVMLightClassifierFactory<L, F> implements ClassifierFactory<L, F, 
     for (int i : weights.keySet()) {
       L l = labelIndex.get((i-1) / numFeatures); // integer division on purpose
       F f = featureIndex.get((i-1) % numFeatures);
-      double w = weights.getCount(i);
+      double w = weights.get(i);
       newWeights.incrementCount(new Pair<>(f, l),w);
     }
 

@@ -3,6 +3,7 @@ package edu.stanford.nlp.ling.tokensregex.parser;
 // all generated classes are in this package
 
 //imports
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.tokensregex.types.*;
 import edu.stanford.nlp.ling.tokensregex.*;
 import edu.stanford.nlp.util.CoreMap;
@@ -54,7 +55,7 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
         return !str.isEmpty() && str.charAt(0) == '+' ? Long.valueOf(str.substring(1)) : Long.valueOf(str);
     }
 
-  final public List<SequenceMatchRules.Rule> RuleList(Env env) throws ParseException {
+  public List<SequenceMatchRules.Rule> RuleList(Env env) throws ParseException {
   List<SequenceMatchRules.Rule> rules = new ArrayList<>();
   SequenceMatchRules.Rule rule;
     label_1:
@@ -71,11 +72,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       rule = Rule(env);
                          rules.add(rule);
     }
-      if (true) return rules;
-      throw new Error("Missing return statement in function");
+      return rules;
+
   }
 
-  final public SequenceMatchRules.Rule Rule(Env env) throws ParseException {
+  public SequenceMatchRules.Rule Rule(Env env) throws ParseException {
   SequenceMatchRules.Rule rule;
   Expressions.CompositeValue cv;
     if (jj_2_1(3)) {
@@ -89,57 +90,61 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return rule;
-      throw new Error("Missing return statement in function");
+      return rule;
+//
   }
 
-  final public SequenceMatchRules.Rule ExpressionExtractorRule(Env env) throws ParseException {
+  public SequenceMatchRules.Rule ExpressionExtractorRule(Env env) throws ParseException {
   SequencePattern.PatternExpr expr;
   String stringRegex;
   Expression result;
   Token ruleTypeToken;
-    if (jj_2_4(2)) {
-      jj_consume_token(21);
-      stringRegex = StringRegex(env);
-      jj_consume_token(22);
-      result = Expression(env);
-      jj_consume_token(23);
-        if (true) return SequenceMatchRules.createExtractionRule(env, null, stringRegex, result);
-    } else if (jj_2_5(2)) {
-      jj_consume_token(21);
-      jj_consume_token(24);
-      expr = SeqRegex(env);
-      jj_consume_token(25);
-      jj_consume_token(22);
-      result = Expression(env);
-      jj_consume_token(23);
-        if (true) return SequenceMatchRules.createExtractionRule(env, null, TokenSequencePattern.compile(expr), result);
-    } else if (jj_2_6(2)) {
-      jj_consume_token(21);
-      jj_consume_token(26);
-      jj_consume_token(24);
-      expr = SeqRegex(env);
-      jj_consume_token(25);
-      jj_consume_token(22);
-      result = Expression(env);
-      jj_consume_token(23);
-        if (true) return SequenceMatchRules.createTokenPatternRule(env, expr, result);
-    } else if (jj_2_7(2)) {
-      jj_consume_token(21);
-      jj_consume_token(27);
-      stringRegex = StringRegex(env);
-      jj_consume_token(22);
-      result = Expression(env);
-      jj_consume_token(23);
-        if (true) return SequenceMatchRules.createTextPatternRule(env, stringRegex, result);
-    } else {
-      jj_consume_token(-1);
-      throw new ParseException();
-    }
-    throw new Error("Missing return statement in function");
+      if (jj_2_4(2)) {
+          jj_consume_token(21);
+          stringRegex = StringRegex(env);
+          jj_consume_token(22);
+          result = Expression(env);
+          jj_consume_token(23);
+          return SequenceMatchRules.createExtractionRule(env, null, stringRegex, result);
+      } else {
+          if (jj_2_5(2)) {
+              jj_consume_token(21);
+              jj_consume_token(24);
+              expr = SeqRegex(env);
+              jj_consume_token(25);
+              jj_consume_token(22);
+              result = Expression(env);
+              jj_consume_token(23);
+              return SequenceMatchRules.createExtractionRule(env, null, TokenSequencePattern.compile(expr), result);
+          } else {
+              if (jj_2_6(2)) {
+                  jj_consume_token(21);
+                  jj_consume_token(26);
+                  jj_consume_token(24);
+                  expr = SeqRegex(env);
+                  jj_consume_token(25);
+                  jj_consume_token(22);
+                  result = Expression(env);
+                  jj_consume_token(23);
+                  return SequenceMatchRules.createTokenPatternRule(env, expr, result);
+              } else if (jj_2_7(2)) {
+                  jj_consume_token(21);
+                  jj_consume_token(27);
+                  stringRegex = StringRegex(env);
+                  jj_consume_token(22);
+                  result = Expression(env);
+                  jj_consume_token(23);
+                  return SequenceMatchRules.createTextPatternRule(env, stringRegex, result);
+              } else {
+                  jj_consume_token(-1);
+                  throw new ParseException();
+              }
+          }
+      }
+      //
   }
 
-  final public SequenceMatchRules.Rule AssignmentRule(Env env) throws ParseException {
+  public SequenceMatchRules.Rule AssignmentRule(Env env) throws ParseException {
   AssignableExpression var;
   Expression result;
     var = AssignableExpression(env);
@@ -152,18 +157,18 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
     default:
       jj_la1[1] = jj_gen;
     }
-      if (true) return SequenceMatchRules.createAssignmentRule(env, var, result);
-      throw new Error("Missing return statement in function");
+      return SequenceMatchRules.createAssignmentRule(env, var, result);
+    //
   }
 
-  final public AssignableExpression AssignableExpression(Env env) throws ParseException {
+  public AssignableExpression AssignableExpression(Env env) throws ParseException {
   AssignableExpression expr;
     expr = AssignableNestedVarExpression(env);
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+      //
   }
 
-  final public Expression Expression(Env env) throws ParseException {
+  public Expression Expression(Env env) throws ParseException {
   Expression expr;
     if (jj_2_8(4)) {
       expr = FunctionCallExpression(env);
@@ -179,20 +184,20 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+      //
   }
 
-  final public int Index() throws ParseException {
+  public int Index() throws ParseException {
   Token t;
     jj_consume_token(30);
     t = IntegerToken();
     jj_consume_token(31);
-      if (true) return Integer.valueOf(t.image);
-      throw new Error("Missing return statement in function");
+      return Integer.valueOf(t.image);
+      //
   }
 
-  final public Expression FunctionCallExpression(Env env) throws ParseException {
+  public Expression FunctionCallExpression(Env env) throws ParseException {
   Token typeToken;
   Expression param;
   List<Expression> params = new ArrayList<>();
@@ -233,11 +238,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_la1[3] = jj_gen;
     }
     jj_consume_token(25);
-      if (true) return new Expressions.FunctionCallExpression(typeToken.image, params);
-      throw new Error("Missing return statement in function");
+      return new Expressions.FunctionCallExpression(typeToken.image, params);
+      //
   }
 
-  final public Value ValueExpression(Env env) throws ParseException {
+  public Value ValueExpression(Env env) throws ParseException {
   Value expr;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.NONNEGINT:
@@ -257,12 +262,12 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+      //
   }
 
-  final public Expressions.CompositeValue CompositeFieldValue(Env env) throws ParseException {
-    Map<String, Expression> attributes = new ArrayMap<>();
+  public Expressions.CompositeValue CompositeFieldValue(Env env) throws ParseException, Error {
+    RadixTree< Expression> attributes = new RadixTree<>();
     jj_consume_token(21);
     FieldValue(env, attributes);
     label_3:
@@ -290,11 +295,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       FieldValue(env, attributes);
     }
     jj_consume_token(23);
-      if (true) return new Expressions.CompositeValue(/*"COMPOSITE", */ attributes, false);
-      throw new Error("Missing return statement in function");
+      return new Expressions.CompositeValue(/*"COMPOSITE", */ attributes, false);
+      //
   }
 
-  final public Map<String,Expression> FieldValue(Env env, Map<String,Expression> attributes) throws ParseException {
+  public RadixTree<Expression> FieldValue(Env env, RadixTree<Expression> attributes) throws ParseException {
         String fieldname = null;
         Expression expr = null;
     fieldname = RelaxedString();
@@ -302,105 +307,105 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
     expr = Expression(env);
               if (fieldname != null && expr != null)  {
                 if (attributes.containsKey(fieldname)) {
-                    if (true) throw new Error("Field already defined: " + fieldname);
+                    throw new Error("Field already defined: " + fieldname);
                 }
                 attributes.put(fieldname, expr);
               }
-      if (true) return attributes;
-      throw new Error("Missing return statement in function");
+      return attributes;
+
   }
 
-  final public Value BasicValue(Env env) throws ParseException {
+  public Value BasicValue(Env env) throws ParseException {
         Token tok = null;
         SequencePattern.PatternExpr seqRegex = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.REGEX:
       tok = jj_consume_token(TokenSequenceParserConstants.REGEX);
-        if (true) return new Expressions.RegexValue(/*"REGEX",*/ tok.image.substring(1,tok.image.length()-1));
-        break;
+        return new Expressions.RegexValue(/*"REGEX",*/ tok.image.substring(1, tok.image.length() - 1));
+//        break;
     case TokenSequenceParserConstants.STR:
       tok = jj_consume_token(TokenSequenceParserConstants.STR);
-        if (true) return new Expressions.PrimitiveValue<>("STRING", tok.image.substring(1,tok.image.length()-1) );
-        break;
+        return new Expressions.PrimitiveValue<>("STRING", tok.image.substring(1, tok.image.length() - 1));
+//        break;
     case TokenSequenceParserConstants.NONNEGINT:
     case TokenSequenceParserConstants.INT:
       tok = IntegerToken();
-        if (true) return new Expressions.PrimitiveValue<Number>("INTEGER", parseInteger(tok.image));
-        break;
+        return new Expressions.PrimitiveValue<Number>("INTEGER", parseInteger(tok.image));
+//        break;
     case TokenSequenceParserConstants.LONGINT:
       tok = jj_consume_token(TokenSequenceParserConstants.LONGINT);
-        if (true) return new Expressions.PrimitiveValue<Number>("INTEGER", parseLongInteger(tok.image));
-        break;
+        return new Expressions.PrimitiveValue<Number>("INTEGER", parseLongInteger(tok.image));
+//        break;
     case TokenSequenceParserConstants.REAL:
       tok = jj_consume_token(TokenSequenceParserConstants.REAL);
-        if (true) return new Expressions.PrimitiveValue<Number>("REAL", Double.valueOf(tok.image));
-        break;
+        return new Expressions.PrimitiveValue<Number>("REAL", Double.valueOf(tok.image));
+//        break;
     case 24:
       jj_consume_token(24);
       seqRegex = SeqRegex(env);
       jj_consume_token(25);
           TokenSequencePattern seqPattern = new TokenSequencePattern(null, seqRegex);
-        if (true) return new Expressions.PrimitiveValue<>("TOKEN_REGEX", seqPattern);
-        break;
+        return new Expressions.PrimitiveValue<>("TOKEN_REGEX", seqPattern);
+//        break;
     default:
       jj_la1[7] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
-  final public AssignableExpression AssignableVar(Env env) throws ParseException {
+  public AssignableExpression AssignableVar(Env env) throws ParseException {
         Token tok = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.IDENTIFIER:
       tok = jj_consume_token(TokenSequenceParserConstants.IDENTIFIER);
-        if (true) return new Expressions.VarExpression(tok.image);
-        break;
+        return new Expressions.VarExpression(tok.image);
+//        break;
     case TokenSequenceParserConstants.REGEXVAR:
       tok = jj_consume_token(TokenSequenceParserConstants.REGEXVAR);
-        if (true) return new Expressions.RegexMatchVarExpression(tok.image);
-        break;
+        return new Expressions.RegexMatchVarExpression(tok.image);
+//        break;
     default:
       jj_la1[8] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
-  final public Expression VarOrRegexVar(Env env) throws ParseException {
+  public Expression VarOrRegexVar(Env env) throws ParseException {
         Token tok = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.IDENTIFIER:
       tok = jj_consume_token(TokenSequenceParserConstants.IDENTIFIER);
-        if (true) return new Expressions.VarExpression(tok.image);
-        break;
+        return new Expressions.VarExpression(tok.image);
+//        break;
     case TokenSequenceParserConstants.REGEXVAR:
       tok = jj_consume_token(TokenSequenceParserConstants.REGEXVAR);
-        if (true) return new Expressions.RegexMatchVarExpression(tok.image);
-        break;
+        return new Expressions.RegexMatchVarExpression(tok.image);
+//        break;
     case TokenSequenceParserConstants.REGEXGROUP:
       tok = jj_consume_token(TokenSequenceParserConstants.REGEXGROUP);
-        if (true) return new Expressions.RegexMatchVarExpression(Integer.valueOf(tok.image.substring(1)));
-        break;
+        return new Expressions.RegexMatchVarExpression(Integer.valueOf(tok.image.substring(1)));
+//        break;
     case TokenSequenceParserConstants.REGEXMRVAR:
       tok = jj_consume_token(TokenSequenceParserConstants.REGEXMRVAR);
-        if (true) return new Expressions.RegexMatchResultVarExpression(tok.image.substring(1));
-        break;
+        return new Expressions.RegexMatchResultVarExpression(tok.image.substring(1));
+//        break;
     case TokenSequenceParserConstants.REGEXMRGROUP:
       tok = jj_consume_token(TokenSequenceParserConstants.REGEXMRGROUP);
-        if (true) return new Expressions.RegexMatchResultVarExpression(Integer.valueOf(tok.image.substring(2)));
-        break;
+        return new Expressions.RegexMatchResultVarExpression(Integer.valueOf(tok.image.substring(2)));
+//        break;
     default:
       jj_la1[9] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
-  final public Expression MethodCallExpression(Env env, Expression parent) throws ParseException {
+  public Expression MethodCallExpression(Env env, Expression parent) throws ParseException {
   Token typeToken;
   Expression param;
   List<Expression> params = new ArrayList<>();
@@ -441,11 +446,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_la1[11] = jj_gen;
     }
     jj_consume_token(25);
-      if (true) return new Expressions.MethodCallExpression(typeToken.image, parent, params);
-      throw new Error("Missing return statement in function");
+      return new Expressions.MethodCallExpression(typeToken.image, parent, params);
+
   }
 
-  final public AssignableExpression AssignableNestedVarExpression(Env env) throws ParseException {
+  public AssignableExpression AssignableNestedVarExpression(Env env) throws ParseException {
   AssignableExpression expr;
   Expression fieldExpr;
   String s;
@@ -479,11 +484,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
         throw new ParseException();
       }
     }
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+
   }
 
-  final public Expression NestedVarExpression(Env env) throws ParseException {
+  public Expression NestedVarExpression(Env env) throws ParseException {
   Expression expr;
   Expression fieldExpr;
   String s;
@@ -520,11 +525,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
         throw new ParseException();
       }
     }
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+
   }
 
-  final public Expression ListExpression(Env env) throws ParseException {
+  public Expression ListExpression(Env env) throws ParseException {
   List<Expression> exprs = new ArrayList<>();
   Expression expr;
     jj_consume_token(24);
@@ -544,11 +549,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
        exprs.add(expr);
     }
     jj_consume_token(25);
-      if (true) return new Expressions.ListExpression(Expressions.TYPE_LIST, exprs);
-      throw new Error("Missing return statement in function");
+      return new Expressions.ListExpression(Expressions.TYPE_LIST, exprs);
+
   }
 
-  final public Expression BasicCondExpression(Env env) throws ParseException {
+  public Expression BasicCondExpression(Env env) throws ParseException {
   Expression expr1 = null;
   Expression expr2 = null;
   Token op = null;
@@ -563,18 +568,18 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       default:
         jj_la1[15] = jj_gen;
       }
-        if (true) return new Expressions.ConditionalExpression(expr1);
+        return new Expressions.ConditionalExpression(expr1);
     } else if (jj_2_21(3)) {
       expr1 = FunctionCallExpression(env);
-        if (true) return new Expressions.ConditionalExpression(expr1);
+        return new Expressions.ConditionalExpression(expr1);
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
-  final public Expression CondGroup(Env env) throws ParseException {
+  public Expression CondGroup(Env env) throws ParseException {
   Expression expr;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.IDENTIFIER:
@@ -594,11 +599,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+
   }
 
-  final public Expression CondExpression(Env env) throws ParseException {
+  public Expression CondExpression(Env env) throws ParseException {
   Expression child;
   List<Expression> disjChildren = new ArrayList<>();
   List<Expression> conjChildren = new ArrayList<>();
@@ -645,11 +650,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
           } else {
              disjChildren.add(conjChildren.get(0));
           }
-      if (true) return disjChildren.get(0);
-      throw new Error("Missing return statement in function");
+      return disjChildren.get(0);
+
   }
 
-  final public Expression CaseExpression(Env env) throws ParseException {
+  public Expression CaseExpression(Env env) throws ParseException {
   Expression cond = null;
   Expression expr = null;
   List<Pair<Expression, Expression>> cases
@@ -698,53 +703,53 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_la1[21] = jj_gen;
     }
     jj_consume_token(23);
-      if (true) return new Expressions.CaseExpression(cases, elseExpr);
-      throw new Error("Missing return statement in function");
+      return new Expressions.CaseExpression(cases, elseExpr);
+
   }
 
-  final public String StringRegex(Env env) throws ParseException {
+  public String StringRegex(Env env) throws ParseException {
   Token tok;
     tok = jj_consume_token(TokenSequenceParserConstants.REGEX);
-      if (true) return tok.image.substring(1,tok.image.length()-1);
-      throw new Error("Missing return statement in function");
+      return tok.image.substring(1, tok.image.length() - 1);
+
   }
 
-  final public SequencePattern.PatternExpr SeqRegex(Env env) throws ParseException {
+  public SequencePattern.PatternExpr SeqRegex(Env env) throws ParseException {
   SequencePattern.PatternExpr expr;
     expr = SeqRegexDisjConj(env);
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+
   }
 
-  final public Object StringNumberValue(Env env) throws ParseException {
+  public Object StringNumberValue(Env env) throws ParseException {
         Token tok = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.STR:
       tok = jj_consume_token(TokenSequenceParserConstants.STR);
-        if (true) return tok.image.substring(1,tok.image.length()-1);
-        break;
+        return tok.image.substring(1, tok.image.length() - 1);
+//        break;
     case TokenSequenceParserConstants.NONNEGINT:
     case TokenSequenceParserConstants.INT:
       tok = IntegerToken();
-        if (true) return parseInteger(tok.image);
-        break;
+        return parseInteger(tok.image);
+//        break;
     case TokenSequenceParserConstants.LONGINT:
       tok = jj_consume_token(TokenSequenceParserConstants.LONGINT);
-        if (true) return parseLongInteger(tok.image);
-        break;
+        return parseLongInteger(tok.image);
+//        break;
     case TokenSequenceParserConstants.REAL:
       tok = jj_consume_token(TokenSequenceParserConstants.REAL);
-        if (true) return Double.valueOf(tok.image);
-        break;
+        return Double.valueOf(tok.image);
+//        break;
     default:
       jj_la1[22] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
-  final public SequencePattern.PatternExpr SeqRegexBasic(Env env) throws ParseException {
+  public SequencePattern.PatternExpr SeqRegexBasic(Env env) throws ParseException {
   List<SequencePattern.PatternExpr> children = new ArrayList<>();
   NodePattern node;
   MultiNodePattern multiNode;
@@ -821,11 +826,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
           if (value != null) {
             expr = new SequencePattern.ValuePatternExpr(expr, value);
           }
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+
   }
 
-  final public SequencePattern.PatternExpr SeqRegexRepeatTimes(Env env, SequencePattern.PatternExpr expr) throws ParseException {
+  public SequencePattern.PatternExpr SeqRegexRepeatTimes(Env env, SequencePattern.PatternExpr expr) throws ParseException {
    Token value;
    Token v2;
    int min = -1;
@@ -882,11 +887,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
     default:
       jj_la1[29] = jj_gen;
     }
-      if (true) return new SequencePattern.RepeatPatternExpr(expr, min, max, greedy);
-      throw new Error("Missing return statement in function");
+      return new SequencePattern.RepeatPatternExpr(expr, min, max, greedy);
+
   }
 
-  final public SequencePattern.PatternExpr SeqRegexDisj(Env env) throws ParseException {
+  public SequencePattern.PatternExpr SeqRegexDisj(Env env) throws ParseException {
   List<SequencePattern.PatternExpr> children = new ArrayList<>();
   SequencePattern.PatternExpr expr;
     expr = SeqRegexBasic(env);
@@ -916,11 +921,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       expr = SeqRegexBasic(env);
                                                 children.add(expr);
     }
-      if (true) return children.get(0);
-      throw new Error("Missing return statement in function");
+      return children.get(0);
+
   }
 
-  final public SequencePattern.PatternExpr SeqRegexDisjConj(Env env) throws ParseException {
+  public SequencePattern.PatternExpr SeqRegexDisjConj(Env env) throws ParseException {
         SequencePattern.PatternExpr child;
         List<SequencePattern.PatternExpr> disjChildren = new ArrayList<>();
         List<SequencePattern.PatternExpr> conjChildren = new ArrayList<>();
@@ -975,11 +980,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
           } else {
              disjChildren.add(conjChildren.get(0));
           }
-      if (true) return disjChildren.get(0);
-      throw new Error("Missing return statement in function");
+      return disjChildren.get(0);
+
   }
 
-  final public SequencePattern.PatternExpr SeqRegexGroup(Env env) throws ParseException {
+  public SequencePattern.PatternExpr SeqRegexGroup(Env env) throws ParseException {
   SequencePattern.PatternExpr expr;
   boolean capturing = true;
   String varname = null;
@@ -1009,11 +1014,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
     }
     expr = SeqRegex(env);
     jj_consume_token(25);
-      if (true) return new SequencePattern.GroupPatternExpr(expr, varname);
-      throw new Error("Missing return statement in function");
+      return new SequencePattern.GroupPatternExpr(expr, varname);
+
   }
 
-  final public NodePattern BracketedNode(Env env) throws ParseException {
+  public NodePattern BracketedNode(Env env) throws ParseException {
   NodePattern node;
     if (jj_2_24(2)) {
       jj_consume_token(30);
@@ -1032,31 +1037,31 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
         throw new ParseException();
       }
     }
-      if (true) return node;
-      throw new Error("Missing return statement in function");
+      return node;
+
   }
 
-  final public SequencePattern.PatternExpr SeqVar(Env env) throws ParseException {
+  public SequencePattern.PatternExpr SeqVar(Env env) throws ParseException {
   SequencePattern.PatternExpr expr;
   Token name;
     name = jj_consume_token(TokenSequenceParserConstants.REGEXVAR);
         expr = env.getSequencePatternExpr(name.image, true);
         if (expr == null) {
-            if (true) throw new Error("Unknown sequence pattern variable " + name.image);
+            throw new Error("Unknown sequence pattern variable " + name.image);
         }
-      if (true) return expr;
-      throw new Error("Missing return statement in function");
+      return expr;
+
   }
 
-  final public SequencePattern.PatternExpr SeqBackRef(Env env) throws ParseException {
+  public SequencePattern.PatternExpr SeqBackRef(Env env) throws ParseException {
   Token name;
     name = jj_consume_token(TokenSequenceParserConstants.BACKREF);
         int v = Integer.parseInt(name.image.substring(1));
-      if (true) return new SequencePattern.BackRefPatternExpr(CoreMapNodePattern.TEXT_ATTR_EQUAL_CHECKER, v);
-      throw new Error("Missing return statement in function");
+      return new SequencePattern.BackRefPatternExpr(CoreMapNodePattern.TEXT_ATTR_EQUAL_CHECKER, v);
+
   }
 
-  final public NodePattern Node(Env env) throws ParseException {
+  public NodePattern Node(Env env) throws ParseException {
   NodePattern node;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case 30:
@@ -1077,11 +1082,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return node;
-      throw new Error("Missing return statement in function");
+      return node;
+
   }
 
-  final public NodePattern NodeDisj(Env env) throws ParseException {
+  public NodePattern NodeDisj(Env env) throws ParseException {
         List<NodePattern> children = new ArrayList<>();
         NodePattern child;
     child = NodeGroup(env);
@@ -1111,11 +1116,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       child = NodeGroup(env);
                                                children.add(child);
     }
-      if (true) return child;
-      throw new Error("Missing return statement in function");
+      return child;
+
   }
 
-  final public NodePattern NodeConj(Env env) throws ParseException {
+  public NodePattern NodeConj(Env env) throws ParseException {
         NodePattern child;
         List children = new ArrayList();
     child = NodeGroup(env);
@@ -1145,11 +1150,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       child = NodeGroup(env);
                                                children.add(child);
     }
-      if (true) return child;
-      throw new Error("Missing return statement in function");
+      return child;
+
   }
 
-  final public NodePattern NodeDisjConj(Env env) throws ParseException {
+  public NodePattern NodeDisjConj(Env env) throws ParseException {
         NodePattern child;
         List<NodePattern> disjChildren = new ArrayList<>();
         List<NodePattern> conjChildren = new ArrayList<>();
@@ -1204,11 +1209,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
           } else {
              disjChildren.add(conjChildren.get(0));
           }
-      if (true) return disjChildren.get(0);
-      throw new Error("Missing return statement in function");
+      return disjChildren.get(0);
+
   }
 
-  final public NodePattern NodeGroup(Env env) throws ParseException {
+  public NodePattern NodeGroup(Env env) throws ParseException {
   NodePattern node;
     if (jj_2_25(2)) {
       node = NodeBasic(env);
@@ -1226,18 +1231,18 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return node;
-      throw new Error("Missing return statement in function");
+      return node;
+
   }
 
-  final public NodePattern NodeBasic(Env env) throws ParseException {
+  public NodePattern NodeBasic(Env env) throws ParseException {
         NodePattern child;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case 45:
       jj_consume_token(45);
       child = CoreMapNode(env);
-        if (true) return new NodePattern.NegateNodePattern(child);
-        break;
+        return new NodePattern.NegateNodePattern(child);
+//        break;
     case TokenSequenceParserConstants.IDENTIFIER:
     case TokenSequenceParserConstants.REGEXVAR:
     case TokenSequenceParserConstants.REGEX:
@@ -1245,18 +1250,18 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
     case 21:
     case 46:
       child = CoreMapNode(env);
-        if (true) return child;
-        break;
+        return child;
+//        break;
     default:
       jj_la1[44] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
-  final public NodePattern CoreMapNode(Env env) throws ParseException {
-    Map<String, String> attributes = new ArrayMap<>();
+  public NodePattern CoreMapNode(Env env) throws ParseException {
+    RadixTree< String> attributes = new RadixTree<>();
     NodePattern pat;
         Token value = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
@@ -1318,27 +1323,27 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
         throw new ParseException();
       }
           pat = CoreMapNodePattern.valueOf(env, attributes);
-        if (true) return pat;
-        break;
+        return pat;
+//        break;
     case TokenSequenceParserConstants.REGEXVAR:
       pat = CoreMapVarNodePattern(env);
-        if (true) return pat;
-        break;
+        return pat;
+//        break;
     case 46:
       jj_consume_token(46);
       pat = CoreMapExprNodePattern(env);
       jj_consume_token(47);
-        if (true) return pat;
-        break;
+        return pat;
+//        break;
     default:
       jj_la1[49] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
-  final public Map<String,String> AttrValue(Env env, Map<String,String> attributes) throws ParseException {
+  public RadixTree<String> AttrValue(Env env, RadixTree<String> attributes) throws ParseException {
         Token attr = null;
         Token value = null;
         Token tok = null;
@@ -1396,16 +1401,16 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
               if (tok != null) { str = tok.image + str; }
               if (attr != null && str != null)  {
                 if (attributes.containsKey(attr.image)) {
-                    if (true) throw new Error("Attribute match already defined: " + attr.image);
+                    throw new Error("Attribute match already defined: " + attr.image);
                 }
                 attributes.put(attr.image, str);
               }
-      if (true) return attributes;
-      throw new Error("Missing return statement in function");
+      return attributes;
+
   }
 
-  final public NodePattern CoreMapWordPattern(Env env) throws ParseException {
-    Map<String, String> attributes = new ArrayMap<>();
+  public NodePattern CoreMapWordPattern(Env env) throws ParseException {
+    Map< String,String> attributes = new ArrayMap<>();
     CoreMapNodePattern pat;
         Token value = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
@@ -1425,11 +1430,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
     }
                   attributes.put("word", value.image);
           pat = CoreMapNodePattern.valueOf(env, attributes);
-      if (true) return pat;
-      throw new Error("Missing return statement in function");
+      return pat;
+
   }
 
-  final public MultiNodePattern MultiNodePattern(Env env) throws ParseException {
+  public MultiNodePattern MultiNodePattern(Env env) throws ParseException {
     NodePattern pat;
     MultiNodePattern mp;
     Token v1, v2;
@@ -1474,32 +1479,32 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       mp = new MultiCoreMapNodePattern(pat);
       mp.setMinNodes(min);
       mp.setMaxNodes(max);
-      if (true) return mp;
-      throw new Error("Missing return statement in function");
+      return mp;
+
   }
 
-  final public String CoreMapVarValue(Env env) throws ParseException {
+  public String CoreMapVarValue(Env env) throws ParseException {
         Token value = null;
     value = jj_consume_token(TokenSequenceParserConstants.REGEXVAR);
-      if (true) return (String) env.get(value.image);
-      throw new Error("Missing return statement in function");
+      return (String) env.get(value.image);
+
   }
 
-  final public NodePattern CoreMapVarNodePattern(Env env) throws ParseException {
+  public NodePattern CoreMapVarNodePattern(Env env) throws ParseException {
         Token value = null;
     value = jj_consume_token(TokenSequenceParserConstants.REGEXVAR);
-      if (true) return env.getNodePattern(value.image);
-      throw new Error("Missing return statement in function");
+      return env.getNodePattern(value.image);
+
   }
 
-  final public NodePattern CoreMapExprNodePattern(Env env) throws ParseException {
+  public NodePattern CoreMapExprNodePattern(Env env) throws ParseException {
         Expression expr = null;
     expr = CondExpression(env);
-      if (true) return new CoreMapExpressionNodePattern(env, expr);
-      throw new Error("Missing return statement in function");
+      return new CoreMapExpressionNodePattern(env, expr);
+
   }
 
-  final public Pair<SequencePattern.PatternExpr, SequenceMatchAction<CoreMap>> SeqRegexWithAction(Env env) throws ParseException {
+  public Pair<SequencePattern.PatternExpr, SequenceMatchAction<CoreMap>> SeqRegexWithAction(Env env) throws ParseException {
   SequencePattern.PatternExpr expr;
   SequenceMatchAction<CoreMap> action = null;
     expr = SeqRegex(env);
@@ -1510,30 +1515,31 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
     default:
       jj_la1[56] = jj_gen;
     }
-      if (true) return new Pair<>(expr,action);
-      throw new Error("Missing return statement in function");
+      return new Pair<>(expr, action);
+
   }
 
-  final public SequenceMatchAction<CoreMap> Action(Env env) throws ParseException {
+  public SequenceMatchAction<CoreMap> Action(Env env) throws ParseException {
    SequenceMatchAction<CoreMap> action;
     jj_consume_token(50);
     action = AnnotateAction(env);
-      if (true) return action;
-      throw new Error("Missing return statement in function");
+      return action;
+
   }
 
-  final public SequenceMatchAction<CoreMap> AnnotateAction(Env env) throws ParseException {
+  public SequenceMatchAction<CoreMap> AnnotateAction(Env env) throws ParseException {
   Map<String, String> attributes;
     jj_consume_token(51);
     jj_consume_token(24);
     //  group = <NONNEGINT> ","
       attributes = SetAttrValues(env);
     jj_consume_token(25);
-      if (true) return new CoreMapSequenceMatchAction.AnnotateAction<>( /*group,*/ attributes);
-      throw new Error("Missing return statement in function");
+      return new CoreMapSequenceMatchAction.
+              AnnotateAction<>( /*group,*/ attributes);
+
   }
 
-  final public Map<String,String> SetAttrValues(Env env) throws ParseException {
+  public Map<String, String> SetAttrValues(Env env) throws ParseException {
     Map<String, String> attributes = new ArrayMap<>();
     jj_consume_token(21);
     SetAttrValue(env, attributes);
@@ -1562,11 +1568,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       SetAttrValue(env, attributes);
     }
     jj_consume_token(23);
-      if (true) return attributes;
-      throw new Error("Missing return statement in function");
+      return attributes;
+
   }
 
-  final public Map<String,String> SetAttrValue(Env env, Map<String,String> attributes) throws ParseException {
+  public Map<String, String> SetAttrValue(Env env, Map<String, String> attributes) throws ParseException {
         Token attr = null;
         Token value = null;
         String str = null;
@@ -1590,15 +1596,15 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
               if (value != null) { str = value.image; }
               if (attr != null && str != null)  {
                 if (attributes.containsKey(attr.image)) {
-                    if (true) throw new Error("Attribute already defined: " + attr.image);
+                    throw new Error("Attribute already defined: " + attr.image);
                 }
                 attributes.put(attr.image, str);
               }
-      if (true) return attributes;
-      throw new Error("Missing return statement in function");
+      return attributes;
+
   }
 
-  final public Token NumberToken() throws ParseException {
+  public Token NumberToken() throws ParseException {
    Token value = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.NONNEGINT:
@@ -1615,11 +1621,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return value;
-      throw new Error("Missing return statement in function");
+      return value;
+
   }
 
-  final public Token IntegerToken() throws ParseException {
+  public Token IntegerToken() throws ParseException {
    Token value = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.NONNEGINT:
@@ -1633,11 +1639,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return value;
-      throw new Error("Missing return statement in function");
+      return value;
+
   }
 
-  final public Token CmpToken() throws ParseException {
+  public Token CmpToken() throws ParseException {
    Token value = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.STRREGEXCMP:
@@ -1651,11 +1657,11 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return value;
-      throw new Error("Missing return statement in function");
+      return value;
+
   }
 
-  final public Token RelaxedStringToken() throws ParseException {
+  public Token RelaxedStringToken() throws ParseException {
    Token value = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.STR:
@@ -1669,27 +1675,27 @@ public class TokenSequenceParser implements SequencePattern.Parser<CoreMap> {
       jj_consume_token(-1);
       throw new ParseException();
     }
-      if (true) return value;
-      throw new Error("Missing return statement in function");
+      return value;
+
   }
 
-  final public String RelaxedString() throws ParseException {
+  public String RelaxedString() throws ParseException {
    Token value = null;
     switch (jj_ntk==-1 ?jj_ntk():jj_ntk) {
     case TokenSequenceParserConstants.STR:
       value = jj_consume_token(TokenSequenceParserConstants.STR);
-        if (true) return value.image.substring(1,value.image.length()-1);
-        break;
+        return value.image.substring(1, value.image.length() - 1);
+//        break;
     case TokenSequenceParserConstants.IDENTIFIER:
       value = jj_consume_token(TokenSequenceParserConstants.IDENTIFIER);
-        if (true) return value.image;
-        break;
+        return value.image;
+//        break;
     default:
       jj_la1[64] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
-    throw new Error("Missing return statement in function");
+
   }
 
 /*
@@ -1703,11 +1709,11 @@ String VarName() : {
   | ( value = <STR> )
     { return value.image.substring(1,value.image.length()-1); }
 } */
-  final public String RelaxedStringNoIdentifier() throws ParseException {
+  public String RelaxedStringNoIdentifier() throws ParseException {
    Token value = null;
     value = jj_consume_token(TokenSequenceParserConstants.STR);
-      if (true) return value.image.substring(1,value.image.length()-1);
-      throw new Error("Missing return statement in function");
+      return value.image.substring(1, value.image.length() - 1);
+
   }
 
   private boolean jj_2_1(int xla) {
@@ -2910,7 +2916,7 @@ String VarName() : {
 
 
 /** Get the next Token. */
-  final public Token getNextToken() {
+  public Token getNextToken() {
       token = token.next != null ? token.next : (token.next = token_source.getNextToken());
     jj_ntk = -1;
     jj_gen++;
@@ -2918,7 +2924,7 @@ String VarName() : {
   }
 
 /** Get the specific Token. */
-  final public Token getToken(int index) {
+  public Token getToken(int index) {
     Token t = token;
     for (int i = 0; i < index; i++) {
         t = t.next != null ? t.next : (t.next = token_source.getNextToken());
@@ -2997,11 +3003,11 @@ String VarName() : {
   }
 
   /** Enable tracing. */
-  final public void enable_tracing() {
+  public void enable_tracing() {
   }
 
   /** Disable tracing. */
-  final public void disable_tracing() {
+  public void disable_tracing() {
   }
 
   private void jj_rescan_token() {

@@ -41,7 +41,7 @@ public class CollinsHeadFinder extends AbstractCollinsHeadFinder {
   public CollinsHeadFinder(TreebankLanguagePack tlp, String... categoriesToAvoid) {
     super(tlp, categoriesToAvoid);
 
-      nonTerminalInfo = new FastMap<>();
+      nonTerminalInfo = new ca.gedge.radixtree.RadixTree<>();
     // This version from Collins' diss (1999: 236-238)
     nonTerminalInfo.put("ADJP", new String[][]{{"left", "NNS", "QP", "NN", "$", "ADVP", "JJ", "VBN", "VBG", "ADJP", "JJR", "NP", "JJS", "DT", "FW", "RBR", "RBS", "SBAR", "RB"}});
     nonTerminalInfo.put("ADVP", new String[][]{{"right", "RB", "RBR", "RBS", "FW", "ADVP", "TO", "CD", "JJR", "JJ", "IN", "NP", "JJS", "NN"}});

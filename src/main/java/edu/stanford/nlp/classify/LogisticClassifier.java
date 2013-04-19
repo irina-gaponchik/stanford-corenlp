@@ -202,7 +202,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, RVFClassifier
     for (F feature : features.keySet()) {
       int f = featureIndex.indexOf(feature);
       if (f >= 0) {
-        sum += weights[f]*features.getCount(feature);
+        sum += weights[f]*features.get(feature);
       }
     }
     return sum;
@@ -216,7 +216,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, RVFClassifier
     for (F feature : features.keySet()) {
       int f = featureIndex.indexOf(feature);
       if (f >= 0) {
-        fWts.incrementCount(feature,weights[f]*features.getCount(feature));
+        fWts.incrementCount(feature,weights[f]*features.get(feature));
       }
     }
     return fWts;

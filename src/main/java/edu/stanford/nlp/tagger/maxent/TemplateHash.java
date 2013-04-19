@@ -94,7 +94,7 @@ class ListInstances {
 public class TemplateHash {
 
   // the positions of the feature extractors
-  private final Map<Pair<Integer, CharSequence>, ListInstances> tempHash = new FastMap<>();
+  private final Map<Pair<Integer, String>, ListInstances> tempHash = new FastMap<>();
 
     private final MaxentTagger maxentTagger;
 
@@ -103,12 +103,11 @@ public class TemplateHash {
   }
 
   protected void addPositions(int start, int end, FeatureKey fK) {
-    Pair<Integer, CharSequence> key = new Pair<>(fK.num, fK.val);
-    tempHash.get(key).addPositions(start, end);
+      tempHash.get(new Pair<>(fK.num, fK.val)).addPositions(start, end);
   }
 
   protected int[] getPositions(FeatureKey s) {
-    Pair<Integer, CharSequence> p = new Pair<>(s.num, s.val);
+    Pair<Integer, String> p = new Pair<>(s.num, s.val);
     return tempHash.get(p).getPositions();
   }
 
@@ -127,10 +126,10 @@ public class TemplateHash {
   }
 
   protected void add(int nFeatFrame, History history, int number) {
-    Pair<Integer, CharSequence> wT;
+    Pair<Integer, String> wT;
     int general = maxentTagger.extractors.getSize();
 
-      wT = nFeatFrame < general ? new Pair<>(nFeatFrame, maxentTagger.extractors.extract(nFeatFrame, history)) : new Pair<>(nFeatFrame, maxentTagger.extractorsRare.extract(nFeatFrame - general, history));
+      wT = new Pair<>(nFeatFrame, nFeatFrame < general ? maxentTagger.extractors.extract(nFeatFrame, history) : maxentTagger.extractorsRare.extract(nFeatFrame - general, history));
 
     if (tempHash.containsKey(wT)) {
       ListInstances li = tempHash.get(wT);
@@ -149,10 +148,10 @@ public class TemplateHash {
 
 
   protected void addPrev(int nFeatFrame, History history) {
-    Pair<Integer, CharSequence> wT;
+    Pair<Integer, String> wT;
     int general = maxentTagger.extractors.getSize();
 
-      wT = nFeatFrame < general ? new Pair<>(nFeatFrame, maxentTagger.extractors.extract(nFeatFrame, history)) : new Pair<>(nFeatFrame, maxentTagger.extractorsRare.extract(nFeatFrame - general, history));
+      wT = new Pair<>(nFeatFrame, nFeatFrame < general ? maxentTagger.extractors.extract(nFeatFrame, history) : maxentTagger.extractorsRare.extract(nFeatFrame - general, history));
     if (tempHash.containsKey(wT)) {
       tempHash.get(wT).inc();
     } else {
@@ -163,7 +162,7 @@ public class TemplateHash {
   }
 
 
-  protected int[] getXValues(Pair<Integer, CharSequence> key) {
+  protected int[] getXValues(Pair<Integer, String> key) {
     if (tempHash.containsKey(key)) {
       return tempHash.get(key).getInstances();
     }

@@ -5,6 +5,7 @@ import edu.stanford.nlp.util.*;
 
 import edu.stanford.nlp.util.Interval;
 import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 import javolution.util.FastSet;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
@@ -324,7 +325,7 @@ public class SUTime {
     }
 
     public Map<String, String> getTimexAttributes(TimeIndex timeIndex) {
-      Map<String, String> map = new LinkedHashMap<>();
+        Map <String,String>map = new FastMap<>();
       map.put(TimexAttr.tid.name(), getTidString(timeIndex));
       // NOTE: GUTime used "VAL" instead of TIMEX3 standard "value"
       // NOTE: attributes are case sensitive, GUTIME used mostly upper case

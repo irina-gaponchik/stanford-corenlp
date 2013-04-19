@@ -497,7 +497,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
   public double countHistory(IntDependency dependency) {
     IntDependency temp = new IntDependency(dependency.head.word, tagBin(dependency.head.tag), wildTW.word, wildTW.tag, dependency.leftHeaded, valenceBin(dependency.distance));
 
-    return argCounter.getCount(temp);
+    return argCounter.get(temp);
   }
 
   /** Score a tag binned dependency. */
@@ -564,18 +564,18 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     IntTaggedWord anyTagArg = new IntTaggedWord(dependency.arg.word, ANY_TAG_INT);
 
     IntDependency temp = new IntDependency(dependency.head, dependency.arg, leftHeaded, binDistance);
-    double c_aTW_hTWd = argCounter.getCount(temp);
+    double c_aTW_hTWd = argCounter.get(temp);
     temp = new IntDependency(dependency.head, anyArg, leftHeaded, binDistance);
-    double c_aT_hTWd = argCounter.getCount(temp);
+    double c_aT_hTWd = argCounter.get(temp);
     temp = new IntDependency(dependency.head, wildTW, leftHeaded, binDistance);
-    double c_hTWd = argCounter.getCount(temp);
+    double c_hTWd = argCounter.get(temp);
 
     temp = new IntDependency(anyHead, dependency.arg, leftHeaded, binDistance);
-    double c_aTW_hTd = argCounter.getCount(temp);
+    double c_aTW_hTd = argCounter.get(temp);
     temp = new IntDependency(anyHead, anyArg, leftHeaded, binDistance);
-    double c_aT_hTd = argCounter.getCount(temp);
+    double c_aT_hTd = argCounter.get(temp);
     temp = new IntDependency(anyHead, wildTW, leftHeaded, binDistance);
-    double c_hTd = argCounter.getCount(temp);
+    double c_hTd = argCounter.get(temp);
 
     // for smooth tag projection
     short aPT = Short.MIN_VALUE;
@@ -594,25 +594,25 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
       IntTaggedWord projectedAnyArg = new IntTaggedWord(ANY_WORD_INT, aPT);
 
       temp = new IntDependency(projectedAnyHead, projectedArg, leftHeaded, binDistance);
-      c_aPTW_hPTd = argCounter.getCount(temp);
+      c_aPTW_hPTd = argCounter.get(temp);
       temp = new IntDependency(projectedAnyHead, projectedAnyArg, leftHeaded, binDistance);
-      c_aPT_hPTd = argCounter.getCount(temp);
+      c_aPT_hPTd = argCounter.get(temp);
       temp = new IntDependency(projectedAnyHead, wildTW, leftHeaded, binDistance);
-      c_hPTd = argCounter.getCount(temp);
+      c_hPTd = argCounter.get(temp);
 
       temp = new IntDependency(wildTW, projectedArg, false, ANY_DISTANCE_INT);
-      c_aPTW_aPT = argCounter.getCount(temp);
+      c_aPTW_aPT = argCounter.get(temp);
       temp = new IntDependency(wildTW, projectedAnyArg, false, ANY_DISTANCE_INT);
-      c_aPT = argCounter.getCount(temp);
+      c_aPT = argCounter.get(temp);
     }
 
     // wild head is always directionless and no use distance
     temp = new IntDependency(wildTW, dependency.arg, false, ANY_DISTANCE_INT);
-    double c_aTW = argCounter.getCount(temp);
+    double c_aTW = argCounter.get(temp);
     temp = new IntDependency(wildTW, anyArg, false, ANY_DISTANCE_INT);
-    double c_aT = argCounter.getCount(temp);
+    double c_aT = argCounter.get(temp);
     temp = new IntDependency(wildTW, anyTagArg, false, ANY_DISTANCE_INT);
-    double c_aW = argCounter.getCount(temp);
+    double c_aW = argCounter.get(temp);
 
     // do the Bayesian magic
     // MLE probs
@@ -720,13 +720,13 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     IntTaggedWord anyHead = new IntTaggedWord(ANY_WORD_INT, dependency.head.tag);
 
     IntDependency temp = new IntDependency(dependency.head, stopTW, dependency.leftHeaded, binDistance);
-    double c_stop_hTWds = stopCounter.getCount(temp);
+    double c_stop_hTWds = stopCounter.get(temp);
     temp = new IntDependency(unknownHead, stopTW, dependency.leftHeaded, binDistance);
-    double c_stop_hTds = stopCounter.getCount(temp);
+    double c_stop_hTds = stopCounter.get(temp);
     temp = new IntDependency(dependency.head, wildTW, dependency.leftHeaded, binDistance);
-    double c_hTWds = stopCounter.getCount(temp);
+    double c_hTWds = stopCounter.get(temp);
     temp = new IntDependency(anyHead, wildTW, dependency.leftHeaded, binDistance);
-    double c_hTds = stopCounter.getCount(temp);
+    double c_hTds = stopCounter.get(temp);
 
     double p_stop_hTds = c_hTds > 0.0 ? c_stop_hTds / c_hTds : 1.0;
 
@@ -750,12 +750,12 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     ClassicCounter<IntDependency> compressedStopC = stopCounter;
     stopCounter = new ClassicCounter<>();
     for (IntDependency d : compressedArgC.keySet()) {
-      double count = compressedArgC.getCount(d);
+      double count = compressedArgC.get(d);
       expandArg(d, d.distance, count);
     }
 
     for (IntDependency d : compressedStopC.keySet()) {
-      double count = compressedStopC.getCount(d);
+      double count = compressedStopC.get(d);
       expandStop(d, d.distance, count, false);
     }
 
@@ -776,7 +776,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     for (IntDependency dependency : fullArgCounter.keySet()) {
       if (dependency.head != wildTW && dependency.arg != wildTW &&
               dependency.head.word != -1 && dependency.arg.word != -1) {
-        argCounter.incrementCount(dependency, fullArgCounter.getCount(dependency));
+        argCounter.incrementCount(dependency, fullArgCounter.get(dependency));
       }
     }
 
@@ -784,7 +784,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     stopCounter = new ClassicCounter<>();
     for (IntDependency dependency : fullStopCounter.keySet()) {
       if (dependency.head.word != -1) {
-        stopCounter.incrementCount(dependency, fullStopCounter.getCount(dependency));
+        stopCounter.incrementCount(dependency, fullStopCounter.get(dependency));
       }
     }
 
@@ -850,7 +850,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
     for (IntDependency dependency : argCounter.keySet()) {
       if (dependency.head != wildTW && dependency.arg != wildTW &&
               dependency.head.word != -1 && dependency.arg.word != -1) {
-        double count = argCounter.getCount(dependency);
+        double count = argCounter.get(dependency);
         out.println(dependency.toString(wordIndex, tagIndex) + ' ' + count);
       }
     }
@@ -859,7 +859,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
 
     for (IntDependency dependency : stopCounter.keySet()) {
       if (dependency.head.word != -1) {
-        double count = stopCounter.getCount(dependency);
+        double count = stopCounter.get(dependency);
         out.println(dependency.toString(wordIndex, tagIndex) + ' ' + count);
       }
     }

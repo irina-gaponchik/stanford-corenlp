@@ -33,6 +33,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.Word;
@@ -621,8 +622,8 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
   /**
    * Command-line option specification.
    */
-  private static Map<String,Integer> optionArgDefs() {
-      Map<String,Integer> optionArgDefs = new FastMap<>();
+  private static RadixTree<Integer> optionArgDefs() {
+      RadixTree<Integer> optionArgDefs = new RadixTree<>();
     optionArgDefs.put("options", 1);
     optionArgDefs.put("ioFileList", 0);
     optionArgDefs.put("lowerCase", 0);

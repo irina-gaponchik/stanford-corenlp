@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.international.Languages;
 import edu.stanford.nlp.international.Languages.Language;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -80,8 +81,8 @@ public class TaggingEval extends AbstractEval {
       }};
   }
 
-  private static Map<String,Set<Label>> makeObjectsByCat(Tree t) {
-      Map<String,Set<Label>> catMap = new FastMap<>();
+  private static RadixTree<Set<Label>> makeObjectsByCat(Tree t) {
+      RadixTree<Set<Label>> catMap = new RadixTree<>();
     List<CoreLabel> tly = t.taggedLabeledYield();
 
     for(CoreLabel label : tly) {
@@ -107,8 +108,8 @@ public class TaggingEval extends AbstractEval {
     super.evaluate(guess, gold, pw);
 
     if(doCatLevelEval) {
-      Map<String,Set<Label>> guessCats = makeObjectsByCat(guess);
-      Map<String,Set<Label>> goldCats = makeObjectsByCat(gold);
+      RadixTree<Set<Label>> guessCats = makeObjectsByCat(guess);
+      RadixTree<Set<Label>> goldCats = makeObjectsByCat(gold);
         Set<String> allCats = new FastSet<>();
       allCats.addAll(guessCats.keySet());
       allCats.addAll(goldCats.keySet());
@@ -140,10 +141,10 @@ public class TaggingEval extends AbstractEval {
         if(lex != null) measureOOV(guess,gold);
 
         if (pw != null && runningAverages) {
-          pw.println(cat + "\tP: " + (int) (currentPrecision * 10000) / 100.0 + " (sent ave " + (int) (precisions.getCount(cat) * 10000 / num) / 100.0 + ") (evalb " + (int) (precisions2.getCount(cat) * 10000 / pnums2.getCount(cat)) / 100.0 + ')');
-          pw.println("\tR: " + (int) (currentRecall * 10000) / 100.0 + " (sent ave " + (int) (recalls.getCount(cat) * 10000 / num) / 100.0 + ") (evalb " + (int) (recalls2.getCount(cat) * 10000 / rnums2.getCount(cat)) / 100.0 + ')');
-          double cF1 = 2.0 / (rnums2.getCount(cat) / recalls2.getCount(cat) + pnums2.getCount(cat) / precisions2.getCount(cat));
-          String emit = str + " F1: " + (int) (currentF1 * 10000) / 100.0 + " (sent ave " + (int) (10000 * f1s.getCount(cat) / num) / 100.0 + ", evalb " + (int) (10000 * cF1) / 100.0 + ')';
+          pw.println(cat + "\tP: " + (int) (currentPrecision * 10000) / 100.0 + " (sent ave " + (int) (precisions.get(cat) * 10000 / num) / 100.0 + ") (evalb " + (int) (precisions2.get(cat) * 10000 / pnums2.get(cat)) / 100.0 + ')');
+          pw.println("\tR: " + (int) (currentRecall * 10000) / 100.0 + " (sent ave " + (int) (recalls.get(cat) * 10000 / num) / 100.0 + ") (evalb " + (int) (recalls2.get(cat) * 10000 / rnums2.get(cat)) / 100.0 + ')');
+          double cF1 = 2.0 / (rnums2.get(cat) / recalls2.get(cat) + pnums2.get(cat) / precisions2.get(cat));
+          String emit = str + " F1: " + (int) (currentF1 * 10000) / 100.0 + " (sent ave " + (int) (10000 * f1s.get(cat) / num) / 100.0 + ", evalb " + (int) (10000 * cF1) / 100.0 + ')';
           pw.println(emit);
         }
       }
@@ -187,10 +188,10 @@ public class TaggingEval extends AbstractEval {
 
       Map<Double,String> f1Map = new TreeMap<>();
       for (String cat : cats) {
-        double pnum2 = pnums2.getCount(cat);
-        double rnum2 = rnums2.getCount(cat);
-        double prec = precisions2.getCount(cat) / pnum2;
-        double rec = recalls2.getCount(cat) / rnum2;
+        double pnum2 = pnums2.get(cat);
+        double rnum2 = rnums2.get(cat);
+        double prec = precisions2.get(cat) / pnum2;
+        double rec = recalls2.get(cat) / rnum2;
         double f1 = 2.0 / (1.0 / prec + 1.0 / rec);
 
         if(new Double(f1).equals(Double.NaN)) f1 = -1.0;
@@ -205,15 +206,15 @@ public class TaggingEval extends AbstractEval {
       pw.println("============================================================");
 
       for (String cat : f1Map.values()) {
-        double pnum2 = pnums2.getCount(cat);
-        double rnum2 = rnums2.getCount(cat);
-        double prec = precisions2.getCount(cat) / pnum2;
+        double pnum2 = pnums2.get(cat);
+        double rnum2 = rnums2.get(cat);
+        double prec = precisions2.get(cat) / pnum2;
         prec *= 100.0;
-        double rec = recalls2.getCount(cat) / rnum2;
+        double rec = recalls2.get(cat) / rnum2;
         rec *= 100.0;
         double f1 = 2.0 / (1.0 / prec + 1.0 / rec);
 
-        double oovRate = lex == null ? -1.0 : percentOOV.getCount(cat) / percentOOV2.getCount(cat);
+        double oovRate = lex == null ? -1.0 : percentOOV.get(cat) / percentOOV2.get(cat);
 
         pw.println(cat + "\tLP: " + (pnum2 == 0.0 ? " N/A": nf.format(prec)) + "\tguessed: " + (int) pnum2 +
             "\tLR: " + (rnum2 == 0.0 ? " N/A": nf.format(rec)) + "\tgold:  " + (int) rnum2 +
@@ -237,7 +238,7 @@ public class TaggingEval extends AbstractEval {
     usage.append("  -e         : Input encoding.\n");
   }
 
-  public static final Map<String,Integer> optionArgDefs = new FastMap<>();
+  public static final RadixTree<Integer> optionArgDefs = new RadixTree<>();
 
     static {
     optionArgDefs.put("-v", 0);
@@ -268,7 +269,7 @@ public class TaggingEval extends AbstractEval {
     String guessFile = null;
     String goldFile = null;
 
-    Map<String, String[]> argsMap = StringUtils.argsToMap(args, optionArgDefs);
+    RadixTree< String[]> argsMap = StringUtils.argsToMap(args, optionArgDefs);
 
     for(Map.Entry<String, String[]> opt : argsMap.entrySet()) {
       if(opt.getKey() == null) continue;

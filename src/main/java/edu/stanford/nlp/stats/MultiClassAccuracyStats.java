@@ -102,8 +102,8 @@ public class MultiClassAccuracyStats<L> implements Scorer<L> {
       Counter<L> scores = classifier.logProbabilityOf(d);
       L guess = Counters.argmax(scores);
       L correctLab = d.label();
-      double guessScore = scores.getCount(guess);
-      double correctScore = scores.getCount(correctLab);
+      double guessScore = scores.get(guess);
+      double correctScore = scores.get(correctLab);
       int guessInd = data.labelIndex().indexOf(guess);
       int correctInd = data.labelIndex().indexOf(correctLab);
 

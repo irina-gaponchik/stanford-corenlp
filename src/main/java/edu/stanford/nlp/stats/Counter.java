@@ -82,7 +82,7 @@ public interface Counter<E> extends PrettyLoggable {
    * @param key The key
    * @return The count
    */
-  public double getCount(Object key);
+  public double get(Object key);
 
   /**
    * Sets the count for the given key to be the given value.

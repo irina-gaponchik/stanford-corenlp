@@ -651,10 +651,10 @@ public class Rules {
        high_freq = 16;
      }
      
-     if(dict.corefDict.get(dictVersion-1).getCount(mention_pair) > high_freq) return true;
+     if(dict.corefDict.get(dictVersion-1).get(mention_pair) > high_freq) return true;
 
-     if(dict.corefDict.get(dictVersion-1).getCount(mention_pair) > freq){
-         if(dict.corefDictPMI.getCount(mention_pair) > 0.18) return true;
+     if(dict.corefDict.get(dictVersion-1).get(mention_pair) > freq){
+         if(dict.corefDictPMI.get(mention_pair) > 0.18) return true;
          if(!dict.corefDictPMI.containsKey(mention_pair)) return true;
      }     
      return false; 

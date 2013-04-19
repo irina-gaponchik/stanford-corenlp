@@ -140,7 +140,7 @@ public class FactoredLexicon extends BaseLexicon {
     double p_W = cW / wordTag.totalCount();
     
     // p_T
-    double cTseen = tagCounter.getCount(tagId);
+    double cTseen = tagCounter.get(tagId);
     double p_T = cTseen / tagCounter.totalCount();
     
     // p_T_L
@@ -150,7 +150,7 @@ public class FactoredLexicon extends BaseLexicon {
       if (cW > 100.0 && cWT > 0.0) {
         p_T_W = cWT / cW;
       } else {
-        double cTunseen = wordTagUnseen.getCount(tagId);
+        double cTunseen = wordTagUnseen.get(tagId);
         // TODO p_T_U is 0?
         double p_T_U = cTunseen / wordTagUnseen.totalCount();
         p_T_W = (cWT + smooth[1]*p_T_U) / (cW + smooth[1]); 
@@ -159,7 +159,7 @@ public class FactoredLexicon extends BaseLexicon {
       
     } else { // Unseen word. Score based on the word signature (of the surface form)
       IntTaggedWord iTW = new IntTaggedWord(wordId, tagId);
-      double c_T = tagCounter.getCount(tagId);
+      double c_T = tagCounter.get(tagId);
       p_W_T = Math.exp(getUnknownWordModel().score(iTW, loc, c_T, tagCounter.totalCount(), smooth[0], word));
     }
     
@@ -183,7 +183,7 @@ public class FactoredLexicon extends BaseLexicon {
     double p_L = cL / lemmaTag.totalCount();
     
     // p_T
-    double cTseen = tagCounter.getCount(tagId);
+    double cTseen = tagCounter.get(tagId);
     double p_T = cTseen / tagCounter.totalCount();
     
     // p_T_L
@@ -193,7 +193,7 @@ public class FactoredLexicon extends BaseLexicon {
       if (cL > 100.0 && cLT > 0.0) {
         p_T_L = cLT / cL;
       } else {
-        double cTunseen = lemmaTagUnseen.getCount(tagId);
+        double cTunseen = lemmaTagUnseen.get(tagId);
         // TODO(spenceg): p_T_U is 0??
         double p_T_U = cTunseen / lemmaTagUnseen.totalCount();
         p_T_L = (cLT + smooth[1]*p_T_U) / (cL + smooth[1]); 
@@ -202,7 +202,7 @@ public class FactoredLexicon extends BaseLexicon {
     
     } else { // Unseen lemma. Score based on the word signature (of the surface form)
       // Hack
-      double cTunseen = lemmaTagUnseen.getCount(tagId);
+      double cTunseen = lemmaTagUnseen.get(tagId);
       p_L_T = cTunseen / tagCounter.totalCount();
 
       //      int wordId = wordIndex.indexOf(word);
@@ -229,7 +229,7 @@ public class FactoredLexicon extends BaseLexicon {
     double p_M = cM / morphTag.totalCount();
     
     // p_T
-    double cTseen = tagCounter.getCount(tagId);
+    double cTseen = tagCounter.get(tagId);
     double p_T = cTseen / tagCounter.totalCount();
     
     double p_M_T = 0.0;
@@ -351,7 +351,7 @@ public class FactoredLexicon extends BaseLexicon {
     for (IntTaggedWord iTW : lexRules) {
       if (iTW.word() == nullWord) {
         // Mix in UW signature rules for open class types
-        double types = uwModel.unSeenCounter().getCount(iTW);
+        double types = uwModel.unSeenCounter().get(iTW);
         if (types > trainOptions.openClassTypesThreshold) {
           IntTaggedWord iTU = new IntTaggedWord(unkWord, iTW.tag);
           if (!rulesWithWord[unkWord].contains(iTU)) {
@@ -564,7 +564,7 @@ public class FactoredLexicon extends BaseLexicon {
     Collections.sort(biggestKeys, Counters.toComparator(errors, false, true));
     Counters.normalize(errors);
     for (String key : biggestKeys) {
-      System.err.printf("%s\t%.2f%n", key, errors.getCount(key)*100.0);
+      System.err.printf("%s\t%.2f%n", key, errors.get(key)*100.0);
     }
   }
 

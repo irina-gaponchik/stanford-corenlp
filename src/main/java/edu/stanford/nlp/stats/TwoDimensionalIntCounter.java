@@ -241,7 +241,7 @@ public class TwoDimensionalIntCounter<K1, K2> implements Serializable {
     for (K1 key1 : map.keySet()) {
       IntCounter<K2> c = getCounter(key1);
       for (K2 key2 : c.keySet()) {
-        double score = c.getCount(key2);
+        double score = c.get(key2);
         buff.append(key1).append('\t').append(key2).append('\t').append(score).append('\n');
       }
     }

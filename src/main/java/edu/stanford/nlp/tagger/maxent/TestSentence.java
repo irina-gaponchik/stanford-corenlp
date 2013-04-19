@@ -7,6 +7,7 @@
 
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.EncodingPrintWriter;
 import edu.stanford.nlp.io.PrintFile;
 import edu.stanford.nlp.ling.HasOffset;
@@ -66,7 +67,7 @@ public class TestSentence implements SequenceModel {
   private int endSizePairs; // = 0;
 
   private volatile History history;
-  protected volatile Map<String,double[]> localScores = new FastMap<>();
+  protected volatile RadixTree<double[]> localScores = new RadixTree<>();
     protected volatile double[][] localContextScores;
 
   protected final MaxentTagger maxentTagger;

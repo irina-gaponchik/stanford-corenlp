@@ -1,5 +1,6 @@
 package edu.stanford.nlp.trees.international.negra;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.LabelFactory;
 import edu.stanford.nlp.ling.StringLabel;
@@ -59,7 +60,7 @@ public class NegraLabel extends StringLabel {
       NegraLabel result;
       if(oldLabel instanceof NegraLabel) {
         NegraLabel l = (NegraLabel) oldLabel;
-          result = new NegraLabel(l.value(), l.getEdge(), new FastMap<String, String>());
+          result = new NegraLabel(l.value(), l.getEdge(), new RadixTree< String>());
         for (Map.Entry<String,String> e : l.features.entrySet()) {
           result.features.put(e.getKey(), e.getValue());
         }
@@ -70,7 +71,7 @@ public class NegraLabel extends StringLabel {
     }
   }
 
-  private Map<String,String> features;
+  private RadixTree<String> features;
 
   public void setEdge(String edge) {
     this.edge = edge;
@@ -84,14 +85,14 @@ public class NegraLabel extends StringLabel {
   }
 
   public NegraLabel(String str) {
-      this(str, new FastMap<String, String>());
+      this(str, new RadixTree< String>());
   }
 
-  public NegraLabel(String str, Map<String,String> features) {
+  public NegraLabel(String str, RadixTree<String> features) {
     this(str, null, features);
   }
 
-  public NegraLabel(String str, String edge, Map<String,String> features) {
+  public NegraLabel(String str, String edge, RadixTree<String> features) {
     super(str);
     this.edge = edge;
     this.features = features;

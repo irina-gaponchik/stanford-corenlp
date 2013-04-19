@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.process.LexedTokenFactory;
@@ -615,7 +616,7 @@ class ArabicLexer {
  // Normalize newlines to this token
  public static final String NEWLINE_TOKEN = "*NL*";
 
- private Map<String,String> normMap;
+ private RadixTree<String> normMap;
  
  public ArabicLexer(Reader r, LexedTokenFactory<?> tf, Properties props) {
    this(r);
@@ -640,7 +641,7 @@ class ArabicLexer {
  }
 
  private void setupNormalizationMap() {
-     normMap = new FastMap<>(200);
+     normMap = new RadixTree<>();
 
    // Junk characters that we always remove
    normMap.put("\u0600","#");

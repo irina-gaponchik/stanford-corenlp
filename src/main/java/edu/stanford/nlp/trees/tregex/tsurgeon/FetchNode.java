@@ -14,7 +14,7 @@ class FetchNode extends TsurgeonPattern {
 
   @Override
   public Tree evaluate(Tree t, TregexMatcher m) {
-    Tree result = root.newNodeNames.get(label);
+    Tree result = (Tree) root.newNodeNames.get(label);
     if (result == null) {
       result = m.getNode(label);
     }

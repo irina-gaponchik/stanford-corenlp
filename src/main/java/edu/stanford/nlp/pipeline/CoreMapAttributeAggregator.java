@@ -1,5 +1,6 @@
 package edu.stanford.nlp.pipeline;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.stats.IntCounter;
@@ -22,12 +23,7 @@ public abstract class CoreMapAttributeAggregator
     return DEFAULT_AGGREGATORS;
   }
 
-  public static CoreMapAttributeAggregator getAggregator(String str)
-  {
-    return AGGREGATOR_LOOKUP.get(str);
-  }
-
-  abstract public Object aggregate(Class key, List<? extends CoreMap> in);
+    abstract public Object aggregate(Class key, List<? extends CoreMap> in);
 
   public final static CoreMapAttributeAggregator FIRST_NON_NIL = new CoreMapAttributeAggregator() {
       public Object aggregate(Class key, List<? extends CoreMap> in) {
@@ -241,7 +237,7 @@ public abstract class CoreMapAttributeAggregator
   }
   public final static CoreMapAttributeAggregator MOST_FREQ = new MostFreqAggregator();
 
-  private static final Map<String, CoreMapAttributeAggregator> AGGREGATOR_LOOKUP = new FastMap<>();
+  private static final RadixTree< CoreMapAttributeAggregator> AGGREGATOR_LOOKUP = new RadixTree<>();
 
     static {
     AGGREGATOR_LOOKUP.put("FIRST", FIRST);

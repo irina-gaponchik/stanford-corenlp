@@ -3,6 +3,7 @@ package edu.stanford.nlp.process;
 import java.io.Serializable;
 import java.util.Map;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.Timing;
 import javolution.util.FastMap;
@@ -16,7 +17,7 @@ public class DistSimClassifier implements Serializable {
 
   private static final long serialVersionUID = 3L;
 
-  private final Map<CharSequence, String> lexicon;
+  private final RadixTree< String> lexicon;
   private final boolean cased;
   private final boolean numberEquivalence;
   private final String unknownWordClass;
@@ -39,10 +40,10 @@ public class DistSimClassifier implements Serializable {
     this.numberEquivalence = numberEquivalence;
     this.unknownWordClass = unknownWordClass;
     Timing.startDoing("Loading distsim lexicon from " + filename);
-      lexicon = new FastMap<>(1 << 15);  // make a reasonable starting size
+      lexicon = new RadixTree<>( );  // make a reasonable starting size
     boolean terryKoo = "terryKoo".equals(format);
     for (String line : ObjectBank.getLineIterator(filename, encoding)) {
-      CharSequence word;
+      String word;
       String wordClass;
       if (terryKoo) {
         String[] bits = line.split("\\t");
@@ -69,7 +70,7 @@ public class DistSimClassifier implements Serializable {
   }
 
 
-  public String distSimClass(CharSequence word) {
+  public String distSimClass(String word) {
     if ( ! cased) {
       word = String.valueOf(word).toLowerCase();
     }

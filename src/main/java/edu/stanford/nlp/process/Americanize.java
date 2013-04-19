@@ -1,6 +1,7 @@
 package edu.stanford.nlp.process;
 
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.StringUtils;
 
@@ -212,9 +213,9 @@ public class Americanize implements Function<HasWord,HasWord> {
   private static final String[] timexConverted = {"January", "February", /* not "march" ! */
                                                               "April", /* Not "may"! */ "June", "July", "August", "September", "October", "November", "December", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
-  private static final Map<String,String> mapping = new FastMap<>();
+  private static final RadixTree<String> mapping = new RadixTree<>();
 
-    private static final Map<String,String> timexMapping = new FastMap<>();
+    private static final RadixTree<String> timexMapping = new RadixTree<>();
 
 
     // static initialization block

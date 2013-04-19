@@ -57,17 +57,17 @@ public class BinaryGrammarExtractor extends AbstractTreeExtractor<Pair<UnaryGram
     UnaryGrammar ug = new UnaryGrammar(stateIndex);
     // add unaries
     for (UnaryRule ur : unaryRules) {
-      ur.score = (float) Math.log(unaryRuleCounter.getCount(ur) / symbolCounter.getCount(stateIndex.get(ur.parent)));
+      ur.score = (float) Math.log(unaryRuleCounter.get(ur) / symbolCounter.get(stateIndex.get(ur.parent)));
       if (op.trainOptions.compactGrammar() >= 4) {
-        ur.score = (float) unaryRuleCounter.getCount(ur);
+        ur.score = (float) unaryRuleCounter.get(ur);
       }
       ug.addRule(ur);
     }
     // add binaries
     for (BinaryRule br : binaryRules) {
-      br.score = (float) Math.log((binaryRuleCounter.getCount(br) - op.trainOptions.ruleDiscount) / symbolCounter.getCount(stateIndex.get(br.parent)));
+      br.score = (float) Math.log((binaryRuleCounter.get(br) - op.trainOptions.ruleDiscount) / symbolCounter.get(stateIndex.get(br.parent)));
       if (op.trainOptions.compactGrammar() >= 4) {
-        br.score = (float) binaryRuleCounter.getCount(br);
+        br.score = (float) binaryRuleCounter.get(br);
       }
       bg.addRule(br);
     }

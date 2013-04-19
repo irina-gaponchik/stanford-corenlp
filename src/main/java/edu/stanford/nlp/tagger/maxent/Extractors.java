@@ -84,7 +84,7 @@ public class Extractors implements Serializable {
    * @return String The feature value
    */
 
-  CharSequence extract(int i, History h) {
+  String extract(int i, History h) {
     return v[i].extract(h);
   }
 

@@ -1,5 +1,6 @@
 package edu.stanford.nlp.trees.international.pennchinese;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.trees.EnglishGrammaticalRelations;
 import edu.stanford.nlp.trees.GrammaticalRelation;
 import edu.stanford.nlp.trees.GrammaticalRelation.Language;
@@ -8,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static edu.stanford.nlp.trees.GrammaticalRelation.DEPENDENT;
 import static edu.stanford.nlp.trees.GrammaticalRelation.GOVERNOR;
@@ -1211,7 +1211,7 @@ public class ChineseGrammaticalRelations {
   
   // Map from Chinese GrammaticalRelation short names to their corresponding
   // GrammaticalRelation objects
-  public static final Map<String, GrammaticalRelation> shortNameToGRel = new ConcurrentHashMap<>();
+  public static final RadixTree< GrammaticalRelation> shortNameToGRel = new RadixTree<>();
   static {
     for (GrammaticalRelation gr : ChineseGrammaticalRelations.values()) {
       shortNameToGRel.put(gr.getShortName(), gr);

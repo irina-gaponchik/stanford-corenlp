@@ -1,5 +1,6 @@
 package edu.stanford.nlp.time;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ie.NumberNormalizer;
 import edu.stanford.nlp.util.ArrayMap;
 import javolution.util.FastMap;
@@ -21,7 +22,7 @@ public class EnglishDateTimeUtils {
   static final Pattern teDayHolPattern   = Pattern.compile("\\b(election|memorial|C?Hanukk?ah|Rosh|Kippur|tet|diwali|halloween)\\b", Pattern.CASE_INSENSITIVE);
 
   // holidays that appear on fixed date
-  static Map<String,String> fixedHol2Date = new FastMap<>(30);
+  static FastMap<Object, Object> fixedHol2Date = new FastMap<>();
 
     static {
     fixedHol2Date.put("newyear",   "0101");
@@ -56,7 +57,7 @@ public class EnglishDateTimeUtils {
 
   // holidays that appear on certain day of the week
   // format is month-DOW-nth
-  static Map<String,String> nthDOWHol2Date = new FastMap<>(9);
+  static RadixTree<String> nthDOWHol2Date = new RadixTree<>();
 
     static {
     nthDOWHol2Date.put("mlk",        "1-1-3");
@@ -73,8 +74,8 @@ public class EnglishDateTimeUtils {
   // "jan" => 1, "feb" =>  2, "mar" =>  3, "apr" =>  4,
 	//	 "may" => 5, "jun" =>  6, "jul" =>  7, "aug" =>  8,
 	//	 "sep" => 9, "oct" => 10, "nov" => 11, "dec" => 12
-  static String[] months = { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
-  public static Map<String,Integer> month2Num = new FastMap<>(months.length);
+  static Object[] months = { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+  public static FastMap<Object, Integer> month2Num = new FastMap<Object, Integer>(months.length);
 
     static {
     for (int i = 0; i < months.length; i++) {
@@ -85,7 +86,7 @@ public class EnglishDateTimeUtils {
   // "sunday"    => 0, "monday"   => 1, "tuesday" => 2,  "wednesday" => 3,
   // "thursday" => 4, "friday"  => 5, "saturday"  => 6
   static String[] dayOfWeek = { "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday" };
-  static Map<String,Integer> day2Num = new FastMap<>(dayOfWeek.length);
+  static Map<String, Integer> day2Num = new FastMap<String, Integer>(dayOfWeek.length);
 
     static {
     for (int i = 0; i < dayOfWeek.length; i++) {
@@ -95,7 +96,7 @@ public class EnglishDateTimeUtils {
 
   // TODO: Java also knows about time zones...
   // %TE_TimeZones    = ("E" => -5, "C" => -6, "M" => -7, "P" => -8);
-  static Map<String,Integer> teTimeZones = new ArrayMap<>(4);
+  static Map<String, Integer> teTimeZones = new ArrayMap<String, Integer>(4);
   static {
     teTimeZones.put("E", -5);
     teTimeZones.put("C", -6);
@@ -105,7 +106,7 @@ public class EnglishDateTimeUtils {
 
   // %TE_Season       = ("spring" => "SP", "summer" => "SU",
   //     "autumn" => "FA", "fall" => "FA", "winter" => "WI");
-  static Map<String,String> teSeason = new ArrayMap<>(5);
+  static Map<String, String> teSeason = new ArrayMap<String, String>(5);
   static {
     teSeason.put("spring", "SP");
     teSeason.put("summer", "SU");
@@ -115,7 +116,7 @@ public class EnglishDateTimeUtils {
   }
 
   // %TE_Season2Month = ("SP" => 4, "SU" => 6, "FA" => 9, "WI" => 12);
-  static Map<String,Integer> teSeason2Month = new ArrayMap<>(4);
+  static Map<String, Integer> teSeason2Month = new ArrayMap<String, Integer>(4);
   static {
     teSeason2Month.put("SP", 4);
     teSeason2Month.put("SU", 6);
@@ -130,7 +131,7 @@ public class EnglishDateTimeUtils {
   static int[] teCumMl = {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365};
 
   // time expression ordinals - like ordWord2Num but only goes to thirty
-  static Map<String,Integer> teOrd2Num = new FastMap<>(31);
+  static Map<String, Integer> teOrd2Num = new FastMap<String, Integer>(31);
 
     static {
     teOrd2Num.put("first", 1);
@@ -166,7 +167,7 @@ public class EnglishDateTimeUtils {
 	  teOrd2Num.put("thirty-first", 31);
   }
 
-  static Map<String,Integer> teDecadeNums = new FastMap<>(9);
+  static Map<String, Integer> teDecadeNums = new FastMap<String, Integer>(9);
 
     static {
     teDecadeNums.put("twenties", 2);

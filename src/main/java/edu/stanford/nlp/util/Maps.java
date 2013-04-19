@@ -1,5 +1,6 @@
 package edu.stanford.nlp.util;
 
+import ca.gedge.radixtree.RadixTree;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
 
@@ -161,12 +162,12 @@ public class Maps {
   }
 
   public static void main(String... args) {
-      Map<String, String> map1 = new FastMap<>();
+      RadixTree< String> map1 = new RadixTree<>();
     map1.put("a", "1");
     map1.put("b", "2");
     map1.put("c", "2");
     map1.put("d", "4");
-      Map<String, String> map2 = new FastMap<>();
+      RadixTree< String> map2 = new RadixTree<>();
     map2.put("1", "x");
     map2.put("2", "y");
     map2.put("3", "z");
@@ -175,8 +176,8 @@ public class Maps {
     System.out.println("invertSet(map1): " + Maps.invertSet(map1));
     System.out.println("map2: " + map2);
     System.out.println("compose(map1,map2): " + Maps.compose(map1, map2));
-      Map<String, Set<String>> setValues = new FastMap<>();
-      Map<String, List<String>> listValues = new FastMap<>();
+      RadixTree< Set<String>> setValues = new RadixTree<>();
+      RadixTree< List<String>> listValues = new RadixTree<>();
     Maps.putIntoValueArrayList(listValues, "a", "1");
     Maps.putIntoValueArrayList(listValues, "a", "1");
     Maps.putIntoValueArrayList(listValues, "a", "2");

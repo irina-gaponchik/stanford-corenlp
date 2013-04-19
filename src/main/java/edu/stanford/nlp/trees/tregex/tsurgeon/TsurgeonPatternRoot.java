@@ -1,5 +1,6 @@
 package edu.stanford.nlp.trees.tregex.tsurgeon;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import javolution.util.FastMap;
@@ -12,7 +13,7 @@ import java.util.Map;
 class TsurgeonPatternRoot extends TsurgeonPattern {
 
   final CoindexationGenerator coindexer = new CoindexationGenerator();
-  Map<String, Tree> newNodeNames;
+  Map newNodeNames=new RadixTree<>();
 
 
   public TsurgeonPatternRoot(TsurgeonPattern... children) {

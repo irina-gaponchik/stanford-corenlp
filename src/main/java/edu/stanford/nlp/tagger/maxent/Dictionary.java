@@ -6,6 +6,7 @@
  */
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.InDataStreamFile;
 import edu.stanford.nlp.stats.IntCounter;
 import javolution.util.FastMap;
@@ -23,12 +24,12 @@ import java.util.Map;
  */
 public class Dictionary {
 
-  private final Map<String,TagCount> dict = new FastMap<>();
+  private final RadixTree<TagCount> dict = new RadixTree<>();
     private final Map<Integer,CountWrapper> partTakingVerbs = new FastMap<>();
     private static final String naWord = "NA";
   private static final boolean VERBOSE = false;
 
-    void fillWordTagCounts(Map<String, IntCounter<String>> wordTagCounts) {
+    void fillWordTagCounts(RadixTree< IntCounter<String>> wordTagCounts) {
     for (Map.Entry<String, IntCounter<String>> stringIntCounterEntry : wordTagCounts.entrySet()) {
       TagCount count = new TagCount(stringIntCounterEntry.getValue());
       dict.put(stringIntCounterEntry.getKey(), count);

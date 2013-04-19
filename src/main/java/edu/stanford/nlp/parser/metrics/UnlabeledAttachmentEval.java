@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.international.Languages;
 import edu.stanford.nlp.international.Languages.Language;
 import edu.stanford.nlp.ling.Label;
@@ -111,7 +112,7 @@ public class UnlabeledAttachmentEval extends AbstractEval {
     usage.append("  -e         : Input encoding.\n");
   }
 
-  public static final Map<String,Integer> optionArgDefs = new FastMap<>();
+  public static final RadixTree<Integer> optionArgDefs = new RadixTree<>();
 
     static {
     optionArgDefs.put("-v", 0);
@@ -134,7 +135,7 @@ public class UnlabeledAttachmentEval extends AbstractEval {
     String guessFile = null;
     String goldFile = null;
 
-    Map<String, String[]> argsMap = StringUtils.argsToMap(args, optionArgDefs);
+    RadixTree< String[]> argsMap = StringUtils.argsToMap(args, optionArgDefs);
 
     for(Map.Entry<String, String[]> opt : argsMap.entrySet()) {
       if(opt.getKey() == null) continue;

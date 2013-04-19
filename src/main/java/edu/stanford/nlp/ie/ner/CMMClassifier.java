@@ -195,8 +195,8 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
         if ("NEWGENE".equals(wordInfo.get(CoreAnnotations.GazAnnotation.class))) {
           for (String label : scores.keySet()) {
             if ("G".equals(label)) {
-              System.err.println(wordInfo.word() + ':' + scores.getCount(label));
-              if (scores.getCount(label) > flags.newgeneThreshold) {
+              System.err.println(wordInfo.word() + ':' + scores.get(label));
+              if (scores.get(label) > flags.newgeneThreshold) {
                 answer = label;
               }
             }
@@ -249,9 +249,9 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
 
       double total = Double.NEGATIVE_INFINITY;
       for (String s : c.keySet()) {
-        total = SloppyMath.logAdd(total, c.getCount(s));
+        total = SloppyMath.logAdd(total, c.get(s));
       }
-      cll -= c.getCount(d.label()) - total;
+      cll -= c.get(d.label()) - total;
     }
     // quadratic prior
     // HN: TODO: add other priors
@@ -385,14 +385,14 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
           for (j = start; j < end; j++) {
             // grow the sequence from j until the end
             for (int k = j; k < end; k++) {
-              double score = prevScores.getCount(new Pair<>(j, k));
+              double score = prevScores.get(new Pair<>(j, k));
               Pair<Integer, Integer> al = new Pair<>(j - 1, k); // adding a word to the left
               Pair<Integer, Integer> ar = new Pair<>(j, k + 1); // adding a word to the right
               Pair<Integer, Integer> sl = new Pair<>(j + 1, k); // subtracting word from left
               Pair<Integer, Integer> sr = new Pair<>(j, k - 1); // subtracting word from right
 
               // make sure the score is greater than all its neighbors (one add or subtract)
-              if (score >= flags.newgeneThreshold && (!prevScores.containsKey(al) || score > prevScores.getCount(al)) && (!prevScores.containsKey(ar) || score > prevScores.getCount(ar)) && (!prevScores.containsKey(sl) || score > prevScores.getCount(sl)) && (!prevScores.containsKey(sr) || score > prevScores.getCount(sr))) {
+              if (score >= flags.newgeneThreshold && (!prevScores.containsKey(al) || score > prevScores.get(al)) && (!prevScores.containsKey(ar) || score > prevScores.get(ar)) && (!prevScores.containsKey(sl) || score > prevScores.get(sl)) && (!prevScores.containsKey(sr) || score > prevScores.get(sr))) {
                 TextBuilder sb = new TextBuilder();
                 wordInfo = document.get(j);
                 String docId = wordInfo.get(CoreAnnotations.IDAnnotation.class);
@@ -1466,7 +1466,7 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
           int[] tA = getPossibleValues(pos);
           for (int j = 0; j < tA.length; j++) {
             if (tA[j] == t) {
-              scores[j] = c.getCount(s);
+              scores[j] = c.get(s);
               //if (false && flags.justify) {
               //    System.out.println("Label " + s + " got score " + scores[j]);
               //}

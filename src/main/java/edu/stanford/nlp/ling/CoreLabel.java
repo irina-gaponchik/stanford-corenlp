@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.AnnotationLookup.KeyLookup;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
@@ -131,7 +132,7 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
    */
   public static interface GenericAnnotation<T> extends CoreAnnotation<T> {  }
   //Unchecked is below because eclipse can't handle the level of type inference if we correctly parameterize GenericAnnotation with String
-  public static final Map<String, Class<? extends GenericAnnotation>> genericKeys = new FastMap<>();
+  public static final RadixTree< Class<? extends GenericAnnotation>> genericKeys = new RadixTree<>();
     public static final Map<Class<? extends GenericAnnotation>, String> genericValues = new FastMap<>();
 
 
@@ -606,7 +607,7 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
               if (index != null) {
                   buf.append('-').append(index.intValue());
               }
-              Map<String, Object> map2 = new TreeMap<>();
+              RadixTree<Object> map2 = new RadixTree<>();
               for (Class key : this.keySet()) {
                   String cls = key.getName();
                   // special shortening of all the Annotation classes

@@ -26,6 +26,7 @@
 
 package edu.stanford.nlp.ie.crf;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ie.*;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -152,7 +153,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
   Random random = new Random(2147483647L);
   Index<Integer> nodeFeatureIndicesMap;
   Index<Integer> edgeFeatureIndicesMap;
-  Map<String, double[]> embeddings;
+  RadixTree< double[]> embeddings;
 
   /**
    * Name of default serialized classifier resource to look for in a jar file.
@@ -2698,7 +2699,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
         throw new RuntimeException("format error in embeddings");
       }
       int embeddingSize = Integer.parseInt(toks[1]);
-        embeddings = new FastMap<>(embeddingSize);
+        embeddings = new RadixTree<>();
       count = 0;
       while (count < embeddingSize) {
         line = br.readLine().trim();
@@ -3173,7 +3174,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
     featureIndex = (Index<String>) ois.readObject();
     flags = (SeqClassifierFlags) ois.readObject();
     if (flags.useEmbedding) {
-      embeddings = (Map<String, double[]>) ois.readObject();
+      embeddings = (RadixTree< double[]>) ois.readObject();
     }
     if (flags.nonLinearCRF) {
       nodeFeatureIndicesMap = (Index<Integer>) ois.readObject();
@@ -3370,7 +3371,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
       }
       System.err.println("Found a dictionary of size " + wordList.size());
       br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(crf.flags.embeddingVectors))));
-        crf.embeddings = new FastMap<>();
+        crf.embeddings = new RadixTree<>();
       double[] vector = null;
       int count = 0;
       while ((line = br.readLine()) != null) {
@@ -3477,8 +3478,8 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
     }
   }
 
-  public Map<String, Counter<String>> topWeights() {
-    Map<String, Counter<String>> w = new HashMap<>();
+  public RadixTree< Counter<String>> topWeights() {
+    RadixTree< Counter<String>> w = new RadixTree<>();
     for (String feature : featureIndex) {
       int index = featureIndex.indexOf(feature);
       // line.add(feature+"["+(-p)+"]");

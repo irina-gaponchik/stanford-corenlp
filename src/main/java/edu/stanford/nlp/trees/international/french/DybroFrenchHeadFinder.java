@@ -29,7 +29,7 @@ public class DybroFrenchHeadFinder extends AbstractCollinsHeadFinder {
     // D (determiner), ET (foreign word), I (interjection), N (noun),
     // P (preposition), PREF (prefix), PRO (strong pronoun -- very confusing), V (verb), PUNC (punctuation)
 
-      nonTerminalInfo = new FastMap<>();
+      nonTerminalInfo = new ca.gedge.radixtree.RadixTree<>();
 
     // "sentence"
     nonTerminalInfo.put(tlp.startSymbol(), new String[][]{{"right", "VN", "AP", "NP", "Srel", "VPpart", "AdP", "I", "Ssub", "VPinf", "PP", "ADV"}, {"right"}});

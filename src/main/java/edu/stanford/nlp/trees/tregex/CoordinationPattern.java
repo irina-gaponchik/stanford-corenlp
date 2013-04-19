@@ -1,12 +1,12 @@
 package edu.stanford.nlp.trees.tregex;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.trees.Tree;
 import javolution.text.TextBuilder;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.IdentityHashMap;
-import java.util.Map;
 
 class CoordinationPattern extends TregexPattern {
 
@@ -70,7 +70,7 @@ class CoordinationPattern extends TregexPattern {
   @Override
   public TregexMatcher matcher(Tree root, Tree tree, 
                                IdentityHashMap<Tree, Tree> nodesToParents,
-                               Map<String, Tree> namesToNodes, 
+                               RadixTree<Tree> namesToNodes,
                                VariableStrings variableStrings) {
     return new CoordinationMatcher(this, root, tree, nodesToParents, namesToNodes, variableStrings);
   }
@@ -85,7 +85,7 @@ class CoordinationPattern extends TregexPattern {
 
     public CoordinationMatcher(CoordinationPattern n, Tree root, Tree tree, 
                                IdentityHashMap<Tree, Tree> nodesToParents,
-                               Map<String, Tree> namesToNodes, 
+                               RadixTree<Tree> namesToNodes,
                                VariableStrings variableStrings) {
       super(root, tree, nodesToParents, namesToNodes, variableStrings);
       myNode = n;

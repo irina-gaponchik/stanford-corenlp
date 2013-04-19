@@ -27,6 +27,7 @@
 
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.maxent.Experiments;
 import edu.stanford.nlp.util.Pair;
 import javolution.util.FastMap;
@@ -154,7 +155,7 @@ public class TaggerExperiments extends Experiments {
       for (FeatureKey fK : sTemplates) {
         int numF = fK.num;
         int[] xValues;
-        Pair<Integer, CharSequence> wT = new Pair<>(numF, fK.val);
+        Pair<Integer, String> wT = new Pair<>(numF, fK.val);
         xValues = tFeature.getXValues(wT);
         if (xValues == null) {
           System.err.println("  xValues is null: " + fK.toString()); //  + " " + i
@@ -240,10 +241,10 @@ public class TaggerExperiments extends Experiments {
           // look up the tag # in the index
           if (maxentTagger.fAssociations.size() <= fK.num) {
             for (int i = maxentTagger.fAssociations.size(); i <= fK.num; ++i) {
-                maxentTagger.fAssociations.add(new FastMap<CharSequence, int[]>());
+                maxentTagger.fAssociations.add(new RadixTree<int[]>());
             }
           }
-          Map<CharSequence, int[]> fValueAssociations = maxentTagger.fAssociations.get(fK.num);
+          RadixTree< int[]> fValueAssociations = maxentTagger.fAssociations.get(fK.num);
           int[] fTagAssociations = fValueAssociations.get(fK.val);
           if (fTagAssociations == null) {
             fTagAssociations = new int[ySize];
@@ -362,7 +363,7 @@ public class TaggerExperiments extends Experiments {
     // Feature templates general
 
     for (int i = 0; i < numFeatsGeneral; i++) {
-      CharSequence s = maxentTagger.extractors.extract(i, h);
+      String s = maxentTagger.extractors.extract(i, h);
       if (s.equals(zeroSt)) {
         continue;
       } //do not add the feature
@@ -403,7 +404,7 @@ public class TaggerExperiments extends Experiments {
     }
     int start = numFeatsGeneral;
     for (int i = start; i < numFeatsAll; i++) {
-      CharSequence s = maxentTagger.extractorsRare.extract(i - start, h);
+      String s = maxentTagger.extractorsRare.extract(i - start, h);
 
       if (s.equals(zeroSt)) {
         continue;

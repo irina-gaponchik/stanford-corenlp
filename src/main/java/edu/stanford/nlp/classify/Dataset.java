@@ -286,13 +286,13 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
       }
       double l1norm = 0;
       for(F feature: tfidfFeatures.keySet()){
-        double idf = Math.log((double) (this.size()+1) /(featureDocCounts.getCount(feature)+0.5));
-        double tf = tfidfFeatures.getCount(feature);
+        double idf = Math.log((double) (this.size()+1) /(featureDocCounts.get(feature)+0.5));
+        double tf = tfidfFeatures.get(feature);
         tfidfFeatures.setCount(feature, tf*idf);
         l1norm += tf*idf;
       }
       for(F feature: tfidfFeatures.keySet()){
-        double tfidf = tfidfFeatures.getCount(feature);
+        double tfidf = tfidfFeatures.get(feature);
         tfidfFeatures.setCount(feature, tfidf/l1norm);
       }
       RVFDatum<L,F> rvfDatum = new RVFDatum<>(tfidfFeatures,datum.label());
@@ -659,7 +659,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
 
     double entropy = 0.0;
     for (int i = 0; i < labelIndex.size(); i++) {
-      double labelCount = labelCounter.getCount(labelIndex.get(i));
+      double labelCount = labelCounter.get(labelIndex.get(i));
       double p = labelCount / size();
       entropy -= p * Math.log(p) / Math.log(2);
     }
@@ -670,7 +670,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
     for (int i = 0; i < featureIndex.size(); i++) {
       F feature = featureIndex.get(i);
 
-      double featureCount = featureCounter.getCount(feature);
+      double featureCount = featureCounter.get(feature);
       double notFeatureCount = size() - featureCount;
 
       double pFeature =  featureCount / size();
@@ -751,7 +751,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
     sb.append(classNo);
     sb.append(' ');
     for (int f: features) {
-      sb.append(f + 1).append(':').append(c.getCount(f)).append(' ');
+      sb.append(f + 1).append(':').append(c.get(f)).append(' ');
     }
     pw.println(sb.toString());
   }

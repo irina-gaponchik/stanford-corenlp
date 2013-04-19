@@ -39,7 +39,7 @@ public class ExtractorVerbalVBNZero extends DictionaryExtractor {
 
 
   @Override
-  CharSequence extract(History h, PairsHolder pH) {
+  String extract(History h, PairsHolder pH) {
     String cword = pH.getWord(h, 0);
     int allCount = dict.sum(cword);
     int vBNCount = dict.getCount(cword, vbnTag);

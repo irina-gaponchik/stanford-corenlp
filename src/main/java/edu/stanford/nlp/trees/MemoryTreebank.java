@@ -3,6 +3,7 @@ package edu.stanford.nlp.trees;
 import java.io.*;
 import java.util.*;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -158,10 +159,10 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
     srlMap = null;
   }
 
-  private Map<String,CollectionValuedMap<Integer,String>> srlMap;
+  private RadixTree<CollectionValuedMap<Integer,String>> srlMap;
 
   private void readSRLFile(String srlFile) {
-      srlMap = new FastMap<>();
+      srlMap = new RadixTree<>();
     for (String line : ObjectBank.getLineIterator(new File(srlFile))) {
       String[] bits = line.split("\\s+", 3);
       String filename = bits[0];

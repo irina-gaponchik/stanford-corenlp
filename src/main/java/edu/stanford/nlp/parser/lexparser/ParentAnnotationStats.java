@@ -1,5 +1,6 @@
 package edu.stanford.nlp.parser.lexparser;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.NumberRangeFileFilter;
 import edu.stanford.nlp.ling.StringLabelFactory;
 import edu.stanford.nlp.trees.*;
@@ -31,12 +32,12 @@ public class ParentAnnotationStats implements TreeVisitor {
 
   private final boolean doTags;
 
-  private Map<String,ClassicCounter<List<String>>> nodeRules = new FastMap<>();
+  private RadixTree<ClassicCounter<List<String>>> nodeRules = new RadixTree<>();
     private Map<List<String>,ClassicCounter<List<String>>> pRules = new FastMap<>();
     private Map<List<String>,ClassicCounter<List<String>>> gPRules = new FastMap<>();
 
     // corresponding ones for tags
-  private Map<String,ClassicCounter<List<String>>> tagNodeRules = new FastMap<>();
+  private RadixTree<ClassicCounter<List<String>>> tagNodeRules = new RadixTree<>();
     private Map<List<String>,ClassicCounter<List<String>>> tagPRules = new FastMap<>();
     private Map<List<String>,ClassicCounter<List<String>>> tagGPRules = new FastMap<>();
 
@@ -69,7 +70,7 @@ public class ParentAnnotationStats implements TreeVisitor {
 
   public void processTreeHelper(String gP, String p, Tree t) {
     if (!t.isLeaf() && (doTags || !t.isPreTerminal())) { // stop at words/tags
-      Map<String,ClassicCounter<List<String>>> nr;
+      RadixTree<ClassicCounter<List<String>>> nr;
       Map<List<String>,ClassicCounter<List<String>>> pr;
       Map<List<String>,ClassicCounter<List<String>>> gpr;
       if (t.isPreTerminal()) {
@@ -314,7 +315,7 @@ public class ParentAnnotationStats implements TreeVisitor {
   }
 
 
-  private static void getSplitters(double cutOff, Map<String,ClassicCounter<List<String>>> nr,
+  private static void getSplitters(double cutOff, RadixTree<ClassicCounter<List<String>>> nr,
                                    Map<List<String>,ClassicCounter<List<String>>> pr,
                                    Map<List<String>,ClassicCounter<List<String>>> gpr,
                                    Set<String> splitters) {

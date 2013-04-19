@@ -434,7 +434,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
       Counter<F> c = d.asFeaturesCounter();
       ClassicCounter<Integer> printC = new ClassicCounter<>();
       for (F f : c.keySet()) {
-        printC.setCount(featureIndex.indexOf(f), c.getCount(f));
+        printC.setCount(featureIndex.indexOf(f), c.get(f));
       }
       Integer[] features = printC.keySet().toArray(new Integer[printC.keySet().size()]);
       Arrays.sort(features);
@@ -451,7 +451,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
       //I think this is what was meant (using printC rather than c), but not sure
       // ~Sarah Spikes (sdspikes@cs.stanford.edu)
       for (int f: features) {
-        sb.append(f + 1).append(':').append(printC.getCount(f)).append(' ');
+        sb.append(f + 1).append(':').append(printC.get(f)).append(' ');
       }
       pw.println(sb.toString());
     }

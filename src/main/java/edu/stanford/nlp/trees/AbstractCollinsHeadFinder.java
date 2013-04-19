@@ -1,5 +1,7 @@
 package edu.stanford.nlp.trees;
 
+import ca.gedge.radixtree.RadixTree;
+
 import java.util.Map;
 
 /**
@@ -58,7 +60,7 @@ public abstract class AbstractCollinsHeadFinder implements HeadFinder /* Seriali
 
   private static final boolean DEBUG = false;
   protected final TreebankLanguagePack tlp;
-  protected Map<String, String[][]> nonTerminalInfo;
+  protected RadixTree< String[][]> nonTerminalInfo;
 
   /** Default direction if no rule is found for category (the head/parent).
    *  Subclasses can turn it on if they like.

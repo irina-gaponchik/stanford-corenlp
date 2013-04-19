@@ -12,7 +12,7 @@ import java.util.Set;
  * @author Jamie Nicolson
  */
 public class Prior {
-  // Map<String, int> maps field names to indexes in the matrix
+  // RadixTree< int> maps field names to indexes in the matrix
   private Map fieldIndices;
   private String[] indexFields;
 
@@ -45,7 +45,7 @@ public class Prior {
   }
 
   /**
-   * Map<String, boolean>
+   * RadixTree< boolean>
    */
   public double get(Set presentFields) {
     int index = 0;

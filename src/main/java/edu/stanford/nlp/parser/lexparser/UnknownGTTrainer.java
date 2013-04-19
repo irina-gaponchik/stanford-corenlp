@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.trees.Tree;
@@ -33,7 +34,7 @@ public class UnknownGTTrainer {
 
     double tokens;
   
-  Map<String,Float> unknownGT = new FastMap<>();
+  RadixTree<Float> unknownGT = new RadixTree<>();
 
     public void train(Collection<Tree> trees) {
     train(trees, 1.0);
@@ -77,7 +78,7 @@ public class UnknownGTTrainer {
     
     /* find # of once-seen words for each tag */
     for (Pair<String,String> wt : wtCount.keySet()) {
-      if (wtCount.getCount(wt) == 1) {
+      if (wtCount.get(wt) == 1) {
         r1.incrementCount(wt.second());
       }
     }
@@ -94,7 +95,7 @@ public class UnknownGTTrainer {
     
     /* set unseen word probability for each tag */
     for (String tag : tagCount.keySet()) {
-      float logprob = (float) Math.log(r1.getCount(tag) / (tagCount.getCount(tag) * r0.getCount(tag)));
+      float logprob = (float) Math.log(r1.get(tag) / (tagCount.get(tag) * r0.get(tag)));
       unknownGT.put(tag, logprob);
     }
     

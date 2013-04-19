@@ -111,7 +111,7 @@ public class RVFDatum<L, F> implements Datum<L, F> {
   }
 
   public double getFeatureCount(F feature) {
-    return features.getCount(feature);
+    return features.get(feature);
   }
 
   /**

@@ -159,7 +159,7 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
     if (c.totalCount() == 0.0 && !c.keySet().contains(o2)) {
       return defaultReturnValue();
     }
-    return c.getCount(o2);
+    return c.get(o2);
   }
 
   /**
@@ -210,7 +210,7 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
     for (K1 key1 : cc.firstKeySet()) {
       ClassicCounter<K2> c = cc.getCounter(key1);
       for (K2 key2 : c.keySet()) {
-        double count = c.getCount(key2);
+        double count = c.get(key2);
         result.setCount(key2, key1, count);
       }
     }
@@ -230,7 +230,7 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
     for (K1 key1 : map.keySet()) {
       ClassicCounter<K2> c = getCounter(key1);
       for (K2 key2 : c.keySet()) {
-        double score = c.getCount(key2);
+        double score = c.get(key2);
         buff.append(key1).append('\t').append(key2).append('\t').append(score).append('\n');
       }
     }
@@ -307,7 +307,7 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
     for (K1 key1 : firstKeySet()) {
       ClassicCounter<K2> inner = getCounter(key1);
       for (K2 key2 : inner.keySet()) {
-        result.setCount(new Pair<>(key1, key2), inner.getCount(key2));
+        result.setCount(new Pair<>(key1, key2), inner.get(key2));
       }
     }
     return result;
@@ -381,7 +381,7 @@ public class TwoDimensionalCounter<K1, K2> implements TwoDimensionalCounterInter
       for (K1 key1 : new FastSet<>(map.keySet())) {
       ClassicCounter<K2> c = map.get(key1);
           for (K2 key2 : new FastSet<>(c.keySet())) {
-        if (SloppyMath.isCloseTo(0.0, c.getCount(key2))) {
+        if (SloppyMath.isCloseTo(0.0, c.get(key2))) {
           c.remove(key2);
         }
       }

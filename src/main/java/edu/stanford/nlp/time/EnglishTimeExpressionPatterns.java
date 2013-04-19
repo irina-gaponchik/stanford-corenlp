@@ -51,7 +51,7 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
   }
 
   public CoreMapExpressionExtractor createExtractor() {
-    CoreMapExpressionExtractor expressionExtractor = new CoreMapExpressionExtractor(env);
+    CoreMapExpressionExtractor<TimeExpression> expressionExtractor = new CoreMapExpressionExtractor<TimeExpression>(env);
     expressionExtractor.setExtractRules(
             timeExtractionRule,
             compositeTimeExtractionRule,
@@ -545,7 +545,7 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
     @SuppressWarnings("unused")
     SequenceMatchRules.ExtractRule<String,TimeExpression> srule = null;
     @SuppressWarnings("unused")
-    SequenceMatchRules.SequencePatternExtractRule trule = null;
+    SequenceMatchRules.SequencePatternExtractRule<CoreMap, TimeExpression> trule = null;
     TimeExpressionExtractors.TimePatternExtractor timePatternExtractor = null;
 
     // two digit year
@@ -1396,7 +1396,7 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
     return temp;
   }
 
-  Map<String,SUTime.TemporalOp> wordToTemporalOp = new FastMap<>();
+  Map<String,SUTime.TemporalOp> wordToTemporalOp = new FastMap<String, SUTime.TemporalOp>();
 
     private void initTemporalOpMap()
   {
@@ -1408,8 +1408,7 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
     wordToTemporalOp.put("previous", SUTime.TemporalOp.PREV);
     wordToTemporalOp.put("last", SUTime.TemporalOp.PREV);
   }
-
-  Map<String,SUTime.Temporal> wordToTemporal = new FastMap<>();
+Map<String,SUTime.Temporal> wordToTemporal = new FastMap<String, SUTime.Temporal>();
 
     private void initTemporalMap()
   {
@@ -1515,8 +1514,7 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
     wordToTemporal.put("future", SUTime.TIME_FUTURE);
     wordToTemporal.put("thefuture", SUTime.TIME_FUTURE);
   }
-
-  Map<String,SUTime.Duration> abbToTimeUnit = new FastMap<>();
+Map<String,SUTime.Duration> abbToTimeUnit = new FastMap<String, SUTime.Duration>();
 
     private void initTimeUnitsMap() {
     // note - some of the incorrect spelling in this hash is due to the generalized matching which will match things like "centurys"

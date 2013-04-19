@@ -1,5 +1,6 @@
 package edu.stanford.nlp.ie.pascal;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ie.QuantifiableEntityNormalizer;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.process.PTBTokenizer;
@@ -279,7 +280,7 @@ public class ISODateInstance {
   /**
    * Map for mapping a relativeDate String to a pair with the field that should be modified and the amount to modify it *
    */
-  public static final Map<String, Pair<DateField, Integer>> relativeDateMap = new FastMap<>();
+  public static final RadixTree< Pair<DateField, Integer>> relativeDateMap = new RadixTree<>();
 
     static {
     //Add entries to the relative datemap
@@ -996,7 +997,7 @@ public class ISODateInstance {
           year = year + '*';
         }
       } else if (QuantifiableEntityNormalizer.ordinalsToValues.containsKey(inputDate)) {
-        year = Double.toString(QuantifiableEntityNormalizer.ordinalsToValues.getCount(inputDate));
+        year = Double.toString(QuantifiableEntityNormalizer.ordinalsToValues.get(inputDate));
         while (year.length() < 4) {
           year = year + '*';
         }
@@ -1043,9 +1044,9 @@ public class ISODateInstance {
     for (int a = 0; a < tokens.size(); a++) {
       String extract = tokens.get(a);
       if (QuantifiableEntityNormalizer.wordsToValues.containsKey(extract)) {
-        extract = Integer.toString(Double.valueOf(QuantifiableEntityNormalizer.wordsToValues.getCount(extract)).intValue());
+        extract = Integer.toString(Double.valueOf(QuantifiableEntityNormalizer.wordsToValues.get(extract)).intValue());
       } else if (QuantifiableEntityNormalizer.ordinalsToValues.containsKey(extract)) {
-        extract = Integer.toString(Double.valueOf(QuantifiableEntityNormalizer.ordinalsToValues.getCount(extract)).intValue());
+        extract = Integer.toString(Double.valueOf(QuantifiableEntityNormalizer.ordinalsToValues.get(extract)).intValue());
       }
       extract = extract.replaceAll("[^0-9]", "");
       if (!extract.isEmpty()) {

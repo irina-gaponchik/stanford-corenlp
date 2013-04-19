@@ -615,7 +615,7 @@ public class GeneralizedCounter<K> implements Serializable {
     }
 
     @Override
-    public double getCount(Object o) {
+    public double get(Object o) {
       List<K> l = (List<K>)o;
         return l.size() != depth ? 0.0 : GeneralizedCounter.this.getCounts(l)[depth];
     }
@@ -730,7 +730,7 @@ public class GeneralizedCounter<K> implements Serializable {
     }
 
     @Override
-    public double getCount(Object o) {
+    public double get(Object o) {
       return GeneralizedCounter.this.getCount(o);
     }
 
@@ -893,15 +893,15 @@ public class GeneralizedCounter<K> implements Serializable {
     System.out.println("string representation of counter view:");
     System.out.println(c.toString());
 
-    double d1 = c.getCount(Arrays.asList("a", "j", "x"));
-    double d2 = c.getCount(Arrays.asList("a", "j", "w"));
+    double d1 = c.get(Arrays.asList("a", "j", "x"));
+    double d2 = c.get(Arrays.asList("a", "j", "w"));
 
     System.out.println(d1 + " " + d2);
 
 
     ClassicCounter<List<String>> c1 = gc1.counterView();
 
-    System.out.println("Count of {j,x} -- should be 3.0\t" + c1.getCount(Arrays.asList("j", "x")));
+    System.out.println("Count of {j,x} -- should be 3.0\t" + c1.get(Arrays.asList("j", "x")));
 
 
     System.out.println(c.keySet() + " size " + c.keySet().size());

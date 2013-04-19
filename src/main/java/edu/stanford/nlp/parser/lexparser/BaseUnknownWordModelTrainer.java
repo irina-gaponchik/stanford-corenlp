@@ -3,6 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.Map;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Tag;
 import edu.stanford.nlp.ling.TaggedWord;
@@ -100,7 +101,7 @@ public class BaseUnknownWordModelTrainer
     if (treesRead > indexToStartUnkCounting) {
       // start doing this once some way through trees; 
       // treesRead is 1 based counting
-      if (seenCounter.getCount(iW) < 2) {
+      if (seenCounter.get(iW) < 2) {
         IntTaggedWord iT = new IntTaggedWord(IntTaggedWord.ANY, tagStr, wordIndex, tagIndex);
         unSeenCounter.incrementCount(iT, weight);
         unSeenCounter.incrementCount(NULL_ITW, weight);
@@ -128,7 +129,7 @@ public class BaseUnknownWordModelTrainer
       
       /* inner iteration is over words */
       for (String end : wc.keySet()) {
-        double prob = Math.log(wc.getCount(end) / tc.getCount(labelClassicCounterEntry.getKey()));  // p(sig|tag)
+        double prob = Math.log(wc.get(end) / tc.get(labelClassicCounterEntry.getKey()));  // p(sig|tag)
         tagHash.get(labelClassicCounterEntry.getKey()).setCount(end, prob);
         //if (Test.verbose)
         //EncodingPrintWriter.out.println(tag + " rewrites as " + end + " endchar with probability " + prob,encoding);
@@ -139,7 +140,7 @@ public class BaseUnknownWordModelTrainer
   }
 
   protected UnknownWordModel buildUWM() {
-    Map<String,Float> unknownGT = null;
+    RadixTree<Float> unknownGT = null;
     if (useGT) {
       unknownGT = unknownGTTrainer.unknownGT;
     }

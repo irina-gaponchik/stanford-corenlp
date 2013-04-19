@@ -47,6 +47,7 @@ import edu.stanford.nlp.stats.Sampler;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.concurrent.*;
 import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 import javolution.util.FastSet;
 
 import java.io.*;
@@ -54,8 +55,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
+ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -91,7 +91,7 @@ public abstract class AbstractSequenceClassifier<IN extends CoreMap> implements 
   protected int windowSize;
   // different threads can add or query knownLCWords at the same time,
   // so we need a concurrent data structure
-  protected Set<String> knownLCWords = Collections.newSetFromMap(new ConcurrentHashMap<String,Boolean>());
+  protected Set<String> knownLCWords = Collections.newSetFromMap(new FastMap<String,Boolean>());
 
   private boolean VERBOSE = true;
   private DocumentReaderAndWriter<IN> defaultReaderAndWriter;
@@ -360,7 +360,7 @@ public abstract class AbstractSequenceClassifier<IN extends CoreMap> implements 
         pos++;
         kth.add(newFL);
       }
-      kBest.setCount(kth, bestSequences.getCount(seq));
+      kBest.setCount(kth, bestSequences.get(seq));
     }
 
     return kBest;
@@ -1124,8 +1124,8 @@ public abstract class AbstractSequenceClassifier<IN extends CoreMap> implements 
       List<List<IN>> sorted = Counters.toSortedList(kBest);
       int n = 1;
       for (List<IN> l : sorted) {
-        System.out.println("<sentence id=" + numSentences + " k=" + n + " logProb=" + kBest.getCount(l) + " prob="
-            + Math.exp(kBest.getCount(l)) + '>');
+        System.out.println("<sentence id=" + numSentences + " k=" + n + " logProb=" + kBest.get(l) + " prob="
+            + Math.exp(kBest.get(l)) + '>');
         writeAnswers(l, printWriter, readerAndWriter);
         System.out.println("</sentence>");
         n++;
@@ -1478,9 +1478,9 @@ public abstract class AbstractSequenceClassifier<IN extends CoreMap> implements 
     entities.addAll(entityFN.keySet());
     boolean printedHeader = false;
     for (String entity : entities) {
-      double tp = entityTP.getCount(entity);
-      double fp = entityFP.getCount(entity);
-      double fn = entityFN.getCount(entity);
+      double tp = entityTP.get(entity);
+      double fp = entityFP.get(entity);
+      double fn = entityFN.get(entity);
       printedHeader = printPRLine(entity, tp, fp, fn, printedHeader);
     }
     double tp = entityTP.totalCount();

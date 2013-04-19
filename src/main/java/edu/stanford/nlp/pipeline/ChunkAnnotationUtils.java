@@ -1,5 +1,6 @@
 package edu.stanford.nlp.pipeline;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.AnnotationLookup;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -803,7 +804,7 @@ public class ChunkAnnotationUtils {
     annotation.set(newAnnotationKey, v);
   }
 
-  public static void annotateChunk(CoreMap chunk, Map<String,String> attributes)
+  public static void annotateChunk(CoreMap chunk, Map<String, String> attributes)
   {
     for (Map.Entry<String, String> stringStringEntry : attributes.entrySet()) {
       String value = stringStringEntry.getValue();
@@ -832,14 +833,14 @@ public class ChunkAnnotationUtils {
     }
   }
 
-  public static void annotateChunks(List<? extends CoreMap> chunks, int start, int end, Map<String,String> attributes)
+  public static void annotateChunks(List<? extends CoreMap> chunks, int start, int end, Map<String, String> attributes)
   {
     for (int i = start; i < end; i++) {
       annotateChunk(chunks.get(i), attributes);
     }
   }
 
-  public static void annotateChunks(List<? extends CoreMap> chunks, Map<String,String> attributes)
+  public static void annotateChunks(List<? extends CoreMap> chunks, RadixTree<String> attributes)
   {
     for (CoreMap chunk:chunks) {
       annotateChunk(chunk, attributes);

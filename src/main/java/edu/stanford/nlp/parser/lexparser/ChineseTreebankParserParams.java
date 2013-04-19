@@ -1158,7 +1158,7 @@ public class ChineseTreebankParserParams extends AbstractTreebankParserParams {
               }
               dg.setLex(lex);
               for (IntDependency dependency : dependencyCounter.keySet()) {
-                  dg.addRule(dependency, dependencyCounter.getCount(dependency));
+                  dg.addRule(dependency, dependencyCounter.get(dependency));
               }
               return dg;
           }

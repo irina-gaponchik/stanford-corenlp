@@ -1,5 +1,6 @@
 package edu.stanford.nlp.ling.tokensregex;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.pipeline.ChunkAnnotationUtils;
 import edu.stanford.nlp.pipeline.CoreMapAttributeAggregator;
@@ -39,12 +40,12 @@ public class CoreMapSequenceMatcher<T extends CoreMap> extends SequenceMatcher<T
     }
   }
 
-  public void annotateGroup(Map<String,String> attributes)
+  public void annotateGroup(RadixTree<String> attributes)
   {
     annotateGroup(0, attributes);
   }
 
-  public void annotateGroup(int group, Map<String,String> attributes)
+  public void annotateGroup(int group, RadixTree<String> attributes)
   {
     int groupStart = start(group);
     if (groupStart >=0) {

@@ -3,6 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.Map;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Tag;
 import edu.stanford.nlp.ling.TaggedWord;
@@ -79,7 +80,7 @@ public class ChineseUnknownWordModelTrainer
     
     this.unknownGTTrainer = useGT ? new UnknownGTTrainer() : null;
 
-    Map<String,Float> unknownGT = null;
+    RadixTree<Float> unknownGT = null;
     if (useGT) {
       unknownGT = unknownGTTrainer.unknownGT;
     }
@@ -127,7 +128,7 @@ public class ChineseUnknownWordModelTrainer
     if (treesRead > indexToStartUnkCounting) {
       // start doing this once some way through trees; 
       // treesRead is 1 based counting
-      if (seenCounter.getCount(iW) < 2) {
+      if (seenCounter.get(iW) < 2) {
         IntTaggedWord iT = new IntTaggedWord(IntTaggedWord.ANY, tag, wordIndex, tagIndex);
         unSeenCounter.incrementCount(iT, weight);
         unSeenCounter.incrementCount(iTotal, weight);
@@ -136,7 +137,7 @@ public class ChineseUnknownWordModelTrainer
   }
   
   public UnknownWordModel finishTraining() {
-    Map<String,Float> unknownGT = null;
+    RadixTree<Float> unknownGT = null;
     if (useGT) {
       unknownGTTrainer.finishTraining();
       unknownGT = unknownGTTrainer.unknownGT;
@@ -158,7 +159,7 @@ public class ChineseUnknownWordModelTrainer
       
       // inner iteration is over words  as strings
       for (String first : wc.keySet()) {
-        double prob = Math.log(wc.getCount(first) / tc.getCount(labelClassicCounterEntry.getKey()));
+        double prob = Math.log(wc.get(first) / tc.get(labelClassicCounterEntry.getKey()));
         tagHash.get(labelClassicCounterEntry.getKey()).setCount(first, prob);
         //if (Test.verbose)
         //EncodingPrintWriter.out.println(tag + " rewrites as " + first + " firstchar with probability " + prob,encoding);

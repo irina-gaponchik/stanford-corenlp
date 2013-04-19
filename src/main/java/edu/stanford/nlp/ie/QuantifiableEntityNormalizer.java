@@ -1,5 +1,6 @@
 package edu.stanford.nlp.ie;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ie.pascal.ISODateInstance;
 import edu.stanford.nlp.ie.regexp.NumberSequenceClassifier;
 import edu.stanford.nlp.ling.CoreAnnotations;
@@ -70,9 +71,9 @@ public class QuantifiableEntityNormalizer {
     private static final Set<String> quantifiable;  //Entity types that are quantifiable
     private static final Set<String> collapseBeforeParsing;
     private static final Set<String> timeUnitWords;
-    private static final Map<String, Double> moneyMultipliers;
-    private static final Map<String, Integer> moneyMultipliers2;
-    private static final Map<String, Character> currencyWords;
+    private static final RadixTree< Double> moneyMultipliers;
+    private static final RadixTree< Integer> moneyMultipliers2;
+    private static final RadixTree< Character> currencyWords;
     private static final String dateRangeAfterOneWord = "after|since";
     private static final String dateRangeBeforeOneWord = "before|until";
     private static final List<Pair<String, String>> dateRangeBeforePairedOneWord;
@@ -155,7 +156,7 @@ public class QuantifiableEntityNormalizer {
         timeUnitWords.add("year");
         timeUnitWords.add("years");
 
-        currencyWords = new FastMap<>();
+        currencyWords = new RadixTree<>();
         currencyWords.put("dollars?", '$');
         currencyWords.put("cents?", '$');
         currencyWords.put("pounds?", '\u00A3');
@@ -172,7 +173,7 @@ public class QuantifiableEntityNormalizer {
         currencyWords.put("\u20A9", '\u20A9');  // Won
         currencyWords.put("yuan", '\u5143');   // Yuan
 
-        moneyMultipliers = new FastMap<>();
+        moneyMultipliers = new RadixTree<>();
         moneyMultipliers.put("trillion", 1000000000000.0);  // can't be an integer
         moneyMultipliers.put("billion", 1000000000.0);
         moneyMultipliers.put("bn", 1000000000.0);
@@ -184,7 +185,7 @@ public class QuantifiableEntityNormalizer {
         moneyMultipliers.put(" m ", 1000000.0);
         moneyMultipliers.put(" k ", 1000.0);
 
-        moneyMultipliers2 = new FastMap<>();
+        moneyMultipliers2 = new RadixTree<>();
         moneyMultipliers2.put("[0-9](m)(?:[^a-zA-Z]|$)", 1000000);
         moneyMultipliers2.put("[0-9](b)(?:[^a-zA-Z]|$)", 1000000000);
 
@@ -843,12 +844,12 @@ public class QuantifiableEntityNormalizer {
         double dd = 0.0;
         for (String part : parts) {
             if (wordsToValues.containsKey(part)) {
-                dd += wordsToValues.getCount(part);
+                dd += wordsToValues.get(part);
                 processed = true;
             } else {
                 String partMatch = getOneSubstitutionMatch(part, wordsToValues.keySet());
                 if (partMatch != null) {
-                    dd += wordsToValues.getCount(partMatch);
+                    dd += wordsToValues.get(partMatch);
                     processed = true;
                 }
             }
@@ -930,10 +931,10 @@ public class QuantifiableEntityNormalizer {
             // just parse number part, assuming last two letters are st/nd/rd
             return normalizedNumberStringQuiet(matcher.group(), 1.0, "", numberFromSUTime);
         } else if (ordinalsToValues.containsKey(s)) {
-            return Double.toString(ordinalsToValues.getCount(s));
+            return Double.toString(ordinalsToValues.get(s));
         } else {
             String val = getOneSubstitutionMatch(s, ordinalsToValues.keySet());
-            return val != null ? Double.toString(ordinalsToValues.getCount(val)) : null;
+            return val != null ? Double.toString(ordinalsToValues.get(val)) : null;
         }
     }
 

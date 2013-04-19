@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.math.SloppyMath;
@@ -292,7 +293,7 @@ public class SplittingGrammarExtractor {
     lex.initializeTraining(trainSize);
 
     for (Tree tree : trees) {
-      double weight = treeWeights.getCount(tree);
+      double weight = treeWeights.get(tree);
       lex.incrementTreesRead(weight);
       initialBetasAndLexicon(tree, 0, weight);
     }
@@ -357,12 +358,12 @@ public class SplittingGrammarExtractor {
 
     // root states should only have 1
     for (String root : startSymbols) {
-      if (newStateSplitCounts.getCount(root) > 1) {
+      if (newStateSplitCounts.get(root) > 1) {
         newStateSplitCounts.setCount(root, 1);
       }
     }
 
-    if (newStateSplitCounts.getCount(Lexicon.BOUNDARY_TAG) > 1) {
+    if (newStateSplitCounts.get(Lexicon.BOUNDARY_TAG) > 1) {
       newStateSplitCounts.setCount(Lexicon.BOUNDARY_TAG, 1);
     }
 
@@ -548,7 +549,7 @@ public class SplittingGrammarExtractor {
    * Creates temporary beta data structures and fills them in by
    * iterating over the trees.
    */
-  public void recalculateTemporaryBetas(boolean splitStates, Map<String, double[]> totalStateMass,
+  public void recalculateTemporaryBetas(boolean splitStates, RadixTree< double[]> totalStateMass,
                                         TwoDimensionalMap<String, String, double[][]> tempUnaryBetas,
                                         ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas) {
     tempWordIndex = new HashIndex<>();
@@ -557,7 +558,7 @@ public class SplittingGrammarExtractor {
     tempLex.initializeTraining(trainSize);
 
     for (Tree tree : trees) {
-      double weight = treeWeights.getCount(tree);
+      double weight = treeWeights.get(tree);
       if (DEBUG()) {
         System.out.println("Incrementing trees read: " + weight);
       }
@@ -618,13 +619,13 @@ public class SplittingGrammarExtractor {
   }
 
   public void recalculateTemporaryBetas(Tree tree, boolean splitStates,
-                                        Map<String, double[]> totalStateMass,
+                                        RadixTree< double[]> totalStateMass,
                                         TwoDimensionalMap<String, String, double[][]> tempUnaryBetas,
                                         ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas) {
     if (DEBUG()) {
       System.out.println("Recalculating temporary betas for tree " + tree);
     }
-    double[] stateWeights = { Math.log(treeWeights.getCount(tree)) };
+    double[] stateWeights = { Math.log(treeWeights.get(tree)) };
 
     IdentityHashMap<Tree, double[][]> unaryTransitions = new IdentityHashMap<>();
     IdentityHashMap<Tree, double[][][]> binaryTransitions = new IdentityHashMap<>();
@@ -642,7 +643,7 @@ public class SplittingGrammarExtractor {
   public int recalculateTemporaryBetas(Tree tree, double[] stateWeights, int position,
                                        IdentityHashMap<Tree, double[][]> unaryTransitions,
                                        IdentityHashMap<Tree, double[][][]> binaryTransitions,
-                                       Map<String, double[]> totalStateMass,
+                                       RadixTree< double[]> totalStateMass,
                                        TwoDimensionalMap<String, String, double[][]> tempUnaryBetas,
                                        ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas) {
     if (tree.isLeaf()) {
@@ -1115,13 +1116,13 @@ public class SplittingGrammarExtractor {
     // counting the total mass
     TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<>();
     ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<>();
-      Map<String, double[]> totalStateMass = new FastMap<>();
+      RadixTree< double[]> totalStateMass = new RadixTree<>();
     recalculateTemporaryBetas(false, totalStateMass, tempUnaryBetas, tempBinaryBetas);
 
     // Next, for each tree we count the effect of merging its
     // annotations.  We only consider the most recently split
     // annotations as candidates for merging.
-      Map<String, double[]> deltaAnnotations = new FastMap<>();
+      RadixTree< double[]> deltaAnnotations = new RadixTree<>();
     for (Tree tree : trees) {
       countMergeEffects(tree, totalStateMass, deltaAnnotations);
     }
@@ -1164,7 +1165,7 @@ public class SplittingGrammarExtractor {
     System.out.println();
     System.out.println(sortedDeltas);
 
-    Map<String, int[]> mergeCorrespondence = buildMergeCorrespondence(sortedDeltas);
+    RadixTree< int[]> mergeCorrespondence = buildMergeCorrespondence(sortedDeltas);
 
     recalculateMergedBetas(mergeCorrespondence);
 
@@ -1173,7 +1174,7 @@ public class SplittingGrammarExtractor {
     }
   }
 
-  public void recalculateMergedBetas(Map<String, int[]> mergeCorrespondence) {
+  public void recalculateMergedBetas(RadixTree< int[]> mergeCorrespondence) {
     TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<>();
     ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<>();
 
@@ -1183,7 +1184,7 @@ public class SplittingGrammarExtractor {
     tempLex.initializeTraining(trainSize);
 
     for (Tree tree : trees) {
-      double treeWeight = treeWeights.getCount(tree);
+      double treeWeight = treeWeights.get(tree);
       double[] stateWeights = { Math.log(treeWeight) };
       tempLex.incrementTreesRead(treeWeight);
 
@@ -1217,7 +1218,7 @@ public class SplittingGrammarExtractor {
                                IdentityHashMap<Tree, double[][]> newUnaryTransitions,
                                IdentityHashMap<Tree, double[][][]> newBinaryTransitions,
                                double[] stateWeights, 
-                               Map<String, int[]> mergeCorrespondence) {
+                               RadixTree< int[]> mergeCorrespondence) {
     if (parent.isPreTerminal() || parent.isLeaf()) {
       return;
     }
@@ -1362,8 +1363,8 @@ public class SplittingGrammarExtractor {
     }
   }
 
-  Map<String, int[]> buildMergeCorrespondence(List<Triple<String, Integer, Double>> deltas) {
-      Map<String, int[]> mergeCorrespondence = new FastMap<>();
+  RadixTree< int[]> buildMergeCorrespondence(List<Triple<String, Integer, Double>> deltas) {
+      RadixTree< int[]> mergeCorrespondence = new RadixTree<>();
     for (String state : originalStates) {
       int states = getStateSplitCount(state);
       int[] correspondence = new int[states];
@@ -1383,8 +1384,8 @@ public class SplittingGrammarExtractor {
     return mergeCorrespondence;
   }
 
-  public void countMergeEffects(Tree tree, Map<String, double[]> totalStateMass, 
-                                Map<String, double[]> deltaAnnotations) {
+  public void countMergeEffects(Tree tree, RadixTree< double[]> totalStateMass,
+                                RadixTree< double[]> deltaAnnotations) {
     IdentityHashMap<Tree, double[]> probIn = new IdentityHashMap<>();
     IdentityHashMap<Tree, double[]> probOut = new IdentityHashMap<>();
     IdentityHashMap<Tree, double[][]> unaryTransitions = new IdentityHashMap<>();
@@ -1397,8 +1398,8 @@ public class SplittingGrammarExtractor {
     }
   }
 
-  public static void countMergeEffects(Tree tree, Map<String, double[]> totalStateMass,
-                                       Map<String, double[]> deltaAnnotations,
+  public static void countMergeEffects(Tree tree, RadixTree< double[]> totalStateMass,
+                                       RadixTree< double[]> deltaAnnotations,
                                        IdentityHashMap<Tree, double[]> probIn,
                                        IdentityHashMap<Tree, double[]> probOut) {
     if (tree.isLeaf()) {
@@ -1461,7 +1462,7 @@ public class SplittingGrammarExtractor {
     // counting the total mass...
     TwoDimensionalMap<String, String, double[][]> tempUnaryBetas = new TwoDimensionalMap<>();
     ThreeDimensionalMap<String, String, String, double[][][]> tempBinaryBetas = new ThreeDimensionalMap<>();
-      Map<String, double[]> totalStateMass = new FastMap<>();
+      RadixTree< double[]> totalStateMass = new RadixTree<>();
     recalculateTemporaryBetas(false, totalStateMass, tempUnaryBetas, tempBinaryBetas);
 
     // ... but note we don't actually rescale the betas.

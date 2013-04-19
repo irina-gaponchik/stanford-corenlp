@@ -3,6 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.Map;
 import java.util.Set;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Tag;
 import edu.stanford.nlp.stats.ClassicCounter;
@@ -69,7 +70,7 @@ public class BaseUnknownWordModel implements UnknownWordModel {
   /** This is the set of all signatures that we have seen. */
   final private Set<String> seenEnd;
 
-  final Map<String,Float> unknownGT;
+  final Map<String, Float> unknownGT;
 
   /** All classes that implement UnknownWordModel must call the constructor that initializes this variable. */
   private final Lexicon lex;
@@ -80,7 +81,7 @@ public class BaseUnknownWordModel implements UnknownWordModel {
                               Index<String> tagIndex,
                               ClassicCounter<IntTaggedWord> unSeenCounter,
                               Map<Label,ClassicCounter<String>> tagHash,
-                              Map<String,Float> unknownGT,
+                              Map<String, Float> unknownGT,
                               Set<String> seenEnd) {
     endLength = op.lexOptions.unknownSuffixSize;
     // TODO: refactor these terms into BaseUnknownWordModelTrainer
@@ -111,7 +112,7 @@ public class BaseUnknownWordModel implements UnknownWordModel {
       this(op, lex, wordIndex, tagIndex,
          new ClassicCounter<IntTaggedWord>(),
               new FastMap<Label, ClassicCounter<String>>(),
-              new FastMap<String, Float>(),
+              new RadixTree< Float>(),
               new FastSet<String>());
   }
 
@@ -156,7 +157,7 @@ public class BaseUnknownWordModel implements UnknownWordModel {
           System.err.println("Warning: proposed tag is unseen in training data:\t"+tagStr);
           logProb = Float.NEGATIVE_INFINITY;
         } else
-            logProb = wordProbs.keySet().contains(end) ? (float) wordProbs.getCount(end) : (float) wordProbs.getCount(unknown);
+            logProb = wordProbs.keySet().contains(end) ? (float) wordProbs.get(end) : (float) wordProbs.get(unknown);
       }
     } else if (useGT) {
       logProb = scoreGT(tagStr);

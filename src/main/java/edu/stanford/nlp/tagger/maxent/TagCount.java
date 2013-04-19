@@ -8,6 +8,7 @@
 
 package edu.stanford.nlp.tagger.maxent;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.stats.IntCounter;
 import javolution.util.FastMap;
 
@@ -25,7 +26,7 @@ import java.io.DataOutputStream;
  */
 class TagCount {
 
-  private Map<String, Integer> map = new FastMap<>();
+  private RadixTree< Integer> map = new RadixTree<>();
     private int ambClassId = -1; /* This is a numeric ID shared by all words that have the same set of possible tags. */
 
   private String[] getTagsCache; // = null;
@@ -78,7 +79,7 @@ class TagCount {
     try {
 
       int numTags = rf.readInt();
-        map = new FastMap<>(numTags);
+        map = new RadixTree<>();
 
       for (int i = 0; i < numTags; i++) {
 	String tag = rf.readUTF();

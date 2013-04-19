@@ -1,5 +1,6 @@
 package edu.stanford.nlp.util;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -39,6 +40,7 @@ public class StringUtils {
     private static final Pattern COMPILE5 = Pattern.compile("VB|VBD|VBG|VBN|VBZ|VBP|MD");
     private static final Pattern COMPILE6 = Pattern.compile("JJ|JJR|JJS|CD");
     private static final Pattern COMPILE7 = Pattern.compile("RB|RBR|RBS|RP|WRB");
+    public static final RadixTree<Integer> EMPTY = new RadixTree<>();
 
     /**
    * Don't let anyone instantiate this class.
@@ -131,9 +133,9 @@ public class StringUtils {
    * @param map A string of the form "x1=y1,x2=y2,..."
    * @return  A Map m is returned such that m.get(xn) = yn
    */
-  public static Map<String, String> mapStringToMap(String map) {
+  public static RadixTree< String> mapStringToMap(String map) {
     String[] m = PATTERN.split(map);
-      Map<String, String> res = new FastMap<>();
+      RadixTree< String> res = new RadixTree<>();
     for (String str : m) {
       int index = str.lastIndexOf('=');
       String key = str.substring(0, index);
@@ -633,8 +635,8 @@ public class StringUtils {
    * @return a {@link java.util.Map} of flag names to flag argument {@link
    *         String} arrays.
    */
-  public static Map<String, String[]> argsToMap(String... args) {
-    return argsToMap(args, Collections.<String,Integer>emptyMap());
+  public static RadixTree< String[]> argsToMap(String... args) {
+    return argsToMap(args, new RadixTree<Integer>());
   }
 
   /**
@@ -671,8 +673,8 @@ public class StringUtils {
    * @return a {@link java.util.Map} of flag names to flag argument {@link
    *         String} arrays.
    */
-  public static Map<String, String[]> argsToMap(String[] args, Map<String, Integer> flagsToNumArgs) {
-      Map<String, String[]> result = new FastMap<>();
+  public static RadixTree< String[]> argsToMap(String[] args, RadixTree< Integer> flagsToNumArgs) {
+      RadixTree< String[]> result = new RadixTree<>();
     List<String> remainingArgs = new ArrayList<>();
     for (int i = 0; i < args.length; i++) {
       String key = args[i];
@@ -712,7 +714,7 @@ public class StringUtils {
    * @return A Properties object representing the arguments.
    */
   public static Properties argsToProperties(String... args) {
-    return argsToProperties(args, Collections.<String,Integer>emptyMap());
+    return argsToProperties(args, EMPTY);
   }
 
   /**
@@ -734,7 +736,7 @@ public class StringUtils {
    * @param flagsToNumArgs Map of how many arguments flags should have. The keys are without the minus signs.
    * @return A Properties object representing the arguments.
    */
-  public static Properties argsToProperties(String[] args, Map<String,Integer> flagsToNumArgs) {
+  public static Properties argsToProperties(String[] args, RadixTree<Integer> flagsToNumArgs) {
     Properties result = new Properties();
     List<String> remainingArgs = new ArrayList<>();
     for (int i = 0; i < args.length; i++) {
@@ -993,8 +995,8 @@ public class StringUtils {
    * @return A Map from keys to possible values (String or null)
    */
   @SuppressWarnings("unchecked")
-  public static Map<String, String> parseCommandLineArguments(String... args) {
-    return (Map)parseCommandLineArguments(args, false);
+  public static RadixTree< String> parseCommandLineArguments(String... args) {
+    return parseCommandLineArguments(args, false);
   }
 
   /**
@@ -1011,8 +1013,8 @@ public class StringUtils {
    *
    * @return A Map from keys to possible values (String or null)
    */
-  public static Map<String, Object> parseCommandLineArguments(String[] args, boolean parseNumbers) {
-      Map<String, Object> result = new FastMap<>();
+  public static<T> RadixTree< T> parseCommandLineArguments(String[] args, boolean parseNumbers) {
+      RadixTree< Object> result = new RadixTree<>();
     for (int i = 0; i < args.length; i++) {
       String key = args[i];
       if (key.charAt(0) == '-') {
@@ -1039,7 +1041,7 @@ public class StringUtils {
         }
       }
     }
-    return result;
+    return (RadixTree<T>) result;
   }
 
   public static String stripNonAlphaNumerics(String orig) {
@@ -1781,7 +1783,7 @@ public class StringUtils {
    * variables. if the variable is not found then substitute it for empty string
    */
   public static Properties argsToPropertiesWithResolve(String... args) {
-    TreeMap<String, String> result = new TreeMap<>();
+    RadixTree< String> result = new RadixTree<>();
     for (int i = 0; i < args.length; i++) {
       String key = args[i];
       if (!key.isEmpty() && key.charAt(0) == '-') { // found a flag
@@ -1811,8 +1813,8 @@ public class StringUtils {
    * @return The corresponding TreeMap where the ordering is the same as in the
    *         props file
    */
-  public static TreeMap<String, String> propFileToTreeMap(String filename) {
-    TreeMap<String, String> result = new TreeMap<>();
+  public static  RadixTree< String> propFileToTreeMap(String filename) {
+    RadixTree< String> result = new RadixTree<>();
     for (String l : IOUtils.readLines(filename)) {
       l = l.trim();
       if (l.isEmpty() || !l.isEmpty() && l.charAt(0) == '#')

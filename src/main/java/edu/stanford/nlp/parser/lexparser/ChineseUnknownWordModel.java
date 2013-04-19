@@ -1,5 +1,6 @@
 package edu.stanford.nlp.parser.lexparser;
 
+import ca.gedge.radixtree.RadixTree;
 import edu.stanford.nlp.io.EncodingPrintWriter;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Tag;
@@ -8,7 +9,6 @@ import edu.stanford.nlp.ling.WordTag;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.util.Index;
 import javolution.util.FastMap;
-import javolution.util.FastSet;
 
 import java.util.Map;
 import java.util.Set;
@@ -55,7 +55,7 @@ public class ChineseUnknownWordModel extends BaseUnknownWordModel {
                                    Index<String> tagIndex,
                                    ClassicCounter<IntTaggedWord> unSeenCounter,
                                    Map<Label, ClassicCounter<String>> tagHash,
-                                   Map<String, Float> unknownGT,
+                                   Map< String,Float> unknownGT,
                                    boolean useGT,
                                    Set<String> seenFirst) {
         super(op, lex, wordIndex, tagIndex,
@@ -79,7 +79,7 @@ public class ChineseUnknownWordModel extends BaseUnknownWordModel {
         this(op, lex, wordIndex, tagIndex,
                 new ClassicCounter<IntTaggedWord>(),
                 new FastMap<Label, ClassicCounter<String>>(),
-                new FastMap<String, Float>(),
+                new  RadixTree< Float>(),
                 false, (Set<String>) new FastMap<>());
     }
 
@@ -219,7 +219,7 @@ public class ChineseUnknownWordModel extends BaseUnknownWordModel {
                     if (VERBOSE) System.err.println("Warning: proposed tag is unseen in training data!");
                     logProb = Float.NEGATIVE_INFINITY;
                 } else
-                    logProb = wordProbs.containsKey(first) ? (float) wordProbs.getCount(first) : (float) wordProbs.getCount(unknown);
+                    logProb = wordProbs.containsKey(first) ? (float) wordProbs.get(first) : (float) wordProbs.get(unknown);
             } else if (useGT) {
                 logProb = scoreGT(tag);
             } else {

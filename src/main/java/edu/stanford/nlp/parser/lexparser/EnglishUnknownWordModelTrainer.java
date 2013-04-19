@@ -1,13 +1,8 @@
 package edu.stanford.nlp.parser.lexparser;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import edu.stanford.nlp.io.EncodingPrintWriter;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.stats.ClassicCounter;
-import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.Index;
 
 public class EnglishUnknownWordModelTrainer
@@ -60,7 +55,7 @@ public class EnglishUnknownWordModelTrainer
     if (treesRead > indexToStartUnkCounting) {
       // start doing this once some way through trees; 
       // treesRead is 1 based counting
-      if (seenCounter.getCount(iW) < 1.5) {
+      if (seenCounter.get(iW) < 1.5) {
         // it's an entirely unknown word
         int s = model.getSignatureIndex(iTW.word, loc, 
                                         wordIndex.get(iTW.word));

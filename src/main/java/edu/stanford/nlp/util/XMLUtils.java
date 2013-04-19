@@ -19,6 +19,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
+import ca.gedge.radixtree.RadixTree;
 import javolution.text.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
@@ -845,7 +846,7 @@ public class XMLUtils {
   public static class XMLTag {
     public String text;
     public String name;
-    public Map<String,String> attributes;
+    public RadixTree<String> attributes;
     public boolean isEndTag;
     public boolean isSingleTag;
 
@@ -880,7 +881,7 @@ public class XMLUtils {
         isSingleTag = false;
       }
       tag = tag.substring(begin, end);
-        attributes = new FastMap<>();
+        attributes = new RadixTree<>();
       begin = 0;
       end = findSpace(tag, 0);
 

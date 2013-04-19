@@ -121,12 +121,12 @@ public class EnglishUnknownWordModel extends BaseUnknownWordModel {
 
     int wordSig = getSignatureIndex(iTW.word, loc, word);
     IntTaggedWord temp = new IntTaggedWord(wordSig, iTW.tag);
-    double c_TS = unSeenCounter.getCount(temp);
+    double c_TS = unSeenCounter.get(temp);
     temp = new IntTaggedWord(wordSig, nullTag);
-    double c_S = unSeenCounter.getCount(temp);
-    double c_U = unSeenCounter.getCount(NULL_ITW);
+    double c_S = unSeenCounter.get(temp);
+    double c_U = unSeenCounter.get(NULL_ITW);
     temp = new IntTaggedWord(nullWord, iTW.tag);
-    double c_T = unSeenCounter.getCount(temp);
+    double c_T = unSeenCounter.get(temp);
 
     double p_T_U = c_T / c_U;
     if (unknownLevel == 0) {

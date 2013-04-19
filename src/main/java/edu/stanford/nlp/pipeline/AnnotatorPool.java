@@ -2,6 +2,7 @@ package edu.stanford.nlp.pipeline;
 
 import java.util.Map;
 
+import ca.gedge.radixtree.RadixTree;
 import javolution.util.FastMap;
 
 /**
@@ -17,15 +18,15 @@ import javolution.util.FastMap;
  */
 public class AnnotatorPool {
 
-  private final Map<String, Annotator> annotators;
-  private final Map<String, AnnotatorFactory> factories;
+  private final RadixTree< Annotator> annotators;
+  private final RadixTree< AnnotatorFactory> factories;
 
   /**
    * Create an empty AnnotatorPool.
    */
   public AnnotatorPool() {
-      this.annotators = new FastMap<>();
-      this.factories = new FastMap<>();
+      this.annotators = new RadixTree<>();
+      this.factories = new RadixTree<>();
   }
 
   /**
