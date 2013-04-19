@@ -30,7 +30,7 @@ package edu.stanford.nlp.tagger.maxent;
 
 import edu.stanford.nlp.process.WordShapeClassifier;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.*;
 
@@ -397,7 +397,7 @@ public class ExtractorFrames {
     CharSequence extract(History h, PairsHolder pH) {
       // I ran a bunch of timing tests that seem to indicate it is
       // cheaper to simply add string + char + string than use a
-      // javolution.text.TxtBuilder or go through the StringBuildMemoizer -horatio
+      // javolution.text.TextBuilder or go through the StringBuildMemoizer -horatio
       return pH.getWord(h, leftPosition) + '!' + pH.getWord(h, rightPosition);
     }
 
@@ -451,7 +451,7 @@ public class ExtractorFrames {
     CharSequence extract(History h, PairsHolder pH) {
       // I ran a bunch of timing tests that seem to indicate it is
       // cheaper to simply add string + char + string than use a
-      // javolution.text.TxtBuilder or go through the StringBuildMemoizer -horatio
+      // javolution.text.TextBuilder or go through the StringBuildMemoizer -horatio
       return pH.getTag(h, leftPosition) + '!' + pH.getTag(h, rightPosition);
     }
 
@@ -528,7 +528,7 @@ public class ExtractorFrames {
 
     @Override
     CharSequence extract(History h, PairsHolder pH) {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       if (position < 0) {
         for (int idx = position; idx < 0; idx++) {
           if (idx != position) {
@@ -733,7 +733,7 @@ class ExtractorWordShapeConjunction extends Extractor {
 
   @Override
   CharSequence extract(History h, PairsHolder pH) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (int j = left; j <= right; j++) {
       String s = pH.getWord(h, j);
       sb.append(WordShapeClassifier.wordShape(s, wordShaper));

@@ -41,7 +41,6 @@ import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.tagger.io.TaggedFileRecord;
 import edu.stanford.nlp.trees.*;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.StringUtils;
@@ -49,6 +48,7 @@ import edu.stanford.nlp.util.Timing;
 import edu.stanford.nlp.util.Triple;
 import edu.stanford.nlp.util.concurrent.MulticoreWrapper;
 import edu.stanford.nlp.util.concurrent.ThreadsafeProcessor;
+import javolution.util.FastSet;
 
 import java.io.*;
 import java.util.*;
@@ -1273,7 +1273,7 @@ public class LexicalizedParser implements Function<List<? extends HasWord>, Tree
       testTreebank.loadPath(testPath, testFilter);
     }
 
-    op.trainOptions.sisterSplitters = Generics.newHashSet(Arrays.asList(op.tlpParams.sisterSplitters()));
+      op.trainOptions.sisterSplitters = new FastSet<>((Set<? extends String>) Arrays.asList(op.tlpParams.sisterSplitters()));
 
     // at this point we should be sure that op.tlpParams is
     // set appropriately (from command line, or from grammar file),

@@ -10,7 +10,7 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.process.WordToSentenceProcessor;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 
 /**
@@ -59,7 +59,7 @@ public class WordsToSentencesAnnotator implements Annotator {
                                                    Collections.<String>emptySet(),
                                                    Collections.singleton(nlToken[0]));
     } else {
-      Set<String> nlTokens = Generics.newHashSet(Arrays.asList(nlToken));
+        Set<String> nlTokens = new FastSet<>((Set<? extends String>) Arrays.asList(nlToken));
       wts = new WordToSentenceProcessor<>("",
                                                    Collections.<String>emptySet(),
                                                    nlTokens);

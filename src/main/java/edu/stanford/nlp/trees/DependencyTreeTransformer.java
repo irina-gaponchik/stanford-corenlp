@@ -1,12 +1,12 @@
 package edu.stanford.nlp.trees;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.trees.tregex.tsurgeon.Tsurgeon;
 import edu.stanford.nlp.trees.tregex.tsurgeon.TsurgeonPattern;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 
 /**
@@ -79,8 +79,8 @@ public class DependencyTreeTransformer implements TreeTransformer {
     Tsurgeon.parseOperation("prune none");
 
   protected static Tree stripEmptyNode(Tree t) {
-    List<Pair<TregexPattern, TsurgeonPattern>> ops = Generics.newArrayList();
-    ops.add(Generics.newPair(matchPattern, operation));
+      List<Pair<TregexPattern, TsurgeonPattern>> ops = new ArrayList<>();
+      ops.add(new Pair<>(matchPattern, operation));
     return Tsurgeon.processPatternsOnTree(ops, t);
   }
 

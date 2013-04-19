@@ -1,9 +1,11 @@
 package edu.stanford.nlp.util;
 
+import javolution.util.FastMap;
+import javolution.util.FastSet;
+
 import java.io.PrintStream;
 import java.lang.reflect.Type;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -61,7 +63,7 @@ public class PropertiesUtils {
    * Tired of Properties not behaving like Map<String,String>s?  This method will solve that problem for you.
    */
   public static Map<String, String> asMap(Properties properties) {
-    Map<String, String> map = Generics.newHashMap();
+      Map<String, String> map = new FastMap<>();
     for (Entry<Object, Object> entry : properties.entrySet()) {
       map.put((String)entry.getKey(), (String)entry.getValue());
     }
@@ -81,7 +83,7 @@ public class PropertiesUtils {
    */
   @SuppressWarnings("unchecked")
   public static void checkProperties(Properties properties, Properties defaults) {
-    Set<String> names = Generics.newHashSet();
+      Set<String> names = new FastSet<>();
     for (Enumeration<String> e = (Enumeration<String>) properties.propertyNames();
          e.hasMoreElements(); ) {
       names.add(e.nextElement());
@@ -160,7 +162,7 @@ public class PropertiesUtils {
   /**
    * Load a boolean property.  If the key is not present, returns defaultValue.
    */
-  public static boolean getBool(Properties props, String key, 
+  public static boolean getBool(Properties props, String key,
                                 boolean defaultValue) {
     String value = props.getProperty(key);
       return value != null ? Boolean.parseBoolean(value) : defaultValue;

@@ -3,7 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.stats.ClassicCounter;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.*;
 import java.io.Reader;
@@ -54,7 +54,7 @@ public class TreeBinarizer implements TreeTransformer {
   }
 
   private static String join(List<Tree> treeList) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (Iterator<Tree> i = treeList.iterator(); i.hasNext();) {
       Tree t = i.next();
       sb.append(t.label().value());
@@ -65,7 +65,7 @@ public class TreeBinarizer implements TreeTransformer {
     return sb.toString();
   }
 
-  private static void localTreeString(Tree t, TxtBuilder sb, int level) {
+  private static void localTreeString(Tree t, TextBuilder sb, int level) {
     sb.append('\n');
     for (int i = 0; i < level; i++) {
       sb.append("  ");
@@ -96,9 +96,9 @@ public class TreeBinarizer implements TreeTransformer {
 
       if (DEBUG) {
         CategoryWordTag.printWordTag = false;
-        TxtBuilder sb1 = new TxtBuilder();
+        TextBuilder sb1 = new TextBuilder();
         localTreeString(t, sb1, 0);
-        TxtBuilder sb2 = new TxtBuilder();
+        TextBuilder sb2 = new TextBuilder();
         localTreeString(t2, sb2, 0);
         System.out.println("Old Local Tree: " + sb1);
         System.out.println("New Local Tree: " + sb2);
@@ -340,7 +340,7 @@ public class TreeBinarizer implements TreeTransformer {
     // String's that linger.
     // String labelStr = "@" + topCat + "| " + headStr + "_" + middlePiece + finalPiece;
     int leng = 1 + 2 + 1 + topCat.length() + headStr.length() + middlePiece.length() + finalPiece.length();
-    TxtBuilder sb = new TxtBuilder(leng);
+    TextBuilder sb = new TextBuilder(leng);
     sb.append('@').append(topCat).append("| ").append(headStr).append('_').append(middlePiece).append(finalPiece);
     String labelStr = sb.toString();
     // System.err.println("makeSyntheticLabel2: " + labelStr);

@@ -9,21 +9,21 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import javolution.util.FastSet;
 import org.xml.sax.SAXException;
 
 import edu.stanford.nlp.ie.machinereading.common.DomReader;
 import edu.stanford.nlp.ie.machinereading.domains.ace.reader.RobustTokenizer.WordToken;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.Word;
-import edu.stanford.nlp.util.Generics;
 
 public class AceSentenceSegmenter extends DomReader {
   // list of tokens which mark sentence boundaries
   private final static String[] sentenceFinalPunc = { ".", "!",
       "?" };
-  private static Set<String> sentenceFinalPuncSet = Generics.newHashSet();
+  private static Set<String> sentenceFinalPuncSet = new FastSet<>();
 
-  static {
+    static {
     // set up sentenceFinalPuncSet
       Collections.addAll(sentenceFinalPuncSet, sentenceFinalPunc);
   }

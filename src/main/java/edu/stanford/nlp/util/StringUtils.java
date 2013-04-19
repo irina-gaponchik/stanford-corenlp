@@ -5,7 +5,9 @@ import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.math.SloppyMath;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import java.io.*;
 import java.lang.reflect.Field;
@@ -131,7 +133,7 @@ public class StringUtils {
    */
   public static Map<String, String> mapStringToMap(String map) {
     String[] m = PATTERN.split(map);
-    Map<String, String> res = Generics.newHashMap();
+      Map<String, String> res = new FastMap<>();
     for (String str : m) {
       int index = str.lastIndexOf('=');
       String key = str.substring(0, index);
@@ -194,7 +196,7 @@ public class StringUtils {
     Set<String> ret = null;
     if (str != null) {
       String[] fields = str.split(delimiter);
-      ret = Generics.newHashSet(fields.length);
+        ret = new FastSet<>(fields.length);
       for (String field:fields) {
         field = field.trim();
         ret.add(field);
@@ -205,7 +207,7 @@ public class StringUtils {
 
 
   public static String joinWords(Iterable<? extends HasWord> l, String glue) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     boolean first = true;
     for (HasWord o : l) {
         if (first) {
@@ -220,7 +222,7 @@ public class StringUtils {
 
 
   public static <E> String join(List<? extends E> l, String glue, Function<E,String> toStringFunc, int start, int end) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     boolean first = true;
     start = Math.max(start, 0);
     end = Math.min(end, l.size());
@@ -255,7 +257,7 @@ public class StringUtils {
     }
 
     CoreLabel lastToken = tokens.get(0);
-    TxtBuilder buffer = new TxtBuilder(lastToken.word());
+    TextBuilder buffer = new TextBuilder(lastToken.word());
 
     for (int i = 1; i < tokens.size(); i++) {
       CoreLabel currentToken = tokens.get(i);
@@ -277,7 +279,7 @@ public class StringUtils {
    * a comma-separated list by calling {@code join(numbers, ", ")}.
    */
   public static <X> String join(Iterable<X> l, String glue) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     boolean first = true;
     for (X o : l) {
         if (first) {
@@ -298,7 +300,7 @@ public class StringUtils {
 //   * <tt>join(numbers, ", ")</tt>.
 //   */
 //  public static String join(List l, String glue) {
-//    javolution.text.TxtBuilder sb = new javolution.text.TxtBuilder();
+//    javolution.text.TextBuilder sb = new javolution.text.TextBuilder();
 //    for (int i = 0, sz = l.size(); i < sz; i++) {
 //      if (i > 0) {
 //        sb.append(glue);
@@ -415,7 +417,7 @@ public class StringUtils {
       str = "null";
     }
     int slen = str.length();
-    TxtBuilder sb = new TxtBuilder(str);
+    TextBuilder sb = new TextBuilder(str);
     for (int i = 0; i < totalChars - slen; i++) {
       sb.append(' ');
     }
@@ -442,7 +444,7 @@ public class StringUtils {
     }
     int leng = str.length();
     if (leng < num) {
-      TxtBuilder sb = new TxtBuilder(str);
+      TextBuilder sb = new TextBuilder(str);
       for (int i = 0; i < num - leng; i++) {
         sb.append(' ');
       }
@@ -462,7 +464,7 @@ public class StringUtils {
     }
     int leng = str.length();
     if (leng < num) {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       for (int i = 0; i < num - leng; i++) {
         sb.append(' ');
       }
@@ -487,7 +489,7 @@ public class StringUtils {
     if (str == null) {
       str = "null";
     }
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (int i = 0, num = totalChars - str.length(); i < num; i++) {
       sb.append(ch);
     }
@@ -535,7 +537,7 @@ public class StringUtils {
     if (times == 0) {
       return "";
     }
-    TxtBuilder sb = new TxtBuilder(times * s.length());
+    TextBuilder sb = new TextBuilder(times * s.length());
     for (int i = 0; i < times; i++) {
       sb.append(s);
     }
@@ -546,7 +548,7 @@ public class StringUtils {
     if (times == 0) {
       return "";
     }
-    TxtBuilder sb = new TxtBuilder(times);
+    TextBuilder sb = new TextBuilder(times);
     for (int i = 0; i < times; i++) {
       sb.append(ch);
     }
@@ -559,7 +561,7 @@ public class StringUtils {
    */
   public static String fileNameClean(String s) {
     char[] chars = s.toCharArray();
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (char c : chars) {
       if (c >= 'A' && c <= 'Z' || c >= 'a' && c <= 'z' || c >= '0' && c <= '9' || c == '_') {
         sb.append(c);
@@ -670,7 +672,7 @@ public class StringUtils {
    *         String} arrays.
    */
   public static Map<String, String[]> argsToMap(String[] args, Map<String, Integer> flagsToNumArgs) {
-    Map<String, String[]> result = Generics.newHashMap();
+      Map<String, String[]> result = new FastMap<>();
     List<String> remainingArgs = new ArrayList<>();
     for (int i = 0; i < args.length; i++) {
       String key = args[i];
@@ -1010,7 +1012,7 @@ public class StringUtils {
    * @return A Map from keys to possible values (String or null)
    */
   public static Map<String, Object> parseCommandLineArguments(String[] args, boolean parseNumbers) {
-    Map<String, Object> result = Generics.newHashMap();
+      Map<String, Object> result = new FastMap<>();
     for (int i = 0; i < args.length; i++) {
       String key = args[i];
       if (key.charAt(0) == '-') {
@@ -1041,7 +1043,7 @@ public class StringUtils {
   }
 
   public static String stripNonAlphaNumerics(String orig) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (int i = 0; i < orig.length(); i++) {
       char c = orig.charAt(i);
       if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9') {
@@ -1065,7 +1067,7 @@ public class StringUtils {
   }
 
   public static String escapeString(String s, char[] charsToEscape, char escapeChar) {
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
       if (c == escapeChar) {
@@ -1100,14 +1102,14 @@ public class StringUtils {
     List<String> result = new ArrayList<>();
     int i = 0;
     int length = s.length();
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     while (i < length) {
       char curr = s.charAt(i);
       if (curr == splitChar) {
         // add last buffer
         if (b.length() > 0) {
           result.add(b.toString());
-          b = new TxtBuilder();
+          b = new TextBuilder();
         }
         i++;
       } else if (curr == quoteChar) {
@@ -1380,7 +1382,7 @@ public class StringUtils {
   public static String objectToColumnString(Object object, String delimiter, String... fieldNames)
           throws IllegalAccessException, NoSuchFieldException, NoSuchMethodException, InvocationTargetException
   {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (String fieldName : fieldNames) {
       if (sb.length() > 0) {
         sb.append(delimiter);
@@ -1430,7 +1432,7 @@ public class StringUtils {
    * second dimension the columns.
    */
   public static String makeHTMLTable(String[][] table, String[] rowLabels, String... colLabels) {
-    TxtBuilder buff = new TxtBuilder();
+    TextBuilder buff = new TextBuilder();
     buff.append("<table class=\"auto\" border=\"1\" cellspacing=\"0\">\n");
     // top row
     buff.append("<tr>\n");
@@ -1461,7 +1463,7 @@ public class StringUtils {
    * second dimension the columns.
    */
   public static String makeAsciiTable(Object[][] table, Object[] rowLabels, Object[] colLabels, int padLeft, int padRight, boolean tsv) {
-    TxtBuilder buff = new TxtBuilder();
+    TextBuilder buff = new TextBuilder();
     // top row
     buff.append(makeAsciiTableCell("", padLeft, padRight, tsv)); // the top left cell
     for (int j = 0; j < table[0].length; j++) { // assume table is a rectangular matrix
@@ -1518,7 +1520,7 @@ public class StringUtils {
   }
 
   public static String toAscii(String s) {
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     for (int i = 0; i < s.length(); i++) {
       char c = s.charAt(i);
       if (c > 127) {
@@ -1586,7 +1588,7 @@ public class StringUtils {
 
 
   public static String toCSVString(String... fields) {
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     for (String fld : fields) {
       if (b.length() > 0) {
         b.append(',');
@@ -1608,13 +1610,13 @@ public class StringUtils {
    */
   public static String tr(String input, String from, String to) {
     assert from.length() == to.length();
-    TxtBuilder sb = null;
+    TextBuilder sb = null;
     int len = input.length();
     for (int i = 0; i < len; i++) {
       int ind = from.indexOf(input.charAt(i));
       if (ind >= 0) {
         if (sb == null) {
-          sb = new TxtBuilder(input);
+          sb = new TextBuilder(input);
         }
         sb.setCharAt(i, to.charAt(ind));
       }
@@ -1650,7 +1652,7 @@ public class StringUtils {
 
 
   public static String toInvocationString(String cls, String... args) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append(cls).append(" invoked on ").append(new Date());
     sb.append(" with arguments:\n  ");
     for (String arg : args) {

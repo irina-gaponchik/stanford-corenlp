@@ -5,7 +5,8 @@ import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseEnglishWordMap;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.XMLUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.io.*;
 import java.util.*;
@@ -591,7 +592,7 @@ public class TreePrint {
           System.err.println(t);
           System.err.println();
         } else {
-          Map<Integer,Integer> deps = Generics.newHashMap();
+            Map<Integer,Integer> deps = new FastMap<>();
           for (Dependency<Label, Label, Object> dep : depsSet) {
             CoreLabel child = (CoreLabel)dep.dependent();
             CoreLabel parent = (CoreLabel)dep.governor();
@@ -755,7 +756,7 @@ public class TreePrint {
     String options = "";
     String tlpName = "edu.stanford.nlp.trees.PennTreebankLanguagePack";
     String hfName = null;
-    Map<String,Integer> flagMap = Generics.newHashMap();
+      Map<String,Integer> flagMap = new FastMap<>();
     flagMap.put("-format", 1);
     flagMap.put("-options", 1);
     flagMap.put("-tLP", 1);
@@ -882,7 +883,7 @@ public class TreePrint {
    *         typed dependencies
    */
   private static String toString(Collection<TypedDependency> dependencies, boolean extraSep) {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     if (extraSep) {
       List<TypedDependency> extraDeps =  new ArrayList<>();
       for (TypedDependency td : dependencies) {
@@ -910,7 +911,7 @@ public class TreePrint {
 
   // NO OUTSIDE USE
   private static String toReadableString(Collection<TypedDependency> dependencies) {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     buf.append(String.format("%-20s%-20s%-20s%n", "dep", "reln", "gov"));
     buf.append(String.format("%-20s%-20s%-20s%n", "---", "----", "---"));
     for (TypedDependency td : dependencies) {
@@ -921,7 +922,7 @@ public class TreePrint {
 
   // NO OUTSIDE USE
   private static String toXMLString(Collection<TypedDependency> dependencies) {
-    TxtBuilder buf = new TxtBuilder("<dependencies style=\"typed\">\n");
+    TextBuilder buf = new TextBuilder("<dependencies style=\"typed\">\n");
     for (TypedDependency td : dependencies) {
       String reln = td.reln().toString();
       String gov = td.gov().value();

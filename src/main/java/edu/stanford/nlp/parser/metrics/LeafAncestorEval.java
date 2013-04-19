@@ -19,9 +19,9 @@ import edu.stanford.nlp.parser.lexparser.TreebankLangParserParams;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.Treebank;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /**
  * Implementation of the Leaf Ancestor metric first described by Sampson and Babarczy (2003) and
@@ -58,8 +58,8 @@ public class LeafAncestorEval {
   public LeafAncestorEval(String str) {
     this.name = str;
 
-    catAvg = Generics.newHashMap();
-    catNum = Generics.newHashMap();
+      catAvg = new FastMap<>();
+      catNum = new FastMap<>();
   }
 
   /**
@@ -197,7 +197,7 @@ public class LeafAncestorEval {
   }
 
   private static String toString(List<CoreLabel> lineage) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for(CoreLabel cl : lineage) {
       sb.append(cl.value());
       sb.append(" <-- ");
@@ -251,7 +251,7 @@ public class LeafAncestorEval {
   }
 
 
-  private static TxtBuilder usage = new TxtBuilder();
+  private static TextBuilder usage = new TextBuilder();
   static {
     usage.append(String.format("Usage: java %s [OPTS] goldFile guessFile\n\n",LeafAncestorEval.class.getName()));
     usage.append("Options:\n");
@@ -270,8 +270,9 @@ public class LeafAncestorEval {
   private static File guessFile;
   private static File goldFile;
 
-  public static final Map<String,Integer> optionArgDefs = Generics.newHashMap();
-  static {
+  public static final Map<String,Integer> optionArgDefs = new FastMap<>();
+
+    static {
     optionArgDefs.put("-y", 1);
     optionArgDefs.put("-l", 1);
     optionArgDefs.put("-v", 0);

@@ -40,7 +40,8 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.LabeledScoredTreeFactory;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.PriorityQueue;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -355,7 +356,7 @@ public class ExhaustivePCFGParser implements Scorer, KBestViterbiParser {
             originalCoreLabels = new CoreLabel[length];
             originalTags = new HasTag[length];
             int unk = 0;
-            TxtBuilder unkWords = new TxtBuilder("[");
+            TextBuilder unkWords = new TextBuilder("[");
             // int unkIndex = wordIndex.size();
 
             for (int i = 0; i < length; i++) {
@@ -567,7 +568,7 @@ public class ExhaustivePCFGParser implements Scorer, KBestViterbiParser {
 //
 //    int unk = 0;
 //    int i = 0;
-//    javolution.text.TxtBuilder unkWords = new javolution.text.TxtBuilder("[");
+//    javolution.text.TextBuilder unkWords = new javolution.text.TextBuilder("[");
 //    for (LatticeEdge edge : lr) {
 //      String s = edge.word;
 //      if (op.testOptions.verbose && !lex.isKnown(wordNumberer.number(s))) {
@@ -1262,7 +1263,7 @@ oScore[split][end][br.rightChild] = totR;
         // todo [cdm 2012]: This case seems buggy in never doing unaries over span 1 items
         // note we don't look for "words" including the end symbol!
         for (int end = start + 1; end < length - 1 && end - start <= op.testOptions.maxSpanForTags || start + 1 == end; end++) {
-          TxtBuilder word = new TxtBuilder();
+          TextBuilder word = new TextBuilder();
           //wsg: Feb 2010 - Appears to support character-level parsing
           for (int i = start; i < end; i++) {
             if (sentence.get(i) instanceof HasWord) {
@@ -1539,7 +1540,7 @@ oScore[split][end][br.rightChild] = totR;
       if (op.testOptions.maxSpanForTags > 1) {
         Tree wordNode = null;
         if (sentence != null) {
-          TxtBuilder word = new TxtBuilder();
+          TextBuilder word = new TextBuilder();
           for (int i = start; i < end; i++) {
             if (sentence.get(i) instanceof HasWord) {
               HasWord cl = (HasWord) sentence.get(i);
@@ -1801,8 +1802,8 @@ oScore[split][end][br.rightChild] = totR;
    */
   public List<ScoredObject<Tree>> getKBestParses(int k) {
 
-    cand = Generics.newHashMap();
-    dHat = Generics.newHashMap();
+      cand = new FastMap<>();
+      dHat = new FastMap<>();
 
     int start = 0;
     int end = length;
@@ -1994,10 +1995,10 @@ oScore[split][end][br.rightChild] = totR;
     return bs;
   }
 
-  private Map<Vertex,PriorityQueue<Derivation>> cand = Generics.newHashMap();
-  private Map<Vertex,LinkedList<Derivation>> dHat = Generics.newHashMap();
+  private Map<Vertex,PriorityQueue<Derivation>> cand = new FastMap<>();
+    private Map<Vertex,LinkedList<Derivation>> dHat = new FastMap<>();
 
-  private PriorityQueue<Derivation> getCandidates(Vertex v, int k) {
+    private PriorityQueue<Derivation> getCandidates(Vertex v, int k) {
     PriorityQueue<Derivation> candV = cand.get(v);
     if (candV == null) {
       candV = new BinaryHeapPriorityQueue<>();

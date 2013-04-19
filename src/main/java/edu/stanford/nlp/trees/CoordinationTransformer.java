@@ -5,7 +5,6 @@ import edu.stanford.nlp.ling.LabelFactory;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.trees.tregex.tsurgeon.Tsurgeon;
 import edu.stanford.nlp.trees.tregex.tsurgeon.TsurgeonPattern;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 
@@ -104,11 +103,11 @@ public class CoordinationTransformer implements TreeTransformer {
     }
     Tree firstChild = t.firstChild();
     if (firstChild != null) {
-      List<Pair<TregexPattern,TsurgeonPattern>> ops = Generics.newArrayList();
+        List<Pair<TregexPattern,TsurgeonPattern>> ops = new ArrayList<>();
 
       for (int i = 0; i < operations.length; i++) {
         for (TregexPattern pattern : matchPatterns[i]) {
-          ops.add(Generics.newPair(pattern, operations[i]));
+            ops.add(new Pair<>(pattern, operations[i]));
         }
       }
 

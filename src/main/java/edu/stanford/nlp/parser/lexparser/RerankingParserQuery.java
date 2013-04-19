@@ -8,8 +8,6 @@ import java.util.List;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.parser.KBestViterbiParser;
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeTransformer;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.ScoredComparator;
 import edu.stanford.nlp.util.ScoredObject;
 
@@ -130,7 +128,7 @@ public class RerankingParserQuery implements ParserQuery {
     if (scoredTrees == null || scoredTrees.isEmpty()) {
       throw new AssertionError();
     }
-    List<ScoredObject<Tree>> equalTrees = Generics.newArrayList();
+      List<ScoredObject<Tree>> equalTrees = new ArrayList<>();
     double score = scoredTrees.get(0).score();
     int treePos = 0;
     while (treePos < scoredTrees.size() && scoredTrees.get(treePos).score() == score) {
@@ -151,7 +149,7 @@ public class RerankingParserQuery implements ParserQuery {
 
   @Override
   public List<ScoredObject<Tree>> getKBestPCFGParses(int kbestPCFG) {
-    List<ScoredObject<Tree>> trees = Generics.newArrayList();
+      List<ScoredObject<Tree>> trees = new ArrayList<>();
     for (int treePos = 0; treePos < scoredTrees.size() && treePos < kbestPCFG; ++treePos) {
       trees.add(scoredTrees.get(treePos));
     }

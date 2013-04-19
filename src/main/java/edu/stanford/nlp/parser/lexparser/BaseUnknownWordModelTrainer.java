@@ -1,7 +1,5 @@
 package edu.stanford.nlp.parser.lexparser;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,9 +7,9 @@ import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Tag;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.stats.ClassicCounter;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 public class BaseUnknownWordModelTrainer
   extends AbstractUnknownWordModelTrainer 
@@ -46,10 +44,10 @@ public class BaseUnknownWordModelTrainer
 
     seenCounter = new ClassicCounter<>();
       unSeenCounter = new ClassicCounter<>();
-    tagHash = Generics.newHashMap();
+      tagHash = new FastMap<>();
     tc = new ClassicCounter<>();
-    c = Generics.newHashMap();
-    seenEnd = Generics.newHashSet();
+      c = new FastMap<>();
+      seenEnd = new FastSet<>();
 
     useEnd = op.lexOptions.unknownSuffixSize > 0 &&
               op.lexOptions.useUnknownWordSignatures > 0;

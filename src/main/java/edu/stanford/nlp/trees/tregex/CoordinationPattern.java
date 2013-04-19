@@ -1,7 +1,7 @@
 package edu.stanford.nlp.trees.tregex;
 
 import edu.stanford.nlp.trees.Tree;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.Iterator;
 import java.util.List;
@@ -43,7 +43,7 @@ class CoordinationPattern extends TregexPattern {
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     if (isConj) {
       for (TregexPattern node : children) {
         sb.append(node.toString());

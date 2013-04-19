@@ -18,7 +18,7 @@ import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * Utilities to manipulate Annotations storing datasets or sentences with Machine Reading info
@@ -410,7 +410,7 @@ public final class AnnotationUtils {
    */
   public static String getTextContent(CoreMap sent, Span span) {
     List<CoreLabel> tokens = sent.get(CoreAnnotations.TokensAnnotation.class);
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     assert span != null;
     for(int i = span.start(); i < span.end(); i ++){
       if(i > span.start()) buf.append(' ');
@@ -420,7 +420,7 @@ public final class AnnotationUtils {
   }
 
   public static String sentenceToString(CoreMap sent) {
-    TxtBuilder sb = new TxtBuilder(512);
+    TextBuilder sb = new TextBuilder(512);
     List<CoreLabel> tokens = sent.get(CoreAnnotations.TokensAnnotation.class);
     sb.append('"').append(StringUtils.join(tokens, " ")).append('"');
     sb.append('\n');
@@ -439,7 +439,7 @@ public final class AnnotationUtils {
   }
 
   public static String tokensAndNELabelsToString(CoreMap sentence) {
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
     if(tokens != null){
       boolean first = true;
@@ -457,7 +457,7 @@ public final class AnnotationUtils {
 
   public static String datasetToString(CoreMap dataset){
     List<CoreMap> sents = dataset.get(CoreAnnotations.SentencesAnnotation.class);
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     if(sents != null){
       for(CoreMap sent: sents){
         b.append(sentenceToString(sent));
@@ -482,7 +482,7 @@ public final class AnnotationUtils {
   */
 
   public static String tokensToString(List<CoreLabel> tokens) {
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     boolean first = true;
     for(CoreLabel t: tokens){
       if(! first) os.append(' ');

@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util;
 
+import javolution.util.FastMap;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -116,23 +118,23 @@ public abstract class MapFactory<K,V> implements Serializable {
 
     @Override
     public Map<K,V> newMap() {
-      return Generics.newHashMap();
+        return new FastMap<>();
     }
 
     @Override
     public Map<K,V> newMap(int initCapacity) {
-      return Generics.newHashMap(initCapacity);
+        return new FastMap<>(initCapacity);
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map) {
-      map = Generics.newHashMap();
+        map = new FastMap<>();
       return map;
     }
 
     @Override
     public <K1, V1> Map<K1, V1> setMap(Map<K1,V1> map, int initCapacity) {
-      map = Generics.newHashMap(initCapacity);
+        map = new FastMap<>(initCapacity);
       return map;
     }
 

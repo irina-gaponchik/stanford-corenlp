@@ -3,8 +3,8 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.*;
 import java.io.Serializable;
 
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 public class LatticeEdge implements Serializable {
 
@@ -21,8 +21,8 @@ public class LatticeEdge implements Serializable {
 		this.weight = weight;
 		this.start = start;
 		this.end = end;
-		
-		attrs = Generics.newHashMap();
+
+        attrs = new FastMap<>();
 	}
 
 	public void setAttr(String key, String value) { attrs.put(key, value); }
@@ -35,7 +35,7 @@ public class LatticeEdge implements Serializable {
 
 	@Override
 	public String toString() {
-		TxtBuilder sb = new TxtBuilder();
+		TextBuilder sb = new TextBuilder();
 		sb.append("[ ").append(word);
 		sb.append(String.format(" start(%d) end(%d) wt(%f) ]", start,end,weight));
 		if(label != null)

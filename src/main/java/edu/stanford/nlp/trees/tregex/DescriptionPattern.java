@@ -5,7 +5,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.ArrayStringFilter;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.Filter;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -116,7 +116,7 @@ class DescriptionPattern extends TregexPattern {
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     if (isNegated()) {
       sb.append('!');
     }

@@ -18,16 +18,16 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 public class TrueCaseAnnotator implements Annotator {
 
     private static final Pattern COMPILE = Pattern.compile("\\s+");
     private CRFBiasedClassifier trueCaser;
   
-  private Map<String,String> mixedCaseMap = Generics.newHashMap();
-  
-  private boolean VERBOSE = true;
+  private Map<String,String> mixedCaseMap = new FastMap<>();
+
+    private boolean VERBOSE = true;
   
   public static final String DEFAULT_MODEL_BIAS = "INIT_UPPER:-0.7,UPPER:-0.7,O:0";
   
@@ -125,7 +125,7 @@ public class TrueCaseAnnotator implements Annotator {
   }
   
   public static Map<String,String> loadMixedCaseMap(String mapFile) {
-    Map<String,String> map = Generics.newHashMap();
+      Map<String,String> map = new FastMap<>();
     try {
       InputStream is = IOUtils.getInputStreamFromURLOrClasspathOrFileSystem(mapFile);
       BufferedReader br = new BufferedReader(new InputStreamReader(is));

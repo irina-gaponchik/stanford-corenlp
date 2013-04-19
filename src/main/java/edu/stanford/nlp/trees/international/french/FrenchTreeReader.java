@@ -5,6 +5,7 @@ import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 
+import javolution.util.FastSet;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -16,7 +17,6 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasCategory;
 import edu.stanford.nlp.ling.HasContext;
-import edu.stanford.nlp.ling.HasIndex;
 import edu.stanford.nlp.ling.HasTag;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Label;
@@ -28,7 +28,6 @@ import edu.stanford.nlp.trees.TreeNormalizer;
 import edu.stanford.nlp.trees.TreeReader;
 import edu.stanford.nlp.trees.TreeReaderFactory;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.XMLUtils;
 
 /**
@@ -338,7 +337,7 @@ public class FrenchTreeReader implements TreeReader {
 
     TreeReaderFactory trf = new FrenchTreeReaderFactory(true);
     int totalTrees = 0;
-    Set<String> morphAnalyses = Generics.newHashSet();
+      Set<String> morphAnalyses = new FastSet<>();
     try {
       for(File file : fileList) {
         TreeReader tr = trf.newTreeReader(new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF-8")));

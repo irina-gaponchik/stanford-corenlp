@@ -19,9 +19,10 @@ import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.Treebank;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Filters;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /** 
  *  Dependency unlabeled attachment score.
@@ -89,7 +90,7 @@ public class UnlabeledAttachmentEval extends AbstractEval {
   protected Set<?> makeObjects(Tree tree) {
     if (tree == null) {
       System.err.println("Warning: null tree");
-      return Generics.newHashSet();
+        return new FastSet<>();
     }
     if (headFinder != null) {
       tree.percolateHeads(headFinder);
@@ -100,7 +101,7 @@ public class UnlabeledAttachmentEval extends AbstractEval {
   }
   
   private static final int minArgs = 2;
-  private static final TxtBuilder usage = new TxtBuilder();
+  private static final TextBuilder usage = new TextBuilder();
   static {
     usage.append(String.format("Usage: java %s [OPTS] gold guess\n\n", UnlabeledAttachmentEval.class.getName()));
     usage.append("Options:\n");
@@ -110,8 +111,9 @@ public class UnlabeledAttachmentEval extends AbstractEval {
     usage.append("  -e         : Input encoding.\n");
   }
 
-  public static final Map<String,Integer> optionArgDefs = Generics.newHashMap();
-  static {
+  public static final Map<String,Integer> optionArgDefs = new FastMap<>();
+
+    static {
     optionArgDefs.put("-v", 0);
     optionArgDefs.put("-l", 1);
     optionArgDefs.put("-y", 1);

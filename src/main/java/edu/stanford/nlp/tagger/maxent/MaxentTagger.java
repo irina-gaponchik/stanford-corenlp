@@ -46,14 +46,14 @@ import edu.stanford.nlp.sequences.PlainTextDocumentReaderAndWriter.OutputStyle;
 import edu.stanford.nlp.tagger.io.TaggedFileRecord;
 import edu.stanford.nlp.util.DataFilePaths;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.Timing;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.XMLUtils;
 import edu.stanford.nlp.util.concurrent.MulticoreWrapper;
 import edu.stanford.nlp.util.concurrent.ThreadsafeProcessor;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.io.*;
 import java.util.*;
@@ -198,7 +198,7 @@ import java.text.DecimalFormat;
  * <tr><td>veryCommonWordThresh</td><td>int</td><td>250</td><td>Train</td><td>Words that occur more than this number of times form an equivalence class by themselves.  Ignored unless you are using ambiguity classes.</td></tr>
  * <tr><td>debug</td><td>boolean</td><td>boolean</td><td>All</td><td>Whether to write debugging information (words, top words, unknown words).  Useful for error analysis.</td></tr>
  * <tr><td>debugPrefix</td><td>String</td><td>N/A</td><td>All</td><td>File (path) prefix for where to write out the debugging information (relevant only if debug=true).</td></tr>
- * <tr><td>nthreads</td><td>int</td><td>1</td><td>Test,Txt</td><td>Number of threads to use when processing text.</td></tr>
+ * <tr><td>nthreads</td><td>int</td><td>1</td><td>Test,Text</td><td>Number of threads to use when processing text.</td></tr>
  * </table>
  * <p/>
  *
@@ -299,9 +299,9 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
   Extractors extractorsRare;
   AmbiguityClasses ambClasses;
   static final boolean alltags = false;
-  final Map<String, Set<String>> tagTokens = Generics.newHashMap();
+  final Map<String, Set<String>> tagTokens = new FastMap<>();
 
-  static final int RARE_WORD_THRESH = Integer.valueOf(TaggerConfig.RARE_WORD_THRESH);
+    static final int RARE_WORD_THRESH = Integer.valueOf(TaggerConfig.RARE_WORD_THRESH);
   static final int MIN_FEATURE_THRESH = Integer.valueOf(TaggerConfig.MIN_FEATURE_THRESH);
   static final int CUR_WORD_MIN_FEATURE_THRESH = Integer.valueOf(TaggerConfig.CUR_WORD_MIN_FEATURE_THRESH);
   static final int RARE_WORD_MIN_FEATURE_THRESH = Integer.valueOf(TaggerConfig.RARE_WORD_MIN_FEATURE_THRESH);
@@ -395,79 +395,80 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
 
   // TODO: make these constructors instead of init methods?
   void init(TaggerConfig config) {
-    if (initted) return;  // TODO: why not reinit?
+      if (!initted) {
 
-    this.config = config;
+          this.config = config;
 
-    String lang, arch;
-    String[] openClassTags, closedClassTags;
+          String lang, arch;
+          String[] openClassTags, closedClassTags;
 
-    if (config == null) {
-      lang = "english";
-      arch = "left3words";
-      openClassTags = StringUtils.EMPTY_STRING_ARRAY;
-      closedClassTags = StringUtils.EMPTY_STRING_ARRAY;
-      wordFunction = null;
-    } else {
-      this.VERBOSE = config.getVerbose();
+          if (config == null) {
+              lang = "english";
+              arch = "left3words";
+              openClassTags = StringUtils.EMPTY_STRING_ARRAY;
+              closedClassTags = StringUtils.EMPTY_STRING_ARRAY;
+              wordFunction = null;
+          } else {
+              this.VERBOSE = config.getVerbose();
 
-      lang = config.getLang();
-      arch = config.getArch();
-      openClassTags = config.getOpenClassTags();
-      closedClassTags = config.getClosedClassTags();
-      if (!config.getWordFunction().isEmpty()) {
-        wordFunction =
-          ReflectionLoading.loadByReflection(config.getWordFunction());
+              lang = config.getLang();
+              arch = config.getArch();
+              openClassTags = config.getOpenClassTags();
+              closedClassTags = config.getClosedClassTags();
+              if (!config.getWordFunction().isEmpty()) {
+                  wordFunction =
+                          ReflectionLoading.loadByReflection(config.getWordFunction());
+              }
+
+              if (openClassTags.length > 0 && !lang.isEmpty() || closedClassTags.length > 0 && !lang.isEmpty() || closedClassTags.length > 0 && openClassTags.length > 0) {
+                  throw new RuntimeException("At least two of lang (\"" + lang + "\"), openClassTags (length " + openClassTags.length + ": " + Arrays.toString(openClassTags) + ")," +
+                          "and closedClassTags (length " + closedClassTags.length + ": " + Arrays.toString(closedClassTags) + ") specified---you must choose one!");
+              } else if (openClassTags.length == 0 && lang.isEmpty() && closedClassTags.length == 0 && !config.getLearnClosedClassTags()) {
+                  System.err.println("warning: no language set, no open-class tags specified, and no closed-class tags specified; assuming ALL tags are open class tags");
+              }
+          }
+
+          if (openClassTags.length > 0) {
+              tags = new TTags();
+              tags.setOpenClassTags(openClassTags);
+          } else if (closedClassTags.length > 0) {
+              tags = new TTags();
+              tags.setClosedClassTags(closedClassTags);
+          } else {
+              tags = new TTags(lang);
+          }
+
+          defaultScore = lang.equals("english") ? 1.0 : 0.0;
+
+          if (config != null) {
+              rareWordThresh = config.getRareWordThresh();
+              minFeatureThresh = config.getMinFeatureThresh();
+              curWordMinFeatureThresh = config.getCurWordMinFeatureThresh();
+              rareWordMinFeatureThresh = config.getRareWordMinFeatureThresh();
+              veryCommonWordThresh = config.getVeryCommonWordThresh();
+              occurringTagsOnly = config.occurringTagsOnly();
+              possibleTagsOnly = config.possibleTagsOnly();
+              // System.err.println("occurringTagsOnly: "+occurringTagsOnly);
+              // System.err.println("possibleTagsOnly: "+possibleTagsOnly);
+
+              if (config.getDefaultScore() >= 0)
+                  defaultScore = config.getDefaultScore();
+          }
+
+          if (config == null || config.getMode() == TaggerConfig.Mode.TRAIN) {
+              // initialize the extractors based on the arch variable
+              // you only need to do this when training; otherwise they will be
+              // restored from the serialized file
+              extractors = new Extractors(ExtractorFrames.getExtractorFrames(arch));
+              extractorsRare = new Extractors(ExtractorFramesRare.getExtractorFramesRare(arch, tags));
+
+              setExtractorsGlobal();
+          }
+
+          ambClasses = new AmbiguityClasses(tags);
+
+          initted = true;
       }
-
-      if (openClassTags.length > 0 && !lang.isEmpty() || closedClassTags.length > 0 && !lang.isEmpty() || closedClassTags.length > 0 && openClassTags.length > 0) {
-        throw new RuntimeException("At least two of lang (\"" + lang + "\"), openClassTags (length " + openClassTags.length + ": " + Arrays.toString(openClassTags) + ")," +
-            "and closedClassTags (length " + closedClassTags.length + ": " + Arrays.toString(closedClassTags) + ") specified---you must choose one!");
-      } else if (openClassTags.length == 0 && lang.isEmpty() && closedClassTags.length == 0 && ! config.getLearnClosedClassTags()) {
-        System.err.println("warning: no language set, no open-class tags specified, and no closed-class tags specified; assuming ALL tags are open class tags");
-      }
-    }
-
-    if (openClassTags.length > 0) {
-      tags = new TTags();
-      tags.setOpenClassTags(openClassTags);
-    } else if (closedClassTags.length > 0) {
-      tags = new TTags();
-      tags.setClosedClassTags(closedClassTags);
-    } else {
-      tags = new TTags(lang);
-    }
-
-    defaultScore = lang.equals("english") ? 1.0 : 0.0;
-
-    if (config != null) {
-      rareWordThresh = config.getRareWordThresh();
-      minFeatureThresh = config.getMinFeatureThresh();
-      curWordMinFeatureThresh = config.getCurWordMinFeatureThresh();
-      rareWordMinFeatureThresh = config.getRareWordMinFeatureThresh();
-      veryCommonWordThresh = config.getVeryCommonWordThresh();
-      occurringTagsOnly = config.occurringTagsOnly();
-      possibleTagsOnly = config.possibleTagsOnly();
-      // System.err.println("occurringTagsOnly: "+occurringTagsOnly);
-      // System.err.println("possibleTagsOnly: "+possibleTagsOnly);
-
-      if(config.getDefaultScore() >= 0)
-        defaultScore = config.getDefaultScore();
-    }
-
-    if (config == null || config.getMode() == TaggerConfig.Mode.TRAIN) {
-      // initialize the extractors based on the arch variable
-      // you only need to do this when training; otherwise they will be
-      // restored from the serialized file
-      extractors = new Extractors(ExtractorFrames.getExtractorFrames(arch));
-      extractorsRare = new Extractors(ExtractorFramesRare.getExtractorFramesRare(arch, tags));
-
-      setExtractorsGlobal();
-    }
-
-    ambClasses = new AmbiguityClasses(tags);
-
-    initted = true;
   }
 
 
@@ -486,32 +487,29 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
   protected static TokenizerFactory<? extends HasWord>
     chooseTokenizerFactory(boolean tokenize, String tokenizerFactory,
                            String tokenizerOptions, boolean invertible) {
-    if (tokenize && !tokenizerFactory.trim().isEmpty()) {
       //return (TokenizerFactory<? extends HasWord>) Class.forName(getTokenizerFactory()).newInstance();
-      try {
-        @SuppressWarnings("unchecked")
-        Class<TokenizerFactory<? extends HasWord>> clazz = (Class<TokenizerFactory<? extends HasWord>>) Class.forName(tokenizerFactory.trim());
-        Method factoryMethod = clazz.getMethod("newTokenizerFactory");
-        @SuppressWarnings("unchecked")
-        TokenizerFactory<? extends HasWord> factory = (TokenizerFactory<? extends HasWord>) factoryMethod.invoke(tokenizerOptions);
-        return factory;
+      if (tokenize && !tokenizerFactory.trim().isEmpty()) try {
+          @SuppressWarnings("unchecked")
+          Class<TokenizerFactory<? extends HasWord>> clazz = (Class<TokenizerFactory<? extends HasWord>>) Class.forName(tokenizerFactory.trim());
+          Method factoryMethod = clazz.getMethod("newTokenizerFactory");
+          @SuppressWarnings("unchecked")
+          TokenizerFactory<? extends HasWord> factory = (TokenizerFactory<? extends HasWord>) factoryMethod.invoke(tokenizerOptions);
+          return factory;
       } catch (Exception e) {
-        throw new RuntimeException("Could not load tokenizer factory", e);
+          throw new RuntimeException("Could not load tokenizer factory", e);
       }
-    } else if (tokenize) {
-      if (invertible) {
-        if (tokenizerOptions.isEmpty()) {
-          tokenizerOptions = "invertible=true";
-        } else if (!tokenizerOptions.matches("(^|.*,)invertible=true")) {
-          tokenizerOptions += ",invertible=true";
+      if (tokenize) {
+        if (invertible) {
+            if (!tokenizerOptions.isEmpty()) {
+                if (!tokenizerOptions.matches("(^|.*,)invertible=true")) {
+                  tokenizerOptions += ",invertible=true";
+                }
+            } else tokenizerOptions = "invertible=true";
+            return PTBTokenizerFactory.newCoreLabelTokenizerFactory(tokenizerOptions);
         }
-        return PTBTokenizerFactory.newCoreLabelTokenizerFactory(tokenizerOptions);
-      } else {
-        return PTBTokenizerFactory.newWordTokenizerFactory(tokenizerOptions);
+          return PTBTokenizerFactory.newWordTokenizerFactory(tokenizerOptions);
       }
-    } else {
       return WhitespaceTokenizer.factory();
-    }
   }
 
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -707,7 +705,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       int sizeAssoc = rf.readInt();
       fAssociations = new ArrayList<>();
       for (int i = 0; i < extractors.getSize() + extractorsRare.getSize(); ++i) {
-        fAssociations.add(Generics.<CharSequence, int[]>newHashMap());
+          fAssociations.add(new FastMap<CharSequence, int[]>());
       }
       if (VERBOSE) System.err.printf("Reading %d feature keys...\n",sizeAssoc);
       PrintFile pfVP = null;
@@ -724,7 +722,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
         // fAssociations in a cleaner manner?  Only do this when
         // rebuilding all the tagger models anyway.  When we do that, we
         // can get rid of FeatureKey
-        Map  fValueAssociations = fAssociations.get(fK.num);
+          Map<CharSequence, int[]> fValueAssociations = fAssociations.get(fK.num);
         int[] fTagAssociations = (int[]) fValueAssociations.get(fK.val);
         if (fTagAssociations == null) {
           fTagAssociations = new int[ySize];
@@ -783,40 +781,8 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
     return tags;
   }
 
-  /**
-   * Tags the tokenized input string and returns the tagged version.
-   * This method requires the input to already be tokenized.
-   * The tagger wants input that is whitespace separated tokens, tokenized
-   * according to the conventions of the training data. (For instance,
-   * for the Penn Treebank, punctuation marks and possessive "'s" should
-   * be separated from words.)
-   *
-   * @param toTag The untagged input String
-   * @return The same string with tags inserted in the form word/tag
-   */
-  public String tagTokenizedString(String toTag) {
-    ArrayList<Word> sent = Sentence.toUntaggedList(Arrays.asList(toTag.split("\\s+")));
-    TestSentence testSentence = new TestSentence(this);
-    testSentence.tagSentence(sent, false);
-    return testSentence.getTaggedNice();
-  }
 
-
-  /**
-   * Tags the input string and returns the tagged version.
-   * This method tokenizes the input into words in perhaps multiple sentences
-   * and then tags those sentences.  The default (PTB English)
-   * tokenizer is used.
-   *
-   * @param toTag The untagged input String
-   * @return A String of sentences with tags inserted in the form word/tag
-   */
-  public String tagString(String toTag) {
-    TaggerWrapper tw = new TaggerWrapper(this);
-    return tw.apply(toTag);
-  }
-
-  /**
+    /**
    * Expects a sentence and returns a tagged sentence.  The input Sentence items
    *
    *
@@ -851,19 +817,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
   }
 
 
-  /**
-   * Returns a new Sentence that is a copy of the given sentence with all the
-   * words tagged with their part-of-speech. Convenience method when you only
-   * want to tag a single List instead of a Document of sentences.
-   * @param sentence sentence to tag
-   * @return tagged sentence
-   */
-  public ArrayList<TaggedWord> tagSentence(List<? extends HasWord> sentence) {
-    TestSentence testSentence = new TestSentence(this);
-    return testSentence.tagSentence(sentence, false);
-  }
-
-  /**
+    /**
    * Returns a new Sentence that is a copy of the given sentence with all the
    * words tagged with their part-of-speech. Convenience method when you only
    * want to tag a single List instead of a List of Lists.  If you
@@ -1169,7 +1123,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
     boolean hasCoreLabels = sentence != null &&
             !sentence.isEmpty() &&
                              sentence.get(0) instanceof CoreLabel;
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append("<sentence id=\"").append(sentNum).append("\">\n");
     int wordIndex = 0;
     for (HasWord hw : sentence) {
@@ -1201,7 +1155,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
 
   private static String getTsvWords(boolean verbose, boolean outputLemmas,
                                     List<? extends HasWord> sentence) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     if (verbose && !sentence.isEmpty() &&
         sentence.get(0) instanceof CoreLabel) {
       for (HasWord hw : sentence) {

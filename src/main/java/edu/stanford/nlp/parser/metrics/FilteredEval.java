@@ -9,7 +9,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.trees.TreeFilters;
 import edu.stanford.nlp.util.Filter;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 /**
  * An AbstractEval which doesn't just evaluate all constituents, but
@@ -31,7 +31,7 @@ public class FilteredEval extends AbstractEval {
   }
 
   protected Set<?> makeObjects(Tree tree) {
-    Set<Constituent> set = Generics.newHashSet();
+      Set<Constituent> set = new FastSet<>();
     if (tree != null) {
       set.addAll(tree.constituents(cf, false, subtreeFilter));
     }

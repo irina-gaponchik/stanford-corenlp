@@ -1,6 +1,7 @@
 package edu.stanford.nlp.util;
 
-import java.io.Serializable;
+import javolution.util.FastSet;
+
 import java.lang.reflect.Array;
 import java.util.*;
 
@@ -93,7 +94,7 @@ public class Filters {
     private final boolean judgment;
 
     protected CollectionAcceptFilter(Collection<E> c, boolean judgment) {
-      this.args = Generics.newHashSet(c);
+        this.args = new FastSet<>((Set<? extends E>) c);
       this.judgment = judgment;
     }
 

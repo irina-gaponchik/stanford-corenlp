@@ -33,11 +33,11 @@ import edu.stanford.nlp.trees.tregex.Macros;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.trees.tregex.TregexPatternCompiler;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -272,7 +272,7 @@ public class Tsurgeon {
     String trfOption = "-trf";
     String macroOption = "-macros";
     String macroFilename = "";
-    Map<String,Integer> flagMap = Generics.newHashMap();
+      Map<String,Integer> flagMap = new FastMap<>();
     flagMap.put(patternOperationOption,2);
     flagMap.put(treeFileOption,1);
     flagMap.put(trfOption,1);
@@ -379,7 +379,7 @@ public class Tsurgeon {
    * @return tregex pattern string
    */
   public static String getTregexPatternFromReader(BufferedReader reader) throws IOException {
-    TxtBuilder matchString = new TxtBuilder();
+    TextBuilder matchString = new TextBuilder();
     for (String thisLine; (thisLine = reader.readLine()) != null; ) {
       if (matchString.length() > 0 && emptyLinePattern.matcher(thisLine).matches()) {
         // A blank line after getting some real content (not just comments or nothing)
@@ -437,7 +437,7 @@ public class Tsurgeon {
    * @throws IOException
    */
   public static String getTsurgeonTextFromReader(BufferedReader reader) throws IOException {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (String thisLine; (thisLine = reader.readLine()) != null; ) {
       thisLine = removeComments(thisLine);
       if (emptyLinePattern.matcher(thisLine).matches()) {

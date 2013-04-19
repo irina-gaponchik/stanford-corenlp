@@ -43,9 +43,10 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * Generic mention extractor from a corpus.
@@ -166,7 +167,7 @@ public class MentionExtractor {
       List<CoreLabel> sentence = words.get(sent);
       Tree tree = trees.get(sent);
       List<Mention> mentions = unorderedMentions.get(sent);
-      Map<String, List<Mention>> mentionsToTrees = Generics.newHashMap();
+        Map<String, List<Mention>> mentionsToTrees = new FastMap<>();
 
       // merge the parse tree of the entire sentence with the sentence words
       if(doMergeLabels) mergeLabels(tree, sentence);
@@ -259,15 +260,15 @@ public class MentionExtractor {
 
   /** Find syntactic relations (e.g., appositives) in a sentence */
   private void findSyntacticRelations(Tree tree, List<Mention> orderedMentions) {
-    Set<Pair<Integer, Integer>> appos = Generics.newHashSet();
+      Set<Pair<Integer, Integer>> appos = new FastSet<>();
     findAppositions(tree, appos);
     markMentionRelation(orderedMentions, appos, "APPOSITION");
 
-    Set<Pair<Integer, Integer>> preNomi = Generics.newHashSet();
+      Set<Pair<Integer, Integer>> preNomi = new FastSet<>();
     findPredicateNominatives(tree, preNomi);
     markMentionRelation(orderedMentions, preNomi, "PREDICATE_NOMINATIVE");
 
-    Set<Pair<Integer, Integer>> relativePronounPairs = Generics.newHashSet();
+      Set<Pair<Integer, Integer>> relativePronounPairs = new FastSet<>();
     findRelativePronouns(tree, relativePronounPairs);
     markMentionRelation(orderedMentions, relativePronounPairs, "RELATIVE_PRONOUN");
   }
@@ -375,7 +376,7 @@ public class MentionExtractor {
     boolean replicateCoNLL = Boolean.parseBoolean(props.getProperty(Constants.REPLICATECONLL_PROP, "false"));
 
     Properties pipelineProps = new Properties(props);
-    TxtBuilder annoSb = new TxtBuilder("");
+    TextBuilder annoSb = new TextBuilder("");
       if (replicateCoNLL) {
           annoSb.append("lemma");
       } else {

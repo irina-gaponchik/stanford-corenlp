@@ -64,7 +64,6 @@ import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Factory;
 import edu.stanford.nlp.util.FixedPrioritiesPriorityQueue;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.PriorityQueue;
@@ -72,7 +71,9 @@ import edu.stanford.nlp.util.Sets;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * Static methods for operating on {@link Counter}s.
@@ -604,7 +605,7 @@ public class Counters {
    * removed entries.
    */
   public static <E> Set<E> retainNonZeros(Counter<E> counter) {
-    Set<E> removed = Generics.newHashSet();
+      Set<E> removed = new FastSet<>();
     for (E key : counter.keySet()) {
       if (counter.getCount(key) == 0.0) {
         removed.add(key);
@@ -628,7 +629,7 @@ public class Counters {
    * @return The set of discarded entries.
    */
   public static <E> Set<E> retainAbove(Counter<E> counter, double countThreshold) {
-    Set<E> removed = Generics.newHashSet();
+      Set<E> removed = new FastSet<>();
     for (E key : counter.keySet()) {
       if (counter.getCount(key) < countThreshold) {
         removed.add(key);
@@ -652,7 +653,7 @@ public class Counters {
    * @return The set of discarded entries.
    */
   public static <E> Set<E> retainBelow(Counter<E> counter, double countMaxThreshold) {
-    Set<E> removed = Generics.newHashSet();
+      Set<E> removed = new FastSet<>();
     for (E key : counter.keySet()) {
       if (counter.getCount(key) > countMaxThreshold) {
         removed.add(key);
@@ -674,7 +675,7 @@ public class Counters {
    * @return The set of discarded entries.
    */
   public static Set<String> retainMatchingKeys(Counter<String> counter, List<Pattern> matchPatterns) {
-    Set<String> removed = Generics.newHashSet();
+      Set<String> removed = new FastSet<>();
     for (String key : counter.keySet()) {
       boolean matched = false;
       for (Pattern pattern : matchPatterns) {
@@ -703,7 +704,7 @@ public class Counters {
    * @return The set of discarded entries.
    */
   public static<E> Set<E> retainKeys(Counter<E> counter, Collection<E> matchKeys) {
-    Set<E> removed = Generics.newHashSet();
+      Set<E> removed = new FastSet<>();
     for (E key : counter.keySet()) {
       boolean matched = matchKeys.contains(key);
       if (!matched) {
@@ -741,7 +742,7 @@ public class Counters {
    *         threshold.
    */
   public static <E> Set<E> keysAbove(Counter<E> c, double countThreshold) {
-    Set<E> keys = Generics.newHashSet();
+      Set<E> keys = new FastSet<>()    ;
     for (E key : c.keySet()) {
       if (c.getCount(key) >= countThreshold) {
         keys.add(key);
@@ -755,7 +756,7 @@ public class Counters {
    * This set may have 0 elements but will not be null.
    */
   public static <E> Set<E> keysBelow(Counter<E> c, double countThreshold) {
-    Set<E> keys = Generics.newHashSet();
+      Set<E> keys = new FastSet<>();
     for (E key : c.keySet()) {
       if (c.getCount(key) <= countThreshold) {
         keys.add(key);
@@ -769,7 +770,7 @@ public class Counters {
    * have 0 elements but will not be null.
    */
   public static <E> Set<E> keysAt(Counter<E> c, double count) {
-    Set<E> keys = Generics.newHashSet();
+      Set<E> keys = new FastSet<>();
     for (E key : c.keySet()) {
       if (c.getCount(key) == count) {
         keys.add(key);
@@ -1494,7 +1495,7 @@ public class Counters {
    */
   public static <E> Counter<E> average(Counter<E> c1, Counter<E> c2) {
     Counter<E> average = c1.getFactory().create();
-    Set<E> allKeys = Generics.newHashSet(c1.keySet());
+      Set<E> allKeys = new FastSet<>(c1.keySet());
     allKeys.addAll(c2.keySet());
     for (E key : allKeys) {
       average.setCount(key, (c1.getCount(key) + c2.getCount(key)) * 0.5);
@@ -1603,7 +1604,7 @@ public class Counters {
       }
     }
     // left overs
-    Set<E> rest = Generics.newHashSet(b.keySet());
+      Set<E> rest = new FastSet<>(b.keySet());
     rest.removeAll(a.keySet());
 
     for (E key : rest) {
@@ -1936,7 +1937,7 @@ public class Counters {
   }
 
   public static <E> String toString(Counter<E> counter, NumberFormat nf) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append('{');
     List<E> list = ErasureUtils.sortedIfPossible(counter.keySet());
     // */
@@ -1958,7 +1959,7 @@ public class Counters {
    * doesn't sort the keys.
    */
   public static <E> String toString(Counter<E> counter, NumberFormat nf, String preAppend, String postAppend, String keyValSeparator, String itemSeparator) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append(preAppend);
     // List<E> list = new ArrayList<E>(map.keySet());
     // try {
@@ -2044,7 +2045,7 @@ public class Counters {
   public static <E> String toVerticalString(Counter<E> c, int k, String fmt, boolean swap) {
     PriorityQueue<E> q = Counters.toPriorityQueue(c);
     List<E> sortedKeys = q.toSortedList();
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     int i = 0;
     for (Iterator<E> keyI = sortedKeys.iterator(); keyI.hasNext() && i < k; i++) {
       E key = keyI.next();
@@ -2575,7 +2576,7 @@ public class Counters {
             // return a HashMap backed by the same numeric type to
             // keep the precision of the returned counter consistent with
             // this one's precision
-            return fromMap(Generics.<E, N>newHashMap(), type);
+              return fromMap(new FastMap<E, N>(), type);
           }
         };
       }

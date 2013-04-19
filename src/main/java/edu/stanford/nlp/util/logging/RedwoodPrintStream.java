@@ -1,7 +1,7 @@
 
 package edu.stanford.nlp.util.logging;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.PrintStream;
 import java.util.Locale;
@@ -16,7 +16,7 @@ import java.util.Locale;
 public class RedwoodPrintStream extends PrintStream {
   private final Redwood.Flag tag;
 	private final PrintStream realStream;
-  private TxtBuilder buffer = new TxtBuilder();
+  private TextBuilder buffer = new TextBuilder();
   private boolean checkForThrowable;
 
   public RedwoodPrintStream(Redwood.Flag tag, PrintStream realStream) {
@@ -48,7 +48,7 @@ public class RedwoodPrintStream extends PrintStream {
       if(c == '\n'){
         String msg = buffer.toString();
         if(tag != null){ Redwood.log(tag, msg); } else { Redwood.log(msg); }
-        buffer = new TxtBuilder();
+        buffer = new TextBuilder();
       } else {
         buffer.append("").append(c);
       }

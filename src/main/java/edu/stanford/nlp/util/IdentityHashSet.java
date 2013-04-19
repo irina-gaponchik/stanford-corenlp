@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util;
 
+import javolution.util.FastSet;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -175,7 +177,7 @@ public class IdentityHashSet<E> extends AbstractSet<E> implements Cloneable, Ser
     List<String> b = Arrays.asList("Larry", "Moe", "Curly");
     List<Integer> c = Arrays.asList(x, y, z);
     List<String> d = Arrays.asList("Larry", "Moe", "Curly");
-    Set<List<?>> hs = Generics.newHashSet();
+      Set<List<?>> hs = new FastSet<>();
     IdentityHashSet<List<?>> ihs = new IdentityHashSet<>();
     hs.add(a);
     hs.add(b);

@@ -1,6 +1,7 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.io.*;
 import java.util.*;
@@ -34,8 +35,8 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
 
   // these variables are also used in IntArrayIndex
   ArrayList<E> objects = new ArrayList<>();
-  Map<E,Integer> indexes = Generics.newHashMap();
-  boolean locked; // = false;
+  Map<E,Integer> indexes = new FastMap<>();
+    boolean locked; // = false;
 
   /**
    * Clears this Index.
@@ -245,7 +246,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    */
   public HashIndex(int capacity) {
       objects = new ArrayList<>(capacity);
-    indexes = Generics.newHashMap(capacity);
+      indexes = new FastMap<>(capacity);
   }
 
   /**
@@ -376,7 +377,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    *  @return A String showing some of the index contents
    */
   public String toString(int n) {
-    TxtBuilder buff = new TxtBuilder("[");
+    TextBuilder buff = new TextBuilder("[");
     int sz = objects.size();
     if (n > sz) {
       n = sz;
@@ -393,7 +394,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
   }
 
   public String toStringOneEntryPerLine(int n) {
-    TxtBuilder buff = new TxtBuilder();
+    TextBuilder buff = new TextBuilder();
     int sz = objects.size();
     if (n > sz) {
       n = sz;

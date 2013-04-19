@@ -8,7 +8,7 @@ import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.sequences.SeqClassifierFlags;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.*;
 import java.util.*;
@@ -139,7 +139,7 @@ public class BisequenceEmpiricalNERPrior<IN extends CoreMap> {
     public int[] otherOccurrences;
   
     public String toString(Index<String> tagIndex) {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       sb.append('"');
       sb.append(surface);
       sb.append("\" start: ");
@@ -237,7 +237,7 @@ public class BisequenceEmpiricalNERPrior<IN extends CoreMap> {
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (Entity entity: entityList) {
       sb.append(entity.startPosition);
       sb.append('\t');

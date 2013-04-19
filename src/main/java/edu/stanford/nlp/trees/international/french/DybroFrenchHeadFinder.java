@@ -2,7 +2,7 @@ package edu.stanford.nlp.trees.international.french;
 
 import edu.stanford.nlp.ling.CategoryWordTag;
 import edu.stanford.nlp.trees.*;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /**
  * Implements the head finding rules from Dybro-Johansen master's thesis.
@@ -29,7 +29,7 @@ public class DybroFrenchHeadFinder extends AbstractCollinsHeadFinder {
     // D (determiner), ET (foreign word), I (interjection), N (noun),
     // P (preposition), PREF (prefix), PRO (strong pronoun -- very confusing), V (verb), PUNC (punctuation)
 
-    nonTerminalInfo = Generics.newHashMap();
+      nonTerminalInfo = new FastMap<>();
 
     // "sentence"
     nonTerminalInfo.put(tlp.startSymbol(), new String[][]{{"right", "VN", "AP", "NP", "Srel", "VPpart", "AdP", "I", "Ssub", "VPinf", "PP", "ADV"}, {"right"}});

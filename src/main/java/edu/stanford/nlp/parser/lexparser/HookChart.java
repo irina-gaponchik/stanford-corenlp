@@ -2,7 +2,8 @@ package edu.stanford.nlp.parser.lexparser;
 
 import java.util.*;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * A HookChart is a chart data structure designed for use with the efficient
@@ -13,17 +14,17 @@ import edu.stanford.nlp.util.Generics;
  */
 class HookChart {
 
-  private Map<ChartIndex,List<Hook>> registeredPreHooks = Generics.newHashMap();
-  private Map<ChartIndex,List<Hook>> registeredPostHooks = Generics.newHashMap();
-  private Map<ChartIndex,List<Edge>> registeredEdgesByLeftIndex = Generics.newHashMap();
-  private Map<ChartIndex,List<Edge>> registeredEdgesByRightIndex = Generics.newHashMap();
+  private Map<ChartIndex,List<Hook>> registeredPreHooks = new FastMap<>();
+    private Map<ChartIndex,List<Hook>> registeredPostHooks = new FastMap<>();
+    private Map<ChartIndex,List<Edge>> registeredEdgesByLeftIndex = new FastMap<>();
+    private Map<ChartIndex,List<Edge>> registeredEdgesByRightIndex = new FastMap<>();
 
-  private Map<WeakChartIndex,List<Edge>> realEdgesByL = Generics.newHashMap();
-  private Map<WeakChartIndex,List<Edge>> realEdgesByR = Generics.newHashMap();
-  private Set<ChartIndex> builtLIndexes = Generics.newHashSet();
-  private Set<ChartIndex> builtRIndexes = Generics.newHashSet();
+    private Map<WeakChartIndex,List<Edge>> realEdgesByL = new FastMap<>();
+    private Map<WeakChartIndex,List<Edge>> realEdgesByR = new FastMap<>();
+    private Set<ChartIndex> builtLIndexes = new FastSet<>();
+    private Set<ChartIndex> builtRIndexes = new FastSet<>();
 
-  private Interner interner = new Interner();
+    private Interner interner = new Interner();
 
   private static class ChartIndex {
     public int state;

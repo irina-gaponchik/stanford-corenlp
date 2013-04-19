@@ -4,7 +4,8 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.logging.Redwood;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 import java.io.IOException;
 import java.util.*;
@@ -179,7 +180,7 @@ public class AnnotationPipeline implements Annotator {
    *  @return Human readable information on time spent in processing.
    */
   public String timingInformation() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     if (TIME) {
       sb.append("Annotation pipeline timing information:\n");
       Iterator<AtomicInteger> it = accumulatedTime.iterator();
@@ -196,7 +197,7 @@ public class AnnotationPipeline implements Annotator {
   }
 
   public Set<Requirement> requirementsSatisfied() {
-    Set<Requirement> satisfied = Generics.newHashSet();
+      Set<Requirement> satisfied = new FastSet<>();
     for (Annotator annotator : annotators) {
       satisfied.addAll(annotator.requirementsSatisfied());
     }

@@ -1,6 +1,7 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +57,7 @@ public class Maps {
    * @return The composed map
    */
   public static <X, Y, Z> Map<X, Z> compose(Map<X, Y> map1, Map<Y, Z> map2) {
-    Map<X, Z> composedMap = Generics.newHashMap();
+      Map<X, Z> composedMap = new FastMap<>();
     for (Entry<X, Y> xyEntry : map1.entrySet()) {
       composedMap.put(xyEntry.getKey(), map2.get(xyEntry.getValue()));
     }
@@ -69,7 +70,7 @@ public class Maps {
    * @return The inverted map
    */
   public static <X, Y> Map<Y, X> invert(Map<X, Y> map) {
-    Map<Y, X> invertedMap = Generics.newHashMap();
+      Map<Y, X> invertedMap = new FastMap<>();
     for (Map.Entry<X, Y> entry : map.entrySet()) {
       X key = entry.getKey();
       Y value = entry.getValue();
@@ -84,7 +85,7 @@ public class Maps {
    * @return The inverted set
    */
   public static <X, Y> Map<Y, Set<X>> invertSet(Map<X, Y> map) {
-    Map<Y, Set<X>> invertedMap = Generics.newHashMap();
+      Map<Y, Set<X>> invertedMap = new FastMap<>();
     for (Map.Entry<X, Y> entry : map.entrySet()) {
       X key = entry.getKey();
       Y value = entry.getValue();
@@ -116,7 +117,7 @@ public class Maps {
   /**
    * Stringifies a Map in a stable fashion.
    */
-  public static <K extends Comparable<K>, V> void toStringSorted(Map<K, V> map, TxtBuilder builder) {
+  public static <K extends Comparable<K>, V> void toStringSorted(Map<K, V> map, TextBuilder builder) {
     builder.append('{');
     List<Entry<K,V>> sortedProperties = Maps.sortedEntries(map);
     int index = 0;
@@ -134,7 +135,7 @@ public class Maps {
    * Stringifies a Map in a stable fashion.
    */
   public static <K extends Comparable<K>, V> String toStringSorted(Map<K, V> map) {
-    TxtBuilder builder = new TxtBuilder();
+    TextBuilder builder = new TextBuilder();
     toStringSorted(map, builder);
     return builder.toString();
   }
@@ -160,12 +161,12 @@ public class Maps {
   }
 
   public static void main(String... args) {
-    Map<String, String> map1 = Generics.newHashMap();
+      Map<String, String> map1 = new FastMap<>();
     map1.put("a", "1");
     map1.put("b", "2");
     map1.put("c", "2");
     map1.put("d", "4");
-    Map<String, String> map2 = Generics.newHashMap();
+      Map<String, String> map2 = new FastMap<>();
     map2.put("1", "x");
     map2.put("2", "y");
     map2.put("3", "z");
@@ -174,8 +175,8 @@ public class Maps {
     System.out.println("invertSet(map1): " + Maps.invertSet(map1));
     System.out.println("map2: " + map2);
     System.out.println("compose(map1,map2): " + Maps.compose(map1, map2));
-    Map<String, Set<String>> setValues = Generics.newHashMap();
-    Map<String, List<String>> listValues = Generics.newHashMap();
+      Map<String, Set<String>> setValues = new FastMap<>();
+      Map<String, List<String>> listValues = new FastMap<>();
     Maps.putIntoValueArrayList(listValues, "a", "1");
     Maps.putIntoValueArrayList(listValues, "a", "1");
     Maps.putIntoValueArrayList(listValues, "a", "2");

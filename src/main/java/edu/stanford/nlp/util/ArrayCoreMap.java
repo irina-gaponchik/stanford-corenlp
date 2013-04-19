@@ -15,7 +15,7 @@ import java.util.Set;
 import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 
 /**
@@ -314,7 +314,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
 
     calledSet.add(this);
 
-    TxtBuilder s = new TxtBuilder("[");
+    TextBuilder s = new TextBuilder("[");
     for (int i = 0; i < size; i++) {
       s.append(keys[i].getSimpleName());
       s.append('=');
@@ -350,7 +350,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
    *     ArrayCoreMap.
    */
   public String toShorterString(String... what) {
-    TxtBuilder s = new TxtBuilder("[");
+    TextBuilder s = new TextBuilder("[");
     for (int i = 0; i < size; i++) {
       String name = keys[i].getSimpleName();
       int annoIdx = name.lastIndexOf("Annotation");
@@ -400,7 +400,7 @@ public class ArrayCoreMap implements CoreMap, Serializable {
   }
 
   public String toShortString(char separator, String... what) {
-    TxtBuilder s = new TxtBuilder();
+    TextBuilder s = new TextBuilder();
     for (int i = 0; i < size; i++) {
       boolean include;
       if (what.length > 0) {

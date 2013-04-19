@@ -14,8 +14,8 @@ import java.util.logging.Logger;
 
 import edu.stanford.nlp.ie.machinereading.common.SimpleTokenize;
 import edu.stanford.nlp.ie.machinereading.domains.ace.AceReader;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /**
  * Stores the ACE elements annotated in this document
@@ -62,16 +62,16 @@ public class AceDocument extends AceElement {
   public AceDocument(String id) {
     super(id);
 
-    mEntities = Generics.newHashMap();
-    mEntityMentions = Generics.newHashMap();
+      mEntities = new FastMap<>();
+      mEntityMentions = new FastMap<>();
     mSentenceEntityMentions = new ArrayList<>();
 
-    mRelations = Generics.newHashMap();
-    mRelationMentions = Generics.newHashMap();
+      mRelations = new FastMap<>();
+      mRelationMentions = new FastMap<>();
     mSentenceRelationMentions = new ArrayList<>();
 
-    mEvents = Generics.newHashMap();
-    mEventMentions = Generics.newHashMap();
+      mEvents = new FastMap<>();
+      mEventMentions = new FastMap<>();
     mSentenceEventMentions = new ArrayList<>();
     
     mTokens = new Vector<>();
@@ -264,7 +264,7 @@ public class AceDocument extends AceElement {
   }
 
   private String tokensWithByteSpan(int start, int end) {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     boolean doPrint = false;
     buf.append("...");
       for (AceToken mToken : mTokens) {
@@ -733,7 +733,7 @@ public class AceDocument extends AceElement {
 
   private void readRawBytes(String fileName) throws IOException {
     BufferedReader in = new BufferedReader(new FileReader(fileName));
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     int c;
     while ((c = in.read()) >= 0)
       buf.append((char) c);

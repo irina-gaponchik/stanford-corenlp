@@ -7,7 +7,7 @@ import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.sequences.SequenceModel;
 import edu.stanford.nlp.sequences.SequenceListener;
 import edu.stanford.nlp.ling.CoreAnnotations;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -425,7 +425,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (int i = 0; i < entities.length; i++) {
       sb.append(i);
       sb.append('\t');
@@ -443,7 +443,7 @@ public abstract class EntityCachingAbstractSequencePrior<IN extends CoreMap> imp
   }
 
   public String toString(int pos) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (int i = Math.max(0, pos - 10); i < Math.min(entities.length, pos + 10); i++) {
       sb.append(i);
       sb.append('\t');
@@ -473,7 +473,7 @@ class Entity {
   public int[] otherOccurrences;
 
   public String toString(Index<String> classIndex) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append('"');
     sb.append(StringUtils.join(words, " "));
     sb.append("\" start: ");

@@ -2,12 +2,12 @@ package edu.stanford.nlp.process;
 
 
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
 
 
 import edu.stanford.nlp.ling.HasWord;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -160,7 +160,7 @@ public class Americanize implements Function<HasWord,HasWord> {
   private static final Pattern disjunctivePattern;
 
   static {
-    TxtBuilder foo = new TxtBuilder();
+    TextBuilder foo = new TextBuilder();
     for (int i = 0, len = pats.length; i < len; i++) {
       pats[i] = Pattern.compile(patStrings[i]);
       if (i > 0) {
@@ -212,12 +212,12 @@ public class Americanize implements Function<HasWord,HasWord> {
   private static final String[] timexConverted = {"January", "February", /* not "march" ! */
                                                               "April", /* Not "may"! */ "June", "July", "August", "September", "October", "November", "December", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
-  private static final Map<String,String> mapping = Generics.newHashMap();
+  private static final Map<String,String> mapping = new FastMap<>();
 
-  private static final Map<String,String> timexMapping = Generics.newHashMap();
+    private static final Map<String,String> timexMapping = new FastMap<>();
 
 
-  // static initialization block
+    // static initialization block
   static {
     if (converters.length != converted.length || timexConverters.length != timexConverted.length || pats.length != reps.length || pats.length != excepts.length) {
       throw new RuntimeException("Americanize: Bad initialization data");

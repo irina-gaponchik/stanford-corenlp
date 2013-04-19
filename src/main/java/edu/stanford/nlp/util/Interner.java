@@ -1,8 +1,11 @@
 package edu.stanford.nlp.util;
 
+import javolution.util.FastSet;
+
 import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 /**
  * For interning (canonicalizing) things.
@@ -29,7 +32,7 @@ import java.util.Set;
  */
 public class Interner<T> {
 
-  protected static Interner<Object> interner = Generics.newInterner();
+  protected static Interner<Object> interner = newInterner();
 
   /**
    * For getting the instance that global methods use.
@@ -60,9 +63,21 @@ public class Interner<T> {
   }
 
 
-  protected Map<T,WeakReference<T>> map = Generics.newWeakHashMap();
+  protected Map<T,WeakReference<T>> map = newWeakHashMap();
 
-  public void clear() { map = Generics.newWeakHashMap(); }
+    public static <K,V> WeakHashMap<K,V> newWeakHashMap() {
+    return new WeakHashMap<>();
+  }
+
+    public static <T> Interner<T> newInterner() {
+    return new Interner<>();
+  }
+
+    public static <T> WeakReference<T> newWeakReference(T referent) {
+    return new WeakReference<>(referent);
+  }
+
+    public void clear() { map = newWeakHashMap(); }
   
   /**
    * Returns a unique object o' that .equals the argument o.  If o
@@ -72,7 +87,7 @@ public class Interner<T> {
   public T intern(T o) {
     WeakReference<T> ref = map.get(o);
     if (ref == null) {
-      ref = Generics.newWeakReference(o);
+      ref = newWeakReference(o);
       map.put(o, ref);
     }
 //    else {
@@ -87,7 +102,7 @@ public class Interner<T> {
    * original set.
    */
   public Set<T> internAll(Set<T> s) {
-    Set<T> result = Generics.newHashSet();
+      Set<T> result = new FastSet<>();
     for (T o : s) {
       result.add(intern(o));
     }

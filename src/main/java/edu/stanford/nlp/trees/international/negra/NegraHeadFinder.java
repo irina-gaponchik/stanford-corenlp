@@ -4,7 +4,7 @@ import edu.stanford.nlp.trees.AbstractCollinsHeadFinder;
 import edu.stanford.nlp.trees.HeadFinder;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 
 /**
@@ -44,7 +44,7 @@ public class NegraHeadFinder extends AbstractCollinsHeadFinder {
   public NegraHeadFinder(TreebankLanguagePack tlp) {
     super(tlp);
 
-    nonTerminalInfo = Generics.newHashMap();
+      nonTerminalInfo = new FastMap<>();
 
     left = coordSwitch ? "right" : "left";
     right = coordSwitch ? "left" : "right";

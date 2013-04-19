@@ -3,9 +3,9 @@ package edu.stanford.nlp.trees.tregex;
 // all generated classes are in this package
 
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.trees.HeadFinder;
+import javolution.util.FastSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,9 +27,9 @@ class TregexParser {
   // keep track of which variables we've seen, so that we can reject
   // some nonsense patterns such as ones that reset variables or link
   // to variables that haven't been set
-  private Set<String> knownVariables = Generics.newHashSet();
+  private Set<String> knownVariables = new FastSet<>();
 
-  public TregexParser(java.io.Reader stream,
+    public TregexParser(java.io.Reader stream,
                       Function<String, String> basicCatFunction,
                       HeadFinder headFinder) {
     this(stream);
@@ -267,10 +267,10 @@ class TregexParser {
   // variables, we want to separate those done in different parts of the
   // disjunction.  Variables set in one part won't be set in the next
   // part if it gets there, since disjunctions exit once known.
-  Set<String> originalKnownVariables = Generics.newHashSet(knownVariables);
+      Set<String> originalKnownVariables = new FastSet<>(knownVariables);
   // However, we want to keep track of all the known variables, so that after
   // the disjunction is over, we know them all.
-  Set<String> allKnownVariables = Generics.newHashSet(knownVariables);
+      Set<String> allKnownVariables = new FastSet<>(knownVariables);
     child = ChildrenConj();
       children.add(child);
       allKnownVariables.addAll(knownVariables);
@@ -283,7 +283,7 @@ class TregexParser {
         jj_la1[11] = jj_gen;
         break label_2;
       }
-        knownVariables = Generics.newHashSet(originalKnownVariables);
+        knownVariables = new FastSet<>(originalKnownVariables);
       jj_consume_token(20);
       child = ChildrenConj();
       children.add(child);

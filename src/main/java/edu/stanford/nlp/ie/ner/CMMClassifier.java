@@ -63,13 +63,13 @@ import edu.stanford.nlp.sequences.SequenceModel;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.PaddedList;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 
 /**
@@ -147,7 +147,7 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
    * @return The Set of entities recognized by this Classifier.
    */
   public Set<String> getTags() {
-    Set<String> tags = Generics.newHashSet(classIndex.objectsList());
+      Set<String> tags = new FastSet<>((Set<? extends String>) classIndex.objectsList());
     tags.remove(flags.backgroundSymbol);
     return tags;
   }
@@ -393,7 +393,7 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
 
               // make sure the score is greater than all its neighbors (one add or subtract)
               if (score >= flags.newgeneThreshold && (!prevScores.containsKey(al) || score > prevScores.getCount(al)) && (!prevScores.containsKey(ar) || score > prevScores.getCount(ar)) && (!prevScores.containsKey(sl) || score > prevScores.getCount(sl)) && (!prevScores.containsKey(sr) || score > prevScores.getCount(sr))) {
-                TxtBuilder sb = new TxtBuilder();
+                TextBuilder sb = new TextBuilder();
                 wordInfo = document.get(j);
                 String docId = wordInfo.get(CoreAnnotations.IDAnnotation.class);
                 String startIndex = wordInfo.get(CoreAnnotations.PositionAnnotation.class);
@@ -1131,7 +1131,7 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
    */
   private void makeAnswerArraysAndTagIndex(Collection<List<IN>> docs) {
     if (answerArrays == null) {
-      answerArrays = Generics.newHashSet();
+        answerArrays = new FastSet<>();
     }
     if (classIndex == null) {
       classIndex = new HashIndex<>();
@@ -1231,7 +1231,7 @@ public class CMMClassifier<IN extends CoreLabel> extends AbstractSequenceClassif
     if (addend == null) {
       return feats;
     }
-    Collection<String> newFeats = Generics.newHashSet();
+      Collection<String> newFeats = new FastSet<>();
     for (String feat : feats) {
       String newFeat = feat + addend;
       newFeats.add(newFeat);

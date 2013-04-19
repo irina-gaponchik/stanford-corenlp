@@ -2,17 +2,13 @@ package edu.stanford.nlp.graph;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.stanford.nlp.stats.ClassicCounter;
-import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.util.BinaryHeapPriorityQueue;
-import edu.stanford.nlp.util.Generics;
-import edu.stanford.nlp.util.Pair;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 public class DijkstraShortestPath {
   private DijkstraShortestPath() {} // static method only
@@ -24,9 +20,9 @@ public class DijkstraShortestPath {
       return Collections.singletonList(node2);
     }
 
-    Set<V> visited = Generics.newHashSet();
-    
-    Map<V, V> previous = Generics.newHashMap();
+      Set<V> visited = new FastSet<>();
+
+      Map<V, V> previous = new FastMap<>();
     
     BinaryHeapPriorityQueue<V> unsettledNodes = 
       new BinaryHeapPriorityQueue<>();

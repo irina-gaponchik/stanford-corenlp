@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.stanford.nlp.io.IOUtils;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 public class StringDictionary {
 
@@ -39,8 +39,8 @@ public class StringDictionary {
   public StringDictionary(String name) {
     mName = name;
     mCreate = false;
-    mDict = Generics.newHashMap();
-    mInverse = Generics.newHashMap();
+      mDict = new FastMap<>();
+      mInverse = new FastMap<>();
   }
 
   public void setMode(boolean mode) {

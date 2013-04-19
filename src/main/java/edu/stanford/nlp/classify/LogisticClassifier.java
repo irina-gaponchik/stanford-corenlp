@@ -43,7 +43,7 @@ import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * A classifier for binary logistic regression problems.
@@ -79,7 +79,7 @@ public class LogisticClassifier<L, F> implements Classifier<L, F>, RVFClassifier
       return "";
     }
 
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (F f : featureIndex) {
       sb.append(classes[1]).append(" / ").append(f).append(" = ").append(weights[featureIndex.indexOf(f)]);
     }

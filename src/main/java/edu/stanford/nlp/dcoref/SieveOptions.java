@@ -1,6 +1,6 @@
 package edu.stanford.nlp.dcoref;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 public class SieveOptions {
   public boolean DO_PRONOUN;
@@ -32,7 +32,7 @@ public class SieveOptions {
   public boolean USE_COREF_DICT;
   
   public String toString() {
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     os.append('{');
     if(DO_PRONOUN) os.append("DO_PRONOUN");
     if(USE_iwithini) os.append(", USE_iwithini");

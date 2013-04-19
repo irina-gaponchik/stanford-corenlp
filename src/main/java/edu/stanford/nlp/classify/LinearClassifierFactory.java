@@ -790,8 +790,8 @@ public class LinearClassifierFactory<L, F> extends AbstractLinearClassifierFacto
 
   public Classifier<L, F> trainClassifier(Iterable<Datum<L, F>> dataIterable) {
     Minimizer<DiffFunction> minimizer = getMinimizer();
-    Index<F> featureIndex = Generics.newIndex();
-    Index<L> labelIndex = Generics.newIndex();
+      Index<F> featureIndex = new HashIndex<>();
+      Index<L> labelIndex = new HashIndex<>();
     for (Datum<L, F> d : dataIterable) {
       labelIndex.add(d.label());
       featureIndex.addAll(d.asFeatures());//If there are duplicates, it doesn't add them again.

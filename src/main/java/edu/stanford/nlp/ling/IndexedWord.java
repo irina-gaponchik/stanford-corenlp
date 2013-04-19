@@ -1,7 +1,7 @@
 package edu.stanford.nlp.ling;
 
 import edu.stanford.nlp.util.CoreMap;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * This class is mainly for use with RTE in terms of the methods it provides,
@@ -233,7 +233,7 @@ public class IndexedWord extends CoreLabel implements Comparable<IndexedWord> {
   public String toString(String format) {
 
     if (this.equals(NO_WORD)) return "NO_WORD";
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
 
     // word
       switch (format) {

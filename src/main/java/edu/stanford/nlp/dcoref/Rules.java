@@ -16,9 +16,9 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.math.NumberMatchingRegex;
 import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.stats.IntCounter;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.Sets;
+import javolution.util.FastSet;
 
 
 /**
@@ -92,7 +92,7 @@ public class Rules {
   }
   /** Word inclusion except stop words  */
   public static boolean entityWordsIncluded(CorefCluster mentionCluster, CorefCluster potentialAntecedent, Mention mention, Mention ant) {
-    Set<String> wordsExceptStopWords = Generics.newHashSet(mentionCluster.words);
+      Set<String> wordsExceptStopWords = new FastSet<>(mentionCluster.words);
     wordsExceptStopWords.removeAll(Arrays.asList("the","this", "mr.", "miss", "mrs.", "dr.", "ms.", "inc.", "ltd.", "corp.", "'s"));
     wordsExceptStopWords.remove(mention.headString.toLowerCase());
       return potentialAntecedent.words.containsAll(wordsExceptStopWords) ? true : false;
@@ -337,10 +337,10 @@ public class Rules {
     boolean thisHasExtra = false;
     int lengthThis = m.originalSpan.size();
     int lengthM = ant.originalSpan.size();
-    Set<String> thisWordSet = Generics.newHashSet();
-    Set<String> antWordSet = Generics.newHashSet();
-    Set<String> locationModifier = Generics.newHashSet(Arrays.asList("east", "west", "north", "south",
-        "eastern", "western", "northern", "southern", "upper", "lower"));
+      Set<String> thisWordSet = new FastSet<>();
+      Set<String> antWordSet = new FastSet<>();
+      Set<String> locationModifier = new FastSet<>((Set<? extends String>) Arrays.asList("east", "west", "north", "south",
+              "eastern", "western", "northern", "southern", "upper", "lower"));
 
     for (int i=0; i< lengthThis ; i++){
       String w1 = m.originalSpan.get(i).get(CoreAnnotations.TextAnnotation.class).toLowerCase();
@@ -375,13 +375,13 @@ public class Rules {
       return true;
     }
 
-    Set<String> locationM = Generics.newHashSet();
-    Set<String> locationA = Generics.newHashSet();
+      Set<String> locationM = new FastSet<>();
+      Set<String> locationA = new FastSet<>();
     String mString = m.spanToString().toLowerCase();
     String aString = a.spanToString().toLowerCase();
-    Set<String> locationModifier = Generics.newHashSet(Arrays.asList("east", "west", "north", "south",
-        "eastern", "western", "northern", "southern", "northwestern", "southwestern", "northeastern",
-        "southeastern", "upper", "lower"));
+      Set<String> locationModifier = new FastSet<>((Set<? extends String>) Arrays.asList("east", "west", "north", "south",
+              "eastern", "western", "northern", "southern", "northwestern", "southwestern", "northeastern",
+              "southeastern", "upper", "lower"));
 
     for (CoreLabel w : m.originalSpan){
       if (locationModifier.contains(w.get(CoreAnnotations.TextAnnotation.class).toLowerCase())) return true;
@@ -421,8 +421,8 @@ public class Rules {
         || !a.removePhraseAfterHead().toLowerCase().endsWith(a.headString)) {
       return false;
     }
-    Set<String> mProperNouns = Generics.newHashSet();
-    Set<String> aProperNouns = Generics.newHashSet();
+      Set<String> mProperNouns = new FastSet<>();
+      Set<String> aProperNouns = new FastSet<>();
     for (CoreLabel w : m.sentenceWords.subList(m.startIndex, m.headIndex)){
       if (w.get(CoreAnnotations.PartOfSpeechAnnotation.class).startsWith("NNP")) {
         mProperNouns.add(w.get(CoreAnnotations.TextAnnotation.class));
@@ -444,11 +444,11 @@ public class Rules {
       return !(mHasExtra && aHasExtra);
   }
 
-  static final Set<String> NUMBERS = Generics.newHashSet(Arrays.asList(new String[]{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "hundred", "thousand", "million", "billion"}));
+  static final Set<String> NUMBERS = new FastSet<>((Set<? extends String>) Arrays.asList(new String[]{"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "hundred", "thousand", "million", "billion"}));
 
-  /** Check whether there is a new number in later mention */
+    /** Check whether there is a new number in later mention */
   public static boolean entityNumberInLaterMention(Mention mention, Mention ant) {
-    Set<String> antecedentWords = Generics.newHashSet();
+      Set<String> antecedentWords = new FastSet<>();;
     for (CoreLabel w : ant.originalSpan){
       antecedentWords.add(w.get(CoreAnnotations.TextAnnotation.class));
     }
@@ -466,8 +466,8 @@ public class Rules {
 
   /** Have extra proper noun except strings involved in semantic match */
   public static boolean entityHaveExtraProperNoun(Mention m, Mention a, Set<String> exceptWords) {
-    Set<String> mProper = Generics.newHashSet();
-    Set<String> aProper = Generics.newHashSet();
+      Set<String> mProper = new FastSet<>();
+      Set<String> aProper = new FastSet<>();
     String mString = m.spanToString();
     String aString = a.spanToString();
 
@@ -723,8 +723,8 @@ public class Rules {
    }
    
    private static boolean isContextOverlapping(Mention m1, Mention m2) {
-     Set<String> context1 = Generics.newHashSet();
-     Set<String> context2 = Generics.newHashSet();
+       Set<String> context1 = new FastSet<>();
+       Set<String> context2 = new FastSet<>();
      context1.addAll(m1.getContext());
      context2.addAll(m2.getContext());
      return Sets.intersects(context1, context2);

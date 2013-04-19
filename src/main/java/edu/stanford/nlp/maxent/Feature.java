@@ -9,9 +9,9 @@ package edu.stanford.nlp.maxent;
 
 import edu.stanford.nlp.io.InDataStreamFile;
 import edu.stanford.nlp.io.OutDataStreamFile;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.IntPair;
+import javolution.util.FastMap;
 
 import java.io.PrintStream;
 import java.util.Map;
@@ -57,7 +57,7 @@ public class Feature {
    */
   public Feature(Experiments e, double[] vals, Index<IntPair> instanceIndex) {
     this.instanceIndex = instanceIndex;
-    Map<Integer, Double> setNonZeros = Generics.newHashMap();
+      Map<Integer, Double> setNonZeros = new FastMap<>();
     for (int i = 0; i < vals.length; i++) {
       if (vals[i] != 0.0) {
         Integer in = indexOf(e.get(i)[0], e.get(i)[1]);// new Integer(e.get(i)[0]*e.ySize+e.get(i)[1]);
@@ -257,7 +257,7 @@ public class Feature {
    * required for use of getVal(x,y)
    */
   public void initHashVals() {
-    hashValues = Generics.newHashMap();
+      hashValues = new FastMap<>();
     for (int i = 0; i < len(); i++) {
       int x = getX(i);
       int y = getY(i);

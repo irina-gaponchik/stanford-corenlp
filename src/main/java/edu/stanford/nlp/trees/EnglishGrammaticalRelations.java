@@ -3,7 +3,6 @@ package edu.stanford.nlp.trees;
 import edu.stanford.nlp.trees.GrammaticalRelation.GrammaticalRelationAnnotation;
 import edu.stanford.nlp.trees.GrammaticalRelation.Language;
 import edu.stanford.nlp.trees.tregex.TregexPatternCompiler;
-import edu.stanford.nlp.util.Generics;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -113,7 +112,12 @@ public class EnglishGrammaticalRelations {
     new GrammaticalRelation(Language.English, "pred", "predicate",
         PredicateGRAnnotation.class, DEPENDENT, "S|SINV", tregexCompiler,
             "S|SINV <# VP=target");
-  public static class PredicateGRAnnotation extends GrammaticalRelationAnnotation { }
+
+    public static <K,V> ConcurrentHashMap<K,V> newConcurrentHashMap() {
+    return new ConcurrentHashMap<>();
+  }
+
+    public static class PredicateGRAnnotation extends GrammaticalRelationAnnotation { }
 
 
   /**
@@ -1407,67 +1411,67 @@ public class EnglishGrammaticalRelations {
    * </ul>
    */
   private static final List<GrammaticalRelation> values =
-    Generics.newArrayList(Arrays.asList(new GrammaticalRelation[] {
-      GOVERNOR,
-      DEPENDENT,
-      PREDICATE,
-      ATTRIBUTIVE,
-      AUX_MODIFIER,
-      AUX_PASSIVE_MODIFIER,
-      COPULA,
-      CONJUNCT,
-      COORDINATION,
-      PUNCTUATION,
-      ARGUMENT,
-      SUBJECT,
-      NOMINAL_SUBJECT,
-      NOMINAL_PASSIVE_SUBJECT,
-      CLAUSAL_SUBJECT,
-      CLAUSAL_PASSIVE_SUBJECT,
-      COMPLEMENT,
-      OBJECT,
-      DIRECT_OBJECT,
-      INDIRECT_OBJECT,
-      PREPOSITIONAL_OBJECT,
-      PREPOSITIONAL_COMPLEMENT,
-      CLAUSAL_COMPLEMENT,
-      XCLAUSAL_COMPLEMENT,
-      MARKER,
-      RELATIVE,
-      REFERENT,
-      EXPLETIVE,
-      ADJECTIVAL_COMPLEMENT,
-      MODIFIER,
-      ADV_CLAUSE_MODIFIER,
-      TEMPORAL_MODIFIER,
-      RELATIVE_CLAUSE_MODIFIER,
-      NUMERIC_MODIFIER,
-      ADJECTIVAL_MODIFIER,
-      NOUN_COMPOUND_MODIFIER,
-      APPOSITIONAL_MODIFIER,
-      PARTICIPIAL_MODIFIER,
-      INFINITIVAL_MODIFIER,
-      ADVERBIAL_MODIFIER,
-      NEGATION_MODIFIER,
-      MULTI_WORD_EXPRESSION,
-      DETERMINER,
-      PREDETERMINER,
-      PRECONJUNCT,
-      POSSESSION_MODIFIER,
-      POSSESSIVE_MODIFIER,
-      PREPOSITIONAL_MODIFIER,
-      PHRASAL_VERB_PARTICLE,
-      SEMANTIC_DEPENDENT,
-      CONTROLLING_SUBJECT,
-      AGENT,
-      NUMBER_MODIFIER,
-      QUANTIFIER_MODIFIER,
-      NP_ADVERBIAL_MODIFIER,
-      PARATAXIS,
-      DISCOURSE_ELEMENT,
-      GOES_WITH,
-    }));
-  /* Cache frequently used views of the values list */
+          new ArrayList<>(Arrays.asList(new GrammaticalRelation[]{
+                  GOVERNOR,
+                  DEPENDENT,
+                  PREDICATE,
+                  ATTRIBUTIVE,
+                  AUX_MODIFIER,
+                  AUX_PASSIVE_MODIFIER,
+                  COPULA,
+                  CONJUNCT,
+                  COORDINATION,
+                  PUNCTUATION,
+                  ARGUMENT,
+                  SUBJECT,
+                  NOMINAL_SUBJECT,
+                  NOMINAL_PASSIVE_SUBJECT,
+                  CLAUSAL_SUBJECT,
+                  CLAUSAL_PASSIVE_SUBJECT,
+                  COMPLEMENT,
+                  OBJECT,
+                  DIRECT_OBJECT,
+                  INDIRECT_OBJECT,
+                  PREPOSITIONAL_OBJECT,
+                  PREPOSITIONAL_COMPLEMENT,
+                  CLAUSAL_COMPLEMENT,
+                  XCLAUSAL_COMPLEMENT,
+                  MARKER,
+                  RELATIVE,
+                  REFERENT,
+                  EXPLETIVE,
+                  ADJECTIVAL_COMPLEMENT,
+                  MODIFIER,
+                  ADV_CLAUSE_MODIFIER,
+                  TEMPORAL_MODIFIER,
+                  RELATIVE_CLAUSE_MODIFIER,
+                  NUMERIC_MODIFIER,
+                  ADJECTIVAL_MODIFIER,
+                  NOUN_COMPOUND_MODIFIER,
+                  APPOSITIONAL_MODIFIER,
+                  PARTICIPIAL_MODIFIER,
+                  INFINITIVAL_MODIFIER,
+                  ADVERBIAL_MODIFIER,
+                  NEGATION_MODIFIER,
+                  MULTI_WORD_EXPRESSION,
+                  DETERMINER,
+                  PREDETERMINER,
+                  PRECONJUNCT,
+                  POSSESSION_MODIFIER,
+                  POSSESSIVE_MODIFIER,
+                  PREPOSITIONAL_MODIFIER,
+                  PHRASAL_VERB_PARTICLE,
+                  SEMANTIC_DEPENDENT,
+                  CONTROLLING_SUBJECT,
+                  AGENT,
+                  NUMBER_MODIFIER,
+                  QUANTIFIER_MODIFIER,
+                  NP_ADVERBIAL_MODIFIER,
+                  PARATAXIS,
+                  DISCOURSE_ELEMENT,
+                  GOES_WITH,
+          }));
+    /* Cache frequently used views of the values list */
   private static final List<GrammaticalRelation> unmodifiableValues =
     Collections.unmodifiableList(values);
   private static final List<GrammaticalRelation> synchronizedValues =
@@ -1519,7 +1523,7 @@ public class EnglishGrammaticalRelations {
 
 
   // the exhaustive list of conjunction relations
-  private static final Map<String, GrammaticalRelation> conjs = Generics.newConcurrentHashMap();
+  private static final Map<String, GrammaticalRelation> conjs = newConcurrentHashMap();
 
   public static Collection<GrammaticalRelation> getConjs() {
     return conjs.values();
@@ -1551,8 +1555,8 @@ public class EnglishGrammaticalRelations {
   }
 
   // the exhaustive list of preposition relations
-  private static final Map<String, GrammaticalRelation> preps = Generics.newConcurrentHashMap();
-  private static final Map<String, GrammaticalRelation> prepsC = Generics.newConcurrentHashMap();
+  private static final Map<String, GrammaticalRelation> preps = newConcurrentHashMap();
+  private static final Map<String, GrammaticalRelation> prepsC = newConcurrentHashMap();
 
 
   public static Collection<GrammaticalRelation> getPreps() {

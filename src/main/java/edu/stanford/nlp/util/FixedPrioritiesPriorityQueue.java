@@ -1,6 +1,6 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.*;
 import java.io.Serializable;
@@ -254,7 +254,7 @@ public class FixedPrioritiesPriorityQueue<E>
   public String toString(int maxKeysToPrint) {
     if (maxKeysToPrint <= 0) maxKeysToPrint = Integer.MAX_VALUE;
     FixedPrioritiesPriorityQueue<E> pq = clone();
-    TxtBuilder sb = new TxtBuilder("[");
+    TextBuilder sb = new TextBuilder("[");
     int numKeysPrinted = 0;
     while (numKeysPrinted < maxKeysToPrint && pq.hasNext()) {
       double priority = pq.getPriority();

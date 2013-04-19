@@ -10,7 +10,8 @@ import edu.stanford.nlp.pipeline.*;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.stats.PrecisionRecallStats;
 import edu.stanford.nlp.util.*;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -636,7 +637,7 @@ public class SUTimeMain {
         timex.text = StringUtils.joinWords(tokens, " ", timex.tokenStart, timex.tokenEnd);
         timex.context = joinWordTags(tokens, " ", timex.tokenStart - 3, timex.tokenEnd + 3);
 
-/*        javolution.text.TxtBuilder sb = new javolution.text.TxtBuilder("");
+/*        javolution.text.TextBuilder sb = new javolution.text.TextBuilder("");
         for (int i = timex.tokenStart; i < timex.tokenEnd; i++) {
           if (sb.length() > 0) { sb.append(" "); }
           sb.append(tokens.get(i).word());
@@ -661,7 +662,7 @@ public class SUTimeMain {
 
   private static Map<String,List<TimexAttributes>> readTimexAttrExts(String extentsFile, String attrsFile) throws IOException
   {
-    Map<String,List<TimexAttributes>> timexMap = Generics.newHashMap();
+      Map<String,List<TimexAttributes>> timexMap = new FastMap<>();
     BufferedReader extBr = IOUtils.getBufferedFileReader(extentsFile);
     String line;
     String lastDocId = null;
@@ -852,7 +853,7 @@ public class SUTimeMain {
     if (!outDir.exists()) {
       outDir.mkdirs();
     }
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append("handlers=java.util.logging.ConsoleHandler, java.util.logging.FileHandler\n");
     sb.append(".level=SEVERE\n");
     sb.append("edu.stanford.nlp.level=INFO\n");

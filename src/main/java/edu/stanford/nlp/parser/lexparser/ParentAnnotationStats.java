@@ -5,8 +5,10 @@ import edu.stanford.nlp.ling.StringLabelFactory;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counters;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
+
 import java.io.Reader;
 import java.text.NumberFormat;
 import java.util.*;
@@ -29,16 +31,16 @@ public class ParentAnnotationStats implements TreeVisitor {
 
   private final boolean doTags;
 
-  private Map<String,ClassicCounter<List<String>>> nodeRules = Generics.newHashMap();
-  private Map<List<String>,ClassicCounter<List<String>>> pRules = Generics.newHashMap();
-  private Map<List<String>,ClassicCounter<List<String>>> gPRules = Generics.newHashMap();
+  private Map<String,ClassicCounter<List<String>>> nodeRules = new FastMap<>();
+    private Map<List<String>,ClassicCounter<List<String>>> pRules = new FastMap<>();
+    private Map<List<String>,ClassicCounter<List<String>>> gPRules = new FastMap<>();
 
-  // corresponding ones for tags
-  private Map<String,ClassicCounter<List<String>>> tagNodeRules = Generics.newHashMap();
-  private Map<List<String>,ClassicCounter<List<String>>> tagPRules = Generics.newHashMap();
-  private Map<List<String>,ClassicCounter<List<String>>> tagGPRules = Generics.newHashMap();
+    // corresponding ones for tags
+  private Map<String,ClassicCounter<List<String>>> tagNodeRules = new FastMap<>();
+    private Map<List<String>,ClassicCounter<List<String>>> tagPRules = new FastMap<>();
+    private Map<List<String>,ClassicCounter<List<String>>> tagGPRules = new FastMap<>();
 
-  /**
+    /**
    * Minimum support * KL to be included in output and as feature
    */
   public static final double[] CUTOFFS = {100.0, 200.0, 500.0, 1000.0};
@@ -137,7 +139,7 @@ public class ParentAnnotationStats implements TreeVisitor {
     ClassicCounter<List<String>> allScores = new ClassicCounter<>();
     // do value of parent
     for (Map.Entry<String, ClassicCounter<List<String>>> stringClassicCounterEntry : nodeRules.entrySet()) {
-      ArrayList<Pair<List<String>,Double>> answers = Generics.newArrayList();
+        ArrayList<Pair<List<String>,Double>> answers = new ArrayList<>();
       ClassicCounter<List<String>> cntr = stringClassicCounterEntry.getValue();
       double support = cntr.totalCount();
       System.out.println("Node " + stringClassicCounterEntry.getKey() + " support is " + support);
@@ -234,7 +236,7 @@ public class ParentAnnotationStats implements TreeVisitor {
 
     // do value of grandparent
     for (Map.Entry<List<String>, ClassicCounter<List<String>>> listClassicCounterEntry : pRules.entrySet()) {
-      ArrayList<Pair<List<String>, Double>> answers = Generics.newArrayList();
+        ArrayList<Pair<List<String>, Double>> answers = new ArrayList<>();
       ClassicCounter<List<String>> cntr = listClassicCounterEntry.getValue();
       double support = cntr.totalCount();
       if (support < SUPPCUTOFF) {
@@ -394,7 +396,7 @@ public class ParentAnnotationStats implements TreeVisitor {
 
     // do value of grandparent
     for (Map.Entry<List<String>, ClassicCounter<List<String>>> listClassicCounterEntry : pr.entrySet()) {
-      ArrayList<Pair<List<String>,Double>> answers = Generics.newArrayList();
+        ArrayList<Pair<List<String>,Double>> answers = new ArrayList<>();
       ClassicCounter<List<String>> cntr = listClassicCounterEntry.getValue();
       double support = cntr.totalCount();
       if (support < SUPPCUTOFF) {
@@ -509,7 +511,7 @@ public class ParentAnnotationStats implements TreeVisitor {
   public static Set<String> getSplitCategories(Treebank t, boolean doTags, int algorithm, double phrasalCutOff, double tagCutOff, TreebankLanguagePack tlp) {
     ParentAnnotationStats pas = new ParentAnnotationStats(tlp, doTags);
     t.apply(pas);
-    Set<String> splitters = Generics.newHashSet();
+      Set<String> splitters = new FastSet<>();
     getSplitters(phrasalCutOff, pas.nodeRules, pas.pRules, pas.gPRules, splitters);
     getSplitters(tagCutOff, pas.tagNodeRules, pas.tagPRules, pas.tagGPRules, splitters);
     return splitters;

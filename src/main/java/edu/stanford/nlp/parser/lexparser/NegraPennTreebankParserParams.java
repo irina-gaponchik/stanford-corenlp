@@ -17,7 +17,7 @@ import edu.stanford.nlp.trees.international.negra.NegraLabel;
 import edu.stanford.nlp.trees.international.negra.NegraPennLanguagePack;
 import edu.stanford.nlp.trees.international.negra.NegraPennTreeReaderFactory;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 
 /**
@@ -328,7 +328,7 @@ public class NegraPennTreebankParserParams extends AbstractTreebankParserParams 
 //      }
 //    }
     // put on all the annotations
-    TxtBuilder catSB = new TxtBuilder(cat);
+    TextBuilder catSB = new TextBuilder(cat);
     for (String annotation : annotations) {
       catSB.append(annotation);
     }

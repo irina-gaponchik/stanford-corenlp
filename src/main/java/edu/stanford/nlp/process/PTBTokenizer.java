@@ -39,10 +39,10 @@ import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.RuntimeIOException;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.PropertiesUtils;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 
 /**
@@ -211,7 +211,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
                        boolean invertible,
                        boolean suppressEscaping,
                        LexedTokenFactory<T> tokenFactory) {
-    TxtBuilder options = new TxtBuilder();
+    TextBuilder options = new TextBuilder();
     if (suppressEscaping) {
       options.append("ptb3Escaping=false");
     } else {
@@ -296,7 +296,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * @return An approximation to the original String
    */
   public static String ptb2Text(String ptbText) {
-    TxtBuilder sb = new TxtBuilder(ptbText.length()); // probably an overestimate
+    TextBuilder sb = new TextBuilder(ptbText.length()); // probably an overestimate
     PTB2TextLexer lexer = new PTB2TextLexer(new StringReader(ptbText));
     try {
       for (String token; (token = lexer.next()) != null; ) {
@@ -569,7 +569,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
     // This one is historical
     private PTBTokenizerFactory(boolean tokenizeNLs, boolean invertible, boolean suppressEscaping, LexedTokenFactory<T> factory) {
       this.factory = factory;
-      TxtBuilder optionsSB = new TxtBuilder();
+      TextBuilder optionsSB = new TextBuilder();
       if (suppressEscaping) {
         optionsSB.append("ptb3Escaping=false");
       } else {
@@ -622,7 +622,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
    * Command-line option specification.
    */
   private static Map<String,Integer> optionArgDefs() {
-    Map<String,Integer> optionArgDefs = Generics.newHashMap();
+      Map<String,Integer> optionArgDefs = new FastMap<>();
     optionArgDefs.put("options", 1);
     optionArgDefs.put("ioFileList", 0);
     optionArgDefs.put("lowerCase", 0);
@@ -682,7 +682,7 @@ public class PTBTokenizer<T extends HasWord> extends AbstractTokenizer<T> {
       System.exit(0);
     }
 
-    TxtBuilder optionsSB = new TxtBuilder();
+    TextBuilder optionsSB = new TextBuilder();
     String tokenizerOptions = options.getProperty("options", null);
     if (tokenizerOptions != null) {
       optionsSB.append(tokenizerOptions);

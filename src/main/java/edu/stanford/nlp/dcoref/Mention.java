@@ -51,10 +51,10 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 /**
  * One mention for the SieveCoreferenceSystem.
@@ -128,8 +128,8 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
   public Tree contextParseTree;
   public CoreLabel headWord;
   public SemanticGraph dependency;
-  public Set<String> dependents = Generics.newHashSet();
-  public List<String> preprocessedTerms;
+  public Set<String> dependents = new FastSet<>();
+    public List<String> preprocessedTerms;
   public Object synsets;
 
   /** Set of other mentions in the same sentence that are syntactic appositions to this */
@@ -154,7 +154,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
   }
 
   public String spanToString() {
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     for(int i = 0; i < originalSpan.size(); i ++){
       if(i > 0) os.append(' ');
       os.append(originalSpan.get(i).get(CoreAnnotations.TextAnnotation.class));
@@ -643,7 +643,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
 
   /** Find apposition */
   public void addApposition(Mention m) {
-    if(appositions == null) appositions = Generics.newHashSet();
+    if(appositions == null) appositions = new FastSet<>();
     appositions.add(m);
   }
 
@@ -653,7 +653,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
   }
   /** Find predicate nominatives */
   public void addPredicateNominatives(Mention m) {
-    if(predicateNominatives == null) predicateNominatives = Generics.newHashSet();
+    if(predicateNominatives == null) predicateNominatives = new FastSet<>();
     predicateNominatives.add(m);
   }
 
@@ -664,7 +664,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
 
   /** Find relative pronouns */
   public void addRelativePronoun(Mention m) {
-    if(relativePronouns == null) relativePronouns = Generics.newHashSet();
+    if(relativePronouns == null) relativePronouns = new FastSet<>();
     relativePronouns.add(m);
   }
 
@@ -767,7 +767,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
       if(posWH == -1 && !w.get(CoreAnnotations.PartOfSpeechAnnotation.class).isEmpty() && w.get(CoreAnnotations.PartOfSpeechAnnotation.class).charAt(0) == 'W') posWH = this.startIndex + i;
     }
     if(posComma!=-1 && this.headIndex < posComma){
-      TxtBuilder os = new TxtBuilder();
+      TextBuilder os = new TextBuilder();
       for(int i = 0; i < posComma-this.startIndex; i++){
         if(i > 0) os.append(' ');
         os.append(this.originalSpan.get(i).get(CoreAnnotations.TextAnnotation.class));
@@ -775,7 +775,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
       removed = os.toString();
     }
     if(posComma==-1 && posWH != -1 && this.headIndex < posWH){
-      TxtBuilder os = new TxtBuilder();
+      TextBuilder os = new TextBuilder();
       for(int i = 0; i < posWH-this.startIndex; i++){
         if(i > 0) os.append(' ');
         os.append(this.originalSpan.get(i).get(CoreAnnotations.TextAnnotation.class));
@@ -997,7 +997,7 @@ public class Mention implements CoreAnnotation<Mention>, Serializable {
     }
 
     List<String> neStrings = new ArrayList<>();
-    Set<String> hs = Generics.newHashSet();
+      Set<String> hs = new FastSet<>();
     for (List<CoreLabel> namedEntity : namedEntities) {
       String ne_str = StringUtils.joinWords(namedEntity, " ");
       hs.add(ne_str);

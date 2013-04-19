@@ -6,24 +6,20 @@
  */
 package edu.stanford.nlp.tagger.maxent;
 
-import edu.stanford.nlp.io.NumberRangesFileFilter;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.ling.WordTag;
 import edu.stanford.nlp.stats.IntCounter;
 import edu.stanford.nlp.tagger.common.TaggerConstants;
 import edu.stanford.nlp.tagger.io.TaggedFileReader;
 import edu.stanford.nlp.tagger.io.TaggedFileRecord;
-import edu.stanford.nlp.trees.*;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.Set;
 
 
 /**
@@ -55,7 +51,7 @@ public class ReadDataTagged {
     this.maxentTagger = maxentTagger;
     this.pairs = pairs;
     fileRecords = TaggedFileRecord.createRecords(config, config.getFile());
-    Map<String, IntCounter<String>> wordTagCounts = Generics.newHashMap();
+      Map<String, IntCounter<String>> wordTagCounts = new FastMap<>();
     for (TaggedFileRecord record : fileRecords) {
       loadFile(record.reader(), wordTagCounts);
     }
@@ -104,7 +100,7 @@ public class ReadDataTagged {
           words.add(tw.word());
           tags.add(tw.tag());
           if (!maxentTagger.tagTokens.containsKey(tw.tag())) {
-            maxentTagger.tagTokens.put(tw.tag(), Generics.<String>newHashSet());
+              maxentTagger.tagTokens.put(tw.tag(), (Set<String>) new FastMap<>());
           }
           maxentTagger.tagTokens.get(tw.tag()).add(tw.word());
         }

@@ -23,7 +23,7 @@ import edu.stanford.nlp.util.RuntimeInterruptedException;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.concurrent.MulticoreWrapper;
 import edu.stanford.nlp.util.concurrent.ThreadsafeProcessor;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * This class will add parse information to an Annotation.
@@ -133,7 +133,7 @@ public class ParserAnnotator implements Annotator {
   }
 
   public static String signature(String annotatorName, Properties props) {
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     os.append(annotatorName).append(".model:").append(props.getProperty(annotatorName + ".model",
             LexicalizedParser.DEFAULT_PARSER_LOC));
     os.append(annotatorName).append(".debug:").append(props.getProperty(annotatorName + ".debug", "false"));

@@ -1,7 +1,7 @@
 package edu.stanford.nlp.parser.lexparser;
 
 import edu.stanford.nlp.trees.Tree;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -610,7 +610,7 @@ public class HTKLatticeReader {
 
     @Override
     public String toString() {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       sb.append(startNode).append('\t');
       sb.append(endNode).append('\t');
       sb.append("lm=").append(lm).append(',');

@@ -1,7 +1,7 @@
 package edu.stanford.nlp.ie.crf;
 
 import edu.stanford.nlp.ling.Datum;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -73,7 +73,7 @@ public class CRFDatum<FEAT,LAB> implements Serializable {
    */
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder("CRFDatum[\n");
+    TextBuilder sb = new TextBuilder("CRFDatum[\n");
     sb.append("    label=").append(label).append('\n');
     for (int i = 0, sz = features.size(); i < sz; i++) {
       sb.append("    features(").append(i).append("):").append(features.get(i));

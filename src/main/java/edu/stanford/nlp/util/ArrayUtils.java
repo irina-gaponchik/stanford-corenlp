@@ -1,6 +1,7 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -377,10 +378,10 @@ public class ArrayUtils {
 //     for (int i = 1; i < orig.length; i++) {
 //       if (orig[i] < orig[i-1]) { throw new RuntimeException("Array must be sorted!"); }
 
-//       javolution.text.TxtBuilder bits = new javolution.text.TxtBuilder();
+//       javolution.text.TextBuilder bits = new javolution.text.TextBuilder();
 //       int prevNum = 0;
 //       for (int f : orig) {
-//         javolution.text.TxtBuilder bits1 = new javolution.text.TxtBuilder();
+//         javolution.text.TextBuilder bits1 = new javolution.text.TextBuilder();
 //               System.err.print(f+"\t");
 //               String n = Integer.toString(f-prevNum, 2);
 //               String n1 = Integer.toString(n.length(), 2);
@@ -478,7 +479,7 @@ public class ArrayUtils {
   }
 
   public static String toString(int[][] a) {
-    TxtBuilder result = new TxtBuilder("[");
+    TextBuilder result = new TextBuilder("[");
     for (int i = 0; i < a.length; i++) {
       result.append(Arrays.toString(a[i]));
       if(i < a.length-1)
@@ -569,7 +570,7 @@ public class ArrayUtils {
   /** Return a set containing the same elements as the specified array.
    */
   public static <T> Set<T> asSet(T... a) {
-    return Generics.newHashSet(Arrays.asList(a));
+      return new FastSet<>((Set<? extends T>) Arrays.asList(a)) ;
   }
 
   public static void fill(double[][] d, double val) {
@@ -733,7 +734,7 @@ public class ArrayUtils {
   }
 
   public static String toString(double[][] b) {
-    TxtBuilder result = new TxtBuilder("[");
+    TextBuilder result = new TextBuilder("[");
     for (int i = 0; i < b.length; i++) {
       result.append(Arrays.toString(b[i]));
       if(i < b.length-1)
@@ -744,7 +745,7 @@ public class ArrayUtils {
   }
 
   public static String toString(boolean[][] b) {
-    TxtBuilder result = new TxtBuilder("[");
+    TextBuilder result = new TextBuilder("[");
     for (int i = 0; i < b.length; i++) {
       result.append(Arrays.toString(b[i]));
       if(i < b.length-1)

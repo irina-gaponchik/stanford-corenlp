@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 /**
  * A class which encapsulates configuration settings for Redwood.
@@ -331,7 +331,7 @@ public class RedwoodConfiguration {
    * @return A new Redwood Configuration based on the passed properties, ignoring any existing custom configuration
    */
   public static RedwoodConfiguration parse(Properties props){
-    Set<String> used = Generics.newHashSet();
+      Set<String> used = new FastSet<>();
     //--Construct Pipeline
     //(handlers)
     Redwood.ConsoleHandler console = get(props,"log.toStderr","false",used).equalsIgnoreCase("true") ? Redwood.ConsoleHandler.err() : Redwood.ConsoleHandler.out();

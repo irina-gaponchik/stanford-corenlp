@@ -8,7 +8,7 @@ import java.util.Properties;
 import java.util.regex.Pattern;
 
 import edu.stanford.nlp.io.IOUtils;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /**
  * Reads and stores configuration information for a POS tagger.
@@ -76,8 +76,9 @@ public class TaggerConfig extends Properties /* Inherits implementation of seria
   TAG_SEPARATOR_PROPERTY = "tagSeparator";
 
 
-  private static final Map<String, String> defaultValues = Generics.newHashMap();
-  static {
+  private static final Map<String, String> defaultValues = new FastMap<>();
+
+    static {
     defaultValues.put("arch", ARCH);
     defaultValues.put("wordFunction", WORD_FUNCTION);
     defaultValues.put("closedClassTags", "");

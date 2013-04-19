@@ -9,7 +9,9 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.time.TimeAnnotations;
 import edu.stanford.nlp.time.Timex;
 import edu.stanford.nlp.util.*;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +125,7 @@ public class QuantifiableEntityNormalizer {
     private static String pmThreeWords = "in the (?:afternoon|evening)";
     static {
 
-        quantifiable = Generics.newHashSet();
+        quantifiable = new FastSet<>();
         quantifiable.add("MONEY");
         quantifiable.add("TIME");
         quantifiable.add("DATE");
@@ -132,12 +134,12 @@ public class QuantifiableEntityNormalizer {
         quantifiable.add("ORDINAL");
         quantifiable.add("DURATION");
 
-        collapseBeforeParsing = Generics.newHashSet();
+        collapseBeforeParsing = new FastSet<>();
         collapseBeforeParsing.add("PERSON");
         collapseBeforeParsing.add("ORGANIZATION");
         collapseBeforeParsing.add("LOCATION");
 
-        timeUnitWords = Generics.newHashSet();
+        timeUnitWords = new FastSet<>();
         timeUnitWords.add("second");
         timeUnitWords.add("seconds");
         timeUnitWords.add("minute");
@@ -153,7 +155,7 @@ public class QuantifiableEntityNormalizer {
         timeUnitWords.add("year");
         timeUnitWords.add("years");
 
-        currencyWords = Generics.newHashMap();
+        currencyWords = new FastMap<>();
         currencyWords.put("dollars?", '$');
         currencyWords.put("cents?", '$');
         currencyWords.put("pounds?", '\u00A3');
@@ -170,7 +172,7 @@ public class QuantifiableEntityNormalizer {
         currencyWords.put("\u20A9", '\u20A9');  // Won
         currencyWords.put("yuan", '\u5143');   // Yuan
 
-        moneyMultipliers = Generics.newHashMap();
+        moneyMultipliers = new FastMap<>();
         moneyMultipliers.put("trillion", 1000000000000.0);  // can't be an integer
         moneyMultipliers.put("billion", 1000000000.0);
         moneyMultipliers.put("bn", 1000000000.0);
@@ -182,7 +184,7 @@ public class QuantifiableEntityNormalizer {
         moneyMultipliers.put(" m ", 1000000.0);
         moneyMultipliers.put(" k ", 1000.0);
 
-        moneyMultipliers2 = Generics.newHashMap();
+        moneyMultipliers2 = new FastMap<>();
         moneyMultipliers2.put("[0-9](m)(?:[^a-zA-Z]|$)", 1000000);
         moneyMultipliers2.put("[0-9](b)(?:[^a-zA-Z]|$)", 1000000000);
 
@@ -308,7 +310,7 @@ public class QuantifiableEntityNormalizer {
      */
     public static <E extends CoreMap> String singleEntityToString(List<E> l) {
         String entityType = l.get(0).get(CoreAnnotations.NamedEntityTagAnnotation.class);
-        TxtBuilder sb = new TxtBuilder();
+        TextBuilder sb = new TextBuilder();
         for (E w : l) {
             assert w.get(CoreAnnotations.NamedEntityTagAnnotation.class).equals(entityType);
             sb.append(w.get(CoreAnnotations.TextAnnotation.class));
@@ -339,7 +341,7 @@ public class QuantifiableEntityNormalizer {
 
         List<CoreLabel> s = new ArrayList<>();
         String lastEntity = BACKGROUND_SYMBOL;
-        TxtBuilder entityStringCollector = null;
+        TextBuilder entityStringCollector = null;
 
         //Iterate through each word....
         for (CoreLabel w : l) {
@@ -368,7 +370,7 @@ public class QuantifiableEntityNormalizer {
                     entityStringCollector.append(w.get(CoreAnnotations.TextAnnotation.class));
                 } else {
                     //and its NOT a continuation, make a new buffer.
-                    entityStringCollector = new TxtBuilder();
+                    entityStringCollector = new TextBuilder();
                     entityStringCollector.append(w.get(CoreAnnotations.TextAnnotation.class));
                 }
             } else {
@@ -594,7 +596,7 @@ public class QuantifiableEntityNormalizer {
     static <E extends CoreMap> void concatenateNumericString(List<E> words, List<E> toRemove) {
         if (words.size() <= 1) return;
         boolean first = true;
-        TxtBuilder newText = new TxtBuilder();
+        TextBuilder newText = new TextBuilder();
         E foundEntity = null;
         for (E word : words) {
             if (foundEntity == null && (word.get(CoreAnnotations.PartOfSpeechAnnotation.class).equals("CD") || word.get(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP"))) {
@@ -686,7 +688,7 @@ public class QuantifiableEntityNormalizer {
                 err.printf("timePattern matched groups: |%s| |%s| |%s| |%s|\n", m.group(0), m.group(1), m.group(2), m.group(3));
             }
             // group 1 is hours, group 2 is minutes and maybe seconds; group 3 is am/pm
-            TxtBuilder sb = new TxtBuilder();
+            TextBuilder sb = new TextBuilder();
             sb.append(m.group(1));
             if (m.group(2) == null || m.group(2) != null && m.group(2).isEmpty()) {
                 sb.append(":00");

@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util;
 
+import javolution.util.FastMap;
+
 import java.util.*;
 
 /**
@@ -282,13 +284,13 @@ public class DeltaMap<K,V> extends AbstractMap<K,V> {
    * @param args from command line
    */
   public static void main(String... args) {
-    Map<Integer,Integer> originalMap = Generics.newHashMap();
+      Map<Integer,Integer> originalMap = new FastMap<>();
     Random r = new Random();
     for (int i = 0; i < 1000; i++) {
       originalMap.put(i, r.nextInt(1000));
     }
-    Map<Integer,Integer> originalCopyMap = Generics.newHashMap(originalMap);
-    Map<Integer,Integer> deltaCopyMap = Generics.newHashMap(originalMap);
+      Map<Integer,Integer> originalCopyMap = new FastMap<>(originalMap);
+      Map<Integer,Integer> deltaCopyMap = new FastMap<>(originalMap);
     Map<Integer,Integer> deltaMap = new DeltaMap<>(originalMap);
     // now make a lot of changes to deltaMap;
     // add and change some stuff

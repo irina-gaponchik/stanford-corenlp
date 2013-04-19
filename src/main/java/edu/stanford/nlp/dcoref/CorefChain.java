@@ -38,10 +38,11 @@ import edu.stanford.nlp.dcoref.Dictionaries.Animacy;
 import edu.stanford.nlp.dcoref.Dictionaries.Gender;
 import edu.stanford.nlp.dcoref.Dictionaries.MentionType;
 import edu.stanford.nlp.dcoref.Dictionaries.Number;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.IntPair;
 import edu.stanford.nlp.util.IntTuple;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * Output of coref system.  Each CorefChain represents a set of
@@ -229,7 +230,7 @@ public class CorefChain implements Serializable {
 
     @Override
     public String toString(){
-      TxtBuilder s = new TxtBuilder();
+      TextBuilder s = new TextBuilder();
       s.append('"').append(mentionSpan).append('"').append(" in sentence ").append(sentNum);
       return s.toString();
       //      return "(sentence:" + sentNum + ", startIndex:" + startIndex + "-endIndex:" + endIndex + ")";
@@ -276,12 +277,12 @@ public class CorefChain implements Serializable {
   public CorefChain(CorefCluster c, Map<Mention, IntTuple> positions){
     chainID = c.clusterID;
     mentions = new ArrayList<>();
-    mentionMap = Generics.newHashMap();
+      mentionMap = new FastMap<>();
     for (Mention m : c.getCorefMentions()) {
       CorefMention men = new CorefMention(m, positions.get(m));
       mentions.add(men);
       IntPair position = new IntPair(men.sentNum, men.headIndex);
-      if(!mentionMap.containsKey(position)) mentionMap.put(position, Generics.<CorefMention>newHashSet());
+      if(!mentionMap.containsKey(position)) mentionMap.put(position, new FastSet<CorefMention>());
       mentionMap.get(position).add(men);
       if(men.moreRepresentativeThan(representative)) representative = men;
     }

@@ -8,7 +8,7 @@ import edu.stanford.nlp.trees.TreeFactory;
 import edu.stanford.nlp.trees.TreeNormalizer;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.util.Filter;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 /**
  * Tree normalizer for Negra Penn Treebank format.
@@ -160,11 +160,11 @@ public class NegraPennTreeNormalizer extends TreeNormalizer {
   }
 
 
-  private Set<String> prepositionTags = Generics.newHashSet(Arrays.asList(new String[]{"APPR", "APPRART"}));
-  private Set<String> postpositionTags = Generics.newHashSet(Arrays.asList(new String[]{"APPO", "APZR"}));
+  private Set<String> prepositionTags = new FastSet<>((Set<? extends String>) Arrays.asList(new String[]{"APPR", "APPRART"}));
+    private Set<String> postpositionTags = new FastSet<>((Set<? extends String>) Arrays.asList(new String[]{"APPO", "APZR"}));
 
 
-  private void insertNPinPPall(Tree t) {
+    private void insertNPinPPall(Tree t) {
     Tree[] kids = t.children();
       for (Tree kid : kids) {
           insertNPinPPall(kid);

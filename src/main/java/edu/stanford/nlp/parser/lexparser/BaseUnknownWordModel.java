@@ -7,9 +7,10 @@ import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Tag;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 
 /**
@@ -107,11 +108,11 @@ public class BaseUnknownWordModel implements UnknownWordModel {
   public BaseUnknownWordModel(Options op, Lexicon lex,
                               Index<String> wordIndex, 
                               Index<String> tagIndex) {
-    this(op, lex, wordIndex, tagIndex, 
+      this(op, lex, wordIndex, tagIndex,
          new ClassicCounter<IntTaggedWord>(),
-         Generics.<Label,ClassicCounter<String>>newHashMap(),
-         Generics.<String,Float>newHashMap(),
-         Generics.<String>newHashSet());
+              new FastMap<Label, ClassicCounter<String>>(),
+              new FastMap<String, Float>(),
+              new FastSet<String>());
   }
 
 
@@ -189,7 +190,7 @@ public class BaseUnknownWordModel implements UnknownWordModel {
    * @return A "signature" (which represents an equivalence class of Strings), e.g., a suffix of the string
    */
   public String getSignature(String word, int loc) {
-    TxtBuilder subStr = new TxtBuilder("UNK-");
+    TextBuilder subStr = new TextBuilder("UNK-");
     int n = word.length() - 1;
     char first = word.charAt(0);
     if (useFirstCap) {

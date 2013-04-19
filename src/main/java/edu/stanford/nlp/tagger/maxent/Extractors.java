@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /** Maintains a set of feature extractors and applies them.
  *
@@ -174,7 +174,7 @@ public class Extractors implements Serializable {
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder("Extractors[");
+    TextBuilder sb = new TextBuilder("Extractors[");
     for (int i = 0; i < v.length; i++) {
       sb.append(v[i].toString());
       if (i < v.length - 1) {

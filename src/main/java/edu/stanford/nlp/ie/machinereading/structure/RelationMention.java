@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.IdentityHashSet;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * Each relation has a type and set of arguments
@@ -184,7 +184,7 @@ public class RelationMention extends ExtractionObject {
   
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append("RelationMention [type=").append(type).append(subType != null ? ", subType=" + subType : "").append(", start=").append(getExtentTokenStart()).append(", end=").append(getExtentTokenEnd());
     if(typeProbabilities != null){
       sb.append(", ").append(probsToString());

@@ -4,8 +4,8 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.util.ArrayMap;
 import edu.stanford.nlp.util.CollectionUtils;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -130,7 +130,7 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
 
   @Override
   public Object matchWithResult(CoreMap token) {
-    Map<Class,Object> matchResults = Generics.newHashMap();
+      Map<Class,Object> matchResults = new FastMap<>();
       return match(token, matchResults) ? matchResults : null;
   }
 
@@ -153,7 +153,7 @@ public class CoreMapNodePattern extends NodePattern<CoreMap> {
   }
 
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (Map.Entry<Class, NodePattern> classNodePatternEntry : annotationPatterns.entrySet()) {
       if (sb.length() > 0) {
         sb.append(", ");

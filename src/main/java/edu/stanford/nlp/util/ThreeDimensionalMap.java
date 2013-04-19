@@ -1,5 +1,8 @@
 package edu.stanford.nlp.util;
 
+import javolution.util.FastMap;
+import javolution.util.FastSet;
+
 import java.util.*;
 import java.io.Serializable;
 
@@ -63,7 +66,7 @@ public class ThreeDimensionalMap<K1, K2, K3, V> implements Serializable {
   }
 
   public Collection<V> values() {
-    List<V> s = Generics.newArrayList();
+      List<V> s = new ArrayList<>();
     for (TwoDimensionalMap<K2, K3, V> innerMap : map.values()) {
       s.addAll(innerMap.values());
     }
@@ -75,7 +78,7 @@ public class ThreeDimensionalMap<K1, K2, K3, V> implements Serializable {
   }
 
   public Set<K2> secondKeySet() {
-    Set<K2> keys = Generics.newHashSet();
+      Set<K2> keys = new FastSet<>();
     for (K1 k1 : map.keySet()) {
       keys.addAll(get(k1).firstKeySet());
     }
@@ -83,7 +86,7 @@ public class ThreeDimensionalMap<K1, K2, K3, V> implements Serializable {
   }
 
   public Set<K3> thirdKeySet() {
-    Set<K3> keys = Generics.newHashSet();
+      Set<K3> keys = new FastSet<>();
     for (Map.Entry<K1, TwoDimensionalMap<K2, K3, V>> k1TwoDimensionalMapEntry : map.entrySet()) {
       TwoDimensionalMap<K2, K3, V> m = k1TwoDimensionalMapEntry.getValue();
       for (K2 k2 : m.firstKeySet()) {
@@ -94,7 +97,7 @@ public class ThreeDimensionalMap<K1, K2, K3, V> implements Serializable {
   }
 
   public ThreeDimensionalMap() {
-    this.map = Generics.newHashMap();
+      this.map = new FastMap<>();
   }
 
   @Override

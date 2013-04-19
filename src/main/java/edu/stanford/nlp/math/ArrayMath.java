@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * Class ArrayMath
@@ -1577,7 +1577,7 @@ public class ArrayMath {
   // PRINTING FUNCTIONS
 
   public static String toBinaryString(byte... b) {
-    TxtBuilder s = new TxtBuilder();
+    TextBuilder s = new TextBuilder();
     for (byte by : b) {
       for (int j = 7; j >= 0; j--) {
         if ((by & 1 << j) > 0) {
@@ -1598,7 +1598,7 @@ public class ArrayMath {
   public static String toString(double[] a, NumberFormat nf) {
     if (a == null) return null;
     if (a.length == 0) return "[]";
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     b.append('[');
     for (int i = 0; i < a.length - 1; i++) {
       String s;
@@ -1620,7 +1620,7 @@ public class ArrayMath {
   public static String toString(float[] a, NumberFormat nf) {
     if (a == null) return null;
     if (a.length == 0) return "[]";
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     b.append('[');
     for (int i = 0; i < a.length - 1; i++) {
       String s;
@@ -1642,7 +1642,7 @@ public class ArrayMath {
   public static String toString(int[] a, NumberFormat nf) {
     if (a == null) return null;
     if (a.length == 0) return "[]";
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     b.append('[');
     for (int i = 0; i < a.length - 1; i++) {
       String s;
@@ -1664,7 +1664,7 @@ public class ArrayMath {
   public static String toString(byte[] a, NumberFormat nf) {
     if (a == null) return null;
     if (a.length == 0) return "[]";
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     b.append('[');
     for (int i = 0; i < a.length - 1; i++) {
       String s;
@@ -1696,7 +1696,7 @@ public class ArrayMath {
         total += counts[i][j];
       }
     }
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     // column labels
     if (colLabels != null) {
       result.append(StringUtils.padLeft("", labelSize)); // spacing for the row labels!
@@ -1759,7 +1759,7 @@ public class ArrayMath {
         total += counts[i][j];
       }
     }
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     // column labels
     if (colLabels != null) {
       result.append(StringUtils.padLeft("", cellSize));
@@ -1820,7 +1820,7 @@ public class ArrayMath {
         total += counts[i][j];
       }
     }
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     // column labels
     if (colLabels != null) {
       result.append(StringUtils.padLeft("", cellSize));

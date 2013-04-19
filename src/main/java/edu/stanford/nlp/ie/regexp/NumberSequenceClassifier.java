@@ -13,7 +13,7 @@ import edu.stanford.nlp.time.Timex;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.PaddedList;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.ObjectInputStream;
 import java.io.IOException;
@@ -289,7 +289,7 @@ public class NumberSequenceClassifier extends AbstractSequenceClassifier<CoreLab
 
   @SuppressWarnings("unchecked")
   private static String buildText(List<CoreLabel> tokens, Class textAnnotation) {
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     for (int i = 0, sz = tokens.size(); i < sz; i ++) {
       CoreLabel crt = tokens.get(i);
       // System.out.println("\t" + crt.word() + "\t" + crt.get(CoreAnnotations.CharacterOffsetBeginAnnotation.class) + "\t" + crt.get(CoreAnnotations.CharacterOffsetEndAnnotation.class));

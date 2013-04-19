@@ -1,5 +1,7 @@
 package edu.stanford.nlp.util;
 
+import javolution.util.FastMap;
+
 import java.util.*;
 
 /**
@@ -309,13 +311,13 @@ public class ArrayHeap<E> extends AbstractSet<E> implements Heap<E> {
   public ArrayHeap(Comparator<? super E> cmp) {
     this.cmp = cmp;
     indexToEntry = new ArrayList<>();
-    objectToEntry = Generics.newHashMap();
+      objectToEntry = new FastMap<>();
   }
 
   public ArrayHeap(Comparator<? super E> cmp, int initCapacity) {
     this.cmp = cmp;
     indexToEntry = new ArrayList<>(initCapacity);
-    objectToEntry = Generics.newHashMap(initCapacity);
+      objectToEntry = new FastMap<>(initCapacity);
   }
 
   public List<E> asList() {

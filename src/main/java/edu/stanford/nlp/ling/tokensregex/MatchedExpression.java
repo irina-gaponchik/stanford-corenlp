@@ -7,10 +7,9 @@ import edu.stanford.nlp.pipeline.CoreMapAttributeAggregator;
 import edu.stanford.nlp.util.Comparators;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Interval;
 import edu.stanford.nlp.util.IntervalTree;
-import edu.stanford.nlp.util.TypesafeMap;
+import javolution.util.FastMap;
 
 import java.util.*;
 
@@ -20,7 +19,7 @@ import java.util.*;
  * @author Angel Chang
  */
 public class MatchedExpression {
-  /** Txt representing the matched expression */
+  /** Text representing the matched expression */
   protected String text;
 
   /** Character offsets (relative to original text) */
@@ -307,8 +306,8 @@ public class MatchedExpression {
                                                       List<? extends MatchedExpression> matchedExprs)
   {
     if (matchedExprs == null) return list;
-    Map<Integer, Integer> tokenBeginToListIndexMap = Generics.newHashMap();
-    Map<Integer, Integer> tokenEndToListIndexMap = Generics.newHashMap();
+      Map<Integer, Integer> tokenBeginToListIndexMap = new FastMap<>();
+      Map<Integer, Integer> tokenEndToListIndexMap = new FastMap<>();
     for (int i = 0; i < list.size(); i++) {
       CoreMap cm = list.get(i);
       if (cm.has(CoreAnnotations.TokenBeginAnnotation.class) && cm.has(CoreAnnotations.TokenEndAnnotation.class)) {

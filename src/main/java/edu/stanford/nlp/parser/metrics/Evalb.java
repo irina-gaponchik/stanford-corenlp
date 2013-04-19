@@ -25,11 +25,12 @@ import edu.stanford.nlp.trees.LabeledScoredConstituentFactory;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.Treebank;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.PropertiesUtils;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.Triple;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * A Java re-implementation of the evalb bracket scoring metric (Collins, 1997) that accepts Unicode input.
@@ -64,7 +65,7 @@ public class Evalb extends AbstractEval {
    */
   @Override
   protected Set<Constituent> makeObjects(Tree tree) {
-    Set<Constituent> set = Generics.newHashSet();
+      Set<Constituent> set = new FastSet<>();
     if(tree != null) set.addAll(tree.constituents(cf));
     return set;
   }
@@ -131,7 +132,7 @@ public class Evalb extends AbstractEval {
 
   private static final int minArgs = 2;
   private static String usage() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     String nl = System.getProperty("line.separator");
     sb.append(String.format("Usage: java %s [OPTS] gold guess%n%n",Evalb.class.getName()));
     sb.append("Options:").append(nl);
@@ -145,7 +146,7 @@ public class Evalb extends AbstractEval {
     return sb.toString();
   }
   private static Map<String,Integer> optionArgDefs() {
-    Map<String,Integer> optionArgDefs = Generics.newHashMap();
+      Map<String,Integer> optionArgDefs = new FastMap<>();
     optionArgDefs.put("v", 0);
     optionArgDefs.put("l", 1);
     optionArgDefs.put("y", 1);
@@ -289,14 +290,14 @@ public class Evalb extends AbstractEval {
         guessPw.println(trees.third().toString());
 
         //Output the set differences
-        Set<Constituent> goldDeps = Generics.newHashSet();
+          Set<Constituent> goldDeps = new FastSet<>();
         goldDeps.addAll(trees.second().constituents(cFact));
         goldDeps.removeAll(trees.third().constituents(cFact));
         for(Constituent c : goldDeps)
           goldDepPw.print(c.toString() + "  ");
         goldDepPw.println();
 
-        Set<Constituent> guessDeps = Generics.newHashSet();
+          Set<Constituent> guessDeps = new FastSet<>();
         guessDeps.addAll(trees.third().constituents(cFact));
         guessDeps.removeAll(trees.second().constituents(cFact));
         for(Constituent c : guessDeps)

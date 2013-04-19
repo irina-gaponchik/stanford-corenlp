@@ -1,12 +1,12 @@
 package edu.stanford.nlp.tagger.maxent;
 
 import java.io.*;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 public class ASBCunkDict {
 
@@ -36,7 +36,7 @@ public class ASBCunkDict {
       BufferedReader ASBCunkDetectorReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "GB18030"));
       String ASBCunkDetectorLine;
 
-      ASBCunk_dict = Generics.newHashMap();
+        ASBCunk_dict = new FastMap<>();
 
       while ((ASBCunkDetectorLine = ASBCunkDetectorReader.readLine()) != null) {
         String[] fields = COMPILE.split(ASBCunkDetectorLine);
@@ -44,7 +44,7 @@ public class ASBCunkDict {
         Set<String> words=ASBCunk_dict.get(tag);
 
         if (words==null) {
-          words = Generics.newHashSet();
+            words = new FastSet<>();
           ASBCunk_dict.put(tag,words);
 	}
         words.add(fields[0]);

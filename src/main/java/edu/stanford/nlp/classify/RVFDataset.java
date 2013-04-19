@@ -25,10 +25,11 @@ import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.stats.Counters;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.HashIndex;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * An interfacing class for {@link ClassifierFactory} that incrementally builds
@@ -521,7 +522,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     pw.println();
     for (int i = 0; i < labels.length; i++) {
       pw.print(labelIndex.get(i));
-      Set<Integer> feats = Generics.newHashSet();
+        Set<Integer> feats = new FastSet<>();
       for (int j = 0; j < data[i].length; j++) {
         int feature = data[i][j];
         feats.add(feature);
@@ -550,7 +551,7 @@ public class RVFDataset<L, F> extends GeneralDataset<L, F> { // implements Itera
     pw.println();
     for (int i = 0; i < size; i++) { // changed labels.length to size
       pw.print(labelIndex.get(labels[i])); // changed i to labels[i]
-      Map<Integer, Double> feats = Generics.newHashMap();
+        Map<Integer, Double> feats = new FastMap<>();
       for (int j = 0; j < data[i].length; j++) {
         int feature = data[i][j];
         double val = values[i][j];

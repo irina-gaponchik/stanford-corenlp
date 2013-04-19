@@ -1,6 +1,6 @@
 package edu.stanford.nlp.trees;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /**
  * Implements a variant on the HeadFinder found in Michael Collins' 1999
@@ -51,7 +51,7 @@ public class ModCollinsHeadFinder extends CollinsHeadFinder {
   public ModCollinsHeadFinder(TreebankLanguagePack tlp) {
     super(tlp, tlp.punctuationTags()); // avoid punctuation as head in final default rule
 
-    nonTerminalInfo = Generics.newHashMap();
+      nonTerminalInfo = new FastMap<>();
 
     // This version from Collins' diss (1999: 236-238)
     // NNS, NN is actually sensible (money, etc.)!

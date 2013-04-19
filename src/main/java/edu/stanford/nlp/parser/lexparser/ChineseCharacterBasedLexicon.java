@@ -7,10 +7,11 @@ import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.stats.*;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.trees.international.pennchinese.RadicalMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Timing;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * @author Galen Andrew
@@ -127,7 +128,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
     }
 
     Set<Symbol> singletons = Counters.keysBelow(charCounter, 1.5);
-    knownChars = Generics.newHashSet(charCounter.keySet());
+      knownChars = new FastSet<>(charCounter.keySet());
 
     Timing.tick("Counting nGrams...");
     GeneralizedCounter[] POSspecificCharNGrams = new GeneralizedCounter[CONTEXT_LENGTH + 1];
@@ -197,7 +198,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
     POSDistribution = Distribution.getDistribution(POSCounter);
     Timing.tick("Creating character prior distribution...");
 
-    charDistributions = Generics.newHashMap();
+      charDistributions = new FastMap<>();
     //    charDistributions = Generics.newHashMap();  // 1.5
     //    charCounter.incrementCount(Symbol.UNKNOWN, singletons.size());
     int numberOfKeys = charCounter.size() + singletons.size();
@@ -303,7 +304,7 @@ public class ChineseCharacterBasedLexicon implements Lexicon {
    * @return a sampled word
    */
   public String sampleFrom(String tag) {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     List<Serializable> context = new ArrayList<>(CONTEXT_LENGTH + 1);
 
     // context must contain [tag prevChar prevPrevChar]

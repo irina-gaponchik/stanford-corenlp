@@ -7,8 +7,8 @@
 
 package edu.stanford.nlp.tagger.maxent;
 
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastMap;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -94,9 +94,9 @@ class ListInstances {
 public class TemplateHash {
 
   // the positions of the feature extractors
-  private final Map<Pair<Integer, CharSequence>, ListInstances> tempHash = Generics.newHashMap();
+  private final Map<Pair<Integer, CharSequence>, ListInstances> tempHash = new FastMap<>();
 
-  private final MaxentTagger maxentTagger;
+    private final MaxentTagger maxentTagger;
 
   public TemplateHash(MaxentTagger maxentTagger) {
     this.maxentTagger = maxentTagger;

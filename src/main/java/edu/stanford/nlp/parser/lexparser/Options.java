@@ -4,10 +4,10 @@ import edu.stanford.nlp.trees.CompositeTreeTransformer;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.ReflectionLoading;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 import java.io.*;
 import java.util.*;
@@ -269,7 +269,7 @@ public class Options implements Serializable {
       i += 2;
     } else if (args[i].equalsIgnoreCase("-deleteSplitters") && i+1 < args.length) {
       String[] toDel = args[i+1].split(" *, *");
-      trainOptions.deleteSplitters = Generics.newHashSet(Arrays.asList(toDel));
+        trainOptions.deleteSplitters = new FastSet<>((Set<? extends String>) Arrays.asList(toDel));
       i += 2;
     } else if (args[i].equalsIgnoreCase("-postSplitWithBaseCategory")) {
       trainOptions.postSplitWithBaseCategory = true;
@@ -1044,7 +1044,7 @@ public class Options implements Serializable {
 
   public void writeData(Writer w) {//throws IOException {
     PrintWriter out = new PrintWriter(w);
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append(lexOptions.toString());
     sb.append("parserParams ").append(tlpParams.getClass().getName()).append('\n');
     sb.append("forceCNF ").append(forceCNF).append('\n');

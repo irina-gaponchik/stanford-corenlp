@@ -3,7 +3,6 @@ package edu.stanford.nlp.fsm;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +11,12 @@ import java.util.Set;
 
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Maps;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.Txt;
-import javolution.text.TxtBuilder;
+import javolution.text.Text;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 import javolution.util.FastSet;
 
 /**
@@ -55,13 +54,13 @@ public class TransducerGraph implements Cloneable {
   }
 
   public TransducerGraph() {
-    arcs = Generics.newHashSet();
-    arcsBySource = Generics.newHashMap();
-    arcsByTarget = Generics.newHashMap();
-    arcsByInput = Generics.newHashMap();
-    arcsBySourceAndInput = Generics.newHashMap();
-    arcsByTargetAndInput = Generics.newHashMap();
-    endNodes = Generics.newHashSet();
+      arcs = new FastSet<>();
+      arcsBySource = new FastMap<>();
+      arcsByTarget = new FastMap<>();
+      arcsByInput = new FastMap<>();
+      arcsBySourceAndInput = new FastMap<>();
+      arcsByTargetAndInput = new FastMap<>();
+      endNodes = new FastSet();
       startNode = DEFAULT_START_NODE;
   }
 
@@ -128,7 +127,7 @@ public class TransducerGraph implements Cloneable {
    * Just does union of keysets of maps.
    */
   public Set getNodes() {
-    Set result = Generics.newHashSet();
+      Set result = new FastSet();
     result.addAll(arcsBySource.keySet());
     result.addAll(arcsByTarget.keySet());
     return result;
@@ -188,14 +187,14 @@ public class TransducerGraph implements Cloneable {
    * Can only be one because automaton is deterministic.
    */
   public Arc getArcBySourceAndInput(Object node, Object input) {
-    return arcsBySourceAndInput.get(Generics.newPair(node, input));
+      return arcsBySourceAndInput.get(new Pair<>(node, input));
   }
 
   /**
    * Returns a Set of type TransducerGraph.Arc.
    */
   public Set<Arc> getArcsByTargetAndInput(Object node, Object input) {
-    return ensure(arcsByTargetAndInput.get(Generics.newPair(node, input)));
+      return ensure(arcsByTargetAndInput.get(new Pair<>(node, input)));
   }
 
   /**
@@ -204,7 +203,7 @@ public class TransducerGraph implements Cloneable {
   public Arc getArc(Object source, Object target) {
     Set arcsFromSource = arcsBySource.get(source);
     Set arcsToTarget = arcsByTarget.get(target);
-    Set result = Generics.newHashSet();
+      Set result = new FastSet();
     result.addAll(arcsFromSource);
     result.retainAll(arcsToTarget); // intersection
     if (result.size() < 1) {
@@ -243,13 +242,13 @@ public class TransducerGraph implements Cloneable {
     }
     // it's new, so add to the rest of the data structures
     // add to source and input map
-    Pair p = Generics.newPair(source, input);
+      Pair p = new Pair<>(source, input);
     if (arcsBySourceAndInput.containsKey(p) && checkDeterminism) {
       throw new RuntimeException("Creating nondeterminism while inserting arc " + a + " because it already has arc " + arcsBySourceAndInput.get(p) + checkDeterminism);
     }
     arcsBySourceAndInput.put(p, a);
     Maps.putIntoValueHashSet(arcsBySource, source, a);
-    p = Generics.newPair(target, input);
+      p = new Pair<>(target, input);
     Maps.putIntoValueHashSet(arcsByTargetAndInput, p, a);
     Maps.putIntoValueHashSet(arcsByTarget, target, a);
     Maps.putIntoValueHashSet(arcsByInput, input, a);
@@ -267,7 +266,7 @@ public class TransducerGraph implements Cloneable {
       return false;
     }
     // remove from arcsBySourceAndInput
-    Pair p = Generics.newPair(source, input);
+      Pair p = new Pair<>(source, input);
     if (!arcsBySourceAndInput.containsKey(p)) {
       return false;
     }
@@ -281,7 +280,7 @@ public class TransducerGraph implements Cloneable {
       return false;
     }
     // remove from arcsByTargetAndInput
-    p = Generics.newPair(target, input);
+      p = new Pair<>(target, input);
     s = arcsByTargetAndInput.get(p);
     if (s == null) {
       return false;
@@ -304,7 +303,7 @@ public class TransducerGraph implements Cloneable {
     {
       return false;
     }
-    Pair p = Generics.newPair(source, input);
+      Pair p = new Pair<>(source, input);
     return !arcsBySourceAndInput.containsKey(p); // expensive check
   }
 
@@ -403,7 +402,7 @@ public class TransducerGraph implements Cloneable {
   public static class OutputCombiningProcessor implements ArcProcessor {
     public Arc processArc(Arc a) {
       a = new Arc(a);
-      a.setInput(Generics.newPair(a.getInput(), a.getOutput()));
+        a.setInput(new Pair<>(a.getInput(), a.getOutput()));
       a.setOutput(null);
       return a;
     }
@@ -516,7 +515,7 @@ public class TransducerGraph implements Cloneable {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    depthFirstSearch(true, Txt.valueOf(sb));
+    depthFirstSearch(true, Text.valueOf(sb));
     return sb.toString();
   }
 
@@ -531,7 +530,7 @@ public class TransducerGraph implements Cloneable {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setMaximumFractionDigits(3);
     nf.setMinimumFractionDigits(1);
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     Set nodes = getNodes();
     result.append("digraph G {\n");
     //    result.append("page = \"8.5,11\";\n");
@@ -675,7 +674,7 @@ public class TransducerGraph implements Cloneable {
   }
 
   public Map<List, Double> samplePathsFromGraph(int numPaths) {
-    Map<List, Double> result = Generics.newHashMap();
+      Map<List, Double> result = new FastMap<>();
     for (int i = 0; i < numPaths; i++) {
       List l = sampleUniformPathFromGraph();
       result.put(l, getOutputOfPathInGraph(l));
@@ -840,7 +839,7 @@ public class TransducerGraph implements Cloneable {
     return pathList;
   }
 
-  public void depthFirstSearch(boolean forward, Txt b) {
+  public void depthFirstSearch(boolean forward, Text b) {
     if (forward) {
       depthFirstSearchHelper(startNode, new FastSet(), 0, true, b);
     } else {
@@ -853,7 +852,7 @@ public class TransducerGraph implements Cloneable {
   /**
    * For testing only.
    */
-  private void depthFirstSearchHelper(Object node, Set marked, int level, boolean forward, Txt b) {
+  private void depthFirstSearchHelper(Object node, Set marked, int level, boolean forward, Text b) {
     if (marked.contains(node)) {
       return;
     }
@@ -891,10 +890,10 @@ public class TransducerGraph implements Cloneable {
     System.out.println("Done creating random graph");
     printPathOutputs(pathList, graph, true);
     System.out.println("Depth first search from start node");
-    Txt b =   Txt.EMPTY;
+    Text b =   Text.EMPTY;
     graph.depthFirstSearch(true, b);
     System.out.println(b.toString());
-    b = Txt.EMPTY;
+    b = Text.EMPTY;
     System.out.println("Depth first search back from end node");
     graph.depthFirstSearch(false, b);
     System.out.println(b.toString());

@@ -9,7 +9,7 @@
 package edu.stanford.nlp.tagger.maxent;
 
 import edu.stanford.nlp.stats.IntCounter;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 import java.util.Map;
 import java.io.DataInputStream;
@@ -25,8 +25,8 @@ import java.io.DataOutputStream;
  */
 class TagCount {
 
-  private Map<String, Integer> map = Generics.newHashMap();
-  private int ambClassId = -1; /* This is a numeric ID shared by all words that have the same set of possible tags. */
+  private Map<String, Integer> map = new FastMap<>();
+    private int ambClassId = -1; /* This is a numeric ID shared by all words that have the same set of possible tags. */
 
   private String[] getTagsCache; // = null;
   int sumCache;
@@ -54,11 +54,7 @@ class TagCount {
     try {
       rf.writeInt(map.size());
       for (Map.Entry<String, Integer> stringIntegerEntry : map.entrySet()) {
-        if (stringIntegerEntry.getKey() == null) {
-          rf.writeUTF(NULL_SYMBOL);
-        } else {
-          rf.writeUTF(stringIntegerEntry.getKey());
-        }
+          rf.writeUTF(stringIntegerEntry.getKey() == null ? NULL_SYMBOL : stringIntegerEntry.getKey());
         rf.writeInt(stringIntegerEntry.getValue());
       }
     } catch (Exception e) {
@@ -82,7 +78,7 @@ class TagCount {
     try {
 
       int numTags = rf.readInt();
-      map = Generics.newHashMap(numTags);
+        map = new FastMap<>(numTags);
 
       for (int i = 0; i < numTags; i++) {
 	String tag = rf.readUTF();

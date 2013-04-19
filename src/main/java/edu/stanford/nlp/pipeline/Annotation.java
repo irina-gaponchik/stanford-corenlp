@@ -34,7 +34,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.Sentence;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * An annotation representing a span of text in a document.
@@ -85,7 +85,7 @@ public class Annotation extends ArrayCoreMap {
   public Annotation(List<CoreMap> sentences) {
       this.set(CoreAnnotations.SentencesAnnotation.class, sentences);
     List<CoreLabel> tokens = new ArrayList<>();
-    TxtBuilder text = new TxtBuilder();
+    TextBuilder text = new TextBuilder();
     for (CoreMap sentence : sentences) {
       List<CoreLabel> sentenceTokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
       tokens.addAll(sentenceTokens);

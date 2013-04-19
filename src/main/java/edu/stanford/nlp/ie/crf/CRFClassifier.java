@@ -39,6 +39,8 @@ import edu.stanford.nlp.sequences.*;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.util.*;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -180,7 +182,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
     this.windowSize = crf.windowSize;
     this.featureFactory = crf.featureFactory;
     this.pad = crf.pad;
-    this.knownLCWords = crf.knownLCWords != null ? Generics.<String>newHashSet(crf.knownLCWords) : null;
+      this.knownLCWords = crf.knownLCWords != null ? new FastSet<>(crf.knownLCWords) : null;
     this.featureIndex = crf.featureIndex != null ? new HashIndex<>(crf.featureIndex.objectsList()) : null;
     if (crf.flags.nonLinearCRF) {
       this.nodeFeatureIndicesMap = crf.nodeFeatureIndicesMap != null ? new HashIndex<>(crf.nodeFeatureIndicesMap.objectsList()) : null;
@@ -288,7 +290,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
     int oldNumFeatures = weights.length;
 
     // Create a map of other crf labels to this crf labels
-    Map<CRFLabel, CRFLabel> crfLabelMap = Generics.newHashMap();
+      Map<CRFLabel, CRFLabel> crfLabelMap = new FastMap<>();
     for (int i = 0; i < crf.labelIndices.size(); i++) {
       for (int j = 0; j < crf.labelIndices.get(i).size(); j++) {
         CRFLabel labels = crf.labelIndices.get(i).get(j);
@@ -743,7 +745,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
 
     Set<String>[] featureIndices = new HashSet[windowSize];
     for (int i = 0; i < windowSize; i++) {
-      featureIndices[i] = Generics.newHashSet();
+        featureIndices[i] = new FastSet<>();
     }
 
     labelIndices = new ArrayList<>(windowSize);
@@ -758,8 +760,8 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
     classIndex.add(flags.backgroundSymbol);
 
     Set<String>[] seenBackgroundFeatures = new HashSet[2];
-    seenBackgroundFeatures[0] = Generics.newHashSet();
-    seenBackgroundFeatures[1] = Generics.newHashSet();
+      seenBackgroundFeatures[0] = new FastSet<>();
+      seenBackgroundFeatures[1] = new FastSet<>();
 
     int wordCount = 0;
 
@@ -927,7 +929,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
     // }
 
     // todo [cdm Aug 2012]: Since getCliques returns all cliques within its bounds, can't the for loop here be eliminated? But my first attempt to removed failed to produce identical results....
-    Collection<Clique> done = Generics.newHashSet();
+      Collection<Clique> done = new FastSet<>();
     for (int i = 0; i < windowSize; i++) {
       List<String> featuresC = new ArrayList<>();
       List<Clique> windowCliques = FeatureFactory.getCliques(i, 0);
@@ -2120,8 +2122,8 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
     featureIndicesSetArray = new ArrayList<>(numLopExpert);
     featureIndicesListArray =  new ArrayList<>(numLopExpert);
     for (int i = 0; i < numLopExpert; i++) {
-      featureIndicesSetArray.add(Generics.<Integer>newHashSet(interval));
-      featureIndicesListArray.add(Generics.<Integer>newArrayList(interval));
+        featureIndicesSetArray.add(new FastSet<Integer>(interval));
+        featureIndicesListArray.add(new ArrayList<Integer>(interval));
     }
     if (flags.randomLopFeatureSplit) {
       for (int fIndex = 0; fIndex < numFeatures; fIndex++) {
@@ -2187,7 +2189,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
         System.arraycopy(lopExpertWeights, 0, newLopExpertWeights, 0, lopExpertWeights.length);
           newLopExpertWeights[numLopExpert] = flags.randomLopWeights ? initWeightsUsingDoubleCRF(data, labels, evaluators, pruneFeatureItr) : trainWeightsUsingDoubleCRF(data, labels, evaluators, pruneFeatureItr, null);
 
-        Set<Integer> newSet = Generics.newHashSet(numFeatures);
+          Set<Integer> newSet = new FastSet<>(numFeatures);
         List<Integer> newList = new ArrayList<>(numFeatures);
         for (int fIndex = 0; fIndex < numFeatures; fIndex++) {
           newSet.add(fIndex);
@@ -2552,7 +2554,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
   public void loadTextClassifier(String text, Properties props) throws ClassCastException, IOException,
       ClassNotFoundException, InstantiationException, IllegalAccessException {
     // System.err.println("DEBUG: in loadTextClassifier");
-    System.err.println("Loading Txt Classifier from " + text);
+    System.err.println("Loading Text Classifier from " + text);
     BufferedReader br = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(text))));
 
     String line = br.readLine();
@@ -2696,7 +2698,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
         throw new RuntimeException("format error in embeddings");
       }
       int embeddingSize = Integer.parseInt(toks[1]);
-      embeddings = Generics.newHashMap(embeddingSize);
+        embeddings = new FastMap<>(embeddingSize);
       count = 0;
       while (count < embeddingSize) {
         line = br.readLine().trim();
@@ -2970,7 +2972,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
    *          File to write text format of classifier to.
    */
   public void serializeTextClassifier(String serializePath) {
-    System.err.print("Serializing Txt classifier to " + serializePath + "...");
+    System.err.print("Serializing Text classifier to " + serializePath + "...");
     try {
       PrintWriter pw = new PrintWriter(new GZIPOutputStream(new FileOutputStream(serializePath)));
 
@@ -3368,7 +3370,7 @@ public class CRFClassifier<IN extends CoreMap> extends AbstractSequenceClassifie
       }
       System.err.println("Found a dictionary of size " + wordList.size());
       br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(crf.flags.embeddingVectors))));
-      crf.embeddings = Generics.newHashMap();
+        crf.embeddings = new FastMap<>();
       double[] vector = null;
       int count = 0;
       while ((line = br.readLine()) != null) {

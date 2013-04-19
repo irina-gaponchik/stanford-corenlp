@@ -1,6 +1,6 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.*;
 
@@ -458,7 +458,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
   public String toString(int maxKeysToPrint) {
     if (maxKeysToPrint <= 0) maxKeysToPrint = Integer.MAX_VALUE;
     List<E> sortedKeys = toSortedList();
-    TxtBuilder sb = new TxtBuilder("[");
+    TextBuilder sb = new TextBuilder("[");
     for (int i = 0; i < maxKeysToPrint && i < sortedKeys.size(); i++) {
       E key = sortedKeys.get(i);
       sb.append(key).append('=').append(getPriority(key));
@@ -472,7 +472,7 @@ public class BinaryHeapPriorityQueue<E> extends AbstractSet<E> implements Priori
 
   public String toVerticalString() {
     List<E> sortedKeys = toSortedList();
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (Iterator<E> keyI = sortedKeys.iterator(); keyI.hasNext();) {
       E key = keyI.next();
       sb.append(key);

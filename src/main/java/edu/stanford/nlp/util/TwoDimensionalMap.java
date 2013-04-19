@@ -3,7 +3,7 @@ package edu.stanford.nlp.util;
 import java.util.*;
 import java.io.Serializable;
 
-import edu.stanford.nlp.util.MapFactory;
+import javolution.util.FastSet;
 
 /**
  * @author grenager
@@ -85,7 +85,7 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
 
   public Collection<V> values() {
     // TODO: Should return a specialized class
-    List<V> s = Generics.newArrayList();
+      List<V> s = new ArrayList<>();
     for (Map<K2, V> innerMap : map.values()) {
       s.addAll(innerMap.values());
     }
@@ -97,7 +97,7 @@ public class TwoDimensionalMap<K1, K2, V> implements Serializable, Iterable<TwoD
   }
 
   public Set<K2> secondKeySet() {
-    Set<K2> keys = Generics.newHashSet();
+      Set<K2> keys = new FastSet<>();
     for (K1 k1 : map.keySet()) {
       keys.addAll(get(k1).keySet());
     }

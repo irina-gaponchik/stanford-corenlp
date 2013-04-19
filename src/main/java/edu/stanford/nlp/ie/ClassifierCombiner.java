@@ -7,8 +7,8 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.sequences.DocumentReaderAndWriter;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.ErasureUtils;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.util.FastSet;
 
 import java.io.FileNotFoundException;
 import java.io.ObjectInputStream;
@@ -148,7 +148,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
 
   @Override
   public Set<String> labels() {
-    Set<String> labs = Generics.newHashSet();
+      Set<String> labs = new FastSet<>();
     for(AbstractSequenceClassifier<? extends CoreMap> cls: baseClassifiers)
       labs.addAll(cls.labels());
     return labs;
@@ -175,7 +175,7 @@ public class ClassifierCombiner<IN extends CoreMap & HasWord> extends AbstractSe
 
     // baseLabels.get(i) points to the labels assigned by baseClassifiers.get(i)
     List<Set<String>> baseLabels = new ArrayList<>();
-    Set<String> seenLabels = Generics.newHashSet();
+      Set<String> seenLabels = new FastSet<>();
     for (AbstractSequenceClassifier<? extends CoreMap> baseClassifier : baseClassifiers) {
       Set<String> labs = baseClassifier.labels();
       labs.removeAll(seenLabels);

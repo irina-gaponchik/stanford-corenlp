@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Collection;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /**
  * A {@code TreeGraph} is a tree with additional directed,
@@ -29,9 +29,9 @@ public class TreeGraph implements Serializable {
   /**
    * A map from arbitrary integer indices to nodes.
    */
-  private Map<Integer, TreeGraphNode> indexMap = Generics.newHashMap();
+  private Map<Integer, TreeGraphNode> indexMap = new FastMap<>();
 
-  /**
+    /**
    * Construct a new {@code TreeGraph} having the same tree
    * structure and label values as an existing tree (but no shared
    * storage).  This constructor also assigns integer indices to

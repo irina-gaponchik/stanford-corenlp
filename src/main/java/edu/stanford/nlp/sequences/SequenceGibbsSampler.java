@@ -4,11 +4,11 @@ import edu.stanford.nlp.util.concurrent.*;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.math.ArrayMath;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
 
 //debug
 import edu.stanford.nlp.ie.*;
+import javolution.util.FastSet;
 
 import java.util.*;
 import java.io.PrintStream;
@@ -114,7 +114,7 @@ public class SequenceGibbsSampler implements BestSequenceFinder {
 
     Set<Integer> positionsChanged = null;
     if (speedUpThreshold > 0)
-      positionsChanged = Generics.newHashSet();
+        positionsChanged = new FastSet<>();
 
     for (int i=0; i<schedule.numIterations(); i++) {
       if (BisequenceEmpiricalNERPrior.DEBUG) System.err.println("\n\niteration: " + i);

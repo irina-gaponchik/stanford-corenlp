@@ -5,7 +5,7 @@ import edu.stanford.nlp.ling.tokensregex.*;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.Interval;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 
@@ -276,7 +276,7 @@ public class TimeExpressionExtractors {
 
     public String toString()
     {
-      TxtBuilder sb = new TxtBuilder(getClass().getName());
+      TextBuilder sb = new TextBuilder(getClass().getName());
       if (stringPattern != null) {
         sb.append(" with string pattern=").append(stringPattern.pattern());
       } else {

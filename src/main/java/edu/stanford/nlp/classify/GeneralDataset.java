@@ -9,11 +9,11 @@ import edu.stanford.nlp.ling.Datum;
 import edu.stanford.nlp.ling.RVFDatum;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 /**
  * The purpose of this interface is to unify {@link Dataset} and {@link RVFDataset}.
@@ -290,7 +290,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
   			subset.add(this.getDatum(datumNum));
   		}
   	} else {
-  		Set<Integer> indicedSampled = Generics.newHashSet();
+        Set<Integer> indicedSampled = new FastSet<>();
   		while (subset.size() < sampleSize) {
   			int datumNum = rand.nextInt(this.size());
   			if (!indicedSampled.contains(datumNum)) {
@@ -438,7 +438,7 @@ public abstract class GeneralDataset<L, F>  implements Serializable, Iterable<RV
       }
       Integer[] features = printC.keySet().toArray(new Integer[printC.keySet().size()]);
       Arrays.sort(features);
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       sb.append(labelMap[labels[i]]).append(' ');
       // sb.append(labels[i]).append(' '); // commented out by mihai: labels[i] breaks svm_light conventions!
 

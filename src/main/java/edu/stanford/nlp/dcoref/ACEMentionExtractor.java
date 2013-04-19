@@ -54,8 +54,9 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * Extracts {@code <COREF>} mentions from a file annotated in ACE format (ACE2004, ACE2005).
@@ -215,7 +216,7 @@ public class ACEMentionExtractor extends MentionExtractor {
   }
 
   private static void printRawDoc(List<CoreMap> sentences, List<List<Mention>> allMentions, String filename, boolean gold) throws FileNotFoundException {
-    TxtBuilder doc = new TxtBuilder();
+    TextBuilder doc = new TextBuilder();
     int previousOffset = 0;
     Counter<Integer> mentionCount = new ClassicCounter<>();
     for(List<Mention> l : allMentions) {
@@ -235,11 +236,11 @@ public class ACEMentionExtractor extends MentionExtractor {
       previousOffset = t.get(t.size()-1).get(CoreAnnotations.CharacterOffsetEndAnnotation.class);
       Counter<Integer> startCounts = new ClassicCounter<>();
       Counter<Integer> endCounts = new ClassicCounter<>();
-      Map<Integer, Set<Integer>> endID = Generics.newHashMap();
+        Map<Integer, Set<Integer>> endID = new FastMap<>();
       for (Mention m : mentions) {
         startCounts.incrementCount(m.startIndex);
         endCounts.incrementCount(m.endIndex);
-        if(!endID.containsKey(m.endIndex)) endID.put(m.endIndex, Generics.<Integer>newHashSet());
+        if(!endID.containsKey(m.endIndex)) endID.put(m.endIndex, (Set<Integer>) new FastMap<>());
         endID.get(m.endIndex).add(m.goldCorefClusterID);
       }
       for (int j = 0 ; j < tokens.length; j++){

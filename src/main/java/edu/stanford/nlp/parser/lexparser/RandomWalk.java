@@ -2,11 +2,10 @@ package edu.stanford.nlp.parser.lexparser;
 
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastMap;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.io.Serializable;
 
@@ -15,12 +14,12 @@ class RandomWalk implements Serializable {
 
   private static final long serialVersionUID = -5284941866796561664L;
 
-  private final Map<Object,Counter> model = Generics.newHashMap();
+  private final Map<Object,Counter> model = new FastMap<>();
 
-  private final Map<Object,Counter> hiddenToSeen = Generics.newHashMap();
-  private final Map<Object,Counter> seenToHidden = Generics.newHashMap();
+    private final Map<Object,Counter> hiddenToSeen = new FastMap<>();
+    private final Map<Object,Counter> seenToHidden = new FastMap<>();
 
-  private static final double LAMBDA = 0.01;
+    private static final double LAMBDA = 0.01;
 
   /**
    * Uses the initialized values

@@ -47,8 +47,8 @@ import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /**
  * Extracts {@literal <COREF>} mentions from a file annotated in MUC format.
@@ -214,7 +214,7 @@ public class MUCMentionExtractor extends MentionExtractor {
           sentence.add(word);
         }
       }
-      TxtBuilder textContent = new TxtBuilder();
+      TextBuilder textContent = new TextBuilder();
       for (int i=0 ; i<sentence.size(); i++){
         CoreLabel w = sentence.get(i);
         w.set(CoreAnnotations.IndexAnnotation.class, i+1);
@@ -228,7 +228,7 @@ public class MUCMentionExtractor extends MentionExtractor {
     }
 
     // assign goldCorefClusterID
-    Map<Integer, Mention> idMention = Generics.newHashMap();    // temporary use
+      Map<Integer, Mention> idMention = new FastMap<>();    // temporary use
     for (List<Mention> goldMentions : allGoldMentions) {
       for (Mention m : goldMentions) {
         idMention.put(m.mentionID, m);

@@ -8,8 +8,8 @@ import java.util.Map;
 import java.util.Stack;
 
 import edu.stanford.nlp.util.logging.Redwood.Record;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /**
  * An abstract handler incorporating the logic of outputing a log message,
@@ -91,7 +91,7 @@ public abstract class OutputHandler extends LogRecordHandler{
    */
   public void colorChannel(String channel, Color color){
     if(this.channelColors == null){
-      this.channelColors = Generics.newHashMap();
+        this.channelColors = new FastMap<>();
     }
     this.channelColors.put(channel.toLowerCase(),color);
   }
@@ -103,14 +103,15 @@ public abstract class OutputHandler extends LogRecordHandler{
    */
   public void styleChannel(String channel, Style style){
     if(this.channelStyles == null){
-      this.channelStyles = Generics.newHashMap();
+        this.channelStyles = new FastMap<>();
     }
     this.channelStyles.put(channel.toLowerCase(),style);
   }
 
   public void setColorChannels(boolean colorChannels){
     this.addRandomColors = colorChannels;
-    if(colorChannels){ this.channelColors = Generics.newHashMap(); }
+    if(colorChannels){
+        this.channelColors = new FastMap<>(); }
   }
 
   /**
@@ -121,7 +122,7 @@ public abstract class OutputHandler extends LogRecordHandler{
    * @param style The style to use
    * @return The SringBuilder b
    */
-  protected static TxtBuilder style(TxtBuilder b, String line, Color color, Style style){
+  protected static TextBuilder style(TextBuilder b, String line, Color color, Style style){
     if(color != Color.NONE || style != Style.NONE){
       b.append(color.ansiCode);
       b.append(style.ansiCode);
@@ -135,13 +136,13 @@ public abstract class OutputHandler extends LogRecordHandler{
 
   /**
    *  Format a channel
-   * @param b The javolution.text.TxtBuilder to append to
+   * @param b The javolution.text.TextBuilder to append to
    * @param channelStr The [possibly truncated and/or modified] string
-   *                   to actually print to the javolution.text.TxtBuilder
+   *                   to actually print to the javolution.text.TextBuilder
    * @param channel The original channel
-   * @return |true| if the channel was printed (that is, appended to the javolution.text.TxtBuilder)
+   * @return |true| if the channel was printed (that is, appended to the javolution.text.TextBuilder)
    */
-  protected boolean formatChannel(TxtBuilder b, String channelStr, Object channel){
+  protected boolean formatChannel(TextBuilder b, String channelStr, Object channel){
     if(this.channelColors == null && this.channelStyles == null){
       //(regular concat)
       b.append(channelStr);
@@ -179,7 +180,7 @@ public abstract class OutputHandler extends LogRecordHandler{
   }
 
 
-  private void writeContent(int depth, Object content, TxtBuilder b){
+  private void writeContent(int depth, Object content, TextBuilder b){
     if(leftMargin > 2){ b.append(tab); }
     //(write tabs)
     for(int i=0; i<depth; i++){
@@ -195,7 +196,7 @@ public abstract class OutputHandler extends LogRecordHandler{
       Record signal = queuedTracks.removeFirst();
       if(signal.depth >= untilDepth){ queuedTracks.add(signal); return; }
       //(begin record message)
-      TxtBuilder b = new TxtBuilder();
+      TextBuilder b = new TextBuilder();
       if(missingOpenBracket){
         b.append("{\n");
       }
@@ -207,7 +208,7 @@ public abstract class OutputHandler extends LogRecordHandler{
       writeContent(signal.depth,signal.content,b);
       if(!signal.content.toString().isEmpty()){ b.append(' '); }
       //(print)
-      print(null, style(new TxtBuilder(), b.toString(), trackColor, trackStyle).toString() );
+      print(null, style(new TextBuilder(), b.toString(), trackColor, trackStyle).toString() );
       this.missingOpenBracket = true;  //only set to false if actually updated track state
       //(update lines printed)
       if(info != null){
@@ -218,7 +219,7 @@ public abstract class OutputHandler extends LogRecordHandler{
 
   /** {@inheritDoc} */
   public List<Record> handle(Record record) {
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     
     //--Special case for Exceptions
     String[] content;
@@ -299,7 +300,7 @@ public abstract class OutputHandler extends LogRecordHandler{
           //(case: doesn't fit)
           while(cursorPos < leftMargin){ b.append(' '); cursorPos += 1; }
           if(contentLinesPrinted < content.length){
-            writeContent(record.depth, style(new TxtBuilder(),content[contentLinesPrinted],color,style).toString(), b);
+            writeContent(record.depth, style(new TextBuilder(),content[contentLinesPrinted],color,style).toString(), b);
             contentLinesPrinted += 1;
           }
           b.append("\n ");
@@ -323,7 +324,7 @@ public abstract class OutputHandler extends LogRecordHandler{
     //(write content)
     while(contentLinesPrinted < content.length) {
       while(cursorPos < leftMargin){ b.append(' '); cursorPos += 1; }
-      writeContent(record.depth, style(new TxtBuilder(),content[contentLinesPrinted],color,style).toString(), b);
+      writeContent(record.depth, style(new TextBuilder(),content[contentLinesPrinted],color,style).toString(), b);
       contentLinesPrinted += 1;
       if(contentLinesPrinted < content.length){ b.append('\n'); cursorPos = 0; }
     }
@@ -376,7 +377,7 @@ public abstract class OutputHandler extends LogRecordHandler{
     }
     //(handle track)
     if(this.queuedTracks.isEmpty()){
-      TxtBuilder b = new TxtBuilder();
+      TextBuilder b = new TextBuilder();
       if(!this.missingOpenBracket){
         //(write margin)
         for(int i=0; i<this.leftMargin; i++){
@@ -400,7 +401,7 @@ public abstract class OutputHandler extends LogRecordHandler{
       }
       //(print)
       b.append('\n');
-      print(null, style(new TxtBuilder(), b.toString(), trackColor, trackStyle).toString());
+      print(null, style(new TextBuilder(), b.toString(), trackColor, trackStyle).toString());
     } else {
       this.queuedTracks.removeLast();
     }

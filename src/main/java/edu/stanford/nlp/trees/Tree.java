@@ -22,13 +22,13 @@ import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Filters;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.IntPair;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.Scored;
 import edu.stanford.nlp.util.XMLUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 /**
  * The abstract class {@code Tree} is used to collect all of the
@@ -475,13 +475,13 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *         (in the current implementation, a {@code HashSet}
    */
   public Set<Constituent> constituents(ConstituentFactory cf, boolean charLevel) {
-    Set<Constituent> constituentsSet = Generics.newHashSet();
+      Set<Constituent> constituentsSet = new FastSet<>();
     constituents(constituentsSet, 0, cf, charLevel, null);
     return constituentsSet;
   }
 
   public Set<Constituent> constituents(ConstituentFactory cf, boolean charLevel, Filter<Tree> filter) {
-    Set<Constituent> constituentsSet = Generics.newHashSet();
+      Set<Constituent> constituentsSet = new FastSet<>();
     constituents(constituentsSet, 0, cf, charLevel, filter);
     return constituentsSet;
   }
@@ -583,7 +583,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @return A set of local tree
    */
   public Set<Tree> localTrees() {
-    Set<Tree> set = Generics.newHashSet();
+      Set<Tree> set = new FastSet<>();
     for (Tree st : this) {
       if (st.isPhrasal()) {
         set.add(st.localTree());
@@ -606,10 +606,10 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * The implementation of this may be more efficient than for
    * {@code toString()} on complex trees.
    *
-   * @param sb The {@code javolution.text.TxtBuilder} to which the tree will be appended
-   * @return Returns the {@code javolution.text.TxtBuilder} passed in with extra stuff in it
+   * @param sb The {@code javolution.text.TextBuilder} to which the tree will be appended
+   * @return Returns the {@code javolution.text.TextBuilder} passed in with extra stuff in it
    */
-  public TxtBuilder toStringBuilder(TxtBuilder sb) {
+  public TextBuilder toStringBuilder(TextBuilder sb) {
     return toStringBuilder(sb, true);
   }
 
@@ -619,11 +619,11 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * The implementation of this may be more efficient than for
    * {@code toString()} on complex trees.
    *
-   * @param sb The {@code javolution.text.TxtBuilder} to which the tree will be appended
+   * @param sb The {@code javolution.text.TextBuilder} to which the tree will be appended
    * @param printOnlyLabelValue If true, print only the value() of each node's label
-   * @return Returns the {@code javolution.text.TxtBuilder} passed in with extra stuff in it
+   * @return Returns the {@code javolution.text.TextBuilder} passed in with extra stuff in it
    */
-  public TxtBuilder toStringBuilder(TxtBuilder sb, boolean printOnlyLabelValue) {
+  public TextBuilder toStringBuilder(TextBuilder sb, boolean printOnlyLabelValue) {
     if (isLeaf()) {
       if (label() != null) {
         if(printOnlyLabelValue) {
@@ -661,14 +661,14 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * Converts parse tree to string in Penn Treebank format.
    * <p>
    * Implementation note: Internally, the method gains
-   * efficiency by chaining use of a single {@code javolution.text.TxtBuilder}
+   * efficiency by chaining use of a single {@code javolution.text.TextBuilder}
    * through all the printing.
    *
    * @return the tree as a bracketed list on one line
    */
   @Override
   public String toString() {
-    return toStringBuilder(new TxtBuilder(Tree.initialPrintStringBuilderSize)).toString();
+    return toStringBuilder(new TextBuilder(Tree.initialPrintStringBuilderSize)).toString();
   }
 
 
@@ -676,7 +676,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
 
 
   private static String makeIndentString(int indent) {
-    TxtBuilder sb = new TxtBuilder(indent);
+    TextBuilder sb = new TextBuilder(indent);
     for (int i = 0; i < indentIncr; i++) {
       sb.append(' ');
     }
@@ -736,7 +736,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @param printScores Whether to print the scores (log probs) of tree nodes
    */
   private void indentedListPrint(String indent, String pad, PrintWriter pw, boolean printScores) {
-    TxtBuilder sb = new TxtBuilder(indent);
+    TextBuilder sb = new TextBuilder(indent);
     Label label = label();
     if (label != null) {
       sb.append(label.toString());
@@ -789,7 +789,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    */
   private void indentedXMLPrint(String indent, String pad,
                                 PrintWriter pw, boolean printScores) {
-    TxtBuilder sb = new TxtBuilder(indent);
+    TextBuilder sb = new TextBuilder(indent);
     Tree[] children = children();
     Label label = label();
     if (label != null) {
@@ -812,7 +812,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
             aChildren.indentedXMLPrint(newIndent, pad, pw, printScores);
         }
       if (label != null) {
-        sb = new TxtBuilder(indent);
+        sb = new TextBuilder(indent);
         sb.append("</");
         sb.append(XMLUtils.escapeXML(Sentence.wordToString(label, true)));
         sb.append('>');
@@ -868,7 +868,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
       }
     }
     if (isLeaf() || isPreTerminal()) {
-      String terminalString = toStringBuilder(new TxtBuilder(), onlyLabelValue).toString();
+      String terminalString = toStringBuilder(new TextBuilder(), onlyLabelValue).toString();
       pw.print(terminalString);
       pw.flush();
       return;
@@ -1185,7 +1185,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @return Set of dependencies (each a Dependency)
    */
   public Set<Dependency<Label, Label, Object>> dependencies(Filter<Dependency<Label, Label, Object>> f, boolean isConcrete, boolean copyLabel, boolean copyPosTag) {
-    Set<Dependency<Label, Label, Object>> deps = Generics.newHashSet();
+      Set<Dependency<Label, Label, Object>> deps = new FastSet<>();
     for (Tree node : this) {
       // Skip leaves and unary re-writes
       if (node.isLeaf() || node.children().length < 2) {
@@ -1244,7 +1244,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
     if (hf == null) {
       throw new IllegalArgumentException("mapDependencies: need headfinder");
     }
-    Set<Dependency<Label, Label, Object>> deps = Generics.newHashSet();
+      Set<Dependency<Label, Label, Object>> deps = new FastSet<>();
     for (Tree node : this) {
       if (node.isLeaf() || node.children().length < 2) {
         continue;
@@ -1594,7 +1594,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    *         in the tree.
    */
   public Collection<Label> labels() {
-    Set<Label> n = Generics.newHashSet();
+      Set<Label> n = new FastSet<>();
     n.add(label());
     Tree[] kids = children();
       for (Tree kid : kids) {
@@ -1677,7 +1677,7 @@ public abstract class Tree extends AbstractCollection<Tree> implements Label, La
    * @return the {@code Set} of all subtrees in the tree.
    */
   public Set<Tree> subTrees() {
-    return subTrees(Generics.<Tree>newHashSet());
+      return subTrees(new FastSet<Tree>());
   }
 
   /**

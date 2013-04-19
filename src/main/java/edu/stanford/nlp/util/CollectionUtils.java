@@ -20,7 +20,9 @@ import java.util.Set;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.stats.Counters;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * Collection of useful static methods for working with Collections. Includes
@@ -85,11 +87,11 @@ public class CollectionUtils {
 
   /** Returns a new Set containing all the objects in the specified array. */
   public static <T> Set<T> asSet(T... o) {
-    return Generics.newHashSet(Arrays.asList(o));
+      return new FastSet<>((Set<? extends T>) Arrays.asList(o)) ;
   }
 
   public static <T> Set<T> intersection(Set<T> set1, Set<T> set2) {
-    Set<T> intersect = Generics.newHashSet();
+      Set<T> intersect = new FastSet<>();
     for (T t : set1) {
       if (set2.contains(t)) {
         intersect.add(t);
@@ -110,7 +112,7 @@ public class CollectionUtils {
   }
 
   public static <T> Set<T> unionAsSet(Collection<T> set1, Collection<T> set2) {
-    Set<T> union = Generics.newHashSet();
+      Set<T> union = new FastSet<>();
     for (T t : set1) {
       union.add(t);
     }
@@ -436,7 +438,7 @@ public class CollectionUtils {
   }
 
   public static <K, V> String toVerticalString(Map<K, V> m) {
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     Set<Map.Entry<K, V>> entries = m.entrySet();
     for (Map.Entry<K, V> e : entries) {
       b.append(e.getKey()).append('=').append(e.getValue()).append('\n');
@@ -533,7 +535,7 @@ public class CollectionUtils {
    * @return A set consisting of the items from the Iterable.
    */
   public static <T> Set<T> toSet(Iterable<T> items) {
-    Set<T> set = Generics.newHashSet();
+      Set<T> set = new FastSet<>();
     addAll(set, items);
     return set;
   }
@@ -750,7 +752,7 @@ public class CollectionUtils {
    * for them for limited-use hashing.
    */
   public static <ObjType, Hashable> Collection<ObjType> uniqueNonhashableObjects(Collection<ObjType> objects, Function<ObjType, Hashable> customHasher) {
-    Map<Hashable, ObjType> hashesToObjects = Generics.newHashMap();
+      Map<Hashable, ObjType> hashesToObjects = new FastMap<>();
     for (ObjType object : objects) {
       hashesToObjects.put(customHasher.apply(object), object);
     }
@@ -849,7 +851,7 @@ public class CollectionUtils {
    *
    */
   public static<T1, T2> Set<T2> transformAsSet(Collection<? extends T1> original, Function<T1, ? extends T2> f){
-    Set<T2> transformed = Generics.newHashSet();
+      Set<T2> transformed = new FastSet<>();
     for(T1 t: original){
       transformed.add(f.apply(t));
     }

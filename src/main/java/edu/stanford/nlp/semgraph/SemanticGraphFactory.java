@@ -6,7 +6,8 @@ import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Filters;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import java.util.*;
 
@@ -172,7 +173,7 @@ public class SemanticGraphFactory {
     }
 
     if (filter != null) {
-      List<TypedDependency> depsFiltered = Generics.newArrayList();
+        List<TypedDependency> depsFiltered = new ArrayList<>();
       for (TypedDependency td : deps) {
         if (filter.accept(td)) {
           depsFiltered.add(td);
@@ -181,7 +182,7 @@ public class SemanticGraphFactory {
       deps = depsFiltered;
     }
 
-    Collection<TreeGraphNode> roots = Generics.newHashSet();
+      Collection<TreeGraphNode> roots = new FastSet<>();
 
     // there used to be an if clause that filtered out the case of empty
     // dependencies. However, I could not understand (or replicate) the error
@@ -325,7 +326,7 @@ public class SemanticGraphFactory {
    */
   // XXX why is this a List rather than a Set (i.e. are the duplicates useful)?
   public static Set<IndexedWord> getVerticesFromEdgeSet(Iterable<SemanticGraphEdge> edges) {
-    Set<IndexedWord> retSet = Generics.newHashSet();
+      Set<IndexedWord> retSet = new FastSet<>();
     for (SemanticGraphEdge edge : edges) {
       retSet.add(edge.getGovernor());
       retSet.add(edge.getDependent());
@@ -406,7 +407,7 @@ public class SemanticGraphFactory {
    */
   public static SemanticGraph makeFromGraphs(Collection<SemanticGraph> sgList) {
     SemanticGraph sg = new SemanticGraph();
-    Collection<IndexedWord> newRoots = Generics.newHashSet();
+      Collection<IndexedWord> newRoots = new FastSet<>();
     for (SemanticGraph currSg : sgList) {
       newRoots.addAll(currSg.getRoots());
       for (IndexedWord currVertex : currSg.vertexSet())
@@ -429,7 +430,7 @@ public class SemanticGraphFactory {
   public static SemanticGraph deepCopyFromGraphs(List<SemanticGraph> graphs,
                                                  List<Integer> lengths) {
     SemanticGraph newGraph = new SemanticGraph();
-    Map<Integer, IndexedWord> newWords = Generics.newHashMap();
+      Map<Integer, IndexedWord> newWords = new FastMap<>();
     List<IndexedWord> newRoots = new ArrayList<>();
     int vertexOffset = 0;
     for (int i = 0; i < graphs.size(); ++i) {

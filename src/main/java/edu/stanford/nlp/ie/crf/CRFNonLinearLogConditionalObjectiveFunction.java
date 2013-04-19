@@ -4,10 +4,9 @@ import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.optimization.AbstractCachingDiffFunction;
 import edu.stanford.nlp.optimization.HasL1ParamRange;
 import edu.stanford.nlp.sequences.SeqClassifierFlags;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
-import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.Triple;
+import javolution.util.FastSet;
 
 import java.util.*;
 
@@ -815,18 +814,18 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
   @Override
   public Set<Integer> getL1ParamRange(double... x) {
     if (prior == L1_PRIOR) {
-      Set<Integer> paramRange = Generics.newHashSet(x.length);
+        Set<Integer> paramRange = new FastSet<>(x.length);
       for (int i = 0; i < x.length; i++)
         paramRange.add(i);
       return paramRange;
     } else if (prior == L1_NODE_L2_EDGE_PRIOR) {
-      Set<Integer> paramRange = Generics.newHashSet(beforeOutputWeights - edgeParamCount);
+        Set<Integer> paramRange = new FastSet<>(beforeOutputWeights - edgeParamCount);
       for (int i = edgeParamCount; i < beforeOutputWeights; i++)
         paramRange.add(i);
       return paramRange;
     } else if (prior == L1_SPARSENODE_L2_EDGE_PRIOR) {
       double[][] W = separateWeights(x).second(); // inputLayerWeights 
-      Set<Integer> paramRange = Generics.newHashSet();
+        Set<Integer> paramRange = new FastSet<>();
       for (int nodeFeatureIndex = 0; nodeFeatureIndex < numNodeFeatures; nodeFeatureIndex++) { // for each node feature, we enforce the sparsity
         for (int outputClassIndex = 0; outputClassIndex < numClasses; outputClassIndex++) {
           double maxParamAbsVal = 0;
@@ -850,7 +849,7 @@ public class CRFNonLinearLogConditionalObjectiveFunction extends AbstractCaching
       }
       return paramRange;
     } else {
-      return Generics.newHashSet();
+        return new FastSet<>();
     }
   }
 

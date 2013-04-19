@@ -40,11 +40,12 @@ import edu.stanford.nlp.semgraph.SemanticGraph;
 import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.util.CollectionValuedMap;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.IntPair;
 import edu.stanford.nlp.util.IntTuple;
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 public class Document implements Serializable {
 
@@ -110,16 +111,16 @@ public class Document implements Serializable {
   public Set<Pair<Integer, Integer>> incompatibles;
 
   public Document() {
-    positions = Generics.newHashMap();
-    mentionheadPositions = Generics.newHashMap();
-    roleSet = Generics.newHashSet();
-    corefClusters = Generics.newHashMap();
+      positions = new FastMap<>();
+      mentionheadPositions = new FastMap<>();
+      roleSet = new FastSet<>();
+      corefClusters = new FastMap<>();
     goldCorefClusters = null;
-    allPredictedMentions = Generics.newHashMap();
-    allGoldMentions = Generics.newHashMap();
-    speakers = Generics.newHashMap();
-    speakerPairs = Generics.newHashSet();
-    incompatibles = Generics.newHashSet();
+      allPredictedMentions = new FastMap<>();
+      allGoldMentions = new FastMap<>();
+      speakers = new FastMap<>();
+      speakerPairs = new FastSet<>();
+      incompatibles = new FastSet<>();
   }
 
   public Document(Annotation anno, List<List<Mention>> predictedMentions,
@@ -201,7 +202,7 @@ public class Document implements Serializable {
         m.sentNum = i;
 
         assert !corefClusters.containsKey(m.mentionID);
-        corefClusters.put(m.mentionID, new CorefCluster(m.mentionID, Generics.newHashSet(Collections.singletonList(m))));
+          corefClusters.put(m.mentionID, new CorefCluster(m.mentionID, new FastSet<Mention>((Set<? extends Mention>) Collections.singleton(m))));
         m.corefClusterID = m.mentionID;
 
         IntTuple headPosition = new IntTuple(2);
@@ -231,7 +232,7 @@ public class Document implements Serializable {
       for(Mention g : golds) {
         IntPair ip = new IntPair(g.startIndex, g.endIndex);
         if (goldMentionPositions.containsKey(ip)) {
-          TxtBuilder existingMentions = new TxtBuilder();
+          TextBuilder existingMentions = new TextBuilder();
           for (Mention eg: goldMentionPositions.get(ip)) {
             if (existingMentions.length() > 0) {
               existingMentions.append(',');
@@ -268,8 +269,8 @@ public class Document implements Serializable {
       List<Mention> golds = goldOrderedMentionsBySentence.get(sentNum);
       List<Mention> predicts = predictedOrderedMentionsBySentence.get(sentNum);
 
-      Map<IntPair, Mention> goldMentionPositions = Generics.newHashMap();
-      Map<Integer, LinkedList<Mention>> goldMentionHeadPositions = Generics.newHashMap();
+        Map<IntPair, Mention> goldMentionPositions = new FastMap<>();
+        Map<Integer, LinkedList<Mention>> goldMentionHeadPositions = new FastMap<>();
       for(Mention g : golds) {
         goldMentionPositions.put(new IntPair(g.startIndex, g.endIndex), g);
         if(!goldMentionHeadPositions.containsKey(g.headIndex)) {
@@ -333,7 +334,7 @@ public class Document implements Serializable {
   /** Find document type: Conversation or article  */
   private DocType findDocType(Dictionaries dict) {
     boolean speakerChange = false;
-    Set<Integer> discourseWithIorYou = Generics.newHashSet();
+      Set<Integer> discourseWithIorYou = new FastSet<>();
 
     for(CoreMap sent : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
       for(CoreLabel w : sent.get(CoreAnnotations.TokensAnnotation.class)) {
@@ -375,7 +376,7 @@ public class Document implements Serializable {
 
   /** Extract gold coref cluster information. */
   public void extractGoldCorefClusters(){
-    goldCorefClusters = Generics.newHashMap();
+      goldCorefClusters = new FastMap<>();
     for (List<Mention> mentions : goldOrderedMentionsBySentence) {
       for (Mention m : mentions) {
         int id = m.goldCorefClusterID;
@@ -403,9 +404,9 @@ public class Document implements Serializable {
     List<Pair<IntTuple, IntTuple>> links = new ArrayList<>();
 
     // position of each mention in the input matrix, by id
-    Map<Integer, IntTuple> positions = Generics.newHashMap();
+      Map<Integer, IntTuple> positions = new FastMap<>();
     // positions of antecedents
-    Map<Integer, List<IntTuple>> antecedents = Generics.newHashMap();
+      Map<Integer, List<IntTuple>> antecedents = new FastMap<>();
     for(int i = 0; i < goldOrderedMentionsBySentence.size(); i ++){
       for(int j = 0; j < goldOrderedMentionsBySentence.get(i).size(); j ++){
         Mention m = goldOrderedMentionsBySentence.get(i).get(j);

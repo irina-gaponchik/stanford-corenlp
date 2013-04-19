@@ -4,9 +4,9 @@ import java.util.Set;
 
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastSet;
 
 public class BinaryGrammarExtractor extends AbstractTreeExtractor<Pair<UnaryGrammar,BinaryGrammar>> {
 
@@ -14,10 +14,10 @@ public class BinaryGrammarExtractor extends AbstractTreeExtractor<Pair<UnaryGram
   private ClassicCounter<UnaryRule> unaryRuleCounter = new ClassicCounter<>();
   private ClassicCounter<BinaryRule> binaryRuleCounter = new ClassicCounter<>();
   protected ClassicCounter<String> symbolCounter = new ClassicCounter<>();
-  private Set<BinaryRule> binaryRules = Generics.newHashSet();
-  private Set<UnaryRule> unaryRules = Generics.newHashSet();
+  private Set<BinaryRule> binaryRules = new FastSet<>();
+    private Set<UnaryRule> unaryRules = new FastSet<>();
 
-  //  protected void tallyTree(Tree t, double weight) {
+    //  protected void tallyTree(Tree t, double weight) {
   //    super.tallyTree(t, weight);
   //    System.out.println("Tree:");
   //    t.pennPrint();

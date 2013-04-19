@@ -1,12 +1,14 @@
 package edu.stanford.nlp.ie;
 
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.ie.pascal.AcronymModel;
 import edu.stanford.nlp.ling.CoreAnnotations;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
+import javolution.util.FastTable;
 
 
 import java.util.*;
@@ -41,15 +43,15 @@ public class SeminarsPrior<IN extends CoreMap> extends EntityCachingAbstractSequ
 
   public double scoreOf(int... sequence) {
 
-    Set<String> speakers = Generics.newHashSet();
-    Set<String> locations = Generics.newHashSet();
-    Set<String> stimes = Generics.newHashSet();
-    Set<String> etimes = Generics.newHashSet();
+      Set<String> speakers =  new FastSet<>();
+      Set<String> locations = new FastSet<>();
+      Set<String> stimes =    new FastSet<>();
+      Set<String> etimes =    new FastSet<>();
 
-    List<Entity> speakersL = new ArrayList<>();
-    List<Entity> locationsL = new  ArrayList<>();
-    List<Entity> stimesL = new  ArrayList<>();
-    List<Entity> etimesL = new  ArrayList<>();
+    List<Entity> speakersL =   new FastTable<>();
+    List<Entity> locationsL = new FastTable<>();
+    List<Entity> stimesL =    new FastTable<>();
+    List<Entity> etimesL =    new FastTable<>();
 
     double p = 0.0;
     for (int i = 0; i < entities.length; i++) {
@@ -172,9 +174,9 @@ public class SeminarsPrior<IN extends CoreMap> extends EntityCachingAbstractSequ
     return p;
   }
   
-  private static Map<Pair<String, String>, Boolean> aliasLocCache = Generics.newHashMap();
+  private static Map<Pair<String, String>, Boolean> aliasLocCache = new FastMap<>();
 
-  private static AcronymModel acronymModel;
+    private static AcronymModel acronymModel;
 
   static {
     try {

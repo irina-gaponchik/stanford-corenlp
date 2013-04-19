@@ -1,7 +1,7 @@
 
 package edu.stanford.nlp.ie.machinereading.common;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;
@@ -56,7 +56,7 @@ public final class SimpleTokenize {
    * Replaces all occurences of \" with "
    */
   private static String normalizeQuotes(String str) {
-    TxtBuilder buffer = new TxtBuilder();
+    TextBuilder buffer = new TextBuilder();
     for (int i = 0; i < str.length(); i++) {
       // do not include \ if followed by "
         if (str.charAt(i) != '\\' || i >= str.length() - 1 || str.charAt(i + 1) != '\"') {
@@ -120,7 +120,7 @@ public final class SimpleTokenize {
    * \
    */
   public static String quotify(String str) {
-    TxtBuilder buffer = new TxtBuilder();
+    TextBuilder buffer = new TextBuilder();
     buffer.append('\"');
     for (int i = 0; i < str.length(); i++) {
       if (str.charAt(i) == '\"')

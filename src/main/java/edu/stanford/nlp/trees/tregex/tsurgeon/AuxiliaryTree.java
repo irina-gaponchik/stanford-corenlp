@@ -1,8 +1,8 @@
 package edu.stanford.nlp.trees.tregex.tsurgeon;
 
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastMap;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -28,7 +28,7 @@ class AuxiliaryTree {
     if (foot == null && mustHaveFoot) {
       throw new RuntimeException("Error -- no foot node found for " + originalTreeString);
     }
-    namesToNodes = Generics.newHashMap();
+      namesToNodes = new FastMap<>();
     nodesToNames = new IdentityHashMap<>();
     initializeNamesNodesMaps(tree);
   }
@@ -54,7 +54,7 @@ class AuxiliaryTree {
    * Copies the Auxiliary tree.  Also, puts the new names->nodes map in the TsurgeonPattern that called copy.
    */
   public AuxiliaryTree copy(TsurgeonPattern p) {
-    Map<String,Tree> newNamesToNodes = Generics.newHashMap();
+      Map<String,Tree> newNamesToNodes = new FastMap<>();
     Pair<Tree,Tree> result = copyHelper(tree,newNamesToNodes);
     //if(! result.first().dominates(result.second()))
       //System.err.println("Error -- aux tree copy doesn't dominate foot copy.");

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /**
  * Primarily for debugging, PrettyLogger helps you dump various collection
@@ -225,7 +225,7 @@ public class PrettyLogger {
 
   private static <K,V> void log(RedwoodChannels channels, String description, Dictionary<K,V> dict) {
     //(a real data structure)
-    Map<K, V> map = Generics.newHashMap();
+      Map<K, V> map = new FastMap<>();
     //(copy to map)
     Enumeration<K> keys = dict.keys();
     while(keys.hasMoreElements()){

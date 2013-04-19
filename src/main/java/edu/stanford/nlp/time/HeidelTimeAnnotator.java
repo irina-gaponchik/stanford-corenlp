@@ -6,12 +6,11 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.Annotator;
-import edu.stanford.nlp.time.TimeAnnotations;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.DataFilePaths;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.SystemUtils;
+import javolution.util.FastMap;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -178,8 +177,8 @@ public class HeidelTimeAnnotator implements Annotator {
   
   private static List<CoreMap> toTimexCoreMaps(Element docElem, CoreMap originalDocument) {
     //--Collect Token Offsets
-    Map<Integer,Integer> beginMap = Generics.newHashMap();
-    Map<Integer,Integer> endMap = Generics.newHashMap();
+      Map<Integer,Integer> beginMap = new FastMap<>();
+      Map<Integer,Integer> endMap = new FastMap<>();
     boolean haveTokenOffsets = true;
     for(CoreMap sent : originalDocument.get(CoreAnnotations.SentencesAnnotation.class)){
       for(CoreLabel token : sent.get(CoreAnnotations.TokensAnnotation.class)){

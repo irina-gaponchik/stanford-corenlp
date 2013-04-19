@@ -2,7 +2,7 @@ package edu.stanford.nlp.trees.international.pennchinese;
 
 import edu.stanford.nlp.io.EncodingPrintWriter;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.*;
 import java.util.regex.Pattern;
@@ -91,7 +91,7 @@ public class ChineseUtils {
         spaceChar < 0 || spaceChar > MAX_LEGAL) {
       throw new IllegalArgumentException("ChineseUtils: Unknown parameter option");
     }
-    TxtBuilder out = new TxtBuilder();
+    TextBuilder out = new TextBuilder();
     int len = in.length();
     boolean delete;
     if (ONLY_BMP) {
@@ -283,7 +283,7 @@ public class ChineseUtils {
             throw new IllegalArgumentException("ChineseUtils: Unsupported parameter option: midDot=" + midDot);
         }
         if ( ! delete) {
-          out.append ((char)((char)cp&0xffff));
+          out.append((char) ((char) cp & 0xffff));
         }
       } // end for
     }

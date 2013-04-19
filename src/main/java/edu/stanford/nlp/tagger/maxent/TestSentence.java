@@ -20,9 +20,9 @@ import edu.stanford.nlp.sequences.ExactBestSequenceFinder;
 import edu.stanford.nlp.sequences.SequenceModel;
 import edu.stanford.nlp.tagger.common.TaggerConstants;
 import edu.stanford.nlp.util.ArrayUtils;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -66,8 +66,8 @@ public class TestSentence implements SequenceModel {
   private int endSizePairs; // = 0;
 
   private volatile History history;
-  protected volatile Map<String,double[]> localScores = Generics.newHashMap();
-  protected volatile double[][] localContextScores;
+  protected volatile Map<String,double[]> localScores = new FastMap<>();
+    protected volatile double[][] localContextScores;
 
   protected final MaxentTagger maxentTagger;
 
@@ -159,7 +159,7 @@ public class TestSentence implements SequenceModel {
    * @return tagged sentence
    */
   String getTaggedNice() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     // size - 1 means to exclude the EOS (end of string) symbol
     for (int i = 0; i < size - 1; i++) {
       sb.append(toNice(sent.get(i))).append(tagSeparator).append(toNice(finalTags[i]));

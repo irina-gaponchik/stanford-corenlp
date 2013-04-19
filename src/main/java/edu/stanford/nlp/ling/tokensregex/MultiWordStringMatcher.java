@@ -2,8 +2,8 @@ package edu.stanford.nlp.ling.tokensregex;
 
 import edu.stanford.nlp.util.CacheMap;
 import edu.stanford.nlp.util.IntPair;
-import javolution.text.Txt;
-import javolution.text.TxtBuilder;
+import javolution.text.Text;
+import javolution.text.TextBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -54,14 +54,14 @@ public class MultiWordStringMatcher {
    * @param targetString - Target string to look for
    * @return Updated text with spaces around target string
    */
-  public String putSpacesAroundTargetString(String text, String targetString)
+  public String putSpacesAroundTargetString(Text text, Text targetString)
   {
     return markTargetString(text, targetString, " ", " ", true);
   }
 
-  protected static String markTargetString(String text, String targetString, String beginMark, String endMark, boolean markOnlyIfSpace)
+  protected static String markTargetString(Text text, Text targetString, CharSequence beginMark, CharSequence endMark, boolean markOnlyIfSpace)
   {
-    Txt sb = new Txt(text);
+    Text sb = Text.valueOf((text));
     int i = sb.indexOf(targetString);
     while (i >= 0) {
       boolean matched = true;
@@ -85,12 +85,12 @@ public class MultiWordStringMatcher {
       }
       if (matched) {
         if (markBefore) {
-          sb.insert(i, beginMark);
+          sb.insert(i, Text.valueOf(beginMark));
           i += beginMark.length();
         }
         i = i + targetString.length();
         if (markAfter) {
-          sb.insert(i, endMark);
+          sb.insert(i, Text.valueOf(endMark));
           i += endMark.length();
         }
       } else {
@@ -167,7 +167,7 @@ public class MultiWordStringMatcher {
     List<String> strings = Arrays.asList(targetStrings);
     // Sort by longest string first
     Collections.sort(strings, LONGEST_STRING_COMPARATOR);
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (String s:strings) {
       if (sb.length() > 0) {
         sb.append('|');
@@ -213,7 +213,7 @@ public class MultiWordStringMatcher {
   private static final Pattern punctWhitespacePattern = Pattern.compile("\\s*(\\p{Punct})\\s*");
   public static String getExctWsRegex(String targetString)
   {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     String[] fields = whitespacePattern.split(targetString);
     for (String field:fields) {
       // require at least one whitespace if there is whitespace in target string
@@ -236,7 +236,7 @@ public class MultiWordStringMatcher {
 
   public String getLWsRegex(String targetString)
   {
-    TxtBuilder sb = new TxtBuilder("(?u)(?i)");
+    TextBuilder sb = new TextBuilder("(?u)(?i)");
     sb.append(getExctWsRegex(targetString));
     return sb.toString();
   }
@@ -245,7 +245,7 @@ public class MultiWordStringMatcher {
   private static final Pattern lnrmDelimPattern = Pattern.compile("(?:\\p{Punct}|\\s)+");
   public static String getLnrmRegex(String targetString)
   {
-    TxtBuilder sb = new TxtBuilder("(?u)(?i)");
+    TextBuilder sb = new TextBuilder("(?u)(?i)");
     String[] fields = lnrmDelimPattern.split(targetString);
     boolean first = true;
     for (String field:fields) {

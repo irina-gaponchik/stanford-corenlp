@@ -19,7 +19,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.ErrorHandler;
@@ -106,9 +108,9 @@ public class XMLUtils {
   /**
    * Block-level HTML tags that are rendered with surrounding line breaks.
    */
-  public static final Set<String> breakingTags = Generics.newHashSet(Arrays.asList(new String[] {"blockquote", "br", "div", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "ul", "tr", "td"}));
+  public static final Set<String> breakingTags = new FastSet<>((Set<? extends String>) Arrays.asList(new String[]{"blockquote", "br", "div", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "li", "ol", "p", "pre", "ul", "tr", "td"}));
 
-  /**
+    /**
    * @param r       the reader to read the XML/HTML from
    * @param mapBack a List of Integers mapping the positions in the result buffer
    *                to positions in the original Reader, will be cleared on receipt
@@ -118,7 +120,7 @@ public class XMLUtils {
     if (mapBack != null) {
       mapBack.clear(); // just in case it has something in it!
     }
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     String text;
     String tag;
     int position = 0;
@@ -173,7 +175,7 @@ public class XMLUtils {
     if (!r.ready()) {
       return "";
     }
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     int c = r.read();
     while (c >= 0 && c != '<') {
       b.append((char) c);
@@ -206,7 +208,7 @@ public class XMLUtils {
   static final Pattern xmlEscapingPattern = Pattern.compile("\\&.+?;");
 
   public static String unescapeStringForXML(String s) {
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     Matcher m = xmlEscapingPattern.matcher(s);
     int end = 0;
     while (m.find()) {
@@ -736,7 +738,7 @@ public class XMLUtils {
    */
   public static String escapeXML(String in) {
     int leng = in.length();
-    TxtBuilder sb = new TxtBuilder(leng);
+    TextBuilder sb = new TextBuilder(leng);
     for (int i = 0; i < leng; i++) {
       char c = in.charAt(i);
       if (c == '&') {
@@ -765,7 +767,7 @@ public class XMLUtils {
    */
   public static String escapeElementXML(String in) {
     int leng = in.length();
-    TxtBuilder sb = new TxtBuilder(leng);
+    TextBuilder sb = new TextBuilder(leng);
     for (int i = 0; i < leng; i++) {
       char c = in.charAt(i);
       if (c == '&') {
@@ -792,7 +794,7 @@ public class XMLUtils {
    */
   public static String escapeAttributeXML(String in) {
     int leng = in.length();
-    TxtBuilder sb = new TxtBuilder(leng);
+    TextBuilder sb = new TextBuilder(leng);
     for (int i = 0; i < leng; i++) {
       char c = in.charAt(i);
       if (c == '&') {
@@ -808,7 +810,7 @@ public class XMLUtils {
 
 
   public static String escapeTextAroundXMLTags(String s) {
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     Reader r = new StringReader(s);
     try {
       do {
@@ -878,7 +880,7 @@ public class XMLUtils {
         isSingleTag = false;
       }
       tag = tag.substring(begin, end);
-      attributes = Generics.newHashMap();
+        attributes = new FastMap<>();
       begin = 0;
       end = findSpace(tag, 0);
 
@@ -950,7 +952,7 @@ public class XMLUtils {
     if ( ! r.ready()) {
       return null;
     }
-    TxtBuilder b = new TxtBuilder("<");
+    TextBuilder b = new TextBuilder("<");
     int c = r.read();
     while (c >= 0) {
       b.append((char) c);
@@ -991,7 +993,7 @@ public class XMLUtils {
 
     public static String makeBetterErrorString(String msg,
                                                SAXParseException ex) {
-      TxtBuilder sb = new TxtBuilder(msg);
+      TextBuilder sb = new TextBuilder(msg);
       sb.append(": ");
       String str = ex.getMessage();
       if (str.lastIndexOf('.') == str.length() - 1) {

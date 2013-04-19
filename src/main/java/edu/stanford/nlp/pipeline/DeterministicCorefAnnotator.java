@@ -21,9 +21,9 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.ArraySet;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.IntTuple;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastSet;
 
 /**
  * Implements the Annotator for the new deterministic coreference resolution system.
@@ -149,7 +149,7 @@ public class DeterministicCorefAnnotator implements Annotator {
 
         for (CorefChain corefChain : result.values()) {
           if(corefChain.getMentionsInTextualOrder().size() < 2) continue;
-          Set<CoreLabel> coreferentTokens = Generics.newHashSet();
+            Set<CoreLabel> coreferentTokens = new FastSet<>();
           for (CorefMention mention : corefChain.getMentionsInTextualOrder()) {
             CoreMap sentence = annotation.get(CoreAnnotations.SentencesAnnotation.class).get(mention.sentNum - 1);
             CoreLabel token = sentence.get(CoreAnnotations.TokensAnnotation.class).get(mention.headIndex - 1);

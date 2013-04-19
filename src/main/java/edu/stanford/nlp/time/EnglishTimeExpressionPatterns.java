@@ -8,7 +8,7 @@ import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Filters;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.ArrayList;
@@ -1396,8 +1396,9 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
     return temp;
   }
 
-  Map<String,SUTime.TemporalOp> wordToTemporalOp = Generics.newHashMap();
-  private void initTemporalOpMap()
+  Map<String,SUTime.TemporalOp> wordToTemporalOp = new FastMap<>();
+
+    private void initTemporalOpMap()
   {
     wordToTemporalOp.put("thiscoming", SUTime.TemporalOp.NEXT_IMMEDIATE);
     wordToTemporalOp.put("thispast", SUTime.TemporalOp.PREV_IMMEDIATE);
@@ -1408,8 +1409,9 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
     wordToTemporalOp.put("last", SUTime.TemporalOp.PREV);
   }
 
-  Map<String,SUTime.Temporal> wordToTemporal = Generics.newHashMap();
-  private void initTemporalMap()
+  Map<String,SUTime.Temporal> wordToTemporal = new FastMap<>();
+
+    private void initTemporalMap()
   {
     // Periodic Set
     wordToTemporal.put("annual", SUTime.YEARLY);
@@ -1514,8 +1516,9 @@ public class EnglishTimeExpressionPatterns implements TimeExpressionPatterns {
     wordToTemporal.put("thefuture", SUTime.TIME_FUTURE);
   }
 
-  Map<String,SUTime.Duration> abbToTimeUnit = Generics.newHashMap();
-  private void initTimeUnitsMap() {
+  Map<String,SUTime.Duration> abbToTimeUnit = new FastMap<>();
+
+    private void initTimeUnitsMap() {
     // note - some of the incorrect spelling in this hash is due to the generalized matching which will match things like "centurys"
     // Are the mapped to units used elsewhere?
     abbToTimeUnit.put("years", SUTime.YEAR);

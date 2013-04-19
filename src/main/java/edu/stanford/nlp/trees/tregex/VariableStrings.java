@@ -1,8 +1,8 @@
 package edu.stanford.nlp.trees.tregex;
 
 import edu.stanford.nlp.stats.IntCounter;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.util.Map;
 
@@ -16,7 +16,7 @@ class VariableStrings {
   private final IntCounter<String> numVarsSet;
 
   public VariableStrings() {
-    varsToStrings = Generics.newHashMap();
+      varsToStrings = new FastMap<>();
     numVarsSet = new IntCounter<>();
   }
 
@@ -44,7 +44,7 @@ class VariableStrings {
 
   @Override
   public String toString() {
-    TxtBuilder s = new TxtBuilder();
+    TextBuilder s = new TextBuilder();
     s.append('{');
     boolean appended = false;
     for (Map.Entry<String, String> stringStringEntry : varsToStrings.entrySet()) {

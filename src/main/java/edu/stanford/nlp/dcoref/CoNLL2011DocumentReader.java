@@ -12,7 +12,8 @@ import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.stats.IntCounter;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.*;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.io.*;
 import java.util.*;
@@ -242,7 +243,7 @@ public class CoNLL2011DocumentReader {
 
   private static String concatField(List<String[]> sentWords, int pos)
   {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (String[] fields:sentWords) {
       if (sb.length() > 0) {
         sb.append(' ');
@@ -294,7 +295,7 @@ public class CoNLL2011DocumentReader {
 
     private static Tree wordsToParse(List<String[]> sentWords)
     {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       for (String[] fields:sentWords) {
         if (sb.length() > 0) {
           sb.append(' ');
@@ -730,12 +731,12 @@ public class CoNLL2011DocumentReader {
     List<CoreLabel> sentenceAnno = sentence.get(CoreAnnotations.TokensAnnotation.class);
 
     Tree sentenceTree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
-    Map<Pair<Integer,Integer>,String> sentenceInfo = Generics.newHashMap();
+      Map<Pair<Integer,Integer>,String> sentenceInfo = new FastMap<>();
 
     Set<Tree> sentenceSubTrees = sentenceTree.subTrees();
     sentenceTree.setSpans();
-    Map<Pair<Integer,Integer>,Tree> treeSpanMap = Generics.newHashMap();
-    Map<Pair<Integer,Integer>,List<Tree>> wordSpanMap = Generics.newHashMap();
+      Map<Pair<Integer,Integer>,Tree> treeSpanMap = new FastMap<>();
+      Map<Pair<Integer,Integer>,List<Tree>> wordSpanMap = new FastMap<>();
 
     for (Tree ctree : sentenceSubTrees) {
       IntPair span = ctree.getSpan();
@@ -747,7 +748,7 @@ public class CoNLL2011DocumentReader {
 
     String[][] finalSentence;
     finalSentence = new String [sentenceAnno.size()][];
-    Map<Pair<Integer,Integer>,String> allHeads = Generics.newHashMap();
+      Map<Pair<Integer,Integer>,String> allHeads = new FastMap<>();
 
     int index = -1;
     for (CoreLabel newAnno : sentenceAnno) {
@@ -900,13 +901,13 @@ public class CoNLL2011DocumentReader {
       }
     }
 
-    private static void appendFrac(TxtBuilder sb, String label, int num, int den)
+    private static void appendFrac(TextBuilder sb, String label, int num, int den)
     {
       double frac = (double) num / den;
       sb.append(label).append('\t').append(frac).append("\t(").append(num).append('/').append(den).append(')');
     }
 
-    private static <E> void appendIntCountStats(TxtBuilder sb, String label, IntCounter<E> counts)
+    private static <E> void appendIntCountStats(TextBuilder sb, String label, IntCounter<E> counts)
     {
       sb.append(label).append('\n');
       List<E> sortedKeys = Counters.toSortedList(counts);
@@ -920,7 +921,7 @@ public class CoNLL2011DocumentReader {
 
     public String toString()
     {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       appendIntCountStats(sb, "Mention Tree Labels (no preterminals)", mentionTreeNonPretermLabelCounter);
       sb.append('\n');
       appendIntCountStats(sb, "Mention Tree Labels (with preterminals)", mentionTreeLabelCounter);

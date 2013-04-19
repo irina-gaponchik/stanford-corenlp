@@ -9,8 +9,8 @@ import edu.stanford.nlp.parser.KBestViterbiParser;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 /**
  * A framework for Set-based precision/recall/F1 evaluation.
@@ -236,7 +236,7 @@ public abstract class AbstractEval {
       if (tree.isLeaf()) {
         return "";
       }
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       sb.append(tree.label());
       sb.append(" ->");
       for (int i = 0; i < tree.children().length; i++) {
@@ -248,7 +248,7 @@ public abstract class AbstractEval {
 
     @Override
     protected Set<String> makeObjects(Tree tree) {
-      Set<String> localTrees = Generics.newHashSet();
+        Set<String> localTrees = new FastSet<>();
       for (Tree st : tree.subTreeList()) {
         localTrees.add(localize(st));
       }

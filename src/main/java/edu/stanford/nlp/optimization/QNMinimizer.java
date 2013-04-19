@@ -11,7 +11,7 @@ import java.util.Set;
 
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.math.ArrayMath;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 
 /**
@@ -1177,7 +1177,7 @@ public class QNMinimizer implements Minimizer<DiffFunction>, HasEvaluators {
     if (func instanceof HasL1ParamRange) {
       return ((HasL1ParamRange)func).getL1ParamRange(x);
     } else {
-      Set<Integer> paramRange = Generics.newHashSet(x.length);
+        Set<Integer> paramRange = new FastSet<>(x.length);
       for (int i = 0; i < x.length; i++) {
         paramRange.add(i);
       }

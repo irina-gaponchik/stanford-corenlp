@@ -8,10 +8,8 @@ import edu.stanford.nlp.io.EncodingPrintWriter;
 import edu.stanford.nlp.ling.Document;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.process.PTBLexer;
-import edu.stanford.nlp.process.WhitespaceLexer;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 // todo [cdm Feb 2012]: Rewrite the Set's as List's since while conceptually
 // sets, we just don't need to be hashing things here!
@@ -57,9 +55,9 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
 
   private static final boolean DEBUG = false;
 
-  public static final Set<String> DEFAULT_SENTENCE_BOUNDARIES_TO_DISCARD = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(WhitespaceLexer.NEWLINE, PTBLexer.NEWLINE_TOKEN)));
+  public static final Set<String> DEFAULT_SENTENCE_BOUNDARIES_TO_DISCARD = Collections.unmodifiableSet(new FastSet<String>(){{addAll(Arrays.asList(WhitespaceLexer.NEWLINE, PTBLexer.NEWLINE_TOKEN));}});
 
-  /**
+    /**
    * Regex for tokens (Strings) that qualify as sentence-final tokens.
    */
   private final Pattern sentenceBoundaryTokenPattern;
@@ -122,7 +120,7 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
   @Override
   public List<List<IN>> process(List<? extends IN> words) {
     if (isOneSentence) {
-      List<List<IN>> sentences = Generics.newArrayList();
+        List<List<IN>> sentences = new ArrayList<>();
       sentences.add(new ArrayList<>(words));
       return sentences;
     } else {
@@ -144,7 +142,7 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
    * @see #WordToSentenceProcessor(String, Set, Set, Pattern, Pattern)
    */
   public List<List<IN>> wordsToSentences(List<? extends IN> words) {
-    List<List<IN>> sentences = Generics.newArrayList();
+      List<List<IN>> sentences = new ArrayList<>();
     List<IN> currentSentence = new ArrayList<>();
     List<IN> lastSentence = null;
     boolean insideRegion = false;
@@ -239,9 +237,9 @@ public class WordToSentenceProcessor<IN> implements ListProcessor<IN, List<IN>> 
     return doc;
   }
 
-  public static final Set<String> DEFAULT_BOUNDARY_FOLLOWERS = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(")", "]", "\"", "\'", "''", "-RRB-", "-RSB-", "-RCB-")));
+  public static final Set<String> DEFAULT_BOUNDARY_FOLLOWERS = Collections.unmodifiableSet(new FastSet<String>(){{addAll(Arrays.asList(")", "]", "\"", "\'", "''", "-RRB-", "-RSB-", "-RCB-"));}});
 
-  /**
+    /**
    * Create a {@code WordToSentenceProcessor} using a sensible default
    * list of tokens to split on.  The default set is: {".","?","!"} and
    * any combination of ! or ?, as in !!!?!?!?!!!?!!?!!!

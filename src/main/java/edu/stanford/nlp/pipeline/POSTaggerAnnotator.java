@@ -28,15 +28,9 @@ public class POSTaggerAnnotator implements Annotator {
 
   private final MaxentTagger pos;
 
-  private int maxSentenceLength;
+    private int nThreads = 1;
 
-  private int nThreads = 1;
-
-  public POSTaggerAnnotator() {
-    this(true);
-  }
-
-  public POSTaggerAnnotator(boolean verbose) {
+    public POSTaggerAnnotator(boolean verbose) {
     this(System.getProperty("pos.model", MaxentTagger.DEFAULT_NLP_GROUP_MODEL_PATH), verbose);
   }
 
@@ -48,13 +42,8 @@ public class POSTaggerAnnotator implements Annotator {
     this(loadModel(posLoc, verbose), maxSentenceLength);
   }
 
-  public POSTaggerAnnotator(MaxentTagger model) {
-    this(model, Integer.MAX_VALUE);
-  }
-
-  public POSTaggerAnnotator(MaxentTagger model, int maxSentenceLength) {
+    public POSTaggerAnnotator(MaxentTagger model, int maxSentenceLength) {
     this.pos = model;
-    this.maxSentenceLength = maxSentenceLength;
   }
 
   public POSTaggerAnnotator(String annotatorName, Properties props) {
@@ -64,15 +53,10 @@ public class POSTaggerAnnotator implements Annotator {
     }
     boolean verbose = PropertiesUtils.getBool(props, annotatorName + ".verbose", false);
     this.pos = loadModel(posLoc, verbose);
-    this.maxSentenceLength = PropertiesUtils.getInt(props, annotatorName + ".maxlen", Integer.MAX_VALUE);
-    this.nThreads = PropertiesUtils.getInt(props, annotatorName + ".nthreads", PropertiesUtils.getInt(props, "nthreads", 1));
+      this.nThreads = PropertiesUtils.getInt(props, annotatorName + ".nthreads", PropertiesUtils.getInt(props, "nthreads", 1));
   }
 
-  public void setMaxSentenceLength(int maxLen) {
-    this.maxSentenceLength = maxLen;
-  }
-
-  private static MaxentTagger loadModel(String loc, boolean verbose) {
+    private static MaxentTagger loadModel(String loc, boolean verbose) {
     Timing timer = null;
     if (verbose) {
       timer = new Timing();
@@ -95,7 +79,9 @@ public class POSTaggerAnnotator implements Annotator {
         }
     } else {
         MulticoreWrapper<CoreMap, CoreMap> wrapper = new MulticoreWrapper<>(nThreads, new POSTaggerProcessor());
-        for (CoreMap sentence : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
+        List<CoreMap> get = annotation.get(CoreAnnotations.SentencesAnnotation.class);
+        for (int i = 0, getSize = get.size(); i < getSize; i++) {
+            CoreMap sentence = get.get(i);
             wrapper.put(sentence);
             while (wrapper.peek()) {
                 wrapper.poll();

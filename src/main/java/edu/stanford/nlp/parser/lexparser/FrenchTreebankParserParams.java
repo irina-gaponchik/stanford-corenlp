@@ -30,10 +30,10 @@ import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.trees.tregex.TregexPatternCompiler;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /**
  * TreebankLangParserParams for the Frenck Treebank corpus. This package assumes that the FTB
@@ -48,7 +48,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
   private static final long serialVersionUID = -6976724734594763986L;
 
-  private final TxtBuilder optionsString;
+  private final TextBuilder optionsString;
 
   private HeadFinder headFinder;
   private final Map<String,Pair<TregexPattern,Function<TregexMatcher,String>>> annotationPatterns;
@@ -73,10 +73,10 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
 
     setInputEncoding("UTF-8");
 
-    optionsString = new TxtBuilder();
+    optionsString = new TextBuilder();
     optionsString.append("FrenchTreebankParserParams\n");
 
-    annotationPatterns = Generics.newHashMap();
+      annotationPatterns = new FastMap<>();
     activeAnnotations = new ArrayList<>();
 
     initializeAnnotationPatterns();
@@ -461,7 +461,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
         throw new RuntimeException("Cannot enable POSSequence features without POS sequence map. Use option -frenchMWMap.");
 
       Tree t = m.getMatch();
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       for(Tree kid : t.children()) {
         if( ! kid.isPreTerminal())
           throw new RuntimeException("Not POS sequence for tree: " + t.toString());
@@ -569,7 +569,7 @@ public class FrenchTreebankParserParams extends AbstractTreebankParserParams {
   public Tree transformTree(Tree t, Tree root) {
 
     String baseCat = t.value();
-    TxtBuilder newCategory = new TxtBuilder();
+    TextBuilder newCategory = new TextBuilder();
 
     //Add manual state splits
     for (Pair<TregexPattern,Function<TregexMatcher,String>> e : activeAnnotations) {

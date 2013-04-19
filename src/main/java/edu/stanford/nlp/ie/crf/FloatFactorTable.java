@@ -3,7 +3,7 @@ package edu.stanford.nlp.ie.crf;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.math.SloppyMath;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class FloatFactorTable {
   }
 
   public String toProbString() {
-    TxtBuilder sb = new TxtBuilder("{\n");
+    TextBuilder sb = new TextBuilder("{\n");
     for (int i = 0; i < table.length; i++) {
       sb.append(Arrays.toString(toArray(i)));
       sb.append(": ");
@@ -47,7 +47,7 @@ public class FloatFactorTable {
   }
 
   public String toString(Index classIndex) {
-    TxtBuilder sb = new TxtBuilder("{\n");
+    TextBuilder sb = new TextBuilder("{\n");
     for (int i = 0; i < table.length; i++) {
       sb.append(toString(toArray(i), classIndex));
       sb.append(": ");
@@ -60,7 +60,7 @@ public class FloatFactorTable {
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder("{\n");
+    TextBuilder sb = new TextBuilder("{\n");
     for (int i = 0; i < table.length; i++) {
       sb.append(Arrays.toString(toArray(i)));
       sb.append(": ");

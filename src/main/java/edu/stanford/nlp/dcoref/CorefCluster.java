@@ -37,7 +37,7 @@ import edu.stanford.nlp.dcoref.Dictionaries.Gender;
 import edu.stanford.nlp.dcoref.Dictionaries.Number;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 /**
  * One cluster for the SieveCoreferenceSystem.
@@ -76,13 +76,13 @@ public class CorefCluster implements Serializable{
 
   public CorefCluster(int ID) {
     clusterID = ID;
-    corefMentions = Generics.newHashSet();
+      corefMentions = new FastSet<>();
     numbers = EnumSet.noneOf(Number.class);
     genders = EnumSet.noneOf(Gender.class);
     animacies = EnumSet.noneOf(Animacy.class);
-    nerStrings = Generics.newHashSet();
-    heads = Generics.newHashSet();
-    words = Generics.newHashSet();
+      nerStrings = new FastSet<>();
+      heads = new FastSet<>();
+      words = new FastSet<>();
     firstMention = null;
     representative = null;
   }

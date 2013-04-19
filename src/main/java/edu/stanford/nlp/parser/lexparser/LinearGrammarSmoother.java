@@ -6,9 +6,9 @@ import java.util.Set;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastSet;
 
 /**
  * Implements linear rule smoothing a la Petrov et al. (2006).
@@ -29,9 +29,9 @@ public class LinearGrammarSmoother implements Function<Pair<UnaryGrammar,BinaryG
   // Do not include @ in this list! @ marks synthetic nodes!
   // Stole these from PennTreebankLanguagePack
   private final String[] annotationIntroducingChars = {"-", "=", "|", "#", "^", "~", "_"};
-  private final Set<String> annoteChars = Generics.newHashSet(Arrays.asList(annotationIntroducingChars));
+  private final Set<String> annoteChars = new FastSet<>((Set<? extends String>) Arrays.asList(annotationIntroducingChars));
 
-  private final TrainOptions trainOptions;
+    private final TrainOptions trainOptions;
 
   private final Index<String> stateIndex;
   private final Index<String> tagIndex;

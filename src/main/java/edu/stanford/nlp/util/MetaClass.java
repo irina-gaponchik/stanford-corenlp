@@ -1,7 +1,7 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.Txt;
-import javolution.text.TxtBuilder;
+import javolution.text.Text;
+import javolution.text.TextBuilder;
 
 import java.io.File;
 import java.lang.reflect.*;
@@ -172,12 +172,12 @@ public class MetaClass {
       // (filter:min)
       this.constructor = (Constructor<T>) argmin(potentials, distances, 0);
       if (this.constructor == null) {
-        Txt b =
-                Txt.valueOf(classname).plus('(');
+        Text b =
+                Text.valueOf(classname).plus('(');
         for (Class<?> c : params) {
           b.plus(c.getName()).plus(", ");
         }
-          Txt target = b.subtext(0, params.length == 0 ? b.length() : b.length() - 2).plus(')');
+          Text target = b.subtext(0, params.length == 0 ? b.length() : b.length() - 2).plus(')');
         throw new ConstructorNotFoundException(
             "No constructor found to match: " + target);
       }
@@ -248,11 +248,11 @@ public class MetaClass {
 
     @Override
     public String toString() {
-      Txt b = Txt.valueOf((cl.getName())).plus('(');
+      Text b = Text.valueOf((cl.getName())).plus('(');
       for (Class<?> cl : classParams) {
         b.plus(' ').plus(cl.getName()).plus(',');
       }
-      b= Txt.valueOf(new StringBuilder(b.toString()).replace(b.length() - 1, b.length(), " "));
+      b= Text.valueOf(new StringBuilder(b.toString()).replace(b.length() - 1, b.length(), " "));
       b.plus(')');
       return b.toString();
     }
@@ -482,8 +482,8 @@ public class MetaClass {
 		//--Parse the String
 		//(state)
 		char quoteCloseChar = (char) 0;
-		List<TxtBuilder> terms = new LinkedList<>();
-		TxtBuilder current = new TxtBuilder();
+		List<TextBuilder> terms = new LinkedList<>();
+		TextBuilder current = new TextBuilder();
 		//(start/stop overhead)
 		int start = 0; int end = chars.length;
 		if(chars[0] == '('){ start += 1; end -= 1; if(chars[end] != ')') throw new IllegalArgumentException("Unclosed paren in encoded array: " + encoded); }
@@ -513,7 +513,7 @@ public class MetaClass {
           if (current.length() > 0) {
 					  terms.add(current);
           }
-					current = new TxtBuilder();
+					current = new TextBuilder();
 				}else{
 					current.append(chars[i]);
 				}
@@ -524,7 +524,7 @@ public class MetaClass {
 		if(current.length() > 0) terms.add(current);
 		String[] rtn = new String[terms.size()];
 		int i=0;
-		for(TxtBuilder b : terms){
+		for(TextBuilder b : terms){
 			rtn[i] = b.toString().trim();
 			i += 1;
 		}

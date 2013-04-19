@@ -6,10 +6,10 @@ import java.util.*;
 import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasIndex;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.objectbank.ObjectBank;
+import javolution.util.FastMap;
 
 
 /**
@@ -161,7 +161,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
   private Map<String,CollectionValuedMap<Integer,String>> srlMap;
 
   private void readSRLFile(String srlFile) {
-    srlMap = Generics.newHashMap();
+      srlMap = new FastMap<>();
     for (String line : ObjectBank.getLineIterator(new File(srlFile))) {
       String[] bits = line.split("\\s+", 3);
       String filename = bits[0];
@@ -251,7 +251,7 @@ public final class MemoryTreebank extends Treebank implements FileProcessor, Lis
                               }
                               Map<Integer, String> roleMap = ((ArrayCoreMap) t1.label()).get(CoreAnnotations.CoNLLSRLAnnotation.class);
                               if (roleMap == null) {
-                                  roleMap = Generics.newHashMap();
+                                  roleMap = new FastMap<>();
                                   ((TypesafeMap) t1.label()).set(CoreAnnotations.CoNLLSRLAnnotation.class, roleMap);
                               }
                               roleMap.put(verbIndex, argType);

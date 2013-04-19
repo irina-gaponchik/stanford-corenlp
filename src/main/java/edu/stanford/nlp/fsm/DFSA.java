@@ -1,7 +1,7 @@
 package edu.stanford.nlp.fsm;
 
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Scored;
+import javolution.util.FastSet;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -45,7 +45,7 @@ public final class DFSA<T,S> implements Scored {
   }
 
   public Set<DFSAState<T, S>> states() {
-    Set<DFSAState<T, S>> visited = Generics.newHashSet();
+      Set<DFSAState<T, S>> visited = new FastSet<>();
     List<DFSAState<T,S>> toVisit = new ArrayList<>();
     toVisit.add(initialState());
     exploreStates(toVisit, visited);
@@ -95,7 +95,7 @@ public final class DFSA<T,S> implements Scored {
 
   public void printAttFsmFormat(Writer w) throws IOException {
     Queue<DFSAState<T,S>> q = new LinkedList<>();
-    Set<DFSAState<T,S>> visited = Generics.newHashSet();
+      Set<DFSAState<T,S>> visited = new FastSet<>();
     q.offer(initialState);
     while(q.peek() != null) {
       DFSAState<T, S> state = q.poll();

@@ -7,7 +7,7 @@ import edu.stanford.nlp.ling.Datum;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Triple;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -230,7 +230,7 @@ public class MultiClassPrecisionRecallStats<L> implements Scorer<L> {
    * Returns a String summarizing F1 that will print nicely.
    */
   public String getDescription(int numDigits) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append("--- PR Stats ---").append('\n');
     for (L label : labelIndex) {
       if (label == null || label.equals(negLabel)) { continue; }

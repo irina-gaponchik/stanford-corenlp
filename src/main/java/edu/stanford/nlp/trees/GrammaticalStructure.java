@@ -17,7 +17,9 @@ import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.WhitespaceTokenizer;
 import edu.stanford.nlp.trees.GrammaticalRelation.GrammaticalRelationAnnotation;
 import edu.stanford.nlp.util.*;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import static edu.stanford.nlp.trees.GrammaticalRelation.DEPENDENT;
 import static edu.stanford.nlp.trees.GrammaticalRelation.GOVERNOR;
@@ -206,7 +208,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
     super(root);
     this.puncFilter = Filters.acceptFilter();
     allTypedDependencies = typedDependencies = new ArrayList<>(projectiveDependencies);
-    dependencies = Generics.newHashSet();
+      dependencies = new FastSet<>();
     for (TypedDependency tdep : projectiveDependencies) {
       dependencies.add(new NamedDependency(tdep.gov().toString(), tdep.dep().toString(), tdep.reln()));
     }
@@ -219,7 +221,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
 
   // @Override
   // public String toString() {
-    // javolution.text.TxtBuilder sb = new javolution.text.TxtBuilder(super.toString());
+    // javolution.text.TextBuilder sb = new javolution.text.TextBuilder(super.toString());
     //    sb.append("Dependencies:");
     //    sb.append("\n" + dependencies);
     //    sb.append("Typed Dependencies:");
@@ -258,7 +260,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
    *              If false, the list of typed dependencies will respect the tree structure.
    */
   private List<TypedDependency> getDeps(boolean getExtra, Filter<TypedDependency> f) {
-    List<TypedDependency> basicDep = Generics.newArrayList();
+      List<TypedDependency> basicDep = new ArrayList<>();
 
     for (Dependency<Label, Label, Object> d : dependencies()) {
       TreeGraphNode gov = (TreeGraphNode) d.governor();
@@ -423,7 +425,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
    *         node {@code t}, or else {@code null}
    */
   public static Set<TreeGraphNode> getDependents(TreeGraphNode t) {
-    Set<TreeGraphNode> deps = Generics.newTreeSet();
+      Set<TreeGraphNode> deps = new TreeSet<>();
     for (Tree subtree : t) {
       TreeGraphNode node = (TreeGraphNode) subtree;
       TreeGraphNode gov = getGovernor(node);
@@ -776,7 +778,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
       TreeGraphNode gov = getGovernor(node);
       // System.out.println("Governor for \"" + node.value() + "\": \"" + gov.value() + "\"");
       List<GrammaticalRelation> relations = getListGrammaticalRelation(gov, node);
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       for (GrammaticalRelation relation : relations) {
         //if (!arcLabel.equals(GOVERNOR))
         sb.append(sb.length() == 0 ? "" : "+").append(relation.toString());
@@ -794,7 +796,7 @@ public abstract class GrammaticalStructure extends TreeGraph {
    * @return map of dependencies
    */
   private static Map<Class<? extends GrammaticalRelationAnnotation>, Set<TreeGraphNode>> getAllDependents(TreeGraphNode node) {
-    Map<Class<? extends GrammaticalRelationAnnotation>, Set<TreeGraphNode>> newMap = Generics.newHashMap();
+      Map<Class<? extends GrammaticalRelationAnnotation>, Set<TreeGraphNode>> newMap = new FastMap<>();
 
     for (Class<?> o : node.label.keySet()) {
       if (GrammaticalRelationAnnotation.class.isAssignableFrom(o)) {
@@ -831,13 +833,13 @@ public abstract class GrammaticalStructure extends TreeGraph {
 
     // need to see if more than one governor is not listed somewhere as a dependent
     // first take all the deps
-    Collection<TreeGraphNode> deps = Generics.newHashSet();
+      Collection<TreeGraphNode> deps = new FastSet<>();
     for (TypedDependency typedDep : list) {
       deps.add(typedDep.dep());
     }
 
     // go through the list and add typedDependency for which the gov is not a dep
-    Collection<TreeGraphNode> govs = Generics.newHashSet();
+      Collection<TreeGraphNode> govs = new FastSet<>();
     for (TypedDependency typedDep : list) {
       TreeGraphNode gov = typedDep.gov();
       if (!deps.contains(gov) && !govs.contains(gov)) {
@@ -882,9 +884,9 @@ public abstract class GrammaticalStructure extends TreeGraph {
   }
 
   public static String dependenciesToString(GrammaticalStructure gs, Collection<TypedDependency> deps, Tree tree, boolean conllx, boolean extraSep) {
-    TxtBuilder bf = new TxtBuilder();
+    TextBuilder bf = new TextBuilder();
 
-    Map<Integer, Integer> indexToPos = Generics.newHashMap();
+      Map<Integer, Integer> indexToPos = new FastMap<>();
     indexToPos.put(0,0); // to deal with the special node "ROOT"
     List<Tree> gsLeaves = gs.root.getLeaves();
     for (int i = 0; i < gsLeaves.size(); i++) {

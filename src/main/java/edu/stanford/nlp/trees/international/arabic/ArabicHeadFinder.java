@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 import edu.stanford.nlp.trees.AbstractCollinsHeadFinder;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /**
  * Find the head of an Arabic tree, using the usual kind of heuristic
@@ -104,7 +104,7 @@ public class ArabicHeadFinder extends AbstractCollinsHeadFinder {
     this.tagSet = tagSet;
     //System.err.println("##testing: noun tag is " + tagSet.noun());
 
-    nonTerminalInfo = Generics.newHashMap();
+      nonTerminalInfo = new FastMap<>();
 
     nonTerminalInfo.put("NX", new String[][]{{"left", "DT","DTNN","DTNNS","DTNNP", "DTNNPS", "DTJJ", "DTNOUN_QUANT", "NOUN_QUANT", "MWNP"}});
     nonTerminalInfo.put("ADJP", new String[][]{{"rightdis", tagSet.adj(), "DTJJ", "ADJ_NUM", "DTADJ_NUM", "JJR", "DTJJR", "MWADJP"}, {"right", "ADJP", "VN", tagSet.noun(), "MWNP", "NNP", "NNPS", "NNS", "DTNN", "DTNNS","DTNNP","DTNNPS","DTJJ", "DTNOUN_QUANT", "NOUN_QUANT"}, {"right", "RB", "MWADVP", "CD","DTRB","DTCD"}, {"right", "DT"}}); // sometimes right, sometimes left headed??

@@ -1,7 +1,8 @@
 package edu.stanford.nlp.parser.lexparser;
 
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import java.io.*;
 import java.util.*;
@@ -220,7 +221,7 @@ public class BinaryGrammar implements Serializable, Iterable<BinaryRule> {
 
   @SuppressWarnings("unchecked")
   private void init() {
-    ruleMap = Generics.newHashMap();
+      ruleMap = new FastMap<>();
     int numStates = index.size();
     rulesWithParent = new List[numStates];
     rulesWithLC = new List[numStates];
@@ -231,8 +232,8 @@ public class BinaryGrammar implements Serializable, Iterable<BinaryRule> {
       rulesWithParent[s] = new ArrayList<>();
       rulesWithLC[s] = new ArrayList<>();
       rulesWithRC[s] = new ArrayList<>();
-      ruleSetWithLC[s] = Generics.newHashSet();
-      ruleSetWithRC[s] = Generics.newHashSet();
+        ruleSetWithLC[s] = new FastSet<>();
+        ruleSetWithRC[s] = new FastSet<>();
     }
   }
 

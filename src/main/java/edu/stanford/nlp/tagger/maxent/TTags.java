@@ -4,10 +4,10 @@ import edu.stanford.nlp.io.InDataStreamFile;
 import edu.stanford.nlp.io.OutDataStreamFile;
 import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.tagger.common.TaggerConstants;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 import java.io.IOException;
 import java.io.DataInputStream;
@@ -28,8 +28,8 @@ import java.util.*;
 public class TTags {
 
   private Index<String> index = new HashIndex<>();
-  private final Set<String> closed = Generics.newHashSet();
-  private Set<String> openTags; /* cache */
+  private final Set<String> closed = new FastSet<>();
+    private Set<String> openTags; /* cache */
   private final boolean isEnglish; // for speed
   private static final boolean doDeterministicTagExpansion = true;
 
@@ -257,7 +257,7 @@ public class TTags {
    */
   public Set<String> getOpenTags() {
     if (openTags == null) { /* cache check */
-      Set<String> open = Generics.newHashSet();
+        Set<String> open = new FastSet<>();
 
       for (String tag : index) {
         if ( ! closed.contains(tag)) {
@@ -351,7 +351,7 @@ public class TTags {
   }
 
   public void setOpenClassTags(String... openClassTags) {
-    openTags = Generics.newHashSet();
+      openTags = new FastSet<>();
     openTags.addAll(Arrays.asList(openClassTags));
     for (String tag : openClassTags) {
       add(tag);
@@ -446,7 +446,7 @@ public class TTags {
 
   @Override
   public String toString() {
-    TxtBuilder s = new TxtBuilder();
+    TextBuilder s = new TextBuilder();
     s.append(index.toString());
     s.append(' ');
     if (openFixed) {

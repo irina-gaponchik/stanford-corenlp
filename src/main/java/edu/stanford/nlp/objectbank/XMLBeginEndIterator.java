@@ -3,7 +3,7 @@ package edu.stanford.nlp.objectbank;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.AbstractIterator;
 import edu.stanford.nlp.util.XMLUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -90,7 +90,7 @@ public class XMLBeginEndIterator<E> extends AbstractIterator<E> {
 
   // returns null if there is no next object
   private String getNext() {
-    TxtBuilder result = new TxtBuilder();
+    TextBuilder result = new TextBuilder();
     try {
       XMLUtils.XMLTag tag;
       do {

@@ -1,7 +1,9 @@
 package edu.stanford.nlp.io;
 
 import edu.stanford.nlp.util.*;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -806,7 +808,7 @@ public class IOUtils {
     }
     BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding));
     String temp;
-    TxtBuilder buff = new TxtBuilder(16000); // make biggish
+    TextBuilder buff = new TextBuilder(16000); // make biggish
     while ((temp = br.readLine()) != null) {
       buff.append(temp);
       buff.append(lineSeparator);
@@ -824,7 +826,7 @@ public class IOUtils {
     InputStream is = uc.getInputStream();
     BufferedReader br = new BufferedReader(new InputStreamReader(is));
     String temp;
-    TxtBuilder buff = new TxtBuilder(16000); // make biggish
+    TextBuilder buff = new TextBuilder(16000); // make biggish
     while ((temp = br.readLine()) != null) {
       buff.append(temp);
       buff.append(lineSeparator);
@@ -906,7 +908,7 @@ public class IOUtils {
    */
   public static String slurpReader(Reader reader) {
     BufferedReader r = new BufferedReader(reader);
-    TxtBuilder buff = new TxtBuilder();
+    TextBuilder buff = new TextBuilder();
     try {
       char[] chars = new char[SLURPBUFFSIZE];
       while (true) {
@@ -953,7 +955,7 @@ public class IOUtils {
    */
   public static List<Map<String,String>> readCSVWithHeader(String path, char quoteChar, char escapeChar) throws IOException {
     String[] labels = null;
-    List<Map<String,String>> rows = Generics.newArrayList();
+      List<Map<String,String>> rows = new ArrayList<>();
     for (String line : IOUtils.readLines(path)) {
       System.out.println("Splitting "+line);
       if (labels == null) {
@@ -961,7 +963,7 @@ public class IOUtils {
       } else {
         String[] cells = StringUtils.splitOnCharWithQuoting(line,',',quoteChar,escapeChar);
         assert cells.length == labels.length;
-        Map<String,String> cellMap = Generics.newHashMap();
+          Map<String,String> cellMap = new FastMap<>();
         for (int i=0; i<labels.length; i++) cellMap.put(labels[i],cells[i]);
         rows.add(cellMap);
       }
@@ -981,8 +983,8 @@ public class IOUtils {
    */
   public static LinkedList<String[]> readCSVStrictly(char[] csvContents, int numColumns){
     //--Variables
-    TxtBuilder[] buffer = new TxtBuilder[numColumns];
-    buffer[0] = new TxtBuilder();
+    TextBuilder[] buffer = new TextBuilder[numColumns];
+    buffer[0] = new TextBuilder();
     LinkedList<String[]> lines = new LinkedList<>();
     //--State
     boolean inQuotes = false;
@@ -1008,7 +1010,7 @@ public class IOUtils {
               if(columnI >= numColumns){
                 throw new IllegalArgumentException("Too many columns: "+columnI+ '/' +numColumns+" (offset: " + offset + ')');
               }
-              buffer[columnI] = new TxtBuilder();
+              buffer[columnI] = new TextBuilder();
             }
             break;
           case '\n':
@@ -1026,7 +1028,7 @@ public class IOUtils {
               lines.add(rtn);
               //((update state))
               columnI = 0;
-              buffer[columnI] = new TxtBuilder();
+              buffer[columnI] = new TextBuilder();
             }
             break;
           case '\\':
@@ -1159,7 +1161,7 @@ public class IOUtils {
   {
     BufferedReader br = IOUtils.getBufferedFileReader(infile);
     String line;
-    Set<String> set = Generics.newHashSet();
+      Set<String> set = new FastSet<>();
     while ((line = br.readLine()) != null) {
       line = line.trim();
       if (!line.isEmpty()) {
@@ -1198,7 +1200,7 @@ public class IOUtils {
 
   public static Map<String,String> readMap(String filename) throws IOException
   {
-    Map<String,String> map = Generics.newHashMap();
+      Map<String,String> map = new FastMap<>();
     try {
       BufferedReader br = IOUtils.getBufferedFileReader(filename);
       String line;
@@ -1230,7 +1232,7 @@ public class IOUtils {
    */
   public static String stringFromFile(String filename, String encoding) {
     try {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       BufferedReader in = new BufferedReader(new EncodingFileReader(filename,encoding));
       String line;
       while ((line = in.readLine()) != null) {

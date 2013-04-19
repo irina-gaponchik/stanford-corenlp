@@ -2,15 +2,15 @@
 
 package edu.stanford.nlp.process;
 
-import java.nio.CharBuffer;
+import java.nio.IntBuffer;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.stanford.nlp.process.data.*;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.Txt;
-import javolution.text.TxtBuilder;
+import javolution.text.Text;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 
 /**
@@ -25,7 +25,7 @@ public class Morpha {
      * ZZ_ATTRIBUTE[aState] contains the attributes of state
      * <code>aState</code>
      */
-    private static final int[] ZZ_ATTRIBUTE;
+    private static final IntBuffer ZZ_ATTRIBUTE;
 
     static {
         int[] result = new int[13383];
@@ -40,7 +40,7 @@ public class Morpha {
             int value = ZZ21.ZZ_ATTRIBUTE_PACKED_0.charAt(i++);
             do result[j++] = value; while (--count > 0);
         }
-        ZZ_ATTRIBUTE = result;
+        ZZ_ATTRIBUTE = IntBuffer.wrap(result);
     }
 
     /**
@@ -298,7 +298,7 @@ public class Morpha {
             return s;
         }
 
-        TxtBuilder s1 = new TxtBuilder(s);
+        TextBuilder s1 = new TextBuilder(String.valueOf(s));
         if (Character.isLowerCase(s1.charAt(0))) {
             s1.setCharAt(0, Character.toUpperCase(s1.charAt(0)));
         }
@@ -314,18 +314,18 @@ public class Morpha {
      * Loads a list of words from the array and stores them in a HashSet.
      */
     private static Set<CharSequence> loadVerbStemSet() {
-        Set<CharSequence> set = Generics.<CharSequence>newHashSet(VERBSTEMS.verbStems.length);
+        Set<CharSequence> set = new FastSet<>(VERBSTEMS.verbStems.length);
         Collections.addAll(set, VERBSTEMS.verbStems);
         return set;
     }
 
     CharSequence condub_stem(int del, CharSequence affix) {
-        TxtBuilder yytextBuff = new TxtBuilder(changeCase() ? yytext().toLowerCase() : yytext());
+        Text yytextBuff = (changeCase() ? yytext().toLowerCase() : yytext());
         int stem_length = yylength() - del;
         char d = yytextBuff.charAt(stem_length - 1);
-        if (del > 0) yytextBuff.setLength(stem_length - 1);
-        if (!verbStemSet.contains(yytextBuff.toString().toLowerCase())) yytextBuff.append(d);
-        return option(print_affixes) ? yytextBuff.append('+').append(affix) : yytextBuff;
+        if (del > 0) yytextBuff=yytextBuff.subtext(0,stem_length - 1);
+        if (!verbStemSet.contains(yytextBuff.toString().toLowerCase())) yytextBuff.plus(d);
+        return option(print_affixes) ? yytextBuff.plus('+') .plus(affix) : yytextBuff;
     }
 
     private boolean changeCase() {
@@ -359,7 +359,7 @@ public class Morpha {
      */
     private CharSequence stem(int del, CharSequence add, CharSequence affix) {
         int stem_length = yylength() - del;
-        Txt result = yytext().subtext(0, stem_length);
+        Text result = yytext().subtext(0, stem_length);
         if (changeCase()) result = result.toLowerCase();
         if (add.length() != 0) result = result.plus(add);
         return option(print_affixes) ? result.plus("+").plus(affix) : result;
@@ -395,10 +395,10 @@ public class Morpha {
                 break;
         }
 
-        Txt result;
+        Text result;
         {
 
-            Txt seq = yytext().subtext(0, stem_length);
+            Text seq = yytext().subtext(0, stem_length);
             result = changeCase() ? (seq.toLowerCase()) : (seq);
         }
 
@@ -552,8 +552,8 @@ public class Morpha {
     /**
      * Returns the text matched by the current regular expression.
      */
-    Txt yytext() {
-    return     Txt.valueOf(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
+    Text yytext() {
+    return     Text.valueOf(zzBuffer, zzStartRead, zzMarkedPos - zzStartRead);
     }
 
     /**
@@ -619,7 +619,6 @@ public class Morpha {
 
         int[] zzTransL = ZZ_TRANS;
         int[] zzRowMapL = ZZ_ROWMAP;
-        int[] zzAttrL = ZZ_ATTRIBUTE;
 
         while (true) {
             int zzMarkedPosL = zzMarkedPos;
@@ -638,28 +637,27 @@ public class Morpha {
             {
                 while (true) {
 
-                    if (zzCurrentPosL >= zzEndReadL) {
-                        if (zzAtEOF) {
+                    if (zzCurrentPosL >= zzEndReadL) if (zzAtEOF) {
+                        zzInput = YYEOF;
+                        break zzForAction;
+                    } else {
+                        // store back cached positions
+                        zzCurrentPos = zzCurrentPosL;
+                        zzMarkedPos = zzMarkedPosL;
+                        boolean eof = zzRefill();
+                        // get translated positions and possibly new buffer
+                        zzCurrentPosL = zzCurrentPos;
+                        zzMarkedPosL = zzMarkedPos;
+                        zzBufferL = zzBuffer;
+                        zzEndReadL = zzEndRead;
+                        if (!eof) {
+                            zzInput = zzBufferL[zzCurrentPosL++];
+                        } else {
                             zzInput = YYEOF;
                             break zzForAction;
-                        } else {
-                            // store back cached positions
-                            zzCurrentPos = zzCurrentPosL;
-                            zzMarkedPos = zzMarkedPosL;
-                            boolean eof = zzRefill();
-                            // get translated positions and possibly new buffer
-                            zzCurrentPosL = zzCurrentPos;
-                            zzMarkedPosL = zzMarkedPos;
-                            zzBufferL = zzBuffer;
-                            zzEndReadL = zzEndRead;
-                            if (!eof) {
-                                zzInput = zzBufferL[zzCurrentPosL++];
-                            } else {
-                                zzInput = YYEOF;
-                                break zzForAction;
-                            }
                         }
-                    } else zzInput = zzBufferL[zzCurrentPosL++];
+                    }
+                    else zzInput = zzBufferL[zzCurrentPosL++];
                     int zzNext = zzTransL[ zzRowMapL[zzState] + (int) zzCMapL[zzInput]];
                     switch (zzNext) {
                         case -1:
@@ -667,7 +665,7 @@ public class Morpha {
                     }
                     zzState = zzNext;
 
-                    int zzAttributes = zzAttrL[zzState];
+                    int zzAttributes = ZZ_ATTRIBUTE.get(zzState);
                     switch ((zzAttributes & 1)) {
                         case 1:
                             zzAction = zzState;
@@ -1014,19 +1012,19 @@ public class Morpha {
                     boolean zzFinL[] = zzFin;
                     int zzFState = 5;
                     while (zzFState != -1 && zzFPos < zzMarkedPos) {
-                        if ((zzAttrL[zzFState] & 1) == 1) {
+                        if ((ZZ_ATTRIBUTE.get(zzFState) & 1) == 1) {
                             zzFinL[zzFPos] = true;
                         }
                         zzInput = zzBufferL[zzFPos++];
                         zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
                     }
-                    if (zzFState != -1 && (zzAttrL[zzFState] & 1) == 1) {
+                    if (zzFState != -1 && (ZZ_ATTRIBUTE.get(zzFState) & 1) == 1) {
                         zzFinL[zzFPos] = true;
                     }
 
                     zzFState = 7;
                     zzFPos = zzMarkedPos;
-                    while (!zzFinL[zzFPos] || (zzAttrL[zzFState] & 1) != 1) {
+                    while (!zzFinL[zzFPos] || (ZZ_ATTRIBUTE.get(zzFState) & 1) != 1) {
                         zzInput = zzBufferL[--zzFPos];
                         zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
                     };
@@ -1112,19 +1110,19 @@ public class Morpha {
                     boolean zzFinL[] = zzFin;
                     int zzFState = 5;
                     while (zzFState != -1 && zzFPos < zzMarkedPos) {
-                        if ((zzAttrL[zzFState] & 1) == 1) {
+                        if ((ZZ_ATTRIBUTE.get(zzFState) & 1) == 1) {
                             zzFinL[zzFPos] = true;
                         }
                         zzInput = zzBufferL[zzFPos++];
                         zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
                     }
-                    if (zzFState != -1 && (zzAttrL[zzFState] & 1) == 1) {
+                    if (zzFState != -1 && (ZZ_ATTRIBUTE.get(zzFState) & 1) == 1) {
                         zzFinL[zzFPos] = true;
                     }
 
                     zzFState = 6;
                     zzFPos = zzMarkedPos;
-                    while (!zzFinL[zzFPos] || (zzAttrL[zzFState] & 1) != 1) {
+                    while (!zzFinL[zzFPos] || (ZZ_ATTRIBUTE.get(zzFState) & 1) != 1) {
                         zzInput = zzBufferL[--zzFPos];
                         zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
                     };

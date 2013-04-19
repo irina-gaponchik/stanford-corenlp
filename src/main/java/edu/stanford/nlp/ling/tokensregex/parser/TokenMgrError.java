@@ -2,7 +2,7 @@
 /* JavaCCOptions: */
 package edu.stanford.nlp.ling.tokensregex.parser;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /** Token Manager Error. */
 class TokenMgrError extends Error
@@ -50,7 +50,7 @@ class TokenMgrError extends Error
    * equivalents in the given string
    */
   protected static final String addEscapes(String str) {
-    TxtBuilder retval = new TxtBuilder();
+    TextBuilder retval = new TextBuilder();
     char ch;
     for (int i = 0; i < str.length(); i++) {
       switch (str.charAt(i))

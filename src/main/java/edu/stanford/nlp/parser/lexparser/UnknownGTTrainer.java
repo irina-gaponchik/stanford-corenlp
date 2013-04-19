@@ -1,15 +1,15 @@
 package edu.stanford.nlp.parser.lexparser;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * This class trains a Good-Turing model for unknown words from a
@@ -29,13 +29,13 @@ public class UnknownGTTrainer {
   ClassicCounter<String> tagCount = new ClassicCounter<>();
   ClassicCounter<String> r1 = new ClassicCounter<>(); // for each tag, # of words seen once
   ClassicCounter<String> r0 = new ClassicCounter<>(); // for each tag, # of words not seen
-  Set<String> seenWords = Generics.newHashSet();
+  Set<String> seenWords = new FastSet<>();
+
+    double tokens;
   
-  double tokens;
-  
-  Map<String,Float> unknownGT = Generics.newHashMap();
-  
-  public void train(Collection<Tree> trees) {
+  Map<String,Float> unknownGT = new FastMap<>();
+
+    public void train(Collection<Tree> trees) {
     train(trees, 1.0);
   }
 

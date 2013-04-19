@@ -2,7 +2,7 @@ package edu.stanford.nlp.trees.international.french;
 
 import edu.stanford.nlp.ling.CategoryWordTag;
 import edu.stanford.nlp.trees.*;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 
 /**
@@ -28,7 +28,7 @@ public class FrenchHeadFinder extends AbstractCollinsHeadFinder {
     // D (determiner), ET (foreign word), I (interjection), N (noun),
     // P (preposition), PREF (prefix), PRO (strong pronoun -- very confusing), V (verb), PUNC (punctuation)
 
-    nonTerminalInfo = Generics.newHashMap();
+      nonTerminalInfo = new FastMap<>();
 
     // "sentence"
     nonTerminalInfo.put(tlp.startSymbol(), new String[][]{{"left", "VN", "NP"}, {"left"}});

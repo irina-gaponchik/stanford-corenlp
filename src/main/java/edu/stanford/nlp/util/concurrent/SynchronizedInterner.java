@@ -2,7 +2,6 @@ package edu.stanford.nlp.util.concurrent;
 
 import java.util.Set;
 
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Interner;
 
 /**
@@ -34,7 +33,7 @@ import edu.stanford.nlp.util.Interner;
 public class SynchronizedInterner<T> {
   protected static final Object globalMutex = new Object();
   protected static SynchronizedInterner<Object> interner =
-     Generics.newSynchronizedInterner(Interner.getGlobal(), globalMutex);
+     newSynchronizedInterner(Interner.getGlobal(), globalMutex);
 
 
   /**
@@ -54,7 +53,7 @@ public class SynchronizedInterner<T> {
   public static SynchronizedInterner<Object> setGlobal(Interner<Object> delegate) {
     synchronized(globalMutex) {
       SynchronizedInterner<Object> oldInterner = SynchronizedInterner.interner;
-      SynchronizedInterner.interner = Generics.newSynchronizedInterner(delegate);
+      SynchronizedInterner.interner = newSynchronizedInterner(delegate);
       return oldInterner;
     }
   }
@@ -87,7 +86,16 @@ public class SynchronizedInterner<T> {
     this.mutex = mutex;
   }
 
-  public void clear() {
+    public static <T> SynchronizedInterner<T> newSynchronizedInterner(Interner<T> interner) {
+    return new SynchronizedInterner<>(interner);
+  }
+
+    public static <T> SynchronizedInterner<T> newSynchronizedInterner(Interner<T> interner,
+                                                                    Object mutex) {
+    return new SynchronizedInterner<>(interner, mutex);
+  }
+
+    public void clear() {
     synchronized(mutex) {
       delegate.clear();
     }

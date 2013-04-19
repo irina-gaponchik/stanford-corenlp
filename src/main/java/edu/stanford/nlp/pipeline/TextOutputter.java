@@ -59,7 +59,7 @@ public class TextOutputter {
 
         // display the token-level annotations
         String[] tokenAnnotations = {
-                "Txt", "PartOfSpeech", "Lemma", "Answer", "NamedEntityTag", "CharacterOffsetBegin", "CharacterOffsetEnd", "NormalizedNamedEntityTag", "Timex", "TrueCase", "TrueCaseText" };
+                "Text", "PartOfSpeech", "Lemma", "Answer", "NamedEntityTag", "CharacterOffsetBegin", "CharacterOffsetEnd", "NormalizedNamedEntityTag", "Timex", "TrueCase", "TrueCaseText" };
         for (CoreLabel token: tokens) {
           os.print(token.toShorterString(tokenAnnotations));
           os.print(' ');

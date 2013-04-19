@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 /**
  * Performs equivalence classing of punctuation per PTB guidelines. Many of the multilingual
@@ -33,32 +33,32 @@ import edu.stanford.nlp.util.Generics;
 public class PunctEquivalenceClasser {
 
   private static final String[] eolClassRaw = {".","?","!"};
-  private static final Set<String> sfClass = Generics.newHashSet(Arrays.asList(eolClassRaw));
-  
-  private static final String[] colonClassRaw = {":",";","-","_"};
-  private static final Set<String> colonClass = Generics.newHashSet(Arrays.asList(colonClassRaw));
-  
-  private static final String[] commaClassRaw = {",","ر"};
-  private static final Set<String> commaClass = Generics.newHashSet(Arrays.asList(commaClassRaw));
-  
-  private static final String[] currencyClassRaw = {"$","#","="};
-  private static final Set<String> currencyClass = Generics.newHashSet(Arrays.asList(currencyClassRaw));
-  
-  private static final Pattern pEllipsis = Pattern.compile("\\.\\.+");
+  private static final Set<String> sfClass = new FastSet<>((Set<? extends String>) Arrays.asList(eolClassRaw));
+
+    private static final String[] colonClassRaw = {":",";","-","_"};
+  private static final Set<String> colonClass = new FastSet<>((Set<? extends String>) Arrays.asList(colonClassRaw));
+
+    private static final String[] commaClassRaw = {",","ر"};
+  private static final Set<String> commaClass = new FastSet<>((Set<? extends String>) Arrays.asList(commaClassRaw));
+
+    private static final String[] currencyClassRaw = {"$","#","="};
+  private static final Set<String> currencyClass = new FastSet<>((Set<? extends String>) Arrays.asList(currencyClassRaw));
+
+    private static final Pattern pEllipsis = Pattern.compile("\\.\\.+");
   
   private static final String[] slashClassRaw = {"/","\\"};
-  private static final Set<String> slashClass = Generics.newHashSet(Arrays.asList(slashClassRaw));
-     
-  private static final String[] lBracketClassRaw = {"-LRB-","(","[","<"};
-  private static final Set<String> lBracketClass = Generics.newHashSet(Arrays.asList(lBracketClassRaw));
+  private static final Set<String> slashClass = new FastSet<>((Set<? extends String>) Arrays.asList(slashClassRaw));
 
-  private static final String[] rBracketClassRaw = {"-RRB-",")","]",">"};
-  private static final Set<String> rBracketClass = Generics.newHashSet(Arrays.asList(rBracketClassRaw));
-  
-  private static final String[] quoteClassRaw = {"\"","``","''","'","`"};
-  private static final Set<String> quoteClass = Generics.newHashSet(Arrays.asList(quoteClassRaw));
-  
-  /**
+    private static final String[] lBracketClassRaw = {"-LRB-","(","[","<"};
+  private static final Set<String> lBracketClass = new FastSet<>((Set<? extends String>) Arrays.asList(lBracketClassRaw));
+
+    private static final String[] rBracketClassRaw = {"-RRB-",")","]",">"};
+  private static final Set<String> rBracketClass = new FastSet<>((Set<? extends String>) Arrays.asList(rBracketClassRaw));
+
+    private static final String[] quoteClassRaw = {"\"","``","''","'","`"};
+  private static final Set<String> quoteClass = new FastSet<>((Set<? extends String>) Arrays.asList(quoteClassRaw));
+
+    /**
    * Return the equivalence class of the argument. If the argument is not contained in
    * and equivalence class, then an empty string is returned.
    * 

@@ -10,7 +10,8 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Filter;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /** Utilities for Dependency objects.
  *
@@ -108,7 +109,7 @@ public class Dependencies {
   }
   
   public static Map<TreeGraphNode,List<TypedDependency>> govToDepMap(List<TypedDependency> deps) {
-    Map<TreeGraphNode,List<TypedDependency>> govToDepMap = Generics.newHashMap();
+      Map<TreeGraphNode,List<TypedDependency>> govToDepMap = new FastMap<>();
     for (TypedDependency dep : deps) {
       TreeGraphNode gov = dep.gov();
       
@@ -123,7 +124,9 @@ public class Dependencies {
   }
   
   private static Set<List<TypedDependency>> getGovMaxChains(Map<TreeGraphNode,List<TypedDependency>> govToDepMap, TreeGraphNode gov, int depth) {
-    Set<List<TypedDependency>> depLists = Generics.newHashSet();
+      Set<List<TypedDependency>> depLists = new FastSet<>(
+
+      );
     List<TypedDependency> children = govToDepMap.get(gov);
     
     if (depth > 0 && children != null) {

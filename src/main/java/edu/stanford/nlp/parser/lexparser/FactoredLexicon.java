@@ -21,10 +21,10 @@ import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.stats.TwoDimensionalIntCounter;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.Treebank;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
+import javolution.util.FastSet;
 
 /**
  * 
@@ -82,7 +82,7 @@ public class FactoredLexicon extends BaseLexicon {
     } else {
       if (DEBUG) System.err.println("UNKNOWN WORD");
       // Unknown word signatures
-      Set<IntTaggedWord> lexRules = Generics.newHashSet(10);
+        Set<IntTaggedWord> lexRules = new FastSet<>(10);
       List<IntTaggedWord> uwRules = rulesWithWord[wordIndex.indexOf(UNKNOWN_WORD)];
       // Inject the word into these rules instead of the UW signature
       for (IntTaggedWord iTW : uwRules) {
@@ -339,7 +339,7 @@ public class FactoredLexicon extends BaseLexicon {
     }
     
     // Collect rules, indexed by word
-    Set<IntTaggedWord> lexRules = Generics.newHashSet(40000);
+      Set<IntTaggedWord> lexRules = new FastSet<>(40000);
     for (int wordId : wordTag.firstKeySet()) {
       for (int tagId : wordTag.getCounter(wordId).keySet()) {
         lexRules.add(new IntTaggedWord(wordId, tagId));

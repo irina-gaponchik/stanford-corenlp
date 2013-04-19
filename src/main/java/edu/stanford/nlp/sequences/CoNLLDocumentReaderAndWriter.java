@@ -7,7 +7,7 @@ import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.PaddedList;
 import edu.stanford.nlp.util.AbstractIterator;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.*;
 import java.util.regex.*;
@@ -88,13 +88,13 @@ public class CoNLLDocumentReaderAndWriter implements DocumentReaderAndWriter<Cor
     } else {
       Collection<String> docs = new ArrayList<>();
       ObjectBank<String> ob = ObjectBank.getLineIterator(r);
-      TxtBuilder current = new TxtBuilder();
+      TextBuilder current = new TextBuilder();
       for (String line : ob) {
         if (docPattern.matcher(line).lookingAt()) {
           // Start new doc, store old one if non-empty
           if (current.length() > 0) {
             docs.add(current.toString());
-            current = new TxtBuilder();
+            current = new TextBuilder();
           }
         }
         current.append(line);

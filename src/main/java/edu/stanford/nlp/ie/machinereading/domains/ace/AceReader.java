@@ -13,7 +13,8 @@ import java.util.logging.Logger;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 import org.xml.sax.SAXException;
 
 import edu.stanford.nlp.ie.machinereading.GenericDataSetReader;
@@ -40,7 +41,6 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
 
 /**
@@ -183,7 +183,7 @@ public class AceReader extends GenericDataSetReader {
 
   // todo: Change to use a counters print method (get sorting for free!)
   private void printCounter(Counter<String> c, String h) {
-    TxtBuilder b = new TxtBuilder();
+    TextBuilder b = new TextBuilder();
     b.append(h).append(" counts:\n");
     Set<String> keys = c.keySet();
     for(String k: keys){
@@ -225,7 +225,7 @@ public class AceReader extends GenericDataSetReader {
     String docId = aceDocument.getId();
 
     // map entity mention ID strings to their EntityMention counterparts
-    Map<String, EntityMention> entityMentionMap = Generics.newHashMap();
+      Map<String, EntityMention> entityMentionMap = new FastMap<>();
 
     /*
     for (int sentenceIndex = 0; sentenceIndex < aceDocument.getSentenceCount(); sentenceIndex++) {
@@ -241,7 +241,7 @@ public class AceReader extends GenericDataSetReader {
       List<AceToken> tokens = aceDocument.getSentence(sentenceIndex);
 
       List<CoreLabel> words = new ArrayList<>();
-      TxtBuilder textContent = new TxtBuilder();
+      TextBuilder textContent = new TextBuilder();
       for(int i = 0; i < tokens.size(); i ++){
         CoreLabel l = new CoreLabel();
         l.setWord(tokens.get(i).getLiteral());

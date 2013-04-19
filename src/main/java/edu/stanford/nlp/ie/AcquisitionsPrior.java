@@ -1,9 +1,10 @@
 package edu.stanford.nlp.ie;
 
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.util.FastSet;
+import javolution.util.FastTable;
 
 import java.util.Set;
 import java.util.List;
@@ -25,19 +26,19 @@ public class AcquisitionsPrior<IN extends CoreMap> extends EntityCachingAbstract
 
   public double scoreOf(int... sequence) {
 
-    Set<String> purchasers = Generics.newHashSet();
-    Set<String> purchabrs = Generics.newHashSet();
-    Set<String> sellers = Generics.newHashSet();
-    Set<String> sellerabrs = Generics.newHashSet();
-    Set<String> acquireds = Generics.newHashSet();
-    Set<String> acqabrs = Generics.newHashSet();
+      Set<String> purchasers =new FastSet<>();
+      Set<String> purchabrs = new FastSet<>();
+      Set<String> sellers =   new FastSet<>();
+      Set<String> sellerabrs =new FastSet<>();
+      Set<String> acquireds = new FastSet<>();
+      Set<String> acqabrs =   new FastSet<>();
 
-    List<Entity> purchasersL = new ArrayList<>();
-    List<Entity> purchabrsL = new  ArrayList<>();
-    List<Entity> sellersL = new  ArrayList<>();
-    List<Entity> sellerabrsL = new  ArrayList<>();
-    List<Entity> acquiredsL = new  ArrayList<>();
-    List<Entity> acqabrsL = new  ArrayList<>();
+    List<Entity> purchasersL =  new FastTable<>();
+    List<Entity> purchabrsL =   new FastTable<>();
+    List<Entity> sellersL =     new FastTable<>();
+    List<Entity> sellerabrsL =  new FastTable<>();
+    List<Entity> acquiredsL =   new FastTable<>();
+    List<Entity> acqabrsL =     new FastTable<>();
 
     double p = 0.0;
     for (int i = 0; i < entities.length; i++) {

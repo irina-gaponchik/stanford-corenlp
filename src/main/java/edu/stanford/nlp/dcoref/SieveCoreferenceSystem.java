@@ -70,13 +70,14 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.IntTuple;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.SystemUtils;
 import edu.stanford.nlp.util.logging.NewlineLogFormatter;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * Multi-pass Sieve coreference resolution system (see EMNLP 2010 paper).
@@ -297,7 +298,7 @@ public class SieveCoreferenceSystem {
   }
 
   public static String signature(Properties props) {
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     os.append(Constants.SIEVES_PROP + ':').append(props.getProperty(Constants.SIEVES_PROP,
             Constants.SIEVEPASSES));
     os.append(Constants.SINGLETON_PROP + ':').append(props.getProperty(Constants.SINGLETON_PROP,
@@ -662,7 +663,7 @@ public class SieveCoreferenceSystem {
     String mainWorkDirPath = props.getProperty(Constants.RUN_DIST_CMD_WORK_DIR, "workdir") + '-' + timestamp + File.separator;
     DeterministicCorefSieve[] origSieves = sieves;
     String[] origSieveNames = sieveClassNames;
-    Set<Integer> remainingSieveIndices = Generics.newHashSet();
+      Set<Integer> remainingSieveIndices = new FastSet<>();
     for (int i = 0; i < origSieves.length; i++) {
       remainingSieveIndices.add(i);
     }
@@ -686,7 +687,7 @@ public class SieveCoreferenceSystem {
             if (remainingSieveIndices.contains(ko.first())) {
               logger.info("Restrict selection to " + origSieveNames[ko.first()] + " because of constraint " +
                       toSieveOrderConstraintString(ko, origSieveNames));
-              selectableSieveIndices = Generics.newHashSet(1);
+                selectableSieveIndices = new FastSet<>(1);
               selectableSieveIndices.add(ko.first());
               break;
             }
@@ -823,7 +824,7 @@ public class SieveCoreferenceSystem {
     if(doPostProcessing || replicateCoNLL) postProcessing(document);
 
     // coref system output: CorefChain
-    Map<Integer, CorefChain> result = Generics.newHashMap();
+      Map<Integer, CorefChain> result = new FastMap<>();
     for(CorefCluster c : document.corefClusters.values()) {
       result.put(c.clusterID, new CorefChain(c, document.positions));
     }
@@ -953,11 +954,11 @@ public class SieveCoreferenceSystem {
 
   /** Remove singletons, appositive, predicate nominatives, relative pronouns */
   private static void postProcessing(Document document) {
-    Set<IntTuple> removeSet = Generics.newHashSet();
-    Set<Integer> removeClusterSet = Generics.newHashSet();
+      Set<IntTuple> removeSet = new FastSet<>();
+      Set<Integer> removeClusterSet = new FastSet<>();
 
     for(CorefCluster c : document.corefClusters.values()){
-      Set<Mention> removeMentions = Generics.newHashSet();
+        Set<Mention> removeMentions = new FastSet<>();
       for(Mention m : c.getCorefMentions()) {
         if(m.appositions != null && !m.appositions.isEmpty()
                 || m.predicateNominatives != null && !m.predicateNominatives.isEmpty()
@@ -1179,7 +1180,7 @@ public class SieveCoreferenceSystem {
   }
 
   protected static void printList(Logger logger, String... args)  {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (String arg : args) {
       sb.append(arg);
       sb.append('\t');
@@ -1229,7 +1230,7 @@ public class SieveCoreferenceSystem {
     }
     logger.fine(p);
 
-    TxtBuilder golds = new TxtBuilder();
+    TextBuilder golds = new TextBuilder();
     golds.append("Gold mentions in the sentence:\n");
     Counter<Integer> mBegin = new ClassicCounter<>();
     Counter<Integer> mEnd = new ClassicCounter<>();
@@ -1276,7 +1277,7 @@ public class SieveCoreferenceSystem {
     }
     logger.fine(p);
 
-    golds = new TxtBuilder();
+    golds = new TextBuilder();
     golds.append("Gold mentions in the sentence:\n");
     mBegin = new ClassicCounter<>();
     mEnd = new ClassicCounter<>();
@@ -1366,7 +1367,7 @@ public class SieveCoreferenceSystem {
     logger.finer("doc type: "+document.docType);
     int previousUtterIndex = -1;
     String previousSpeaker = "";
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for(CoreMap s : document.annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
       for(CoreLabel l : s.get(CoreAnnotations.TokensAnnotation.class)) {
         int utterIndex = l.get(CoreAnnotations.UtteranceAnnotation.class);
@@ -1402,7 +1403,7 @@ public class SieveCoreferenceSystem {
   private static void printScoreSummary(String summary, Logger logger, boolean afterPostProcessing) {
     String[] lines = COMPILE2.split(summary);
       if (afterPostProcessing) {
-          TxtBuilder sb = new TxtBuilder();
+          TextBuilder sb = new TextBuilder();
           for (String line : lines) {
               if (line.startsWith("METRIC")) sb.append(line);
               if (!line.startsWith("Identification of Mentions") && line.contains("Recall")) {
@@ -1514,15 +1515,15 @@ public class SieveCoreferenceSystem {
     Annotation anno = document.annotation;
     List<List<String[]>> conllDocSentences = document.conllDoc.sentenceWordLists;
     String docID = anno.get(CoreAnnotations.DocIDAnnotation.class);
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append("#begin document ").append(docID).append('\n');
     List<CoreMap> sentences = anno.get(CoreAnnotations.SentencesAnnotation.class);
     for(int sentNum = 0 ; sentNum < sentences.size() ; sentNum++){
       List<CoreLabel> sentence = sentences.get(sentNum).get(CoreAnnotations.TokensAnnotation.class);
       List<String[]> conllSentence = conllDocSentences.get(sentNum);
-      Map<Integer,Set<Mention>> mentionBeginOnly = Generics.newHashMap();
-      Map<Integer,Set<Mention>> mentionEndOnly = Generics.newHashMap();
-      Map<Integer,Set<Mention>> mentionBeginEnd = Generics.newHashMap();
+        Map<Integer,Set<Mention>> mentionBeginOnly = new FastMap<>();
+        Map<Integer,Set<Mention>> mentionEndOnly = new FastMap<>();
+        Map<Integer,Set<Mention>> mentionBeginEnd = new FastMap<>();
 
       for(int i=0 ; i<sentence.size(); i++){
         mentionBeginOnly.put(i, new LinkedHashSet<Mention>());
@@ -1540,7 +1541,7 @@ public class SieveCoreferenceSystem {
       }
 
       for(int i=0 ; i<sentence.size(); i++){
-        TxtBuilder sb2 = new TxtBuilder();
+        TextBuilder sb2 = new TextBuilder();
         for(Mention m : mentionBeginOnly.get(i)){
           if (sb2.length() > 0) {
             sb2.append('|');
@@ -1588,7 +1589,7 @@ public class SieveCoreferenceSystem {
       allMentions = gold ? document.goldOrderedMentionsBySentence : document.predictedOrderedMentionsBySentence;
     //    String filename = document.annotation.get()
 
-    TxtBuilder doc = new TxtBuilder();
+    TextBuilder doc = new TextBuilder();
     int previousOffset = 0;
 
     for(int i = 0 ; i<sentences.size(); i++) {
@@ -1606,11 +1607,11 @@ public class SieveCoreferenceSystem {
       previousOffset = t.get(t.size()-1).get(CoreAnnotations.CharacterOffsetEndAnnotation.class);
       Counter<Integer> startCounts = new ClassicCounter<>();
       Counter<Integer> endCounts = new ClassicCounter<>();
-      Map<Integer, Set<Mention>> endMentions = Generics.newHashMap();
+        Map<Integer, Set<Mention>> endMentions = new FastMap<>();
       for (Mention m : mentions) {
         startCounts.incrementCount(m.startIndex);
         endCounts.incrementCount(m.endIndex);
-        if(!endMentions.containsKey(m.endIndex)) endMentions.put(m.endIndex, Generics.<Mention>newHashSet());
+        if(!endMentions.containsKey(m.endIndex)) endMentions.put(m.endIndex, (Set<Mention>) new FastMap<>());
         endMentions.get(m.endIndex).add(m);
       }
       for (int j = 0 ; j < tokens.length; j++){

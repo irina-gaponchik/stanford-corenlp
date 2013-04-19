@@ -8,6 +8,7 @@ import edu.stanford.nlp.ling.tokensregex.types.Expression;
 import edu.stanford.nlp.ling.tokensregex.types.Tags;
 import edu.stanford.nlp.ling.tokensregex.types.Value;
 import edu.stanford.nlp.util.*;
+import javolution.util.FastMap;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -119,7 +120,7 @@ public class CoreMapExpressionExtractor<T extends MatchedExpression> {
    * @param env Environment to use for binding variables and applying rules
    */
   public CoreMapExpressionExtractor(Env env) {
-    this.stages = Generics.newHashMap();
+      this.stages = new FastMap<>();
     this.env = env;
     this.tokensAnnotationKey = EnvLookup.getDefaultTokensAnnotationKey(env);
   }

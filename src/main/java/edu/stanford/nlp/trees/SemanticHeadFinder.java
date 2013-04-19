@@ -4,7 +4,7 @@ import edu.stanford.nlp.ling.HasCategory;
 import edu.stanford.nlp.ling.HasTag;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Label;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 import java.util.Arrays;
 import java.util.List;
@@ -90,19 +90,19 @@ public class SemanticHeadFinder extends ModCollinsHeadFinder {
 
     // make a distinction between auxiliaries and copula verbs to
     // get the NP has semantic head in sentences like "Bill is an honest man".  (Added "sha" for "shan't" May 2009
-    verbalAuxiliaries = Generics.newHashSet();
+      verbalAuxiliaries = new FastSet<>();
     verbalAuxiliaries.addAll(Arrays.asList(auxiliaries));
 
-    passiveAuxiliaries = Generics.newHashSet();
+      passiveAuxiliaries = new FastSet<>();
     passiveAuxiliaries.addAll(Arrays.asList(beGetVerbs));
 
     //copula verbs having an NP complement
-    copulars = Generics.newHashSet();
+      copulars = new FastSet<>();
     if (cop) {
       copulars.addAll(Arrays.asList(copulaVerbs));
     } // a few times the apostrophe is missing on "'s"
 
-    verbalTags = Generics.newHashSet();
+      verbalTags = new FastSet<>();
     // include Charniak tags so can do BLLIP right
     verbalTags.addAll(Arrays.asList(verbTags));
 

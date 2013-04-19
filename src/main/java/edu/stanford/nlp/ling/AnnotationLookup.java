@@ -4,7 +4,7 @@ import java.util.Map;
 
 import edu.stanford.nlp.ling.CoreLabel.GenericAnnotation;
 import edu.stanford.nlp.util.ErasureUtils;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /** @author Anna Rafferty */
 public class AnnotationLookup {
@@ -103,9 +103,9 @@ public class AnnotationLookup {
     return null;
   }
 
-  private static Map<Class<CoreAnnotation<?>>,Class<?>> valueCache = Generics.newHashMap();
+  private static Map<Class<CoreAnnotation<?>>,Class<?>> valueCache = new FastMap<>();
 
-  /**
+    /**
    * Returns the runtime value type associated with the given key.  Caches
    * results.
    */

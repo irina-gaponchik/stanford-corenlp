@@ -8,7 +8,7 @@ package edu.stanford.nlp.tagger.maxent;
 
 import edu.stanford.nlp.io.InDataStreamFile;
 import edu.stanford.nlp.stats.IntCounter;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 import java.io.IOException;
 import java.io.DataInputStream;
@@ -23,9 +23,9 @@ import java.util.Map;
  */
 public class Dictionary {
 
-  private final Map<String,TagCount> dict = Generics.newHashMap();
-  private final Map<Integer,CountWrapper> partTakingVerbs = Generics.newHashMap();
-  private static final String naWord = "NA";
+  private final Map<String,TagCount> dict = new FastMap<>();
+    private final Map<Integer,CountWrapper> partTakingVerbs = new FastMap<>();
+    private static final String naWord = "NA";
   private static final boolean VERBOSE = false;
 
     void fillWordTagCounts(Map<String, IntCounter<String>> wordTagCounts) {
@@ -35,85 +35,8 @@ public class Dictionary {
     }
   }
 
-  /*
-  public void release() {
-    dict.clear();
-  }
 
-  public void addVPTaking(String verb, String tag, String partWord) {
-    int h = verb.hashCode();
-    Integer i = Integer.valueOf(h);
-    if (tag.startsWith("RP")) {
-      if (this.partTakingVerbs.containsKey(i)) {
-        this.partTakingVerbs.get(i).incPart(partWord);
-      } else {
-        this.partTakingVerbs.put(i, new CountWrapper(verb, 0, 0, 0, 0));
-        this.partTakingVerbs.get(i).incPart(partWord);
-      }
-    } else if (tag.startsWith("RB")) {
-      if (this.partTakingVerbs.containsKey(i)) {
-        this.partTakingVerbs.get(i).incRB(partWord);
-      } else {
-        this.partTakingVerbs.put(i, new CountWrapper(verb, 0, 0, 0, 0));
-        this.partTakingVerbs.get(i).incRB(partWord);
-      }
-    } else if (tag.startsWith("IN")) {
-      if (this.partTakingVerbs.containsKey(i)) {
-        this.partTakingVerbs.get(i).incIn(partWord);
-      } else {
-        this.partTakingVerbs.put(i, new CountWrapper(verb, 0, 0, 0, 0));
-        this.partTakingVerbs.get(i).incIn(partWord);
-      }
-    }
-  }
-  */
-
-  protected void addVThatTaking(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      this.partTakingVerbs.get(i).incThat();
-    } else {
-      this.partTakingVerbs.put(i, new CountWrapper(verb, 0, 1, 0, 0));
-    }
-  }
-
-  protected int getCountPart(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      return this.partTakingVerbs.get(i).getCountPart();
-    }
-    return 0;
-  }
-
-
-  protected int getCountThat(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      return this.partTakingVerbs.get(i).getCountThat();
-    }
-    return 0;
-  }
-
-
-  protected int getCountIn(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      return this.partTakingVerbs.get(i).getCountIn();
-    }
-    return 0;
-  }
-
-
-  protected int getCountRB(String verb) {
-    int i = verb.hashCode();
-    if (this.partTakingVerbs.containsKey(i)) {
-      return this.partTakingVerbs.get(i).getCountRB();
-    }
-    return 0;
-  }
-
-
-  protected int getCount(CharSequence word, String tag) {
+    protected int getCount(CharSequence word, String tag) {
     TagCount count = dict.get(word);
       return count == null ? 0 : count.get(tag);
   }
@@ -155,17 +78,6 @@ public class Dictionary {
   }
 
 
-  /*
-  public void save(String filename) {
-    try {
-      OutDataStreamFile rf = new OutDataStreamFile(filename);
-      save(rf);
-      rf.close();
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-  */
 
   void save(DataOutputStream file) {
     String[] arr = dict.keySet().toArray(new String[dict.keySet().size()]);
@@ -278,43 +190,6 @@ public class Dictionary {
       e.printStackTrace();
     }
   }
-
-  /*
-  public void printAmbiguous() {
-    String[] arr = dict.keySet().toArray(new String[dict.keySet().size()]);
-    try {
-      int countAmbiguous = 0;
-      int countUnAmbiguous = 0;
-      int countAmbDisamb = 0;
-      for (String word : arr) {
-        if (word.indexOf('|') == -1) {
-          continue;
-        }
-        TagCount count = get(word);
-        if (count.numTags() > 1) {
-          System.out.print(word);
-          countAmbiguous++;
-          tC.print();
-          System.out.println();
-        } else {
-          String wordA = word.substring(0, word.indexOf('|'));
-          if (get(wordA).numTags() > 1) {
-            System.out.print(word);
-            countAmbDisamb++;
-            countUnAmbiguous++;
-            tC.print();
-            System.out.println();
-          } else {
-            countUnAmbiguous++;
-          }
-        }// else
-      }
-      System.out.println(" ambg " + countAmbiguous + " unambg " + countUnAmbiguous + " disamb " + countAmbDisamb);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-  */
 
   /**
    * This makes ambiguity classes from all words in the dictionary and remembers

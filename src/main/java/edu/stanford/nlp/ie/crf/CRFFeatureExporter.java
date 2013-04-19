@@ -5,7 +5,7 @@ import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -64,7 +64,7 @@ public class CRFFeatureExporter<IN extends CoreMap> {
       Collections.reverse(document);
     }
 
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (int j = 0; j < docSize; j++) {
       IN token = document.get(j);
       sb.append(token.get(CoreAnnotations.TextAnnotation.class));
@@ -106,7 +106,7 @@ public class CRFFeatureExporter<IN extends CoreMap> {
       PrintWriter pw = IOUtils.getPrintWriter(exportFile);
       for (int i = 0; i < docsData.length; i++) {
         for (int j = 0; j < docsData[i].length; j++) {
-          TxtBuilder sb = new TxtBuilder();
+          TextBuilder sb = new TextBuilder();
           int label = labels[i][j];
           sb.append(classifier.classIndex.get(label));
           for (int k = 0; k < docsData[i][j].length; k++) {

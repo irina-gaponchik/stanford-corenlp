@@ -13,7 +13,7 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.objectbank.XMLBeginEndIterator;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 /**
  * Produces a list of sentences from either a plain text or XML document.
@@ -202,15 +202,15 @@ public class DocumentPreprocessor implements Iterable<List<HasWord>> {
     public PlainTextIterator() {
       // Establish how to find sentence boundaries
       boolean eolIsSignificant = false;
-      sentDelims = Generics.newHashSet();
+        sentDelims = new FastSet<>();
       if (sentenceDelimiter == null) {
         if (sentenceFinalPuncWords != null) {
           sentDelims.addAll(Arrays.asList(sentenceFinalPuncWords));
         }
-        delimFollowers = Generics.newHashSet(Arrays.asList(sentenceFinalFollowers));
+          delimFollowers = new FastSet<>((Set<? extends String>) Arrays.asList(sentenceFinalFollowers));
       } else {
         sentDelims.add(sentenceDelimiter);
-        delimFollowers = Generics.newHashSet();
+          delimFollowers = new FastSet<>();
         eolIsSignificant = wsPattern.matcher(sentenceDelimiter).matches();
         if(eolIsSignificant) { // For Stanford English Tokenizer
           sentDelims.add(PTBLexer.NEWLINE_TOKEN);

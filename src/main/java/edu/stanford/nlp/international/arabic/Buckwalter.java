@@ -8,10 +8,10 @@ import java.io.*;
 import edu.stanford.nlp.io.EncodingPrintWriter;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.trees.international.arabic.ATBTreeUtils;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.process.SerializableFunction;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /** This class can convert between Unicode and Buckwalter encodings of
  *  Arabic.
@@ -131,8 +131,8 @@ public class Buckwalter implements SerializableFunction<String,String> {
 		if (arabicChars.length != buckChars.length)
 			throw new RuntimeException(this.getClass().getName() + ": Inconsistent u2b/b2u arrays.");
 
-		u2bMap = Generics.newHashMap(arabicChars.length);
-		b2uMap = Generics.newHashMap(buckChars.length);
+        u2bMap = new FastMap<>(arabicChars.length);
+        b2uMap = new FastMap<>(buckChars.length);
 		for (int i = 0; i < arabicChars.length; i++) {
 			Character charU = arabicChars[i];
 			Character charB = buckChars[i];
@@ -160,7 +160,7 @@ public class Buckwalter implements SerializableFunction<String,String> {
 
 	private String convert(String in, boolean unicodeToBuckwalter) {
 		StringTokenizer st = new StringTokenizer(in);
-		TxtBuilder result = new TxtBuilder(in.length());
+		TextBuilder result = new TextBuilder(in.length());
 
 		while(st.hasMoreTokens()) {
 			String token = st.nextToken();
@@ -201,7 +201,7 @@ public class Buckwalter implements SerializableFunction<String,String> {
 	}
 
 
-	private static final TxtBuilder usage = new TxtBuilder();
+	private static final TextBuilder usage = new TextBuilder();
 	static {
 		usage.append("Usage: java Buckwalter [OPTS] file   (or < file)\n");
 		usage.append("Options:\n");

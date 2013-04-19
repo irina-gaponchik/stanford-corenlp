@@ -3,8 +3,9 @@ package edu.stanford.nlp.parser.lexparser;
 import java.io.*;
 import java.util.*;
 
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 public class Lattice implements Serializable, Iterable<LatticeEdge> {
 
@@ -19,9 +20,9 @@ public class Lattice implements Serializable, Iterable<LatticeEdge> {
 	
 	public Lattice() {
 		edges = new ArrayList<>();
-		nodes = Generics.newHashSet();
+        nodes = new FastSet<>();
 		constraints = new ArrayList<>();
-		edgeStartsAt = Generics.newHashMap();
+        edgeStartsAt = new FastMap<>();
 	}
 
 	//TODO Do node normalization here
@@ -66,7 +67,7 @@ public class Lattice implements Serializable, Iterable<LatticeEdge> {
 	
 	@Override
 	public String toString() {
-	  TxtBuilder sb = new TxtBuilder();
+	  TextBuilder sb = new TextBuilder();
 	  sb.append(String.format("[ Lattice: %d edges  %d nodes ]\n",edges.size(), nodes.size()));
 	  for(LatticeEdge e : edges)
 	    sb.append("  ").append(e.toString()).append('\n');

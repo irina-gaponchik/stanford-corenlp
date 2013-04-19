@@ -4,9 +4,9 @@ import java.util.*;
 import java.io.*;
 import java.util.regex.Pattern;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
- /**
+/**
   * Scores Pascal challenge workshop information templates.
   * This score reflects which fields are present/absent, how well acronyms
   * agree with the names and URLs they correspond to.
@@ -139,7 +139,7 @@ public class AcronymModel implements RelationalModel {
   private double computeProb(String wsname, String wsacronym, String confname,
                             String confacronym, String wsurl, String confurl){
 
-    Set<String> presentFields = Generics.newHashSet();
+      Set<String> presentFields = new FastSet<>();
     if( wsname != null && !wsname.equals("null") && !wsname.isEmpty())
       presentFields.add("workshopname");
     if( wsacronym != null && !wsacronym.equals("null") && !wsacronym.isEmpty())

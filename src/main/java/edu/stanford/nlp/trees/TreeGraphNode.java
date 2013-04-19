@@ -13,9 +13,9 @@ import edu.stanford.nlp.ling.LabelFactory;
 import edu.stanford.nlp.trees.GrammaticalRelation.GrammaticalRelationAnnotation;
 import edu.stanford.nlp.util.ErasureUtils;
 import edu.stanford.nlp.util.Filter;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 
 /**
@@ -356,7 +356,8 @@ public class TreeGraphNode extends Tree implements HasParent {
       System.err.println("Warning: you are trying to add an arc from node " + this + " to node " + node + ", but they do not belong to the same TreeGraph!");
     }
     if (!label.containsKey(arcLabel)) {
-      label.set(arcLabel, Generics.<TreeGraphNode>newHashSet());
+        label.set(arcLabel, new FastSet<TreeGraphNode>()
+        );
     }
     return ((Collection) label.get(arcLabel)).add(node);
   }
@@ -409,7 +410,7 @@ public class TreeGraphNode extends Tree implements HasParent {
    *         label arcs between this node and {@code destNode}
    */
   public Set<Class<? extends GrammaticalRelationAnnotation>> arcLabelsToNode(TreeGraphNode destNode) {
-    Set<Class<? extends GrammaticalRelationAnnotation>> arcLabels = Generics.newHashSet();
+      Set<Class<? extends GrammaticalRelationAnnotation>> arcLabels = new FastSet<>();
     CoreLabel cl = label();
     for (Class key : cl.keySet()) {
       if (key == null || !GrammaticalRelationAnnotation.class.isAssignableFrom(key)) {
@@ -505,7 +506,7 @@ public class TreeGraphNode extends Tree implements HasParent {
    * @return Set of dependencies (each a {@code Dependency})
    */
   public Set<Dependency<Label, Label, Object>> dependencies(Filter<Dependency<Label, Label, Object>> f, HeadFinder hf) {
-    Set<Dependency<Label, Label, Object>> deps = Generics.newHashSet();
+      Set<Dependency<Label, Label, Object>> deps = new FastSet<>();
     for (Tree t : this) {
 
       TreeGraphNode node = safeCast(t);
@@ -703,7 +704,7 @@ public class TreeGraphNode extends Tree implements HasParent {
    * @return {@code String} representation of this subtree
    */
   public String toPrettyString(int indentLevel) {
-    TxtBuilder buf = new TxtBuilder("\n");
+    TextBuilder buf = new TextBuilder("\n");
     for (int i = 0; i < indentLevel; i++) {
       buf.append("  ");
     }
@@ -726,7 +727,7 @@ public class TreeGraphNode extends Tree implements HasParent {
    * @return {@code String} representation of this subtree
    */
   public String toOneLineString() {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     if (children == null || children.length == 0) {
       buf.append(label);
     } else {

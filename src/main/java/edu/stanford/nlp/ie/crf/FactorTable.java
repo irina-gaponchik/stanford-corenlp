@@ -3,7 +3,7 @@ package edu.stanford.nlp.ie.crf;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.math.SloppyMath;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +45,7 @@ public class FactorTable {
   }
 
   public String toProbString() {
-    TxtBuilder sb = new TxtBuilder("{\n");
+    TextBuilder sb = new TextBuilder("{\n");
     for (int i = 0; i < table.length; i++) {
       sb.append(Arrays.toString(toArray(i)));
       sb.append(": ");
@@ -57,7 +57,7 @@ public class FactorTable {
   }
 
   public String toNonLogString() {
-    TxtBuilder sb = new TxtBuilder("{\n");
+    TextBuilder sb = new TextBuilder("{\n");
     for (int i = 0; i < table.length; i++) {
       sb.append(Arrays.toString(toArray(i)));
       sb.append(": ");
@@ -69,7 +69,7 @@ public class FactorTable {
   }
 
   public <L> String toString(Index<L> classIndex) {
-    TxtBuilder sb = new TxtBuilder("{\n");
+    TextBuilder sb = new TextBuilder("{\n");
     for (int i = 0; i < table.length; i++) {
       sb.append(toString(toArray(i), classIndex));
       sb.append(": ");
@@ -82,7 +82,7 @@ public class FactorTable {
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder("{\n");
+    TextBuilder sb = new TextBuilder("{\n");
     for (int i = 0; i < table.length; i++) {
       sb.append(Arrays.toString(toArray(i)));
       sb.append(": ");

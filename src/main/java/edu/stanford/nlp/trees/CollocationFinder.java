@@ -13,10 +13,9 @@ import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.ling.WordTag;
 import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.util.ArrayUtils;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * Finds WordNet collocations in parse trees.  It can restructure
@@ -67,7 +66,7 @@ public class CollocationFinder {
     CoordinationTransformer transformer = new CoordinationTransformer();
     this.wnConnect = w;
     this.qTree = transformer.transformTree(t);
-    this.collocationCollector = Generics.newArrayList();
+      this.collocationCollector = new ArrayList<>();
     this.hf = hf;
     this.getCollocationsList(threadSafe);
     if (DEBUG) {
@@ -207,7 +206,7 @@ public class CollocationFinder {
       testString.append('_');
       Integer thisSubtreeLength = subtree.yield().size();
       currWindowLength+=thisSubtreeLength;
-      TxtBuilder testStringNonStemmed = new TxtBuilder(160);
+      TextBuilder testStringNonStemmed = new TextBuilder(160);
       testStringNonStemmed.append(treeAsNonStemmedCollocation(subtree));
       testStringNonStemmed.append('_');
 
@@ -268,7 +267,7 @@ public class CollocationFinder {
   private static String treeAsStemmedCollocation(Tree t, boolean threadSafe) {
     List<WordTag> list= getStemmedWordTagsFromTree(t, threadSafe);
     // err.println(list.size());
-    TxtBuilder s = new TxtBuilder(160);
+    TextBuilder s = new TextBuilder(160);
     WordTag firstWord = list.remove(0);
     s.append(firstWord.word());
     for(WordTag wt : list) {
@@ -282,7 +281,7 @@ public class CollocationFinder {
   private static String treeAsNonStemmedCollocation(Tree t) {
     List<WordTag> list= getNonStemmedWordTagsFromTree(t);
 
-    TxtBuilder s = new TxtBuilder(160);
+    TextBuilder s = new TextBuilder(160);
     WordTag firstWord = list.remove(0);
     s.append(firstWord.word());
     for(WordTag wt : list) {
@@ -293,7 +292,7 @@ public class CollocationFinder {
   }
 
   private static CharSequence mergeLeavesIntoCollocatedString(Tree t) {
-    TxtBuilder sb = new TxtBuilder(160);
+    TextBuilder sb = new TextBuilder(160);
     ArrayList<TaggedWord> sent = t.taggedYield();
     for (TaggedWord aSent : sent) {
       sb.append(aSent.word()).append('_');
@@ -302,7 +301,7 @@ public class CollocationFinder {
   }
 
   private static CharSequence mergeLeavesIntoCollocatedString(Tree... trees) {
-    TxtBuilder sb = new TxtBuilder(160);
+    TextBuilder sb = new TextBuilder(160);
     for (Tree t: trees) {
       ArrayList<TaggedWord> sent = t.taggedYield();
       for (TaggedWord aSent : sent) {
@@ -319,7 +318,7 @@ public class CollocationFinder {
    * stemmed according to their POS tags in the tree.
    */
   private static List<WordTag> getStemmedWordTagsFromTree(Tree t, boolean threadSafe) {
-    List<WordTag> stemmedWordTags = Generics.newArrayList();
+      List<WordTag> stemmedWordTags = new ArrayList<>();
     ArrayList<TaggedWord> s = t.taggedYield();
     for (TaggedWord w : s) {
       WordTag wt = threadSafe ? Morphology.stemStaticSynchronized(w.word(), w.tag())
@@ -330,7 +329,7 @@ public class CollocationFinder {
   }
 
   private static List<WordTag> getNonStemmedWordTagsFromTree(Tree t) {
-    List<WordTag> wordTags = Generics.newArrayList();
+      List<WordTag> wordTags = new ArrayList<>();
     ArrayList<TaggedWord> s = t.taggedYield();
     for (TaggedWord w : s) {
       WordTag wt = new WordTag(w.word(), w.tag());

@@ -1,8 +1,8 @@
 package edu.stanford.nlp.sequences;
 
 import edu.stanford.nlp.util.ArrayUtils;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.io.*;
 import java.util.*;
@@ -25,9 +25,9 @@ public class Clique implements Serializable {
   private static final long serialVersionUID = -8109637472035159453L;
 
   private int[] relativeIndices;
-  protected static Map<CliqueEqualityWrapper, Clique> interner = Generics.newHashMap();
+  protected static Map<CliqueEqualityWrapper, Clique> interner = new FastMap<>();
 
-  private static class CliqueEqualityWrapper {
+    private static class CliqueEqualityWrapper {
     private Clique c;
 
     public CliqueEqualityWrapper(Clique c) {
@@ -153,7 +153,7 @@ public class Clique implements Serializable {
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append('[');
     for (int i = 0; i < relativeIndices.length; i++) {
       sb.append(relativeIndices[i]);

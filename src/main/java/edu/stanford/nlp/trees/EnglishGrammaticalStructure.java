@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.util.*;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import static edu.stanford.nlp.trees.EnglishGrammaticalRelations.*;
 import static edu.stanford.nlp.trees.GrammaticalRelation.*;
@@ -279,12 +281,12 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
   private static void treatCC(Collection<TypedDependency> list) {
     // Construct a map from tree nodes to the set of typed
     // dependencies in which the node appears as dependent.
-    Map<TreeGraphNode, Set<TypedDependency>> map = Generics.newHashMap();
+      Map<TreeGraphNode, Set<TypedDependency>> map = new FastMap<>();
     // Construct a map of tree nodes being governor of a subject grammatical
     // relation to that relation
-    Map<TreeGraphNode, TypedDependency> subjectMap = Generics.newHashMap();
+      Map<TreeGraphNode, TypedDependency> subjectMap = new FastMap<>();
     // Construct a set of TreeGraphNodes with a passive auxiliary on them
-    Set<TreeGraphNode> withPassiveAuxiliary = Generics.newHashSet();
+      Set<TreeGraphNode> withPassiveAuxiliary = new FastSet<>();
     // Construct a map of tree nodes being governor of an object grammatical
     // relation to that relation
     // Map<TreeGraphNode, TypedDependency> objectMap = new
@@ -732,7 +734,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
     // Construct a map from tree nodes to the set of typed
     // dependencies in which the node appears as governor.
     // cdm: could use CollectionValuedMap here!
-    Map<TreeGraphNode, SortedSet<TypedDependency>> map = Generics.newHashMap();
+      Map<TreeGraphNode, SortedSet<TypedDependency>> map = new FastMap<>();
     List<TreeGraphNode> partmod = new ArrayList<>();
 
     for (TypedDependency typedDep : list) {
@@ -1832,7 +1834,7 @@ public class EnglishGrammaticalStructure extends GrammaticalStructure {
    * @param list A list of typed dependencies to check through
    */
   private static void removeDep(Collection<TypedDependency> list) {
-    Set<GrammaticalRelation> prepRels = Generics.newHashSet(EnglishGrammaticalRelations.getPreps());
+      Set<GrammaticalRelation> prepRels = new FastSet<>((Set<? extends GrammaticalRelation>) EnglishGrammaticalRelations.getPreps());
     prepRels.addAll(EnglishGrammaticalRelations.getPrepsC());
     for (TypedDependency td1 : list) {
       if (prepRels.contains(td1.reln())) { // if we have a prep_ relation

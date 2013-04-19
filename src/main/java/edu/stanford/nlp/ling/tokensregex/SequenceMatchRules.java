@@ -5,6 +5,7 @@ import edu.stanford.nlp.ling.tokensregex.types.Expression;
 import edu.stanford.nlp.ling.tokensregex.types.Expressions;
 import edu.stanford.nlp.ling.tokensregex.types.Value;
 import edu.stanford.nlp.util.*;
+import javolution.util.FastMap;
 
 import java.util.*;
 import java.util.regex.MatchResult;
@@ -122,7 +123,7 @@ import java.util.regex.Pattern;
  *   <tr><th>Field</th><th>Values</th><th>Example</th><th>Description</th></tr>
  *   <tr><td>{@code ruleType}</td><td>{@code "tokens" | "text" | "composite" | "filter" }</td>
  *      <td>{@code tokens}</td><td>Type of the rule</td></tr>
- *   <tr><td>{@code pattern}</td><td>{@code &lt;Token Sequence Pattern&gt;&lt; = (...) | &lt;Txt Pattern&gt; = /.../}</td>
+ *   <tr><td>{@code pattern}</td><td>{@code &lt;Token Sequence Pattern&gt;&lt; = (...) | &lt;Text Pattern&gt; = /.../}</td>
  *      <td>{@code ( /winter/ /of/ $YEAR)}</td><td>Pattern to match against.
  *      See {@link TokenSequencePattern} and {@link Pattern} for
  *      how to specify patterns over tokens and strings</td></tr>
@@ -276,7 +277,7 @@ public class SequenceMatchRules {
   public static Rule createRule(Env env, Expressions.CompositeValue cv) {
     Map<String, Object> attributes;
     cv = cv.simplifyNoTypeConversion(env);
-    attributes = Generics.newHashMap();
+      attributes = new FastMap<>();
     for (String s:cv.getAttributes()) {
       attributes.put(s, cv.getExpression(s));
     }
@@ -304,7 +305,7 @@ public class SequenceMatchRules {
     }
     AnnotationExtractRuleCreator ruleCreator = lookupExtractRuleCreator(env, ruleType);
     if (ruleCreator != null) {
-      Map<String,Object> attributes = Generics.newHashMap();
+        Map<String,Object> attributes = new FastMap<>();
       attributes.put("ruleType", ruleType);
       attributes.put("pattern", pattern);
       attributes.put("result", result);
@@ -322,8 +323,9 @@ public class SequenceMatchRules {
   public final static CompositeExtractRuleCreator COMPOSITE_EXTRACT_RULE_CREATOR = new CompositeExtractRuleCreator();
   public final static TextPatternExtractRuleCreator TEXT_PATTERN_EXTRACT_RULE_CREATOR = new TextPatternExtractRuleCreator();
   public final static AnnotationExtractRuleCreator DEFAULT_EXTRACT_RULE_CREATOR = TOKEN_PATTERN_EXTRACT_RULE_CREATOR;
-  final static Map<String, AnnotationExtractRuleCreator> registeredRuleTypes = Generics.newHashMap();
-  static {
+  final static Map<String, AnnotationExtractRuleCreator> registeredRuleTypes = new FastMap<>();
+
+    static {
     registeredRuleTypes.put(TOKEN_PATTERN_RULE_TYPE, TOKEN_PATTERN_EXTRACT_RULE_CREATOR);
     registeredRuleTypes.put(COMPOSITE_RULE_TYPE, COMPOSITE_EXTRACT_RULE_CREATOR);
     registeredRuleTypes.put(TEXT_PATTERN_RULE_TYPE, TEXT_PATTERN_EXTRACT_RULE_CREATOR);

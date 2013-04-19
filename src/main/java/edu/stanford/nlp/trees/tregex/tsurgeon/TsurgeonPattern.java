@@ -30,7 +30,7 @@ package edu.stanford.nlp.trees.tregex.tsurgeon;
 
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 
 /**
@@ -61,7 +61,7 @@ public abstract class TsurgeonPattern {
 
   @Override
   public String toString() {
-    TxtBuilder resultSB = new TxtBuilder();
+    TextBuilder resultSB = new TextBuilder();
     resultSB.append(label);
     if (children.length > 0) {
       resultSB.append('(');

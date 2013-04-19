@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /**
  * Stores one ACE event mention
@@ -23,7 +23,7 @@ public class AceEventMention extends AceMention {
 
   public AceEventMention(String id, AceCharSeq extent, AceCharSeq anchor) {
     super(id, extent);
-    mRolesToArguments = Generics.newHashMap();
+      mRolesToArguments = new FastMap<>();
     this.mAnchor = anchor;
   }
 

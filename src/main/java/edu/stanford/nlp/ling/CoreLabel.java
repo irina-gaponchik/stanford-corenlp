@@ -7,9 +7,9 @@ import java.util.TreeMap;
 import edu.stanford.nlp.ling.AnnotationLookup.KeyLookup;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 
 /**
@@ -131,11 +131,11 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
    */
   public static interface GenericAnnotation<T> extends CoreAnnotation<T> {  }
   //Unchecked is below because eclipse can't handle the level of type inference if we correctly parameterize GenericAnnotation with String
-  public static final Map<String, Class<? extends GenericAnnotation>> genericKeys = Generics.newHashMap();
-  public static final Map<Class<? extends GenericAnnotation>, String> genericValues = Generics.newHashMap();
+  public static final Map<String, Class<? extends GenericAnnotation>> genericKeys = new FastMap<>();
+    public static final Map<Class<? extends GenericAnnotation>, String> genericValues = new FastMap<>();
 
 
-  @SuppressWarnings("unchecked")
+    @SuppressWarnings("unchecked")
   private void initFromStrings(String[] keys, String... values) {
     for (int i = 0; i < Math.min(keys.length, values.length); i++) {
       String key = keys[i];
@@ -568,7 +568,7 @@ public class CoreLabel extends ArrayCoreMap implements Label, HasWord, HasTag, H
    */
   @SuppressWarnings("unchecked")
   public String toString(String format) {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
       switch (format) {
           case "value":
               buf.append(value());

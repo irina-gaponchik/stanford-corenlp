@@ -11,8 +11,9 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.stanford.nlp.util.ErasureUtils;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 
 /**
@@ -35,9 +36,9 @@ public class GeneralizedCounter<K> implements Serializable {
 
   private static final Object[] zeroKey = new Object[0];
 
-  private Map<K,Object> map = Generics.newHashMap();
+  private Map<K,Object> map = new FastMap<>();
 
-  private int depth;
+    private int depth;
   private double total;
 
 
@@ -245,7 +246,7 @@ public class GeneralizedCounter<K> implements Serializable {
    * equal to the depth of the GeneralizedCounter.
    */
   public Set<List<K>> keySet() {
-    return ErasureUtils.<Set<List<K>>>uncheckedCast(keySet(Generics.newHashSet(), zeroKey, true));
+      return ErasureUtils.<Set<List<K>>>uncheckedCast(keySet(new FastSet<>(), zeroKey, true));
   }
 
   /* this is (non-tail) recursive right now, haven't figured out a way
@@ -674,7 +675,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
     @Override
     public String toString() {
-      TxtBuilder sb = new TxtBuilder("{");
+      TextBuilder sb = new TextBuilder("{");
       for (Iterator<Map.Entry<List<K>, Double>> i = entrySet().iterator(); i.hasNext();) {
         Map.Entry<List<K>, Double> e = i.next();
         sb.append(e.toString());
@@ -740,7 +741,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
     @Override
     public Set<K> keySet() {
-      return ErasureUtils.<Set<K>>uncheckedCast(GeneralizedCounter.this.keySet(Generics.newHashSet(), zeroKey, false));
+        return ErasureUtils.<Set<K>>uncheckedCast(GeneralizedCounter.this.keySet(new FastSet<Object>(), zeroKey, false));
     }
 
     @Override
@@ -788,7 +789,7 @@ public class GeneralizedCounter<K> implements Serializable {
 
     @Override
     public String toString() {
-      TxtBuilder sb = new TxtBuilder("{");
+      TextBuilder sb = new TextBuilder("{");
       for (Iterator<Map.Entry<K, Double>> i = entrySet().iterator(); i.hasNext();) {
         Map.Entry<K, Double> e = i.next();
         sb.append(e.toString());
@@ -811,7 +812,7 @@ public class GeneralizedCounter<K> implements Serializable {
   public String toString(String param) {
       switch (param) {
           case "contingency": {
-              TxtBuilder sb = new TxtBuilder();
+              TextBuilder sb = new TextBuilder();
               for (K obj : ErasureUtils.sortedIfPossible(topLevelKeySet())) {
                   sb.append(obj);
                   sb.append(" = ");
@@ -822,7 +823,7 @@ public class GeneralizedCounter<K> implements Serializable {
               return sb.toString();
           }
           case "sorted":
-              TxtBuilder sb = new TxtBuilder();
+              TextBuilder sb = new TextBuilder();
               sb.append("{\n");
               for (K obj : ErasureUtils.sortedIfPossible(topLevelKeySet())) {
                   sb.append(obj);

@@ -2,7 +2,7 @@ package edu.stanford.nlp.dcoref;
 
 import java.util.*;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 public class ScorerMUC extends CorefScorer {
 
@@ -24,7 +24,9 @@ public class ScorerMUC extends CorefScorer {
       rDen += g.corefMentions.size()-1;
       rNum += g.corefMentions.size();
 
-      Set<CorefCluster> partitions = Generics.newHashSet();
+        Set<CorefCluster> partitions = new FastSet<>(
+
+        );
       for (Mention goldMention : g.corefMentions){
           if (predictedMentions.containsKey(goldMention.mentionID)) {
               partitions.add(doc.corefClusters.get(predictedMentions.get(goldMention.mentionID).corefClusterID));
@@ -55,7 +57,9 @@ public class ScorerMUC extends CorefScorer {
       if(c.corefMentions.isEmpty()) continue;
       pDen += c.corefMentions.size()-1;
       pNum += c.corefMentions.size();
-      Set<CorefCluster> partitions = Generics.newHashSet();
+        Set<CorefCluster> partitions = new FastSet<>(
+
+        );
       for (Mention predictedMention : c.corefMentions){
           if (goldMentions.containsKey(predictedMention.mentionID)) {
               partitions.add(doc.goldCorefClusters.get(goldMentions.get(predictedMention.mentionID).goldCorefClusterID));

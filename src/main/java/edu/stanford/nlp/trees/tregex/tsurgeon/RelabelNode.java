@@ -2,7 +2,7 @@ package edu.stanford.nlp.trees.tregex.tsurgeon;
 
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -109,7 +109,7 @@ class RelabelNode extends TsurgeonPattern {
   }
 
   private static String removeEscapeSlashes(String in) {
-    TxtBuilder out = new TxtBuilder();
+    TextBuilder out = new TextBuilder();
     int len = in.length();
     boolean lastIsBackslash = false;
     for (int i = 0; i < len; i++) {
@@ -139,7 +139,7 @@ class RelabelNode extends TsurgeonPattern {
         break;
         case REGEX: {
       Matcher m = labelRegex.matcher(nodeToRelabel.label().value());
-      TxtBuilder label = new TxtBuilder();
+      TextBuilder label = new TextBuilder();
       for (String chunk : replacementPieces) {
         if (variablePattern.matcher(chunk).matches()) {
           String name = chunk.substring(2, chunk.length() - 1);

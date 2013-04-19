@@ -13,10 +13,10 @@ import edu.stanford.nlp.process.WordSegmenter;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseTreebankLanguagePack;
 import edu.stanford.nlp.trees.international.pennchinese.ChineseEscaper;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Timing;
+import javolution.util.FastSet;
 
 import java.io.*;
 import java.util.*;
@@ -539,7 +539,7 @@ public class ChineseLexiconAndWordSegmenter implements Lexicon, WordSegmenter {
       testTreebank.loadPath(testPath, testFilter);
     }
 
-    op.trainOptions.sisterSplitters = Generics.newHashSet(Arrays.asList(tlpParams.sisterSplitters()));
+      op.trainOptions.sisterSplitters = new FastSet<>((Set<? extends String>) Arrays.asList(tlpParams.sisterSplitters()));
 
     // at this point we should be sure that op.tlpParams is
     // set appropriately (from command line, or from grammar file),

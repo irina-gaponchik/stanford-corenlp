@@ -11,7 +11,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeFactory;
 import edu.stanford.nlp.trees.international.arabic.ArabicTreeNormalizer.ArabicEmptyFilter;
 import edu.stanford.nlp.util.Filter;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastSet;
 
 /**
  * Various static convenience methods for processing Arabic parse trees.
@@ -35,8 +35,9 @@ public class ATBTreeUtils {
   
   //Reserved tokens class
   private static final String reservedWordList = "-PLUS- -LRB- -RRB-";
-  public static final Set<String> reservedWords = Generics.newHashSet();
-  static {
+  public static final Set<String> reservedWords = new FastSet<>();
+
+    static {
   	reservedWords.addAll(Arrays.asList(reservedWordList.split("\\s+")));
   }
   

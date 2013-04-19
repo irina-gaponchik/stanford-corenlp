@@ -8,7 +8,8 @@ import de.jollyday.impl.XMLManager;
 import edu.stanford.nlp.ling.tokensregex.Env;
 import edu.stanford.nlp.net.ClasspathURLStreamHandler;
 import edu.stanford.nlp.util.CollectionValuedMap;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 import org.joda.time.DateTimeFieldType;
 import org.joda.time.Partial;
 
@@ -59,7 +60,7 @@ public class JollyDayHolidays implements Env.Binder {
 
   public Map<String, JollyHoliday> getAllHolidaysMap(Set<de.jollyday.config.Holiday> allHolidays)
   {
-    Map<String, JollyHoliday> map = Generics.newHashMap();
+      Map<String, JollyHoliday> map = new FastMap<>();
     for (de.jollyday.config.Holiday h:allHolidays) {
       String descKey = h.getDescriptionPropertiesKey();
       if (descKey != null) {
@@ -123,7 +124,7 @@ public class JollyDayHolidays implements Env.Binder {
 
   public static Set<de.jollyday.config.Holiday> getAllHolidays(Configuration config)
   {
-    Set<de.jollyday.config.Holiday> allHolidays = Generics.newHashSet();
+      Set<de.jollyday.config.Holiday> allHolidays = new FastSet<>();
     getAllHolidays(config, allHolidays);
     return allHolidays;
   }

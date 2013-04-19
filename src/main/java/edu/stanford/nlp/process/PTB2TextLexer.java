@@ -2,7 +2,7 @@
 
 package edu.stanford.nlp.process;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /** Undoes the more common cases of Penn Treebank quoting to producing
  *  something resembling normal text.  That is, it is an approximate inverse
@@ -861,7 +861,7 @@ class PTB2TextLexer {
 */
 
   private static String removeWhite(String in) {
-    TxtBuilder out = new TxtBuilder();
+    TextBuilder out = new TextBuilder();
     for (int i = 0, len = in.length(); i < len; i++) {
       char ch = in.charAt(i);
       if (ch != ' ') {

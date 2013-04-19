@@ -6,7 +6,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.process.CoreTokenFactory;
 import edu.stanford.nlp.util.*;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -184,7 +184,7 @@ public class ChunkAnnotationUtils {
   /**
    * Create chunk that is merged from chunkIndexStart to chunkIndexEnd (exclusive)
    * @param chunkList - List of chunks
-   * @param origText - Txt from which to extract chunk text
+   * @param origText - Text from which to extract chunk text
    * @param chunkIndexStart - Index of first chunk to merge
    * @param chunkIndexEnd - Index of last chunk to merge (exclusive)
    * @return new merged chunk
@@ -275,7 +275,7 @@ public class ChunkAnnotationUtils {
   /**
    * Merge chunks from chunkIndexStart to chunkIndexEnd (exclusive) and replace them in the list
    * @param chunkList - List of chunks
-   * @param origText - Txt from which to extract chunk text
+   * @param origText - Text from which to extract chunk text
    * @param chunkIndexStart - Index of first chunk to merge
    * @param chunkIndexEnd - Index of last chunk to merge (exclusive)
    */
@@ -496,7 +496,7 @@ public class ChunkAnnotationUtils {
   }
   public static String getTokenText(List<? extends CoreMap> tokens, Class tokenTextKey, String delimiter)
   {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (CoreMap t: tokens) {
       if (sb.length() != 0) {
         sb.append(delimiter);

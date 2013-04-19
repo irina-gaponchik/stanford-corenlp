@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 
 /** Provides a tokenizer or lexer that does a pretty good job at
@@ -11903,7 +11903,7 @@ class PTBLexer {
         throw new IllegalArgumentException("PTBLexer: the invertible option requires a CoreLabelTokenFactory");
       }
       prevWord = (CoreLabel) tf.makeToken("", 0, 0);
-      prevWordAfter = new TxtBuilder();
+      prevWordAfter = new TextBuilder();
     }
     if (strictTreebank3) {
       yybegin(YyStrictlyTreebank3);
@@ -11917,7 +11917,7 @@ class PTBLexer {
 
   private LexedTokenFactory<?> tokenFactory;
   private CoreLabel prevWord;
-  private TxtBuilder prevWordAfter;
+  private TextBuilder prevWordAfter;
   private boolean seenUntokenizableCharacter;
   private enum UntokenizableOptions { NONE_DELETE, FIRST_DELETE, ALL_DELETE, NONE_KEEP, FIRST_KEEP, ALL_KEEP }
   private UntokenizableOptions untokenizable = UntokenizableOptions.FIRST_DELETE;
@@ -12005,7 +12005,7 @@ class PTBLexer {
       return in;
     }
     int length = in.length();
-    TxtBuilder out = new TxtBuilder(length - 1);
+    TextBuilder out = new TextBuilder(length - 1);
     for (int i = 0; i < length; i++) {
       char ch = in.charAt(i);
       if (ch != '\u00AD') {

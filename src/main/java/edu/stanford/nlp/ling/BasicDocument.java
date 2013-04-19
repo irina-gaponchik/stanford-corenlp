@@ -4,7 +4,7 @@ import edu.stanford.nlp.process.TokenizerFactory;
 import edu.stanford.nlp.process.PTBTokenizer;
 import edu.stanford.nlp.process.Tokenizer;
 import edu.stanford.nlp.util.ErasureUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.*;
 import java.net.URL;
@@ -413,7 +413,7 @@ public class BasicDocument<L> extends ArrayList<Word> implements Document<L, Wor
    * override this method.</p>
    */
   public String presentableText() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (Word cur : this) {
       if (sb.length() > 0) {
         sb.append(' ');

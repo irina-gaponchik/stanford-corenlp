@@ -1,6 +1,6 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.Serializable;
 import java.util.List;
@@ -128,7 +128,7 @@ public class IntTuple implements Serializable, Comparable<IntTuple> {
 
   @Override
   public String toString() {
-    TxtBuilder name = new TxtBuilder();
+    TextBuilder name = new TextBuilder();
     for (int i = 0; i < elements.length; i++) {
       name.append(get(i));
       if (i < elements.length - 1) {

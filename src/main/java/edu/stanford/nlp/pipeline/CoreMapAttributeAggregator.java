@@ -5,8 +5,8 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.stats.IntCounter;
 import edu.stanford.nlp.util.ArrayMap;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.util.*;
 
@@ -133,7 +133,7 @@ public abstract class CoreMapAttributeAggregator
     }
     public Object aggregate(Class key, List<? extends CoreMap> in) {
       if (in == null) return null;
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       for (CoreMap cm:in) {
         Object obj = cm.get(key);
         if (obj != null) {
@@ -241,8 +241,9 @@ public abstract class CoreMapAttributeAggregator
   }
   public final static CoreMapAttributeAggregator MOST_FREQ = new MostFreqAggregator();
 
-  private static final Map<String, CoreMapAttributeAggregator> AGGREGATOR_LOOKUP = Generics.newHashMap();
-  static {
+  private static final Map<String, CoreMapAttributeAggregator> AGGREGATOR_LOOKUP = new FastMap<>();
+
+    static {
     AGGREGATOR_LOOKUP.put("FIRST", FIRST);
     AGGREGATOR_LOOKUP.put("FIRST_NON_NIL", FIRST_NON_NIL);
     AGGREGATOR_LOOKUP.put("LAST", LAST);

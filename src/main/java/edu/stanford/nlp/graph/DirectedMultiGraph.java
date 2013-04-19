@@ -3,8 +3,9 @@ package edu.stanford.nlp.graph;
 import java.util.*;
 
 import edu.stanford.nlp.util.CollectionUtils;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * Simple graph library; this is directed for now. This class focuses on time
@@ -21,9 +22,9 @@ import javolution.text.TxtBuilder;
 
 public class DirectedMultiGraph<V, E> implements Graph<V, E> /* Serializable */{
 
-  Map<V, Map<V, List<E>>> outgoingEdges = Generics.newHashMap();
+  Map<V, Map<V, List<E>>> outgoingEdges = new FastMap<>();
 
-  Map<V, Map<V, List<E>>> incomingEdges = Generics.newHashMap();
+    Map<V, Map<V, List<E>>> incomingEdges = new FastMap<>();
 
     /**
    * Be careful hashing these. They are mutable objects, and changing the object
@@ -45,8 +46,8 @@ public class DirectedMultiGraph<V, E> implements Graph<V, E> /* Serializable */{
   public boolean addVertex(V v) {
     if (outgoingEdges.containsKey(v))
       return false;
-    outgoingEdges.put(v, Generics.<V, List<E>>newHashMap());
-    incomingEdges.put(v, Generics.<V, List<E>>newHashMap());
+      outgoingEdges.put(v, new FastMap<V, List<E>>());
+      incomingEdges.put(v, new FastMap<V, List<E>>()) ;
     return true;
   }
 
@@ -201,7 +202,7 @@ public class DirectedMultiGraph<V, E> implements Graph<V, E> /* Serializable */{
 
     if (children == null && parents == null)
       return null;
-    Set<V> neighbors = Generics.newHashSet();
+      Set<V> neighbors = new FastSet<>();
     neighbors.addAll(children);
     neighbors.addAll(parents);
     return neighbors;
@@ -477,7 +478,7 @@ public class DirectedMultiGraph<V, E> implements Graph<V, E> /* Serializable */{
 
   @Override
   public String toString() {
-    TxtBuilder s = new TxtBuilder();
+    TextBuilder s = new TextBuilder();
     s.append("{\n");
     s.append("Vertices:\n");
     for (V vertex : outgoingEdges.keySet()) {

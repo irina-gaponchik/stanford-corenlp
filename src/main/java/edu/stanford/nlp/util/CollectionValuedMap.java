@@ -1,6 +1,6 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -332,7 +332,7 @@ public class CollectionValuedMap<K, V> implements Map<K, Collection<V>>, Seriali
    */
   @Override
   public String toString() {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     buf.append('{');
 
     Iterator<Entry<K, Collection<V>>> i = entrySet().iterator();

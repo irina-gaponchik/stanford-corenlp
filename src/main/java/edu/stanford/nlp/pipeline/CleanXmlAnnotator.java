@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.util.XMLUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 
 /**
@@ -90,7 +90,7 @@ public class CleanXmlAnnotator implements Annotator{
 
       // if the doc date was found, save it. it is used by SUTime (inside the "ner" annotator)
       if(!dateTokens.isEmpty()){
-        TxtBuilder os = new TxtBuilder();
+        TextBuilder os = new TextBuilder();
         boolean first = true;
         for (CoreLabel t : dateTokens) {
           if (!first) os.append(' ');
@@ -121,7 +121,7 @@ public class CleanXmlAnnotator implements Annotator{
 
     // we use this to store the before & after annotations if the
     // tokens were tokenized for "invertible"
-    TxtBuilder removedText = new TxtBuilder();
+    TextBuilder removedText = new TextBuilder();
     // we keep track of this so we can look at the last tag after
     // we're outside the loop
 
@@ -156,7 +156,7 @@ public class CleanXmlAnnotator implements Annotator{
             else
               previous.set(CoreAnnotations.AfterAnnotation.class, removedText.toString());
           }
-          removedText = new TxtBuilder();
+          removedText = new TextBuilder();
         }
         if (currentTagSet == null) {
           // We wrap the list in an unmodifiable list because we reuse

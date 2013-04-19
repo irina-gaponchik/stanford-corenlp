@@ -60,7 +60,7 @@ import java.util.Set;
  *   <tr>
  *     <td>{@link edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation}</td>
  *     <td>{@code String}</td>
- *     <td>Txt (for each sentence or for entire annotation if no sentences)</td>
+ *     <td>Text (for each sentence or for entire annotation if no sentences)</td>
  *     <td>Optional</td>
  *   </tr>
  *   <tr><td colspan="4"><center><b>Per token annotations</b></center></td></tr>
@@ -132,7 +132,7 @@ import java.util.Set;
  *   <tr>
  *     <td>{@link edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation}</td>
  *     <td>{@code String}</td>
- *     <td>Txt of this time expression</td>
+ *     <td>Text of this time expression</td>
  *   </tr>
  *   <tr>
  *     <td>{@link edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation}</td>

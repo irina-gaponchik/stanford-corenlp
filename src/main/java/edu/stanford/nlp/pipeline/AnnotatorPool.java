@@ -2,7 +2,7 @@ package edu.stanford.nlp.pipeline;
 
 import java.util.Map;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 /**
  * An object for keeping track of Annotators. Typical use is to allow multiple
@@ -24,8 +24,8 @@ public class AnnotatorPool {
    * Create an empty AnnotatorPool.
    */
   public AnnotatorPool() {
-    this.annotators = Generics.newHashMap();
-    this.factories = Generics.newHashMap();
+      this.annotators = new FastMap<>();
+      this.factories = new FastMap<>();
   }
 
   /**

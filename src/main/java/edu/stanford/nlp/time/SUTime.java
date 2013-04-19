@@ -4,7 +4,8 @@ import edu.stanford.nlp.ling.tokensregex.types.Expressions;
 import edu.stanford.nlp.util.*;
 
 import edu.stanford.nlp.util.Interval;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -1975,7 +1976,7 @@ public class SUTime {
       if ((flags & FORMAT_TIMEX3_VALUE) != 0) {
         return null;
       } // TODO: is there timex3 standard?
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       sb.append("~(");
       if (base != null) {
         sb.append(base.toFormattedString(flags));
@@ -2069,7 +2070,7 @@ public class SUTime {
             if ((flags & FORMAT_ISO) != 0 || (flags & FORMAT_TIMEX3_VALUE) != 0) return null;
 // TODO: is there iso standard?
             // TODO: is there timex3 standard?
-            TxtBuilder sb = new TxtBuilder();
+            TextBuilder sb = new TextBuilder();
             if (base != null && !base.equals(TIME_REF)) sb.append(base.toFormattedString(flags));
             if (tempOp != null) {
                 if (sb.length() > 0) {
@@ -2807,7 +2808,7 @@ public class SUTime {
 
     public String toString() {
       // TODO: is the right way to print this object?
-      TxtBuilder os = new TxtBuilder();
+      TextBuilder os = new TextBuilder();
       if (era == ERA_BC) {
         os.append('-');
       } else if (era == ERA_AD) {
@@ -3619,7 +3620,7 @@ public class SUTime {
         // return super.toFormattedString(flags);
         return null;
       }
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       if (minDuration != null)
         sb.append(minDuration.toFormattedString(flags));
       sb.append('/');
@@ -3780,7 +3781,7 @@ public class SUTime {
     // public boolean includeTimexAltValue() { return true; }
     public String toFormattedString(int flags) {
         if ((flags & (FORMAT_ISO | FORMAT_TIMEX3_VALUE)) == 0) {
-            TxtBuilder sb = new TxtBuilder();
+            TextBuilder sb = new TextBuilder();
             sb.append('(');
             if (begin != null)
                 sb.append(begin);
@@ -3988,7 +3989,7 @@ public class SUTime {
     }
 
     public ExplicitTemporalSet setTimeZone(DateTimeZone tz) {
-      Set<Temporal> tzTemporals = Generics.newHashSet(temporals.size());
+        Set<Temporal> tzTemporals = new FastSet<>(temporals.size());
       for (Temporal t:temporals) {
         tzTemporals.add(Temporal.setTimeZone(t, tz));
       }
@@ -4043,7 +4044,7 @@ public class SUTime {
         return this;
       if (other.equals(TIME_UNKNOWN) || other.equals(DURATION_UNKNOWN))
         return this;
-      Set<Temporal> newTemporals = Generics.newHashSet();
+        Set<Temporal> newTemporals = new FastSet<>();
       for (Temporal t : temporals) {
         Temporal t2 = t.intersect(other);
         if (t2 != null)

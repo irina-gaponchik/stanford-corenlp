@@ -4,8 +4,8 @@ import java.io.Serializable;
 import java.util.Map;
 
 import edu.stanford.nlp.objectbank.ObjectBank;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Timing;
+import javolution.util.FastMap;
 
 
 /** Maps a String to its distributional similarity class.
@@ -39,7 +39,7 @@ public class DistSimClassifier implements Serializable {
     this.numberEquivalence = numberEquivalence;
     this.unknownWordClass = unknownWordClass;
     Timing.startDoing("Loading distsim lexicon from " + filename);
-    lexicon = Generics.newHashMap(1 << 15);  // make a reasonable starting size
+      lexicon = new FastMap<>(1 << 15);  // make a reasonable starting size
     boolean terryKoo = "terryKoo".equals(format);
     for (String line : ObjectBank.getLineIterator(filename, encoding)) {
       CharSequence word;

@@ -7,7 +7,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import static edu.stanford.nlp.parser.lexparser.IntTaggedWord.ANY_WORD_INT;
 import static edu.stanford.nlp.parser.lexparser.IntTaggedWord.ANY_TAG_INT;
@@ -86,7 +86,7 @@ public class MLEDependencyGrammar extends AbstractDependencyGrammar {
   public String toString() {
     NumberFormat nf = NumberFormat.getNumberInstance();
     nf.setMaximumFractionDigits(2);
-    TxtBuilder sb = new TxtBuilder(2000);
+    TextBuilder sb = new TextBuilder(2000);
     String cl = getClass().getName();
     sb.append(cl.substring(cl.lastIndexOf('.') + 1)).append("[tagbins=");
     sb.append(numTagBins).append(",wordTokens=").append(numWordTokens).append("; head -> arg\n");

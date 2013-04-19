@@ -28,8 +28,8 @@
 package edu.stanford.nlp.tagger.maxent;
 
 import edu.stanford.nlp.international.french.FrenchUnknownWordSignatures;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.util.FastSet;
 
 import java.util.*;
 
@@ -617,7 +617,7 @@ class CompanyNameDetector extends RareExtractor {
   final Set<String> companyNameEnds;
 
   public CompanyNameDetector() {
-    companyNameEnds = Generics.newHashSet();
+      companyNameEnds = new FastSet<>();
     companyNameEnds.add("Company");
     companyNameEnds.add("COMPANY");
     companyNameEnds.add("Co.");
@@ -679,7 +679,7 @@ class CaselessCompanyNameDetector extends RareExtractor {
   private final Set<String> companyNameEnds;
 
   public CaselessCompanyNameDetector() {
-    companyNameEnds = Generics.newHashSet();
+      companyNameEnds = new FastSet<>();
     CompanyNameDetector cased = new CompanyNameDetector();
     for (String name : cased.companyNameEnds) {
       companyNameEnds.add(name.toLowerCase());

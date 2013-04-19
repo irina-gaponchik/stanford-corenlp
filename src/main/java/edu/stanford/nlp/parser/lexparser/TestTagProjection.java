@@ -12,7 +12,7 @@ package edu.stanford.nlp.parser.lexparser;
 //  Roger
 
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /** @author Dan Klein */
 class TestTagProjection implements TagProjection {
@@ -20,7 +20,7 @@ class TestTagProjection implements TagProjection {
   private static final long serialVersionUID = 9161675508802284114L;
 
   public String project(String tagStr) {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     boolean good = true;
     for (int pos = 0, len = tagStr.length(); pos < len; pos++) {
       char c = tagStr.charAt(pos);

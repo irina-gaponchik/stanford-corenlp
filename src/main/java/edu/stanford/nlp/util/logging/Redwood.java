@@ -15,8 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * A hierarchical channel based logger. Log messages are arranged hierarchically by depth
@@ -91,8 +92,8 @@ public class Redwood {
   /**
    * Queue of tasks to be run in various threads
    */
-  private static final Map<Long,Queue<Runnable>> threadedLogQueue = Generics.newHashMap();
-  /**
+  private static final Map<Long,Queue<Runnable>> threadedLogQueue = new FastMap<>();
+    /**
    * Thread id which currently has control of the Redwood
    */
   private static long currentThread = -1L;
@@ -393,7 +394,8 @@ public class Redwood {
    * Removes all classes from the list of known logging classes
    */
   protected static void clearLoggingClasses(){
-    if(loggingClasses == null){ loggingClasses = Generics.newHashSet(); }
+    if(loggingClasses == null){
+        loggingClasses = new FastSet<>();}
     loggingClasses.clear();
   }
 
@@ -758,7 +760,7 @@ public class Redwood {
    * @param diff Time difference in milliseconds
    * @param b The string builder to append to
    */
-  protected static void formatTimeDifference(long diff, TxtBuilder b){
+  protected static void formatTimeDifference(long diff, TextBuilder b){
     //--Get Values
     int mili = (int) diff % 1000;
     long rest = diff / 1000;
@@ -1026,7 +1028,7 @@ public class Redwood {
       }
     }
 
-    private TxtBuilder toStringHelper(TxtBuilder b, int depth){
+    private TextBuilder toStringHelper(TextBuilder b, int depth){
       for(int i=0; i<depth; i++){
         b.append("  ");
       }
@@ -1038,7 +1040,7 @@ public class Redwood {
     }
     @Override
     public String toString(){
-      return toStringHelper(new TxtBuilder(), 0).toString();
+      return toStringHelper(new TextBuilder(), 0).toString();
     }
   }
 

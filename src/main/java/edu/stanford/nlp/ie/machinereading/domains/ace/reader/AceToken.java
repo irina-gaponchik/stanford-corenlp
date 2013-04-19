@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import edu.stanford.nlp.ie.machinereading.common.SimpleTokenize;
 import edu.stanford.nlp.ie.machinereading.common.StringDictionary;
 import edu.stanford.nlp.trees.Span;
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
 
 public class AceToken {
     private static final Pattern COMPILE = Pattern.compile(" ");
@@ -90,7 +90,7 @@ public class AceToken {
     WORDS.setMode(true);
     LEMMAS.setMode(true);
     OTHERS.setMode(true);
-    PROX_CLASSES = Generics.newHashMap();
+      PROX_CLASSES = new FastMap<>();
 
     SGML_PATTERN = Pattern.compile("<[^<>]+>");
   }
@@ -98,22 +98,22 @@ public class AceToken {
   public static void loadGazetteers(String dataPath) throws IOException {
 
     System.err.print("Loading location gazetteer... ");
-    LOC_GAZ = Generics.newHashMap();
+      LOC_GAZ = new FastMap<>();
     loadDictionary(LOC_GAZ, dataPath + File.separator + "world_small.gaz.nonambiguous");
     System.err.println("done.");
 
     System.err.print("Loading first-name gazetteer... ");
-    FIRST_GAZ = Generics.newHashMap();
+      FIRST_GAZ = new FastMap<>();
     loadDictionary(FIRST_GAZ, dataPath + File.separator + "per_first.gaz");
     System.err.println("done.");
 
     System.err.print("Loading last-name gazetteer... ");
-    LAST_GAZ = Generics.newHashMap();
+      LAST_GAZ = new FastMap<>();
     loadDictionary(LAST_GAZ, dataPath + File.separator + "per_last.gaz");
     System.err.println("done.");
 
     System.err.print("Loading trigger-word gazetteer... ");
-    TRIGGER_GAZ = Generics.newHashMap();
+      TRIGGER_GAZ = new FastMap<>();
     loadDictionary(TRIGGER_GAZ, dataPath + File.separator + "triggers.gaz");
     System.err.println("done.");
   }

@@ -2,7 +2,7 @@
 /* JavaCCOptions:KEEP_LINE_COL=null */
 package edu.stanford.nlp.trees.tregex.tsurgeon;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * This exception is thrown when parse errors are encountered.
@@ -90,7 +90,7 @@ public class ParseException extends Exception {
                            int[][] expectedTokenSequences,
                            String... tokenImage) {
     String eol = System.getProperty("line.separator", "\n");
-    TxtBuilder expected = new TxtBuilder();
+    TextBuilder expected = new TextBuilder();
     int maxSize = 0;
       for (int[] expectedTokenSequence : expectedTokenSequences) {
           if (maxSize < expectedTokenSequence.length) {
@@ -136,7 +136,7 @@ public class ParseException extends Exception {
    * string literal.
    */
   static String add_escapes(String str) {
-      TxtBuilder retval = new TxtBuilder();
+      TextBuilder retval = new TextBuilder();
       char ch;
       for (int i = 0; i < str.length(); i++) {
         switch (str.charAt(i))

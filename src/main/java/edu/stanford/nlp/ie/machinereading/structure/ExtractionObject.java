@@ -13,9 +13,9 @@ import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 /**
  * Represents any object that can be extracted - entity, relation, event
@@ -99,7 +99,7 @@ public class ExtractionObject implements Serializable {
   
   public String getExtentString() {
     List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (int i = extentTokenSpan.start(); i < extentTokenSpan.end(); i ++){
       CoreLabel token = tokens.get(i);
       if(i > extentTokenSpan.start()) sb.append(' ');
@@ -168,7 +168,7 @@ public class ExtractionObject implements Serializable {
    */
   final public String getFullValue() {
     List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     if(tokens != null && extentTokenSpan != null){
       for(int i = extentTokenSpan.start(); i < extentTokenSpan.end(); i ++){
         if(i > extentTokenSpan.start()) sb.append(' ');
@@ -192,13 +192,13 @@ public class ExtractionObject implements Serializable {
   public static String concatenateTypes(String t1, String t2) {
     String [] t1Toks = t1.split(TYPE_SEP);
     String [] t2Toks = t2.split(TYPE_SEP);
-    Set<String> uniqueTypes = Generics.newHashSet();
+      Set<String> uniqueTypes = new FastSet<>();
       Collections.addAll(uniqueTypes, t1Toks);
       Collections.addAll(uniqueTypes, t2Toks);
     String [] types = new String[uniqueTypes.size()];
     uniqueTypes.toArray(types);
     Arrays.sort(types);
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     for(int i = 0; i < types.length; i ++){
       if(i > 0) os.append(TYPE_SEP);
       os.append(types[i]);
@@ -221,7 +221,7 @@ public class ExtractionObject implements Serializable {
   }
   String probsToString() {
     List<Pair<String, Double>> sorted = Counters.toDescendingMagnitudeSortedListWithCounts(typeProbabilities);
-    TxtBuilder os = new TxtBuilder();
+    TextBuilder os = new TextBuilder();
     os.append('{');
     boolean first = true;
     for(Pair<String, Double> lv: sorted) {

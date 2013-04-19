@@ -6,8 +6,8 @@ import edu.stanford.nlp.ling.tokensregex.types.Expressions;
 import edu.stanford.nlp.ling.tokensregex.types.Value;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 import org.joda.time.*;
 import org.joda.time.format.*;
 
@@ -207,7 +207,7 @@ public class TimeFormatter {
         quantifier = quantifier != null ? quantifier + str : str;
     }
     
-    public TxtBuilder appendRegex(TxtBuilder sb) {
+    public TextBuilder appendRegex(TextBuilder sb) {
       if (group > 0) {
         sb.append('(');
       }
@@ -220,7 +220,7 @@ public class TimeFormatter {
       }
       return sb;
     }
-    abstract protected TxtBuilder appendRegex0(TxtBuilder sb);
+    abstract protected TextBuilder appendRegex0(TextBuilder sb);
 
     public SUTime.Temporal updateTemporal(SUTime.Temporal t, String fieldValueStr) { return t; }
     public int getGroup() { return group; }
@@ -267,7 +267,7 @@ public class TimeFormatter {
       maxValue = property.getMaximumValueOverall();
     }
 
-    protected TxtBuilder appendRegex0(TxtBuilder sb) {
+    protected TextBuilder appendRegex0(TextBuilder sb) {
       if (maxDigits > 5 || minDigits != maxDigits) {
         sb.append("\\d{").append(minDigits).append(',').append(maxDigits).append('}');
       } else {
@@ -300,7 +300,7 @@ public class TimeFormatter {
       }
     }
 
-    protected TxtBuilder appendRegex0(TxtBuilder sb) {
+    protected TextBuilder appendRegex0(TextBuilder sb) {
       if (maxDigits > 5 || minDigits != maxDigits) {
         sb.append("\\d{").append(minDigits).append(',').append(maxDigits).append('}');
       } else {
@@ -355,7 +355,7 @@ public class TimeFormatter {
       minValue = property.getMinimumValueOverall();
       maxValue = property.getMaximumValueOverall();
       this.validValues = new ArrayList<>(maxValue-minValue+1);
-      this.valueMapping = Generics.newHashMap();
+        this.valueMapping = new FastMap<>();
       for (int i = minValue; i <= maxValue; i++) {
         property.set(i);
         if (isShort != null) {
@@ -384,7 +384,7 @@ public class TimeFormatter {
       return v;
     }
 
-    protected TxtBuilder appendRegex0(TxtBuilder sb) {
+    protected TextBuilder appendRegex0(TextBuilder sb) {
       boolean first = true;
       for (String v:validValues) {
         if (first) {
@@ -400,7 +400,7 @@ public class TimeFormatter {
 
   private static class TimeZoneOffsetComponent extends FormatComponent
   {
-    String zeroOffsetParseText;  // Txt indicating timezone offset is zero
+    String zeroOffsetParseText;  // Text indicating timezone offset is zero
 
     // TimezoneOffset is + or - followed by
     // hh
@@ -415,7 +415,7 @@ public class TimeFormatter {
       this.zeroOffsetParseText = zeroOffsetParseText;
     }
 
-    protected TxtBuilder appendRegex0(TxtBuilder sb) {
+    protected TextBuilder appendRegex0(TextBuilder sb) {
       sb.append("[+-]\\d\\d(?::?\\d\\d(?::?\\d\\d(?:[.,]?\\d{1,3})?)?)?");
       if (zeroOffsetParseText != null) {
         sb.append('|').append(Pattern.quote(zeroOffsetParseText));
@@ -490,7 +490,7 @@ public class TimeFormatter {
     static List<String> validValues;
     static {
       validValues = new ArrayList<>(DateTimeZone.getAvailableIDs());
-      valueMapping = Generics.newHashMap();
+        valueMapping = new FastMap<>();
       for (String str:validValues) {
         valueMapping.put(str.toLowerCase(), DateTimeZone.forID(str));
       }
@@ -508,7 +508,7 @@ public class TimeFormatter {
       return v;
     }
 
-    protected TxtBuilder appendRegex0(TxtBuilder sb) {
+    protected TextBuilder appendRegex0(TextBuilder sb) {
       boolean first = true;
       for (String v:validValues) {
         if (first) {
@@ -538,7 +538,7 @@ public class TimeFormatter {
       this.text = str;
     }
     
-    protected TxtBuilder appendRegex0(TxtBuilder sb) {
+    protected TextBuilder appendRegex0(TextBuilder sb) {
       sb.append(Pattern.quote(text));
       return sb;
     }
@@ -552,7 +552,7 @@ public class TimeFormatter {
       this.regex = regex;
     }
 
-    protected TxtBuilder appendRegex0(TxtBuilder sb) {
+    protected TextBuilder appendRegex0(TextBuilder sb) {
       sb.append(regex);
       return sb;
     }
@@ -571,7 +571,7 @@ public class TimeFormatter {
     }
     
     public String toTextRegex() {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       sb.append("\\b");
       for (FormatComponent fc:pieces) {
         fc.appendRegex(sb);
@@ -964,7 +964,7 @@ public class TimeFormatter {
    * @return the parsed token
    */
   private static String parseToken(String pattern, int... indexRef) {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
 
     int i = indexRef[0];
     int length = pattern.length();

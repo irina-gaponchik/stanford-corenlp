@@ -4,9 +4,9 @@ import edu.stanford.nlp.ling.CoreAnnotation;
 import edu.stanford.nlp.trees.tregex.TregexMatcher;
 import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.trees.tregex.TregexPatternCompiler;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 import java.io.Serializable;
 import java.util.*;
@@ -96,10 +96,10 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
   }
 
   private static Map<Class<? extends GrammaticalRelationAnnotation>, GrammaticalRelation>
-    annotationsToRelations = Generics.newHashMap();
-  private static Map<GrammaticalRelation, Class<? extends GrammaticalRelationAnnotation>>
-    relationsToAnnotations = Generics.newHashMap();
-  private static EnumMap<Language, Map<String, GrammaticalRelation>>
+    annotationsToRelations = new FastMap<>();
+    private static Map<GrammaticalRelation, Class<? extends GrammaticalRelationAnnotation>>
+    relationsToAnnotations = new FastMap<>();
+    private static EnumMap<Language, Map<String, GrammaticalRelation>>
     stringsToRelations = new EnumMap<>(Language.class);
 
   /**
@@ -290,7 +290,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
 
     Map<String, GrammaticalRelation> sToR = stringsToRelations.get(language);
     if (sToR == null) {
-      sToR = Generics.newHashMap();
+        sToR = new FastMap<>();
       stringsToRelations.put(language, sToR);
     }
     GrammaticalRelation previous = sToR.put(toString(), this);
@@ -406,7 +406,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
    *         {@code GrammaticalRelation}
    */
   public String toPrettyString() {
-    TxtBuilder buf = new TxtBuilder("\n");
+    TextBuilder buf = new TextBuilder("\n");
     toPrettyString(0, buf);
     return buf.toString();
   }
@@ -420,7 +420,7 @@ public class GrammaticalRelation implements Comparable<GrammaticalRelation>, Ser
    * @param indentLevel how many levels to indent (0 for root node)
    *
    */
-  private void toPrettyString(int indentLevel, TxtBuilder buf) {
+  private void toPrettyString(int indentLevel, TextBuilder buf) {
     for (int i = 0; i < indentLevel; i++) {
       buf.append("  ");
     }

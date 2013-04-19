@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification.MorphoFeatureType;
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /**
  * Holds a set of morphosyntactic features for a given surface form.
@@ -25,7 +25,7 @@ public class MorphoFeatures implements Serializable {
   protected String altTag;
   
   public MorphoFeatures() {
-    fSpec = Generics.newHashMap();
+      fSpec = new FastMap<>();
   }
   
   public MorphoFeatures(MorphoFeatures other) {
@@ -114,7 +114,7 @@ public class MorphoFeatures implements Serializable {
    */
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for(MorphoFeatureType feat : MorphoFeatureType.values()) {
       if(fSpec.containsKey(feat)) {
         sb.append(String.format("-%s%s%s",feat.toString(),KEY_VAL_DELIM,fSpec.get(feat)));

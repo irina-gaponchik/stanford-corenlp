@@ -6,7 +6,7 @@ import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.objectbank.LineIterator;
 import edu.stanford.nlp.objectbank.IteratorFromReaderFactory;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -71,7 +71,7 @@ public class TrueCasingForNISTDocumentReaderAndWriter implements DocumentReaderA
     int wrong = 0;
     
     for (CoreLabel wi : doc) {
-      TxtBuilder sb = new TxtBuilder();
+      TextBuilder sb = new TextBuilder();
       if (! wi.get(CoreAnnotations.AnswerAnnotation.class).equals(wi.get(CoreAnnotations.GoldAnswerAnnotation.class))) {
         wrong++;
       }

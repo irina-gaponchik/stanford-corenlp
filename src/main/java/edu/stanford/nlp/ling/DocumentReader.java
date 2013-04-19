@@ -2,7 +2,7 @@ package edu.stanford.nlp.ling;
 
 import edu.stanford.nlp.process.TokenizerFactory;
 import edu.stanford.nlp.process.PTBTokenizer;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.*;
 import java.net.URL;
@@ -198,7 +198,7 @@ public class DocumentReader<L> {
     BufferedReader br = getBufferedReader(in);
 
     // reads all the chars into a buffer
-    TxtBuilder sb = new TxtBuilder(16000);  // make biggish
+    TextBuilder sb = new TextBuilder(16000);  // make biggish
     int c;
     while ((c = br.read()) >= 0) {
       sb.append((char) c);

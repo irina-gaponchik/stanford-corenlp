@@ -14,7 +14,7 @@ import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.trees.international.hebrew.HebrewTreeReaderFactory;
 import edu.stanford.nlp.trees.international.hebrew.HebrewTreebankLanguagePack;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /**
  * Initial version of a parser pack for the HTB. Not yet integrated
@@ -30,7 +30,7 @@ public class HebrewTreebankParserParams extends AbstractTreebankParserParams {
 
   private static final long serialVersionUID = -3466519995341208619L;
 
-  private final TxtBuilder optionsString;
+  private final TextBuilder optionsString;
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
   public HebrewTreebankParserParams() {
@@ -39,7 +39,7 @@ public class HebrewTreebankParserParams extends AbstractTreebankParserParams {
 
   protected HebrewTreebankParserParams(TreebankLanguagePack tlp) {
     super(tlp);
-    optionsString = new TxtBuilder();
+    optionsString = new TextBuilder();
     optionsString.append("HebrewTreebankParserParams\n");
   }
 

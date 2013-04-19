@@ -53,9 +53,10 @@ import edu.stanford.nlp.sequences.FeatureFactory;
 import edu.stanford.nlp.sequences.SeqClassifierFlags;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.trees.international.pennchinese.RadicalMap;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.PaddedList;
 import edu.stanford.nlp.util.Timing;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 
 /**
@@ -382,7 +383,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
    */
   @Override
   public Collection<String> getCliqueFeatures(PaddedList<IN> cInfo, int loc, Clique clique) {
-    Collection<String> features = Generics.newHashSet();
+      Collection<String> features = new FastSet<>();
 
     boolean doFE = cInfo.get(0).containsKey(CoreAnnotations.DomainAnnotation.class);
     String domain = doFE ? cInfo.get(0).get(CoreAnnotations.DomainAnnotation.class) : null;
@@ -478,7 +479,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       return;
     }
     Timing.startDoing("Loading distsim lexicon from " + flags.distSimLexicon);
-    lexicon = Generics.newHashMap();
+      lexicon = new FastMap<>();
     boolean terryKoo = "terryKoo".equals(flags.distSimFileFormat);
     for (String line : ObjectBank.getLineIterator(flags.distSimLexicon,
                                                   flags.inputEncoding)) {
@@ -528,10 +529,10 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
   }
 
 
-  private Map<String,Collection<String>> wordToSubstrings = Generics.newHashMap();
+  private Map<String,Collection<String>> wordToSubstrings = new FastMap<>();
 
-  public void clearMemory() {
-    wordToSubstrings = Generics.newHashMap();
+    public void clearMemory() {
+        wordToSubstrings = new FastMap<>();
     lexicon = null;
   }
 
@@ -683,10 +684,10 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
     }
   } // end class GazetteInfo
 
-  private Map<String,Collection<String>> wordToGazetteEntries = Generics.newHashMap();
-  private Map<String,Collection<GazetteInfo>> wordToGazetteInfos = Generics.newHashMap();
+  private Map<String,Collection<String>> wordToGazetteEntries = new FastMap<>();
+    private Map<String,Collection<GazetteInfo>> wordToGazetteInfos = new FastMap<>();
 
-  /** Reads a gazette file.  Each line of it consists of a class name
+    /** Reads a gazette file.  Each line of it consists of a class name
    *  (a String not containing whitespace characters), followed by whitespace
    *  characters followed by a phrase, which is one or more tokens separated
    *  by a single space.
@@ -707,7 +708,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
           if (flags.sloppyGazette) {
             Collection<String> entries = wordToGazetteEntries.get(word);
             if (entries == null) {
-              entries = Generics.newHashSet();
+                entries = new FastSet<>();
               wordToGazetteEntries.put(word, entries);
             }
             String feature = intern(type + "-GAZ" + words.length);
@@ -718,7 +719,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
           if (flags.cleanGazette) {
             Collection<GazetteInfo> infos = wordToGazetteInfos.get(word);
             if (infos == null) {
-              infos = Generics.newHashSet();
+                infos = new FastSet<>();
               wordToGazetteInfos.put(word, infos);
             }
             GazetteInfo info = new GazetteInfo(intern(type + "-GAZ" + words.length), i, words);
@@ -735,7 +736,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
 
   @SuppressWarnings({"unchecked", "SuspiciousMethodCalls"})
   private void makeGenericKeyCache(CoreLabel c) {
-    genericAnnotationKeys = Generics.newHashSet();
+      genericAnnotationKeys = new FastSet<>();
     for (Class<?> key : c.keySet()) {
       if (CoreLabel.genericValues.containsKey(key)) {
         Class<? extends GenericAnnotation<?>> genKey = (Class<? extends GenericAnnotation<?>>) key;
@@ -839,7 +840,7 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       if (flags.checkNameList) {
         try {
           if (lastNames == null) {
-            lastNames = Generics.newHashSet();
+              lastNames = new FastSet<>();
 
             for (String line : ObjectBank.getLineIterator(flags.lastNameList)) {
               String[] cols = line.split("\\s+");
@@ -847,14 +848,14 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
             }
           }
           if (maleNames == null) {
-            maleNames = Generics.newHashSet();
+              maleNames = new FastSet<>();
             for (String line : ObjectBank.getLineIterator(flags.maleNameList)) {
               String[] cols = line.split("\\s+");
               maleNames.add(cols[0]);
             }
           }
           if (femaleNames == null) {
-            femaleNames = Generics.newHashSet();
+              femaleNames = new FastSet<>();
             for (String line : ObjectBank.getLineIterator(flags.femaleNameList)) {
               String[] cols = line.split("\\s+");
               femaleNames.add(cols[0]);
@@ -2139,7 +2140,8 @@ public class NERFeatureFactory<IN extends CoreLabel> extends FeatureFactory<IN> 
       return Collections.singletonList("NO-OCCURRENCE-PATTERN");
     }
     // System.err.println("LOOKING");
-    Set<String> l = Generics.newHashSet();
+      Set<String> l = new
+              FastSet<>();
     if (cInfo.get(loc - reverse(1)).getString(CoreAnnotations.PartOfSpeechAnnotation.class) != null && isNameCase(pWord) && cInfo.get(loc - reverse(1)).getString(CoreAnnotations.PartOfSpeechAnnotation.class).equals("NNP")) {
       for (int jump = 3; jump < 150; jump++) {
         if (getWord(cInfo.get(loc + reverse(jump))).equals(word)) {

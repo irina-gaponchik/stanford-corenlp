@@ -6,8 +6,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /**
  *  A class to redirect the output of Redwood to another logging mechanism,
@@ -104,7 +104,7 @@ public class RedirectOutputHandler<LoggerClass, ChannelEquivalent> extends Outpu
    * @inheritDoc
    */
   @Override
-  protected boolean formatChannel(TxtBuilder b, String channelStr, Object channel){
+  protected boolean formatChannel(TextBuilder b, String channelStr, Object channel){
     return !(channelMapping != null && channelMapping.containsKey(channel));
   }
 
@@ -113,7 +113,7 @@ public class RedirectOutputHandler<LoggerClass, ChannelEquivalent> extends Outpu
   //
 
   public static RedirectOutputHandler<Logger, Level> fromJavaUtilLogging(Logger logger) {
-    Map <Object, Level> channelMapping = Generics.newHashMap();
+      Map <Object, Level> channelMapping = new FastMap<>();
     channelMapping.put(Redwood.WARN, Level.WARNING);
     channelMapping.put(Redwood.DBG, Level.FINE);
     channelMapping.put(Redwood.ERR, Level.SEVERE);

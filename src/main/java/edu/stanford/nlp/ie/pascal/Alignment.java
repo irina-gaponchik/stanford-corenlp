@@ -1,6 +1,6 @@
 package edu.stanford.nlp.ie.pascal;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class Alignment {
   public void serialize(PrintWriter writer) {
     writer.println(new String(longForm));
     writer.println(new String(shortForm));
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
       for (int pointer : pointers) {
           sb.append(pointer).append(' ');
       }
@@ -74,7 +74,7 @@ public class Alignment {
   private static final char[] spaces = "                      ".toCharArray();
 
   public String toString(String prefix) {
-    TxtBuilder buf = new TxtBuilder();
+    TextBuilder buf = new TextBuilder();
     buf.append(prefix);
     buf.append(longForm);
     buf.append('\n');

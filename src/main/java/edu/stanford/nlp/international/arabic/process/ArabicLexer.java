@@ -10,9 +10,9 @@ import java.util.regex.Pattern;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.process.LexedTokenFactory;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.PropertiesUtils;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
 
 /**
  * Tokenizer for UTF-8 Arabic. Supports raw text and both sections
@@ -640,7 +640,7 @@ class ArabicLexer {
  }
 
  private void setupNormalizationMap() {
-   normMap = Generics.newHashMap(200);
+     normMap = new FastMap<>(200);
 
    // Junk characters that we always remove
    normMap.put("\u0600","#");
@@ -783,7 +783,7 @@ class ArabicLexer {
      text = segmentationMarker.matcher(text).replaceAll("");
    }
    int len = text.length();
-   TxtBuilder sb = new TxtBuilder(len);
+   TextBuilder sb = new TextBuilder(len);
    for (int i = 0; i < len; ++i) {
      String thisChar = String.valueOf(text.charAt(i));
      // Remove morpheme markers from the ATB vocalized section

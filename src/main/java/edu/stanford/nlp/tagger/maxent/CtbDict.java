@@ -4,11 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import edu.stanford.nlp.util.Generics;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 public class CtbDict {
 
@@ -42,8 +42,8 @@ public class CtbDict {
     BufferedReader ctbDetectorReader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "GB18030"));
     String ctbDetectorLine;
 
-    ctb_pre_dict = Generics.newHashMap();
-    ctb_suf_dict = Generics.newHashMap();
+      ctb_pre_dict = new FastMap<>();
+      ctb_suf_dict = new FastMap<>();
 
     while ((ctbDetectorLine = ctbDetectorReader.readLine()) != null) {
       String[] fields = ctbDetectorLine.split("	");
@@ -52,13 +52,13 @@ public class CtbDict {
       Set<String> sufs=ctb_suf_dict.get(tag);
 
       if(pres==null){
-        pres = Generics.newHashSet();
+          pres = new FastSet<>();
         ctb_pre_dict.put(tag,pres);
       }
       pres.add(fields[1]);
 
       if(sufs==null){
-        sufs = Generics.newHashSet();
+          sufs = new FastSet<>();
         ctb_suf_dict.put(tag,sufs);
       }
       sufs.add(fields[2]);

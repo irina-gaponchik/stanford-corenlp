@@ -11,8 +11,8 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
 
-import edu.stanford.nlp.util.Generics;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 /**
  * Immutable class for representing normalized, smoothed discrete distributions
@@ -754,7 +754,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
           return probabilityOf(o1) < probabilityOf(o2) ? 1 : -1;
       }
     });
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append('[');
     for (int i = 0; i < NUM_ENTRIES_IN_STRING; i++) {
       if (keyList.size() <= i) {
@@ -784,7 +784,7 @@ public class Distribution<E> implements Sampler<E>, ProbabilityDistribution<E> {
     double p = 1000;
 
     String UNK = "!*UNKNOWN*!";
-    Set<String> s = Generics.newHashSet();
+      Set<String> s = new FastSet<>();
     s.add(UNK);
 
     // fill counter with roughly Zipfian distribution

@@ -1,8 +1,8 @@
 
 package edu.stanford.nlp.util.logging;
 
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.logging.Redwood.Record;
+import javolution.util.FastSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,9 +20,9 @@ public class VisibilityHandler extends LogRecordHandler {
   private enum State { SHOW_ALL, HIDE_ALL }
 
   private VisibilityHandler.State defaultState = State.SHOW_ALL;
-  private final Set<Object> deltaPool = Generics.newHashSet();
+  private final Set<Object> deltaPool = new FastSet<>();
 
-  public VisibilityHandler() { }
+    public VisibilityHandler() { }
 
   public VisibilityHandler(Object... channels) {
     if (channels.length > 0) {

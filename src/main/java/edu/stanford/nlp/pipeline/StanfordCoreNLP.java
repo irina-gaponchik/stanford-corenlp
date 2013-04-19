@@ -42,7 +42,8 @@ import edu.stanford.nlp.trees.TreePrint;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.logging.Redwood;
 import edu.stanford.nlp.util.logging.StanfordRedwoodConfiguration;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 import java.io.*;
 import java.util.*;
@@ -256,8 +257,8 @@ public class StanfordCoreNLP extends AnnotationPipeline {
 
     // now construct the annotators from the given properties in the given order
     List<String> annoNames = Arrays.asList(COMPILE2.split(getRequiredProperty(props, "annotators")));
-    Set<String> alreadyAddedAnnoNames = Generics.newHashSet();
-    Set<Requirement> requirementsSatisfied = Generics.newHashSet();
+      Set<String> alreadyAddedAnnoNames = new FastSet<>();
+      Set<Requirement> requirementsSatisfied = new FastSet<>();
     for (String name : annoNames) {
       name = name.trim();
       if (name.isEmpty()) { continue; }
@@ -340,7 +341,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       @Override
       public String signature() {
         // keep track of all relevant properties for this annotator here!
-        TxtBuilder os = new TxtBuilder();
+        TextBuilder os = new TextBuilder();
         os.append("tokenize.whitespace:").append(properties.getProperty("tokenize.whitespace", "false"));
         if (Boolean.valueOf(properties.getProperty("tokenize.whitespace",
                 "false"))) {
@@ -423,17 +424,17 @@ public class StanfordCoreNLP extends AnnotationPipeline {
           // regular boundaries
           String bounds = properties.getProperty("ssplit.boundariesToDiscard");
           if (bounds != null){
-            String [] toks = COMPILE3.split(bounds);
+            final String [] toks = COMPILE3.split(bounds);
             // for(int i = 0; i < toks.length; i ++)
             //   System.err.println("BOUNDARY: " + toks[i]);
-            wts.setSentenceBoundaryToDiscard(Generics.newHashSet (Arrays.asList(toks)));
+              wts.setSentenceBoundaryToDiscard(new FastSet<String>(){{addAll((Collection<? extends String>) Arrays.asList(toks));}});
           }
 
           // HTML boundaries
           bounds = properties.getProperty("ssplit.htmlBoundariesToDiscard");
           if (bounds != null){
-            String [] toks = COMPILE3.split(bounds);
-            wts.addHtmlSentenceBoundaryToDiscard(Generics.newHashSet (Arrays.asList(toks)));
+            final String [] toks = COMPILE3.split(bounds);
+              wts.addHtmlSentenceBoundaryToDiscard(new FastSet<String>(){{addAll(Arrays.asList(toks));}});
           }
 
           // Treat as one sentence
@@ -449,7 +450,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
       @Override
       public String signature() {
         // keep track of all relevant properties for this annotator here!
-        TxtBuilder os = new TxtBuilder();
+        TextBuilder os = new TextBuilder();
         os.append(NEWLINE_SPLITTER_PROPERTY + ':').append(properties.getProperty(NEWLINE_SPLITTER_PROPERTY, "false"));
         if(Boolean.valueOf(properties.getProperty(NEWLINE_SPLITTER_PROPERTY,
                 "false"))) {
@@ -800,7 +801,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
             // keep track of all relevant properties for this annotator here!
             // since we don't know what props they need, let's copy all
             // TODO: can we do better here? maybe signature() should be a method in the Annotator?
-            TxtBuilder os = new TxtBuilder();
+            TextBuilder os = new TextBuilder();
             for(Object key: properties.keySet()) {
               String skey = (String) key;
               os.append(skey).append(':').append(properties.getProperty(skey));
@@ -1020,7 +1021,7 @@ public class StanfordCoreNLP extends AnnotationPipeline {
    */
   @Override
   public String timingInformation() {
-    TxtBuilder sb = new TxtBuilder(super.timingInformation());
+    TextBuilder sb = new TextBuilder(super.timingInformation());
     if (numWords >= 0) {
       long total = this.getTotalTime();
       sb.append(" for ").append(this.numWords).append(" tokens at ");

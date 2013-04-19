@@ -21,13 +21,13 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.stats.Counter;
 import edu.stanford.nlp.stats.TwoDimensionalCounter;
 import edu.stanford.nlp.objectbank.ObjectBank;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.ScoredComparator;
 import edu.stanford.nlp.util.ScoredObject;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastSet;
 
 
 /**
@@ -165,7 +165,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
 
   public Dataset<L, F> getRandomSubDataset(double p, int seed) {
     int newSize = (int)(p * size());
-    Set<Integer> indicesToKeep = Generics.newHashSet();
+      Set<Integer> indicesToKeep = new FastSet<>();
     Random r = new Random(seed);
     int s = size();
     while (indicesToKeep.size() < newSize) {
@@ -264,7 +264,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
     for (int i=0; i < this.size(); i++)
     {
       BasicDatum<L, F> datum = (BasicDatum<L, F>) getDatum(i);
-      Set<F> featureSet   = Generics.newHashSet(datum.asFeatures());
+        Set<F> featureSet   = new FastSet<>((Set<? extends F>) datum.asFeatures());
       for (F key : featureSet) {
         featureCounts.incrementCount(key, 1.0);
       }
@@ -424,7 +424,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
   }
 
   public String toSummaryStatistics() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append("numDatums: ").append(size).append('\n');
     sb.append("numLabels: ").append(labelIndex.size()).append(" [");
     Iterator<L> iter = labelIndex.iterator();
@@ -511,7 +511,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
     pw.println();
     for (int i = 0; i < labels.length; i++) {
       pw.print(labelIndex.get(i));
-      Set<Integer> feats = Generics.newHashSet();
+        Set<Integer> feats = new FastSet<>();
       for (int j = 0; j < data[i].length; j++) {
         int feature = data[i][j];
         feats.add(feature);
@@ -747,7 +747,7 @@ public class Dataset<L, F> extends GeneralDataset<L, F> {
   public static void printSVMLightFormat(PrintWriter pw, ClassicCounter<Integer> c, int classNo) {
     Integer[] features = c.keySet().toArray(new Integer[c.keySet().size()]);
     Arrays.sort(features);
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     sb.append(classNo);
     sb.append(' ');
     for (int f: features) {

@@ -5,7 +5,7 @@ import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -1974,7 +1974,7 @@ public class EnglishTreebankParserParams extends AbstractTreebankParserParams {
 
 
   private static String subCatify(Tree t) {
-    TxtBuilder sb = new TxtBuilder("^a");
+    TextBuilder sb = new TextBuilder("^a");
     boolean n = false;
     boolean s = false;
     boolean p = false;

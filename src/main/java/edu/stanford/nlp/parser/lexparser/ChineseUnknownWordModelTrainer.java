@@ -1,7 +1,5 @@
 package edu.stanford.nlp.parser.lexparser;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,9 +7,9 @@ import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.Tag;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.stats.ClassicCounter;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 public class ChineseUnknownWordModelTrainer 
   extends AbstractUnknownWordModelTrainer 
@@ -70,12 +68,12 @@ public class ChineseUnknownWordModelTrainer
       System.err.println("ChineseUWM: using Good-Turing smoothing for unknown words.");
     }
 
-    this.c = Generics.newHashMap();
+      this.c = new FastMap<>();
     this.tc = new ClassicCounter<>();
     this.unSeenCounter = new ClassicCounter<>();
     this.seenCounter = new ClassicCounter<>();
-    this.seenFirst = Generics.newHashSet();
-    this.tagHash = Generics.newHashMap();
+      this.seenFirst = new FastSet<>();
+      this.tagHash = new FastMap<>();
     
     this.indexToStartUnkCounting = totalTrees * op.trainOptions.fractionBeforeUnseenCounting;
     

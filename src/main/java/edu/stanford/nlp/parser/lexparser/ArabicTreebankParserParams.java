@@ -17,10 +17,11 @@ import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.trees.international.arabic.*;
 import edu.stanford.nlp.trees.tregex.*;
 import edu.stanford.nlp.util.Function;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 /**
  * A {@link TreebankLangParserParams} implementing class for
@@ -38,7 +39,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     private static final Pattern COMPILE = Pattern.compile("VB[^P].*PRD.*");
     private static final Pattern PATTERN = Pattern.compile(",");
 
-    private final TxtBuilder optionsString;
+    private final TextBuilder optionsString;
 
   private boolean retainNPTmp;
   private boolean retainNPSbj;
@@ -59,10 +60,10 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
   public ArabicTreebankParserParams() {
     super(new ArabicTreebankLanguagePack());
 
-    optionsString = new TxtBuilder();
+    optionsString = new TextBuilder();
     optionsString.append("ArabicTreebankParserParams\n");
 
-    annotationPatterns = Generics.newHashMap();
+      annotationPatterns = new FastMap<>();
     activeAnnotations = new ArrayList<>();
 
     //Initialize the headFinder here
@@ -235,7 +236,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
   public Tree transformTree(Tree t, Tree root) {
 
     String baseCat = t.value();
-    TxtBuilder newCategory = new TxtBuilder();
+    TextBuilder newCategory = new TextBuilder();
 
     //Add manual state splits
     for (Pair<TregexPattern,Function<TregexMatcher,String>> e : activeAnnotations) {
@@ -629,16 +630,11 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
       private String annotationMark;
     private String key;
 
-    private static final String nnTags = "DTNN DTNNP DTNNPS DTNNS NN NNP NNS NNPS";
-    private static final Set<String> nnTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(PATTERN.split(nnTags))));
+    private static final String nnTags = "DTNN DTNNP DTNNPS DTNNS NN NNP NNS NNPS"; private static final Set<String> nnTagClass = Collections.unmodifiableSet(new FastSet<String>(){{addAll(Arrays.asList(PATTERN.split(nnTags)));}});
+  private static final String jjTags = "ADJ_NUM DTJJ DTJJR JJ JJR"; private static final Set<String> jjTagClass =                 Collections.unmodifiableSet(new FastSet<String>(){{addAll(Arrays.asList(COMPILE1.split(jjTags)));}});
+  private static final String vbTags = "VBD VBP"; private static final Set<String> vbTagClass =                                   Collections.unmodifiableSet(new FastSet<String>(){{addAll(Arrays.asList(COMPILE2.split(vbTags)));}});
 
-    private static final String jjTags = "ADJ_NUM DTJJ DTJJR JJ JJR";
-    private static final Set<String> jjTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(COMPILE1.split(jjTags))));
-
-    private static final String vbTags = "VBD VBP";
-    private static final Set<String> vbTagClass = Collections.unmodifiableSet(Generics.newHashSet(Arrays.asList(COMPILE2.split(vbTags))));
-
-    private static final TreebankLanguagePack tlp = new ArabicTreebankLanguagePack();
+      private static final TreebankLanguagePack tlp = new ArabicTreebankLanguagePack();
 
     public AddEquivalencedConjNode(String annotationMark, String key) {
       this.annotationMark = annotationMark;

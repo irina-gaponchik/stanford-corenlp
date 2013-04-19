@@ -30,7 +30,7 @@
 package edu.stanford.nlp.tagger.maxent;
 
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -108,7 +108,7 @@ public class AmbiguityClass {
     if (single) {
       return word;
     }
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (Integer sID : sortedIds) {
       sb.append(':').append(sID.intValue());
     }

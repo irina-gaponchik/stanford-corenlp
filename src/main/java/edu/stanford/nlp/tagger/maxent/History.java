@@ -8,7 +8,7 @@
 
 package edu.stanford.nlp.tagger.maxent;
 
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 import java.io.PrintStream;
 
@@ -110,7 +110,7 @@ public class History {
 
   @Override
   public String toString() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     String[] str = getX();
     for (String aStr : str) {
       sb.append(aStr).append('\t');
@@ -120,7 +120,7 @@ public class History {
 
   @Override
   public int hashCode() {
-    TxtBuilder sb = new TxtBuilder();
+    TextBuilder sb = new TextBuilder();
     for (int i = 0; i < extractors.getSize(); i++) {
       sb.append(getX(i));
     }

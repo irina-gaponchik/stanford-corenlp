@@ -8,7 +8,7 @@ import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.io.TaggedFileRecord;
 import edu.stanford.nlp.util.concurrent.MulticoreWrapper;
 import edu.stanford.nlp.util.concurrent.ThreadsafeProcessor;
-import javolution.text.TxtBuilder;
+import javolution.text.TextBuilder;
 
 /** Tags data and can handle either data with gold-standard tags (computing
  *  performance statistics) or unlabeled data.
@@ -131,7 +131,7 @@ public class TestClassifier {
 
 
   String resultsString(MaxentTagger maxentTagger) {
-    TxtBuilder output = new TxtBuilder();
+    TextBuilder output = new TextBuilder();
     output.append("Model ").append(maxentTagger.config.getModel()).append(" has xSize=").append(maxentTagger.xSize).append(", ySize=").append(maxentTagger.ySize).append(", and numFeatures=").append(maxentTagger.prob.lambda.length).append(".\n");
     output.append("Results on ").append(numSentences).append(" sentences and ").append(numRight + numWrong).append(" words, of which ").append(unknownWords).append(" were unknown.\n");
     output.append(String.format("Total sentences right: %d (%f%%); wrong: %d (%f%%).\n",

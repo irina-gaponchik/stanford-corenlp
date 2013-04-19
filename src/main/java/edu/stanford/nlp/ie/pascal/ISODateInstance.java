@@ -3,9 +3,9 @@ package edu.stanford.nlp.ie.pascal;
 import edu.stanford.nlp.ie.QuantifiableEntityNormalizer;
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.process.PTBTokenizer;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
+import javolution.util.FastMap;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -279,9 +279,9 @@ public class ISODateInstance {
   /**
    * Map for mapping a relativeDate String to a pair with the field that should be modified and the amount to modify it *
    */
-  public static final Map<String, Pair<DateField, Integer>> relativeDateMap = Generics.newHashMap();
+  public static final Map<String, Pair<DateField, Integer>> relativeDateMap = new FastMap<>();
 
-  static {
+    static {
     //Add entries to the relative datemap
     relativeDateMap.put("today", new Pair<>(DateField.DAY, 0));
     relativeDateMap.put("tomorrow", new Pair<>(DateField.DAY, 1));
@@ -290,9 +290,9 @@ public class ISODateInstance {
 
   }
 
-  public static final Map<Integer, Integer> daysPerMonth = Generics.newHashMap();
+  public static final Map<Integer, Integer> daysPerMonth = new FastMap<>();
 
-  static {
+    static {
     //Add month entries
     daysPerMonth.put(1, 31);
     daysPerMonth.put(2, 28);

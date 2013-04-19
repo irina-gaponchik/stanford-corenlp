@@ -6,8 +6,9 @@ import edu.stanford.nlp.ling.Tag;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.ling.WordTag;
 import edu.stanford.nlp.stats.ClassicCounter;
-import edu.stanford.nlp.util.Generics;
 import edu.stanford.nlp.util.Index;
+import javolution.util.FastMap;
+import javolution.util.FastSet;
 
 import java.util.Map;
 import java.util.Set;
@@ -77,9 +78,9 @@ public class ChineseUnknownWordModel extends BaseUnknownWordModel {
                                    Index<String> tagIndex) {
         this(op, lex, wordIndex, tagIndex,
                 new ClassicCounter<IntTaggedWord>(),
-                Generics.<Label, ClassicCounter<String>>newHashMap(),
-                Generics.<String, Float>newHashMap(),
-                false, Generics.<String>newHashSet());
+                new FastMap<Label, ClassicCounter<String>>(),
+                new FastMap<String, Float>(),
+                false, (Set<String>) new FastMap<>());
     }
 
     public static void main(String... args) {
