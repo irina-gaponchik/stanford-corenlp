@@ -151,7 +151,7 @@ public class FastExactAutomatonMinimizer implements AutomatonMinimizer {
               Maps.putIntoValueArrayList(symbolToTarget, symbol, target);
           }
       }
-      for (Object symbol : symbolToTarget.keySet()) {
+      for (Object symbol : symbolToTarget.entrySet()) {
           addSplit(new Split((List) symbolToTarget.get(symbol), symbol, block));
       }
   }

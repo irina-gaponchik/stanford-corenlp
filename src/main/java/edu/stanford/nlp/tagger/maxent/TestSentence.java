@@ -455,39 +455,41 @@ public class TestSentence implements SequenceModel {
     double[] scores = new double[tags.length];
     int szCommon = maxentTagger.extractors.getSize();
 
-    for (Pair<Integer,Extractor> e : extractors) {
-      int kf = e.first();
-      Extractor ex = e.second();
-      CharSequence val = ex.extract(h);
-      int[] fAssociations = maxentTagger.fAssociations.get(kf).get(val);
-      if (fAssociations != null) {
-        for (int j = 0; j < tags.length; j++) {
-          String tag = tags[j];
-          int tagIndex = maxentTagger.tags.getIndex(tag);
-          int fNum = fAssociations[tagIndex];
-          if (fNum > -1) {
-            scores[j] += maxentTagger.getLambdaSolve().lambda[fNum];
+      for (int i = 0, extractorsSize = extractors.size(); i < extractorsSize; i++) {
+          Pair<Integer, Extractor> e = extractors.get(i);
+          int kf = e.first();
+          Extractor ex = e.second();
+          CharSequence val = ex.extract(h);
+          int[] fAssociations = maxentTagger.fAssociations.get(kf).get(val);
+          if (fAssociations != null) {
+              for (int j = 0; j < tags.length; j++) {
+                  String tag = tags[j];
+                  int tagIndex = maxentTagger.tags.getIndex(tag);
+                  int fNum = fAssociations[tagIndex];
+                  if (fNum > -1) {
+                      scores[j] += maxentTagger.getLambdaSolve().lambda[fNum];
+                  }
+              }
           }
-        }
       }
-    }
     if (extractorsRare != null) {
-      for (Pair<Integer,Extractor> e : extractorsRare) {
-        int kf = e.first();
-        Extractor ex = e.second();
-        CharSequence val = ex.extract(h);
-        int[] fAssociations = maxentTagger.fAssociations.get(szCommon+kf).get(val);
-        if (fAssociations != null) {
-          for (int j = 0; j < tags.length; j++) {
-            String tag = tags[j];
-            int tagIndex = maxentTagger.tags.getIndex(tag);
-            int fNum = fAssociations[tagIndex];
-            if (fNum > -1) {
-              scores[j] += maxentTagger.getLambdaSolve().lambda[fNum];
+        for (int i = 0, extractorsRareSize = extractorsRare.size(); i < extractorsRareSize; i++) {
+            Pair<Integer, Extractor> e = extractorsRare.get(i);
+            int kf = e.first();
+            Extractor ex = e.second();
+            CharSequence val = ex.extract(h);
+            int[] fAssociations = maxentTagger.fAssociations.get(szCommon + kf).get(val);
+            if (fAssociations != null) {
+                for (int j = 0; j < tags.length; j++) {
+                    String tag = tags[j];
+                    int tagIndex = maxentTagger.tags.getIndex(tag);
+                    int fNum = fAssociations[tagIndex];
+                    if (fNum > -1) {
+                        scores[j] += maxentTagger.getLambdaSolve().lambda[fNum];
+                    }
+                }
             }
-          }
         }
-      }
     }
     return scores;
   }

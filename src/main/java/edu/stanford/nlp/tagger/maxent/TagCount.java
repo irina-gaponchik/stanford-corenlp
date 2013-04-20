@@ -25,7 +25,7 @@ import java.io.DataOutputStream;
  */
 class TagCount {
 
-  private Map<String, Integer> map = new FastMap<>();
+  private FastMap<String, Integer> map = new FastMap<>();//keyset causes excessive allocations without narrow typing
     private int ambClassId = -1; /* This is a numeric ID shared by all words that have the same set of possible tags. */
 
   private String[] getTagsCache; // = null;
@@ -135,11 +135,14 @@ class TagCount {
    */
   public String getFirstTag() {
     String maxTag = null;
-    int max = 0;
-    for (String tag : map.keySet()) {
-      int count = map.get(tag);
+      int max = 0;
+
+      for(FastMap.Entry<String, Integer> tail = map.tail(),e=map.head().getNext();e!=tail;e=e.getNext())
+
+    /*for (String tag : map.keySet())*/ {
+          int count = e.getValue();
       if (count > max) {
-        maxTag = tag;
+        maxTag = e.getKey();
         max = count;
       }
     }
