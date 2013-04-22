@@ -21,7 +21,7 @@ import edu.stanford.nlp.sequences.SequenceModel;
 import edu.stanford.nlp.tagger.common.TaggerConstants;
 import edu.stanford.nlp.util.ArrayUtils;
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 
 import java.io.OutputStreamWriter;

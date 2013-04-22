@@ -8,7 +8,7 @@ import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Triple;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;

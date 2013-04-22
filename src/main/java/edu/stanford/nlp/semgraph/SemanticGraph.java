@@ -11,7 +11,7 @@ import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringParsingTask;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 import javolution.util.FastTable;

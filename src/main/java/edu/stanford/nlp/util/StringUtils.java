@@ -5,7 +5,7 @@ import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.math.SloppyMath;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 

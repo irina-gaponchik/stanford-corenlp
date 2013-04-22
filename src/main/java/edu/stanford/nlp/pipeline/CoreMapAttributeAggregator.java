@@ -5,7 +5,7 @@ import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.stats.IntCounter;
 import edu.stanford.nlp.util.ArrayMap;
 import edu.stanford.nlp.util.CoreMap;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 
 import java.util.*;

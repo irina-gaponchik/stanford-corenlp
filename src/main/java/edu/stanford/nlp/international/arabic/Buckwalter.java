@@ -10,7 +10,7 @@ import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.trees.international.arabic.ATBTreeUtils;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.process.SerializableFunction;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 
 /** This class can convert between Unicode and Buckwalter encodings of

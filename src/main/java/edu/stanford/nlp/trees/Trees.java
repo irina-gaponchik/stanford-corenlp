@@ -6,7 +6,7 @@ import edu.stanford.nlp.util.Function;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.ling.*;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 import java.util.*;

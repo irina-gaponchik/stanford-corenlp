@@ -2,7 +2,7 @@ package edu.stanford.nlp.ie.pascal;
 
 import java.util.*;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 /**

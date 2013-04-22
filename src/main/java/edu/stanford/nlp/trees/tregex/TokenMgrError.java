@@ -2,7 +2,7 @@
 /* JavaCCOptions: */
 package edu.stanford.nlp.trees.tregex;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /** Token Manager Error. */
 class TokenMgrError extends Error

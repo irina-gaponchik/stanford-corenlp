@@ -24,7 +24,7 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.trees.HeadFinder;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.CoreMap;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  *

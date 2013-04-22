@@ -6,7 +6,7 @@ import edu.stanford.nlp.util.StringUtils;
 
 
 import edu.stanford.nlp.ling.HasWord;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 
 import java.io.BufferedReader;

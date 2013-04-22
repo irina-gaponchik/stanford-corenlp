@@ -30,7 +30,7 @@ package edu.stanford.nlp.tagger.maxent;
 
 import edu.stanford.nlp.process.WordShapeClassifier;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.*;
 

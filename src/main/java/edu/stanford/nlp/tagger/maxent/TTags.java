@@ -6,7 +6,7 @@ import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.tagger.common.TaggerConstants;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 import java.io.IOException;

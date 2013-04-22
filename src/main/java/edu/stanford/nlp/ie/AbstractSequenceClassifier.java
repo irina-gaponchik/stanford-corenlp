@@ -46,7 +46,7 @@ import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.stats.Sampler;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.concurrent.*;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 import java.io.*;

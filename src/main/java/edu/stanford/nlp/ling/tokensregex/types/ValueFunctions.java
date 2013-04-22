@@ -5,7 +5,7 @@ import edu.stanford.nlp.ling.tokensregex.*;
 import edu.stanford.nlp.pipeline.ChunkAnnotationUtils;
 import edu.stanford.nlp.process.CoreLabelTokenFactory;
 import edu.stanford.nlp.util.*;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

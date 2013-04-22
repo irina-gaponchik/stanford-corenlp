@@ -12,7 +12,7 @@ package edu.stanford.nlp.parser.lexparser;
 //  Roger
 
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /** @author Dan Klein */
 class TestTagProjection implements TagProjection {

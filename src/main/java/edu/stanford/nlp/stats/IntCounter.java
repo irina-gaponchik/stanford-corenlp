@@ -21,7 +21,7 @@ import edu.stanford.nlp.util.MapFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 /**

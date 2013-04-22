@@ -3,7 +3,7 @@ package edu.stanford.nlp.ie.crf;
 import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.math.SloppyMath;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.Arrays;

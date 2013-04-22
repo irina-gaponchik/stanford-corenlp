@@ -5,7 +5,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.ArrayStringFilter;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.Filter;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;

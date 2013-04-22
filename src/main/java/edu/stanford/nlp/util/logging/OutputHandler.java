@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Stack;
 
 import edu.stanford.nlp.util.logging.Redwood.Record;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 
 /**

@@ -71,7 +71,7 @@ import edu.stanford.nlp.util.Sets;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 

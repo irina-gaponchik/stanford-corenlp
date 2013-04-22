@@ -1,6 +1,6 @@
 package edu.stanford.nlp.dcoref;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 public class SieveOptions {
   public boolean DO_PRONOUN;

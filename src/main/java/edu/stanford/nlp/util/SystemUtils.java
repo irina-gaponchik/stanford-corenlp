@@ -1,6 +1,6 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.*;
 import java.io.*;

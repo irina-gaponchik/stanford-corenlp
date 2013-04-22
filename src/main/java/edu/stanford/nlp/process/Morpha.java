@@ -8,8 +8,8 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import edu.stanford.nlp.process.data.*;
-import javolution.text.Text;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.Text;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 

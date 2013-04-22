@@ -2,7 +2,7 @@
 
 package edu.stanford.nlp.process;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /** Undoes the more common cases of Penn Treebank quoting to producing
  *  something resembling normal text.  That is, it is an approximate inverse

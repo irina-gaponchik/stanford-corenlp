@@ -23,7 +23,7 @@ import edu.stanford.nlp.util.RuntimeInterruptedException;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.concurrent.MulticoreWrapper;
 import edu.stanford.nlp.util.concurrent.ThreadsafeProcessor;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * This class will add parse information to an Annotation.

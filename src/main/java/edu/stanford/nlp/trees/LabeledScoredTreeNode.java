@@ -7,7 +7,7 @@ import java.util.List;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.LabelFactory;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * A {@code LabeledScoredTreeNode} represents a tree composed of a root

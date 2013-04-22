@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.util.XMLUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 
 /**

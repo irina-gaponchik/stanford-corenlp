@@ -6,7 +6,7 @@ import edu.stanford.nlp.ling.tokensregex.types.Expressions;
 import edu.stanford.nlp.ling.tokensregex.types.Value;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Function;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import org.joda.time.*;
 import org.joda.time.format.*;

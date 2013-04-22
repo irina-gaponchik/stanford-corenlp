@@ -1,7 +1,7 @@
 package edu.stanford.nlp.trees.tregex;
 
 import edu.stanford.nlp.trees.Tree;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.Iterator;
 import java.util.List;

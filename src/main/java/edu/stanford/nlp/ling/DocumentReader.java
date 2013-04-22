@@ -2,7 +2,7 @@ package edu.stanford.nlp.ling;
 
 import edu.stanford.nlp.process.TokenizerFactory;
 import edu.stanford.nlp.process.PTBTokenizer;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.io.*;
 import java.net.URL;

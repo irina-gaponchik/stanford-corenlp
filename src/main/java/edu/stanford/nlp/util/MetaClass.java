@@ -1,8 +1,5 @@
 package edu.stanford.nlp.util;
 
-import javolution.text.Text;
-import javolution.text.TextBuilder;
-
 import java.io.File;
 import java.lang.reflect.*;
 import java.util.Arrays;
@@ -248,7 +245,7 @@ public class MetaClass {
 
     @Override
     public String toString() {
-      Text b = Text.valueOf((cl.getName())).plus('(');
+        Text b = Text.valueOf((cl.getName())).plus('(');
       for (Class<?> cl : classParams) {
         b.plus(' ').plus(cl.getName()).plus(',');
       }

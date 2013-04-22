@@ -15,7 +15,7 @@ import java.util.Set;
 import edu.stanford.nlp.util.logging.PrettyLogger;
 import edu.stanford.nlp.util.logging.Redwood;
 import edu.stanford.nlp.util.logging.Redwood.RedwoodChannels;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 
 /**

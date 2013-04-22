@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.Scored;
 import edu.stanford.nlp.util.XMLUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 /**

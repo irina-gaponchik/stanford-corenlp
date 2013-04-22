@@ -7,7 +7,7 @@ import edu.stanford.nlp.math.ArrayMath;
 import edu.stanford.nlp.sequences.SequenceModel;
 import edu.stanford.nlp.sequences.SequenceListener;
 import edu.stanford.nlp.ling.CoreAnnotations;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.List;
 import java.util.ArrayList;

@@ -14,7 +14,7 @@ import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.trees.international.hebrew.HebrewTreeReaderFactory;
 import edu.stanford.nlp.trees.international.hebrew.HebrewTreebankLanguagePack;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Initial version of a parser pack for the HTB. Not yet integrated

@@ -5,7 +5,7 @@ import edu.stanford.nlp.ling.tokensregex.*;
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.Interval;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 

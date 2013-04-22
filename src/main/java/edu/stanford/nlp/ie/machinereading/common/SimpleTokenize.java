@@ -1,7 +1,7 @@
 
 package edu.stanford.nlp.ie.machinereading.common;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.StringTokenizer;

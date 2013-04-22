@@ -1,7 +1,7 @@
 package edu.stanford.nlp.sequences;
 
 import edu.stanford.nlp.util.ArrayUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 
 import java.io.*;

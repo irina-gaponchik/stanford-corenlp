@@ -9,7 +9,7 @@ import edu.stanford.nlp.classify.ProbabilisticClassifier;
 import edu.stanford.nlp.ling.Datum;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Utility class for aggregating counts of true positives, false positives, and

@@ -8,7 +8,7 @@
 
 package edu.stanford.nlp.tagger.maxent;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.io.PrintStream;
 

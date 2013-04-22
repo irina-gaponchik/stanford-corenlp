@@ -1,6 +1,6 @@
 package edu.stanford.nlp.time;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 import org.joda.time.*;
 import org.joda.time.chrono.ISOChronology;

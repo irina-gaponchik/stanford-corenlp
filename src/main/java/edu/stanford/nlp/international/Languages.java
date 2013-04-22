@@ -7,7 +7,7 @@ import edu.stanford.nlp.parser.lexparser.FrenchTreebankParserParams;
 import edu.stanford.nlp.parser.lexparser.HebrewTreebankParserParams;
 import edu.stanford.nlp.parser.lexparser.NegraPennTreebankParserParams;
 import edu.stanford.nlp.parser.lexparser.TreebankLangParserParams;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Constants and parameters for multilingual parsing.

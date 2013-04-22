@@ -1,7 +1,7 @@
 package edu.stanford.nlp.ling;
 
 import edu.stanford.nlp.util.CoreMap;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * This class is mainly for use with RTE in terms of the methods it provides,

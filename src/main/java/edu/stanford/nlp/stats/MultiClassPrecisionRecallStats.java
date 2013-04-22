@@ -7,7 +7,7 @@ import edu.stanford.nlp.ling.Datum;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Triple;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;

@@ -3,7 +3,7 @@ package edu.stanford.nlp.graph;
 import java.util.*;
 
 import edu.stanford.nlp.util.CollectionUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 

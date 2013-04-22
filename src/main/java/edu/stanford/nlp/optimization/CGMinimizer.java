@@ -1,6 +1,6 @@
 package edu.stanford.nlp.optimization;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;

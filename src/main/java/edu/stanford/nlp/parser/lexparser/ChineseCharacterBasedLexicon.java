@@ -9,7 +9,7 @@ import edu.stanford.nlp.trees.*;
 import edu.stanford.nlp.trees.international.pennchinese.RadicalMap;
 import edu.stanford.nlp.util.Index;
 import edu.stanford.nlp.util.Timing;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 

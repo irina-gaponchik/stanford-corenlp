@@ -7,7 +7,7 @@ import edu.stanford.nlp.io.RuntimeIOException;
 import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.PaddedList;
 import edu.stanford.nlp.util.AbstractIterator;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.*;
 import java.util.regex.*;

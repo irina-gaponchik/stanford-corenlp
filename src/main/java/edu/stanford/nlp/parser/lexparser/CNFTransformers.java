@@ -4,7 +4,7 @@ import edu.stanford.nlp.ling.CategoryWordTag;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeTransformer;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.*;
 

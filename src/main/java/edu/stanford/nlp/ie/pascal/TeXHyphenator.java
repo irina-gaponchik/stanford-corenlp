@@ -3,7 +3,7 @@ package edu.stanford.nlp.ie.pascal;
 import java.io.*;
 import java.util.*;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Hyphenates words according to the TeX algorithm.

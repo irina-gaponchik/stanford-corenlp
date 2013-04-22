@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification;
 import edu.stanford.nlp.international.morph.MorphoFeatures;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Extracts morphosyntactic features from BAMA/SAMA analyses. Compatible with both the

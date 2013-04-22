@@ -1,7 +1,7 @@
 
 package edu.stanford.nlp.util.logging;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.io.PrintStream;
 import java.util.Locale;

@@ -3,7 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.*;
 
 import edu.stanford.nlp.util.Index;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 public class OutsideRuleFilter {
 

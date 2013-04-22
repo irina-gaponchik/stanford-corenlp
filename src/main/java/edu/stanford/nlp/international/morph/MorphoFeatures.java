@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.stanford.nlp.international.morph.MorphoFeatureSpecification.MorphoFeatureType;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 
 /**

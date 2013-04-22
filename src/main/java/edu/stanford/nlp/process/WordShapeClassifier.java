@@ -7,7 +7,7 @@ import edu.stanford.nlp.trees.international.pennchinese.ChineseUtils;
 
 import edu.stanford.nlp.objectbank.ObjectBank;
 import edu.stanford.nlp.util.Timing;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 // TODO: put in a regexp for ordinals, fraction num/num and perhaps even 30-5/8

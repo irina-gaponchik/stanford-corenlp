@@ -29,7 +29,7 @@ package edu.stanford.nlp.parser.lexparser;
 import edu.stanford.nlp.process.DistSimClassifier;
 import edu.stanford.nlp.stats.ClassicCounter;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * This is a basic unknown word model for English.  It supports 5 different

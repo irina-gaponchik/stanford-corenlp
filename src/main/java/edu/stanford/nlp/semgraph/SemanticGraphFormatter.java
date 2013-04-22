@@ -3,7 +3,7 @@ package edu.stanford.nlp.semgraph;
 //import edu.stanford.nlp.ling.IndexedFeatureLabel;
 import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 import java.util.*;

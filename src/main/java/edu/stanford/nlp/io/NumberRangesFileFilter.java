@@ -1,7 +1,7 @@
 package edu.stanford.nlp.io;
 
 import edu.stanford.nlp.util.Pair;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.io.File;
 import java.io.FileFilter;

@@ -3,7 +3,7 @@ package edu.stanford.nlp.parser.lexparser;
 import java.util.*;
 import java.io.Serializable;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 
 public class LatticeEdge implements Serializable {

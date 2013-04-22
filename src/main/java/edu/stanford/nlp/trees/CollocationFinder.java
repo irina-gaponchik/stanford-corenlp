@@ -15,7 +15,7 @@ import edu.stanford.nlp.process.Morphology;
 import edu.stanford.nlp.util.ArrayUtils;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Finds WordNet collocations in parse trees.  It can restructure

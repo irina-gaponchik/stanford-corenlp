@@ -1,7 +1,7 @@
 package edu.stanford.nlp.fsm;
 
 import edu.stanford.nlp.stats.ClassicCounter;
-import javolution.text.Text;
+import edu.stanford.nlp.util.Text;
 
 import java.util.*;
 

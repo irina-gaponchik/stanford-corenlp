@@ -20,7 +20,7 @@ import java.io.BufferedReader;
 
 import edu.stanford.nlp.ling.Word;
 import edu.stanford.nlp.process.AbstractTokenizer;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 public class RobustTokenizer<T extends Word> extends AbstractTokenizer<Word> {

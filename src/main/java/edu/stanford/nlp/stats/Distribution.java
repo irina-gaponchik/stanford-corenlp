@@ -11,7 +11,7 @@ import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 /**

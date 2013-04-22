@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import edu.stanford.nlp.util.CoreMap;
 import edu.stanford.nlp.util.IdentityHashSet;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Each relation has a type and set of arguments

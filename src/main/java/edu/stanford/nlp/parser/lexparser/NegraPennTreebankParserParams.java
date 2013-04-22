@@ -17,7 +17,7 @@ import edu.stanford.nlp.trees.international.negra.NegraLabel;
 import edu.stanford.nlp.trees.international.negra.NegraPennLanguagePack;
 import edu.stanford.nlp.trees.international.negra.NegraPennTreeReaderFactory;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 
 /**

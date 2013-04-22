@@ -1,7 +1,7 @@
 package edu.stanford.nlp.util;
 
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * An instantiation of this abstract class parses a {@code String} and

@@ -1,7 +1,7 @@
 package edu.stanford.nlp.optimization;
 
 import edu.stanford.nlp.util.MemoryMonitor;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Evaluate current memory usage

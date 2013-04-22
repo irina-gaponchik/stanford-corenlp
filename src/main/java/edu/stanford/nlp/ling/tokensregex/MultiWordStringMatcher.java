@@ -2,8 +2,8 @@ package edu.stanford.nlp.ling.tokensregex;
 
 import edu.stanford.nlp.util.CacheMap;
 import edu.stanford.nlp.util.IntPair;
-import javolution.text.Text;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.Text;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.*;
 import java.util.regex.Matcher;

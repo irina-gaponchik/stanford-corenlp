@@ -1,7 +1,7 @@
 package edu.stanford.nlp.ie.crf;
 
 import edu.stanford.nlp.ling.Datum;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.io.Serializable;
 import java.util.Arrays;

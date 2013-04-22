@@ -6,7 +6,7 @@ import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.objectbank.LineIterator;
 import edu.stanford.nlp.objectbank.IteratorFromReaderFactory;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.io.PrintWriter;
 import java.io.Reader;

@@ -8,7 +8,7 @@ import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.tagger.io.TaggedFileRecord;
 import edu.stanford.nlp.util.concurrent.MulticoreWrapper;
 import edu.stanford.nlp.util.concurrent.ThreadsafeProcessor;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /** Tags data and can handle either data with gold-standard tags (computing
  *  performance statistics) or unlabeled data.

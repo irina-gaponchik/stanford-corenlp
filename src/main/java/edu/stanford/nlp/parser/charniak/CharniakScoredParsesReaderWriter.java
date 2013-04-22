@@ -19,7 +19,7 @@ import edu.stanford.nlp.util.AbstractIterator;
 import edu.stanford.nlp.util.IterableIterator;
 import edu.stanford.nlp.util.ScoredObject;
 import edu.stanford.nlp.util.Timing;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 /**
  * Utility routines for printing/reading scored parses for the Charniak Parser

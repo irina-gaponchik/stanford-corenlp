@@ -14,8 +14,8 @@ import edu.stanford.nlp.trees.TreebankLanguagePack;
 import edu.stanford.nlp.util.Maps;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.StringUtils;
-import javolution.text.Text;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.Text;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 

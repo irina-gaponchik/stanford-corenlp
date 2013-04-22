@@ -1,6 +1,6 @@
 package edu.stanford.nlp.ling;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;

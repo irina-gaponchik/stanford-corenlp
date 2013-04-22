@@ -3,7 +3,7 @@ package edu.stanford.nlp.objectbank;
 import edu.stanford.nlp.util.Function;
 import edu.stanford.nlp.util.AbstractIterator;
 import edu.stanford.nlp.util.XMLUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

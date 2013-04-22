@@ -12,7 +12,7 @@ import edu.stanford.nlp.trees.TreeTransformer;
 import edu.stanford.nlp.trees.TreeNormalizer;
 import edu.stanford.nlp.util.Filter;
 import edu.stanford.nlp.util.ReflectionLoading;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 public class TaggedFileRecord {
     private static final Pattern COMPILE = Pattern.compile(",");

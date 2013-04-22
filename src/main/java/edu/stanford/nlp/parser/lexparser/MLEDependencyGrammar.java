@@ -7,7 +7,7 @@ import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.HashIndex;
 import edu.stanford.nlp.util.Index;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import static edu.stanford.nlp.parser.lexparser.IntTaggedWord.ANY_WORD_INT;
 import static edu.stanford.nlp.parser.lexparser.IntTaggedWord.ANY_TAG_INT;

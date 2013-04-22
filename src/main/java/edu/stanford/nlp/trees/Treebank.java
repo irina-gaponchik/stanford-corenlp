@@ -6,7 +6,7 @@ import edu.stanford.nlp.stats.Counters;
 import edu.stanford.nlp.util.Sets;
 import edu.stanford.nlp.ling.Label;
 import edu.stanford.nlp.ling.StringLabel;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 import java.io.*;

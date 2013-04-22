@@ -1,6 +1,6 @@
 package edu.stanford.nlp.util.logging;
 
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;

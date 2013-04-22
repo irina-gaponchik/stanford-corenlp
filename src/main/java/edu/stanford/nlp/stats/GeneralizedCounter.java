@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.stanford.nlp.util.ErasureUtils;
-import javolution.text.TextBuilder;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
 
