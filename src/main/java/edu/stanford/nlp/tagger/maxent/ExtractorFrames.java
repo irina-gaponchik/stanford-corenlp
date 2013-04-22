@@ -528,23 +528,28 @@ public class ExtractorFrames {
 
     @Override
     CharSequence extract(History h, PairsHolder pH) {
-      TextBuilder sb = new TextBuilder();
-      if (position < 0) {
-        for (int idx = position; idx < 0; idx++) {
-          if (idx != position) {
-            sb.append('!');
-          }
-          sb.append(pH.getTag(h, idx));
+        TextBuilder sb = null;
+        try {
+            sb = new TextBuilder();
+            if (position < 0) {
+              for (int idx = position; idx < 0; idx++) {
+                if (idx != position) {
+                  sb.append('!');
+                }
+                sb.append(pH.getTag(h, idx));
+              }
+            } else {
+              for (int idx = position; idx > 0; idx--) {
+                if (idx != position) {
+                  sb.append('!');
+                }
+                sb.append(pH.getTag(h, idx));
+              }
+            }
+            return sb.toText();
+        } finally {
+            TextBuilder.recycle(sb);
         }
-      } else {
-        for (int idx = position; idx > 0; idx--) {
-          if (idx != position) {
-            sb.append('!');
-          }
-          sb.append(pH.getTag(h, idx));
-        }
-      }
-      return (CharSequence)sb ;
     }
 
   }

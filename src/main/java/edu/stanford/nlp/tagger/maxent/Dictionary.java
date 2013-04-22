@@ -9,6 +9,9 @@ package edu.stanford.nlp.tagger.maxent;
 import edu.stanford.nlp.io.InDataStreamFile;
 import edu.stanford.nlp.stats.IntCounter;
 import javolution.util.FastMap;
+import org.ardverk.collection.CharArrayKeyAnalyzer;
+import org.ardverk.collection.PatriciaTrie;
+import org.ardverk.collection.StringKeyAnalyzer;
 
 import java.io.IOException;
 import java.io.DataInputStream;
@@ -23,7 +26,7 @@ import java.util.Map;
  */
 public class Dictionary {
 
-  private final Map<String,TagCount> dict = new FastMap<>();
+  private final Map<String,TagCount> dict = new PatriciaTrie<>(StringKeyAnalyzer.CHAR );
     private final Map<Integer,CountWrapper> partTakingVerbs = new FastMap<>();
     private static final String naWord = "NA";
   private static final boolean VERBOSE = false;
@@ -31,7 +34,7 @@ public class Dictionary {
     void fillWordTagCounts(Map<String, IntCounter<String>> wordTagCounts) {
     for (Map.Entry<String, IntCounter<String>> stringIntCounterEntry : wordTagCounts.entrySet()) {
       TagCount count = new TagCount(stringIntCounterEntry.getValue());
-      dict.put(stringIntCounterEntry.getKey(), count);
+      dict.put(String.valueOf(stringIntCounterEntry.getKey().toCharArray()), count);
     }
   }
 
@@ -56,7 +59,7 @@ public class Dictionary {
   }
 
 
-  String getFirstTag(String word) {
+  CharSequence getFirstTag(CharSequence word) {
     TagCount count = dict.get(word);
     if (count != null) {
       return count.getFirstTag();
@@ -73,7 +76,7 @@ public class Dictionary {
     return 0;
   }
 
-  boolean isUnknown(String word) {
+  boolean isUnknown(CharSequence word) {
     return ! dict.containsKey(word);
   }
 
@@ -145,7 +148,7 @@ public class Dictionary {
       if (numTags > maxNumTags) {
         maxNumTags = numTags;
       }
-      this.dict.put(word, count);
+      this.dict.put(String.valueOf(word), count);
       if (VERBOSE) {
         System.err.println("  " + word + " [idx=" + i + "]: " + count);
       }
@@ -196,10 +199,10 @@ public class Dictionary {
    * their classes in the TagCounts
    */
   protected void setAmbClasses(AmbiguityClasses ambClasses, int veryCommonWordThresh, TTags ttags) {
-    for (Map.Entry<String,TagCount> entry : dict.entrySet()) {
-      String w = entry.getKey();
+    for (Map.Entry<String, TagCount> entry : dict.entrySet()) {
+      CharSequence w = entry.getKey() .toString();
       TagCount count = entry.getValue();
-      int ambClassId = ambClasses.getClass(w, this, veryCommonWordThresh, ttags);
+      int ambClassId = ambClasses.getClass(String.valueOf(w), this, veryCommonWordThresh, ttags);
       count.setAmbClassId(ambClassId);
     }
   }
