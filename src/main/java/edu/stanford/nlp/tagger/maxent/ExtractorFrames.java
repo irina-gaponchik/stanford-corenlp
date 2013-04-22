@@ -530,7 +530,7 @@ public class ExtractorFrames {
     CharSequence extract(History h, PairsHolder pH) {
         TextBuilder sb = null;
         try {
-            sb = new TextBuilder();
+            sb = TextBuilder.newInstance();
             if (position < 0) {
               for (int idx = position; idx < 0; idx++) {
                 if (idx != position) {
