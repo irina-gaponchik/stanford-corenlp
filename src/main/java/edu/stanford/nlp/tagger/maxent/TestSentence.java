@@ -55,7 +55,7 @@ public class TestSentence implements SequenceModel {
   // origWords is only set when run with a list of HasWords; when run
   // with a list of strings, this will be null
   protected List<HasWord> origWords;
-  protected int size; // TODO this always has the value of sent.size(). Remove it? [cdm 2008]
+//  private int size; // TODO this always has the value of sent.size(). Remove it? [cdm 2008]
   // protected double[][][] probabilities;
   protected String[] correctTags;
   protected String[] finalTags;
@@ -104,32 +104,26 @@ public class TestSentence implements SequenceModel {
                                       boolean reuseTags) {
       origWords = FastTable.newInstance();origWords.addAll(s);
     int sz = s.size();
-      sent = new ArrayList<>(sz + 1);
+      sent = FastTable.newInstance();
       for (int i1 = 0, sSize1 = s.size(); i1 < sSize1; i1++) {
-          HasWord value1 = s.get(i1);
-          sent.add(maxentTagger.wordFunction != null ? maxentTagger.wordFunction.apply(value1.word()) : value1.word());
+          String word = s.get(i1).word();
+          sent.add(maxentTagger.wordFunction != null ? maxentTagger.wordFunction.apply(word) : word);
       }
     sent.add(TaggerConstants.EOS_WORD);
       if (reuseTags) {
-          originalTags = new FastTable<>(sz + 1);
+          originalTags = FastTable.newInstance();
           for (int i = 0, sSize = s.size(); i < sSize; i++) {
               HasWord value = s.get(i);
               originalTags.add(value instanceof HasTag ? ((HasTag) value).tag() : null);
           }
         originalTags.add(TaggerConstants.EOS_TAG);
       }
-      size = sz + 1;
-      if (VERBOSE) {
+       if (VERBOSE) {
           System.err.println("Sentence is " + Sentence.listToString(sent, false, tagSeparator));
       }
       init();
     result = testTagInference();
-      if (maxentTagger.wordFunction != null) {
-          for (int j = 0; j < sz; ++j) {
-              result.get(j).setWord(s.get(j).word());
-          }
-
-      }
+      if (maxentTagger.wordFunction != null) for (int j = 0; j < sz; ++j) result.get(j).setWord(s.get(j).word());
       return result;
   }
 
@@ -140,8 +134,8 @@ public class TestSentence implements SequenceModel {
 
   protected void init() {
     //the eos are assumed already there
-    localContextScores = new double[size][];
-    for (int i = 0; i < size - 1; i++) if (maxentTagger.dict.isUnknown(sent.get(i))) numUnknown++;
+    localContextScores = new double[getSize()][];
+    for (int i = 0; i < getSize() - 1; i++) if (maxentTagger.dict.isUnknown(sent.get(i))) numUnknown++;
   }
 
   /**
@@ -151,7 +145,7 @@ public class TestSentence implements SequenceModel {
   String getTaggedNice() {
     TextBuilder sb = new TextBuilder();
     // size - 1 means to exclude the EOS (end of string) symbol
-    for (int i = 0; i < size - 1; i++) {
+    for (int i = 0; i < getSize() - 1; i++) {
       sb.append(toNice(sent.get(i))).append(tagSeparator).append(toNice(finalTags[i]));
       sb.append(' ');
     }
@@ -163,7 +157,7 @@ public class TestSentence implements SequenceModel {
     boolean hasOffset;
     hasOffset = origWords != null && origWords.get(0) instanceof HasOffset;
     List<TaggedWord> taggedSentence = FastTable.newInstance();
-    for (int j = 0; j < size - 1; j++) {
+    for (int j = 0; j < getSize() - 1; j++) {
       String tag = finalTags[j];
       TaggedWord w = new TaggedWord(sent.get(j), tag);
       if (hasOffset) {
@@ -176,7 +170,7 @@ public class TestSentence implements SequenceModel {
     return taggedSentence;
   }
 
-  static String toNice(String s) {
+  static CharSequence toNice(CharSequence s) {
       return s == null ? naTag : s;
   }
 
@@ -188,8 +182,8 @@ public class TestSentence implements SequenceModel {
     ArrayUtils.fill(probabilities, Double.NEGATIVE_INFINITY);
     for (int hyp = 0; hyp < kBestSize; hyp++) {
       // put the whole thing in pairs, give its beginning and end
-      pairs.setSize(size);
-      for (int i = 0; i < size; i++) {
+      pairs.setSize(getSize());
+      for (int i = 0; i < getSize(); i++) {
         pairs.setWord(i,sent.get(i));
         pairs.setTag(i,finalTags[i]);
         //pairs.add(new WordTag(sent.get(i),finalTags[i]));
@@ -198,10 +192,10 @@ public class TestSentence implements SequenceModel {
         //pairs.setTag(i,finalTags[i]);
       }
       int start = endSizePairs;
-      int end = endSizePairs + size - 1;
-      endSizePairs = endSizePairs + size;
+      int end = endSizePairs + getSize() - 1;
+      endSizePairs = endSizePairs + getSize();
       // iterate over the sentence
-      for (int current = 0; current < size; current++) {
+      for (int current = 0; current < getSize(); current++) {
         History h = new History(start, end, current + start, pairs, maxentTagger.extractors);
         String[] tags = stringTagsAt(h.current - h.start + leftWindow());
         double[] probs = getHistories(tags, h);
@@ -236,7 +230,7 @@ public class TestSentence implements SequenceModel {
   protected void writeTagsAndErrors(String[] finalTags, PrintFile pf, boolean verboseResults) {
     StringWriter sw = new StringWriter(200);
     for (int i = 0; i < correctTags.length; i++) {
-      sw.write(toNice(sent.get(i)));
+      sw.write(String.valueOf(toNice(sent.get(i))));
       sw.write(tagSeparator);
       sw.write(finalTags[i]);
       sw.write(' ');
@@ -293,7 +287,7 @@ public class TestSentence implements SequenceModel {
       //new KBestSequenceFinder()
     int[] bestTags = ti.bestSequence(this);
     finalTags = new String[bestTags.length];
-    for (int j = 0; j < size; j++) {
+    for (int j = 0; j < getSize(); j++) {
       finalTags[j] = maxentTagger.tags.getTag(bestTags[j + leftWindow()]);
     }
     cleanUpScorer();
@@ -312,7 +306,7 @@ public class TestSentence implements SequenceModel {
       if (j < left) {
         continue;
       } //but shouldn't happen
-      if (j >= size + left) {
+      if (j >= getSize() + left) {
         break;
       } //but shouldn't happen
       h.setTag(j - left, maxentTagger.tags.getTag(tags[j]));
@@ -321,10 +315,10 @@ public class TestSentence implements SequenceModel {
 
   // do initializations for the TagScorer interface
   protected void initializeScorer() {
-    pairs.setSize(size);
-    for (int i = 0; i < size; i++)
+    pairs.setSize(getSize());
+    for (int i = 0; i < getSize(); i++)
       pairs.setWord(i,sent.get(i));
-    endSizePairs += size;
+    endSizePairs += getSize();
   }
 
 
@@ -447,40 +441,28 @@ public class TestSentence implements SequenceModel {
 
       for (int i = 0, extractorsSize = extractors.size(); i < extractorsSize; i++) {
           Pair<Integer, Extractor> e = extractors.get(i);
-          int kf = e.first();
-          Extractor ex = e.second();
-          CharSequence val = ex.extract(h);
-          int[] fAssociations = maxentTagger.fAssociations.get(kf).get(val);
-          if (fAssociations != null) {
-              for (int j = 0; j < tags.length; j++) {
-                  String tag = tags[j];
-                  int tagIndex = maxentTagger.tags.getIndex(tag);
-                  int fNum = fAssociations[tagIndex];
-                  if (fNum > -1) {
-                      scores[j] += maxentTagger.getLambdaSolve().lambda[fNum];
-                  }
-              }
+          int[] fAssociations = maxentTagger.fAssociations.get(e.first()).get(e.second().extract(h));
+          if (fAssociations != null) for (int j = 0; j < tags.length; j++) {
+              String tag = tags[j];
+              int tagIndex = maxentTagger.tags.getIndex(tag);
+              int fNum = fAssociations[tagIndex];
+              if (fNum > -1) scores[j] += maxentTagger.getLambdaSolve().lambda[fNum];
           }
       }
-    if (extractorsRare != null) {
+    if (extractorsRare != null)
         for (int i = 0, extractorsRareSize = extractorsRare.size(); i < extractorsRareSize; i++) {
             Pair<Integer, Extractor> e = extractorsRare.get(i);
             int kf = e.first();
             Extractor ex = e.second();
             CharSequence val = ex.extract(h);
             int[] fAssociations = maxentTagger.fAssociations.get(szCommon + kf).get(val);
-            if (fAssociations != null) {
-                for (int j = 0; j < tags.length; j++) {
-                    String tag = tags[j];
-                    int tagIndex = maxentTagger.tags.getIndex(tag);
-                    int fNum = fAssociations[tagIndex];
-                    if (fNum > -1) {
-                        scores[j] += maxentTagger.getLambdaSolve().lambda[fNum];
-                    }
-                }
+            if (fAssociations != null) for (int j = 0; j < tags.length; j++) {
+                String tag = tags[j];
+                int tagIndex = maxentTagger.tags.getIndex(tag);
+                int fNum = fAssociations[tagIndex];
+                if (fNum > -1) scores[j] += maxentTagger.getLambdaSolve().lambda[fNum];
             }
         }
-    }
     return scores;
   }
 
@@ -496,48 +478,47 @@ public class TestSentence implements SequenceModel {
   void printUnknown(int numSent, PrintFile pfu) {
     NumberFormat nf = new DecimalFormat("0.0000");
     int numTags = maxentTagger.tags.getSize();
-    double[][][] probabilities = new double[size][kBestSize][numTags];
+    double[][][] probabilities = new double[getSize()][kBestSize][numTags];
     calculateProbs(probabilities);
-    for (int current = 0; current < size; current++) {
-      if (maxentTagger.dict.isUnknown(sent.get(current))) {
-        pfu.print(sent.get(current));
-        pfu.print(':');
-        pfu.print(numSent);
-        double[] probs = new double[3];
-        String[] tag3 = new String[3];
-        getTop3(probabilities, current, probs, tag3);
-        for (int i = 0; i < 3; i++) {
-          if (probs[i] > Double.NEGATIVE_INFINITY) {
+      int current;
+      for (current = 0; current < getSize(); current++)
+        if (maxentTagger.dict.isUnknown(sent.get(current))) {
+            pfu.print(sent.get(current));
+            pfu.print(':');
+            pfu.print(numSent);
+            double[] probs = new double[3];
+            String[] tag3 = new String[3];
+            getTop3(probabilities, current, probs, tag3);
+            for (int i = 0; i < 3; i++)
+
+                if (probs[i] > Double.NEGATIVE_INFINITY) {
+                    pfu.print('\t');
+                    pfu.print(tag3[i]);
+                    pfu.print(' ');
+                    pfu.print(nf.format(Math.exp(probs[i])));
+                }
+            int rank;
+            CharSequence correctTag = toNice(correctTags[current]);
+            //if
+            for (rank = 0; rank < 3; rank++)
+                if (correctTag.equals(tag3[rank])) break;
             pfu.print('\t');
-            pfu.print(tag3[i]);
-            pfu.print(' ');
-            pfu.print(nf.format(Math.exp(probs[i])));
-          }
-        }
-        int rank;
-        String correctTag = toNice(correctTags[current]);
-        for (rank = 0; rank < 3; rank++) {
-          if (correctTag.equals(tag3[rank])) {
-            break;
-          } //if
-        }
-        pfu.print('\t');
-        switch (rank) {
-          case 0:
-            pfu.print("Correct");
-            break;
-          case 1:
-            pfu.print("2nd");
-            break;
-          case 2:
-            pfu.print("3rd");
-            break;
-          default:
-            pfu.print("Not top 3");
-        }
-        pfu.println();
-      }// if
-    }// for
+            switch (rank) {
+                case 0:
+                    pfu.print("Correct");
+                    break;
+                case 1:
+                    pfu.print("2nd");
+                    break;
+                case 2:
+                    pfu.print("3rd");
+                    break;
+                default:
+                    pfu.print("Not top 3");
+            }
+            pfu.println();
+        }// if
+      // for
   }
 
   // This method should be called after a sentence has been tagged.
@@ -546,28 +527,25 @@ public class TestSentence implements SequenceModel {
   void printTop(PrintFile pfu) {
     NumberFormat nf = new DecimalFormat("0.0000");
     int numTags = maxentTagger.tags.getSize();
-    double[][][] probabilities = new double[size][kBestSize][numTags];
+    double[][][] probabilities = new double[getSize()][kBestSize][numTags];
     calculateProbs(probabilities);
-    for (int current = 0; current < size; current++) {
+    for (int current = 0; current < getSize(); current++) {
       pfu.print(sent.get(current));
       double[] probs = new double[3];
       String[] tag3 = new String[3];
       getTop3(probabilities, current, probs, tag3);
-      for (int i = 0; i < 3; i++) {
-        if (probs[i] > Double.NEGATIVE_INFINITY) {
-          pfu.print('\t');
-          pfu.print(tag3[i]);
-          pfu.print(' ');
-          pfu.print(nf.format(Math.exp(probs[i])));
-        }
-      }
+      for (int i = 0; i < 3; i++)
+          if (probs[i] > Double.NEGATIVE_INFINITY) {
+              pfu.print('\t');
+              pfu.print(tag3[i]);
+              pfu.print(' ');
+              pfu.print(nf.format(Math.exp(probs[i])));
+          }
       int rank;
-      String correctTag = toNice(correctTags[current]);
-      for (rank = 0; rank < 3; rank++) {
-        if (correctTag.equals(tag3[rank])) {
-          break;
-        } //if
-      }
+        CharSequence correctTag = toNice(correctTags[current]);
+      //if
+      for (rank = 0; rank < 3; rank++)
+          if (correctTag.equals(tag3[rank])) break;
       pfu.print('\t');
       switch (rank) {
       case 0:
@@ -593,27 +571,24 @@ public class TestSentence implements SequenceModel {
     int[] topIds = new int[3];
     double[] probTags = probabilities[current][0];
     Arrays.fill(probs, Double.NEGATIVE_INFINITY);
-    for (int i = 0; i < probTags.length; i++) {
-      if (probTags[i] > probs[0]) {
-        probs[2] = probs[1];
-        probs[1] = probs[0];
-        probs[0] = probTags[i];
-        topIds[2] = topIds[1];
-        topIds[1] = topIds[0];
-        topIds[0] = i;
-      } else if (probTags[i] > probs[1]) {
-        probs[2] = probs[1];
-        probs[1] = probTags[i];
-        topIds[2] = topIds[1];
-        topIds[1] = i;
-      } else if (probTags[i] > probs[2]) {
-        probs[2] = probTags[i];
-        topIds[2] = i;
-      }
-    }
-    for (int j = 0; j < 3; j++) {
-      tags[j] = toNice(maxentTagger.tags.getTag(topIds[j]));
-    }
+    for (int i = 0; i < probTags.length; i++)
+        if (probTags[i] > probs[0]) {
+            probs[2] = probs[1];
+            probs[1] = probs[0];
+            probs[0] = probTags[i];
+            topIds[2] = topIds[1];
+            topIds[1] = topIds[0];
+            topIds[0] = i;
+        } else if (probTags[i] > probs[1]) {
+            probs[2] = probs[1];
+            probs[1] = probTags[i];
+            topIds[2] = topIds[1];
+            topIds[1] = i;
+        } else if (probTags[i] > probs[2]) {
+            probs[2] = probTags[i];
+            topIds[2] = i;
+        }
+    for (int j = 0; j < 3; j++) tags[j] = String.valueOf(toNice(maxentTagger.tags.getTag(topIds[j])));
   }
 
   /*
@@ -640,9 +615,7 @@ public class TestSentence implements SequenceModel {
   public int[] getPossibleValues(int pos) {
     String[] arr1 = stringTagsAt(pos);
     int[] arr = new int[arr1.length];
-    for (int i = 0; i < arr.length; i++) {
-      arr[i] = maxentTagger.tags.getIndex(arr1[i]);
-    }
+    for (int i = 0; i < arr.length; i++) arr[i] = maxentTagger.tags.getIndex(arr1[i]);
 
     return arr;
   }
@@ -652,11 +625,10 @@ public class TestSentence implements SequenceModel {
     double[] scores = scoresOf(tags, pos);
     double score = Double.NEGATIVE_INFINITY;
     int[] pv = getPossibleValues(pos);
-    for (int i = 0; i < scores.length; i++) {
-      if (pv[i] == tags[pos]) {
-        score = scores[i];
-      }
-    }
+    for (int i = 0; i < scores.length; i++)
+        if (pv[i] == tags[pos]) {
+            score = scores[i];
+        }
     return score;
   }
 
@@ -668,36 +640,37 @@ public class TestSentence implements SequenceModel {
   @Override
   public double[] scoresOf(int[] tags, int pos) {
     if (DBG) {
-      System.err.println("scoresOf(): length of tags is " + tags.length + "; position is " + pos + "; endSizePairs = " + endSizePairs + "; size is " + size + "; leftWindow is " + leftWindow());
-      System.err.println("  History h = new History(" + (endSizePairs - size) + ", " + (endSizePairs - 1) + ", " + (endSizePairs - size + pos - leftWindow()) + ')');
+      System.err.println("scoresOf(): length of tags is " + tags.length + "; position is " + pos + "; endSizePairs = " + endSizePairs + "; size is " + getSize() + "; leftWindow is " + leftWindow());
+      System.err.println("  History h = new History(" + (endSizePairs - getSize()) + ", " + (endSizePairs - 1) + ", " + (endSizePairs - getSize() + pos - leftWindow()) + ')');
     }
-    history.init(endSizePairs - size, endSizePairs - 1, endSizePairs - size + pos - leftWindow());
+    history.init(endSizePairs - getSize(), endSizePairs - 1, endSizePairs - getSize() + pos - leftWindow());
     setHistory(pos, history, tags);
     return getScores(history);
   }
 
   // todo [cdm 2013]: Tagging could be sped up quite a bit here if we cached int arrays of tags by index, not Strings
   protected String[] stringTagsAt(int pos) {
-    if (pos < leftWindow() || pos >= size + leftWindow()) {
+      if (pos >= leftWindow() && pos < getSize() + leftWindow()) {
+
+          String[] arr1;
+          if (originalTags == null || originalTags.get(pos - leftWindow()) == null) {
+
+              String word = sent.get(pos - leftWindow());
+              if (maxentTagger.dict.isUnknown(word)) {
+                  Set<String> open = maxentTagger.tags.getOpenTags();
+                  arr1 = open.toArray(new String[open.size()]);
+              } else {
+                  arr1 = maxentTagger.dict.getTags(word);
+              }
+              arr1 = maxentTagger.tags.deterministicallyExpandTags(arr1);
+              return arr1;
+          }
+          return new String[]{originalTags.get(pos - leftWindow())};
+      }
       return naTagArr;
-    }
-
-    String[] arr1;
-    if (originalTags != null && originalTags.get(pos - leftWindow()) != null) {
-      arr1 = new String[1];
-      arr1[0] = originalTags.get(pos - leftWindow());
-      return arr1;
-    }
-
-    String word = sent.get(pos - leftWindow());
-    if (maxentTagger.dict.isUnknown(word)) {
-      Set<String> open = maxentTagger.tags.getOpenTags();
-      arr1 = open.toArray(new String[open.size()]);
-    } else {
-      arr1 = maxentTagger.dict.getTags(word);
-    }
-    arr1 = maxentTagger.tags.deterministicallyExpandTags(arr1);
-    return arr1;
   }
 
+    public int getSize() {
+        return sent.size();
+    }
 }

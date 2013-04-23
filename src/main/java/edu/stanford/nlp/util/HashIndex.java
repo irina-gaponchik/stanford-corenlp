@@ -2,6 +2,7 @@ package edu.stanford.nlp.util;
 
 import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
+import javolution.util.FastTable;
 
 import java.io.*;
 import java.util.*;
@@ -34,8 +35,8 @@ import java.util.concurrent.Semaphore;
 public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, RandomAccess {
 
   // these variables are also used in IntArrayIndex
-  ArrayList<E> objects = new ArrayList<>();
-  Map<E,Integer> indexes = new FastMap<>();
+  List<E> objects =   FastTable.newInstance()      ;
+  Map<E,Integer> indexes =   FastMap.newInstance();
     boolean locked; // = false;
 
   /**
@@ -245,7 +246,7 @@ public class HashIndex<E> extends AbstractCollection<E> implements Index<E>, Ran
    * @param capacity Initial capacity of Index.
    */
   public HashIndex(int capacity) {
-      objects = new ArrayList<>(capacity);
+      objects = FastTable.newInstance();
       indexes = new FastMap<>(capacity);
   }
 

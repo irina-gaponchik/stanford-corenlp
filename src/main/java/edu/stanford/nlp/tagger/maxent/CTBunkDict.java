@@ -69,7 +69,7 @@ public class CTBunkDict {
    * @return "1" as true if the dictionary listed this word with this tag,
    *  and "0" otherwise.
    */
-  protected static String getTag(String tag, String word) {
+  protected static String getTag(String tag, CharSequence word) {
     CTBunkDict dict = CTBunkDict.getInstance();
     Set<String> words = get(tag);
       return words != null && words.contains(word) ? "1" : "0";

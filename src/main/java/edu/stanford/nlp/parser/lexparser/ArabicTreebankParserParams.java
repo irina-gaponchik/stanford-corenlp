@@ -22,6 +22,7 @@ import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
 import javolution.util.FastSet;
+import org.ardverk.collection.PatriciaTrie;
 
 /**
  * A {@link TreebankLangParserParams} implementing class for
@@ -63,7 +64,7 @@ public class ArabicTreebankParserParams extends AbstractTreebankParserParams {
     optionsString = new TextBuilder();
     optionsString.append("ArabicTreebankParserParams\n");
 
-      annotationPatterns = new FastMap<>();
+      annotationPatterns = new PatriciaTrie<>();
     activeAnnotations = new ArrayList<>();
 
     //Initialize the headFinder here

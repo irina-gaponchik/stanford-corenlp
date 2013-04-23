@@ -257,7 +257,7 @@ public class TTags {
    */
   public Set<String> getOpenTags() {
     if (openTags == null) { /* cache check */
-        Set<String> open = new FastSet<>();
+        Set<String> open =   FastSet.newInstance();
 
       for (String tag : index) {
         if ( ! closed.contains(tag)) {

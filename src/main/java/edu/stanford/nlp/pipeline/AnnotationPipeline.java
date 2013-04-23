@@ -5,7 +5,9 @@ import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.*;
 import edu.stanford.nlp.util.logging.Redwood;
 import edu.stanford.nlp.util.TextBuilder;
+import javolution.util.FastMap;
 import javolution.util.FastSet;
+import javolution.util.FastTable;
 
 import java.io.IOException;
 import java.util.*;
@@ -29,17 +31,15 @@ public class AnnotationPipeline implements Annotator {
   protected static final boolean TIME = true;
 
   private List<Annotator> annotators;
-  private List<AtomicInteger> accumulatedTime;
+  private FastTable<AtomicInteger> accumulatedTime;
 
   public AnnotationPipeline(List<Annotator> annotators) {
     this.annotators = annotators;
     if (TIME) {
 
-      accumulatedTime = new ArrayList<>(annotators.size());
-        for (int i = 0, annotatorsSize = annotators.size(); i < annotatorsSize; i++) {
-
+      accumulatedTime = FastTable.newInstance();
+        for (int i = 0, annotatorsSize = annotators.size(); i < annotatorsSize; i++)
             accumulatedTime.add(new AtomicInteger());
-        }
     }
   }
 

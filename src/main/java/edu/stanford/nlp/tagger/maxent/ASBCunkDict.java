@@ -59,7 +59,7 @@ public class ASBCunkDict {
   }
 
 
- protected static String getTag(String a1, String a2) {
+ protected static String getTag(String a1, CharSequence a2) {
    ASBCunkDict dict = ASBCunkDict.getInstance();
     if (get(a1)== null) {
       return "0";

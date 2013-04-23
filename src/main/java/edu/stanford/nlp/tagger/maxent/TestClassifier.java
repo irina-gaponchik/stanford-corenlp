@@ -76,7 +76,7 @@ public class TestClassifier {
       numCorrectSentences++;
     }
     if (verboseResults) {
-      System.err.println("Sentence number: " + numSentences + "; length " + (testS.size-1) +
+      System.err.println("Sentence number: " + numSentences + "; length " + (testS.getSize() -1) +
                          "; correct: " + testS.numRight + "; wrong: " + testS.numWrong +
                          "; unknown wrong: " + testS.numWrongUnknown);
       System.err.println("  Total tags correct: " + numRight + "; wrong: " + numWrong +

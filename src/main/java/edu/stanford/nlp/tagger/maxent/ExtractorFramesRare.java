@@ -30,7 +30,6 @@ package edu.stanford.nlp.tagger.maxent;
 import edu.stanford.nlp.international.french.FrenchUnknownWordSignatures;
 import edu.stanford.nlp.util.StringUtils;
 import edu.stanford.nlp.util.Text;
-import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 import java.util.*;
@@ -1247,21 +1246,14 @@ class ExtractorsConjunction extends RareExtractor {
 
 class PluralAcronymDetector extends RareExtractor {
 
-  public PluralAcronymDetector() {
-  }
-
-  private static boolean pluralAcronym(String s) {
+    private static boolean pluralAcronym(String s) {
     int len = s.length();
     len--;
-    if ('s' != s.charAt(len)) {
-      return false;
-    }
-    for (int i = 0; i < len; i++) {
-      if (!Character.isUpperCase(s.charAt(i))) {
-        return false;
+      if ('s' != s.charAt(len)) {
+          return false;
       }
-    }
-    return true;
+      for (int i = 0; i < len; i++) if (!Character.isUpperCase(s.charAt(i))) return false;
+      return true;
   }
 
   @Override
@@ -1292,11 +1284,10 @@ class CtbPreDetector extends RareExtractor {
 
   @Override
   CharSequence extract(History h, PairsHolder pH) {
-    String s = TestSentence.toNice(pH.getWord(h, position));
+    CharSequence s = TestSentence.toNice(pH.getWord(h, position)
+    );
 
-    if (!s.isEmpty() && CtbDict.getTagPre(t1, s.substring(0, 1)).equals("1"))
-      return "1:"+t1;
-    return "0:"+t1;
+      return s.length()>0 && CtbDict.getTagPre(t1, s.subSequence(0, 1)).equals("1") ? "1:" + t1 : "0:" + t1;
   }
 
   private static final long serialVersionUID = 43L;
@@ -1323,9 +1314,10 @@ class CtbSufDetector extends RareExtractor {
 
   @Override
   CharSequence extract(History h, PairsHolder pH) {
-    String s=TestSentence.toNice(pH.getWord(h, position));
+    CharSequence s=TestSentence.toNice(pH.getWord(h, position));
 
-    if(!s.isEmpty() && CtbDict.getTagSuf(t1, s.substring(s.length()-1, s.length())).equals("1"))
+    if( s.length()!=0&& CtbDict.getTagSuf(t1, s.subSequence(s.length() - 1, s.length())).equals("1"))
+
       return "1:"+t1;
     return "0:"+t1;
   }
@@ -1393,7 +1385,7 @@ class ASBCunkDetector extends RareExtractor {
 
   @Override
   CharSequence extract(History h, PairsHolder pH) {
-    String s=TestSentence.toNice(pH.getWord(h,n1));
+    CharSequence s=TestSentence.toNice(pH.getWord(h, n1));
 
     if (ASBCunkDict.getTag(t1, s).equals("1"))
       return "1:"+t1;
@@ -1419,7 +1411,7 @@ class CTBunkDictDetector extends RareExtractor {
 
   @Override
   CharSequence extract(History h, PairsHolder pH) {
-    String s=TestSentence.toNice(pH.getWord(h,n1));
+    CharSequence s=TestSentence.toNice(pH.getWord(h, n1));
 
     if (CTBunkDict.getTag(t1, s).equals("1"))
       return "1:"+t1;

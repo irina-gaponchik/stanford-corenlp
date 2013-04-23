@@ -68,7 +68,7 @@ public class CtbDict {
   }//try
 
 
-  protected static String getTagPre(String a1, String a2) {
+  protected static String getTagPre(String a1, CharSequence a2) {
     CtbDict dict = CtbDict.getInstance();
     if (dict.getpre(a1)== null)	return "0";
     if (dict.getpre(a1).contains(a2))
@@ -78,7 +78,7 @@ public class CtbDict {
 
 
 
-  protected static String getTagSuf(String a1, String a2) {
+  protected static String getTagSuf(String a1, CharSequence a2) {
     CtbDict dict = CtbDict.getInstance();
     if (dict.getsuf(a1)== null)	return "0";
     if (dict.getsuf(a1).contains(a2))

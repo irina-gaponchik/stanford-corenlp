@@ -157,9 +157,7 @@ public class WordShapeClassifier {
         // implemented, where the word shaper name encodes whether to useLC.
         // If the shaper is in the old compatibility list, then a specified
         // list of knownLCwords is ignored
-        if (knownLCWords != null && dontUseLC(wordShaper)) {
-            knownLCWords = null;
-        }
+        if (knownLCWords != null && dontUseLC(wordShaper)) knownLCWords = null;
         switch (wordShaper) {
             case NOWORDSHAPE:
                 return inStr;
@@ -257,84 +255,95 @@ public class WordShapeClassifier {
      * @return The word shape
      */
     private static String wordShapeDan2(CharSequence s, Collection<String> knownLCWords) {
-        TextBuilder sb = new TextBuilder("WT-");
-        char lastM = '~';
-        boolean nonLetters = false;
-        int len = s.length();
-        for (int i = 0; i < len; i++) {
-            char c = s.charAt(i);
-            char m = c;
-            if (Character.isDigit(c)) {
-                m = 'd';
-            } else if (Character.isLowerCase(c) || c == '_') {
-                m = 'x';
-            } else if (Character.isUpperCase(c)) {
-                m = 'X';
+        TextBuilder sb = null;
+        try {
+            sb = TextBuilder.newInstance().append("WT-");
+            char lastM = '~';
+            boolean nonLetters = false;
+            int len = s.length();
+            for (int i = 0; i < len; i++) {
+                char c = s.charAt(i);
+                char m = c;
+                if (Character.isDigit(c)) {
+                    m = 'd';
+                } else if (Character.isLowerCase(c) || c == '_') {
+                    m = 'x';
+                } else if (Character.isUpperCase(c)) {
+                    m = 'X';
+                }
+                if (m != 'x' && m != 'X') {
+                    nonLetters = true;
+                }
+                if (m != lastM) {
+                    sb.append(m);
+                }
+                lastM = m;
             }
-            if (m != 'x' && m != 'X') {
-                nonLetters = true;
+            if (len <= 3) {
+                sb.append(':').append(len);
             }
-            if (m != lastM) {
-                sb.append(m);
+            if (knownLCWords != null) {
+                if (!nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
+                    sb.append('k');
+                }
             }
-            lastM = m;
+            // System.err.println("wordShapeDan2: " + s + " became " + sb);
+            return sb.toString();
+        } finally {
+            TextBuilder.recycle(sb);
         }
-        if (len <= 3) {
-            sb.append(':').append(len);
-        }
-        if (knownLCWords != null) {
-            if (!nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
-                sb.append('k');
-            }
-        }
-        // System.err.println("wordShapeDan2: " + s + " became " + sb);
-        return sb.toString();
     }
 
     private static String wordShapeJenny1(CharSequence s, Collection<String> knownLCWords) {
-        TextBuilder sb = new TextBuilder("WT-");
-        char lastM = '~';
-        boolean nonLetters = false;
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            char m = c;
+        TextBuilder sb = null;
+        try {
+            sb = TextBuilder.newInstance().append("WT-");
+            char lastM = '~';
+            boolean nonLetters = false;
+            for (int i = 0; i < s.length(); i++) {
+                char c = s.charAt(i);
+                char m = c;
 
-            if (Character.isDigit(c)) {
-                m = 'd';
-            } else if (Character.isLowerCase(c)) {
-                m = 'x';
-            } else if (Character.isUpperCase(c)) {
-                m = 'X';
-            }
-
-            for (String gr : greek)
-                if (String.valueOf(s).startsWith(gr, i)) {
-                    m = 'g';
-                    i = i + gr.length() - 1;
-                    //System.out.println(s + "  ::  " + s.substring(i+1));
-                    break;
+                if (Character.isDigit(c)) {
+                    m = 'd';
+                } else if (Character.isLowerCase(c)) {
+                    m = 'x';
+                } else if (Character.isUpperCase(c)) {
+                    m = 'X';
                 }
 
-            if (m != 'x' && m != 'X') {
-                nonLetters = true;
-            }
-            if (m != lastM) {
-                sb.append(m);
-            }
-            lastM = m;
+                for (String gr : greek)
+                    if (String.valueOf(s).startsWith(gr, i)) {
+                        m = 'g';
+                        i = i + gr.length() - 1;
+                        //System.out.println(s + "  ::  " + s.substring(i+1));
+                        break;
+                    }
+
+                if (m != 'x' && m != 'X') {
+                    nonLetters = true;
+                }
+                if (m != lastM) {
+                    sb.append(m);
+                }
+                lastM = m;
 
 
-        }
-        if (s.length() <= 3) {
-            sb.append(':').append(s.length());
-        }
-        if (knownLCWords != null) {
-            if (!nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
-                sb.append('k');
             }
+            if (s.length() <= 3) {
+                sb.append(':').append(s.length());
+            }
+            if (knownLCWords != null) {
+                if (!nonLetters && knownLCWords.contains(String.valueOf(s).toLowerCase())) {
+                    sb.append('k');
+                }
+            }
+            //System.out.println(s+" became "+sb);
+            return sb.toString();
+        } finally {
+            TextBuilder.recycle(sb);
+
         }
-        //System.out.println(s+" became "+sb);
-        return sb.toString();
     }
 
     /**

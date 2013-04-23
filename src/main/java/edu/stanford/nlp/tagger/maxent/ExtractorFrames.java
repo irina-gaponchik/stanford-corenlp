@@ -527,19 +527,19 @@ public class ExtractorFrames {
     }
 
     @Override
-    CharSequence extract(History h, PairsHolder pH) {
+    CharSequence  extract(History h, PairsHolder pH) {
         TextBuilder sb = null;
         try {
             sb = TextBuilder.newInstance();
-            if (position < 0) for (int idx = position; idx < 0; idx++) {
+            if (position >= 0) for (int idx = position; idx > 0; idx--) {
                 if (idx != position) sb.append('!');
                 sb.append(pH.getTag(h, idx));
             }
-            else for (int idx = position; idx > 0; idx--) {
+            else for (int idx = position; idx < 0; idx++) {
                 if (idx != position) sb.append('!');
                 sb.append(pH.getTag(h, idx));
             }
-            return sb.toText();
+            return sb.toText() ;
         } finally {
             TextBuilder.recycle(sb);
         }
@@ -650,8 +650,7 @@ public class ExtractorFrames {
 
     @Override
     public String toString() {
-      return getClass().getName() + "(t" + position1 +
-              ",t" + position2 + ",w" + word + ')';
+      return new StringBuilder().append(getClass().getName()).append("(t").append(position1).append(",t").append(position2).append(",w").append(word).append(')').toString();
     }
   }
 
@@ -725,7 +724,7 @@ class ExtractorWordShapeConjunction extends Extractor {
       this.left = left;
     this.right = right;
     wordShaper = WordShapeClassifier.lookupShaper(wsc);
-    name = "ExtractorWordShapeConjunction(" + left + ',' + right + ',' + wsc + ')';
+    name = new StringBuilder().append("ExtractorWordShapeConjunction(").append(left).append(',').append(right).append(',').append(wsc).append(')').toString();
   }
 
   @Override
