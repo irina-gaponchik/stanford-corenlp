@@ -23,6 +23,7 @@ import edu.stanford.nlp.util.ArrayUtils;
 import edu.stanford.nlp.util.Pair;
 import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
+import javolution.util.FastTable;
 
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -58,7 +59,7 @@ public class TestSentence implements SequenceModel {
   // protected double[][][] probabilities;
   protected String[] correctTags;
   protected String[] finalTags;
-  ArrayList<TaggedWord> result;
+  List<TaggedWord> result;
   int numRight;
   int numWrong;
   int numUnknown;
@@ -89,9 +90,7 @@ public class TestSentence implements SequenceModel {
   public void setCorrectTags(List<? extends HasTag> sentence) {
     int len = sentence.size();
     correctTags = new String[len];
-    for (int i = 0; i < len; i++) {
-      correctTags[i] = sentence.get(i).tag();
-    }
+    for (int i = 0; i < len; i++) correctTags[i] = sentence.get(i).tag();
   }
 
   /**
@@ -101,38 +100,37 @@ public class TestSentence implements SequenceModel {
    * @param s Input sentence (List).  This isn't changed.
    * @return Tagged sentence
    */
-  public ArrayList<TaggedWord> tagSentence(List<? extends HasWord> s,
-                                           boolean reuseTags) {
-    this.origWords = new ArrayList<>(s);
+  public List<TaggedWord> tagSentence(List<? extends HasWord> s,
+                                      boolean reuseTags) {
+      origWords = FastTable.newInstance();origWords.addAll(s);
     int sz = s.size();
-    this.sent = new ArrayList<>(sz + 1);
-      for (HasWord value1 : s) {
+      sent = new ArrayList<>(sz + 1);
+      for (int i1 = 0, sSize1 = s.size(); i1 < sSize1; i1++) {
+          HasWord value1 = s.get(i1);
           sent.add(maxentTagger.wordFunction != null ? maxentTagger.wordFunction.apply(value1.word()) : value1.word());
       }
     sent.add(TaggerConstants.EOS_WORD);
-    if (reuseTags) {
-      this.originalTags = new ArrayList<>(sz + 1);
-        for (HasWord value : s) {
-            if (value instanceof HasTag) {
-                originalTags.add(((HasTag) value).tag());
-            } else {
-                originalTags.add(null);
-            }
-        }
-      originalTags.add(TaggerConstants.EOS_TAG);
-    }
-    size = sz + 1;
-    if (VERBOSE) {
-      System.err.println("Sentence is " + Sentence.listToString(sent, false, tagSeparator));
-    }
-    init();
-    result = testTagInference();
-    if (maxentTagger.wordFunction != null) {
-      for (int j = 0; j < sz; ++j) {
-        result.get(j).setWord(s.get(j).word());
+      if (reuseTags) {
+          originalTags = new FastTable<>(sz + 1);
+          for (int i = 0, sSize = s.size(); i < sSize; i++) {
+              HasWord value = s.get(i);
+              originalTags.add(value instanceof HasTag ? ((HasTag) value).tag() : null);
+          }
+        originalTags.add(TaggerConstants.EOS_TAG);
       }
-    }
-    return result;
+      size = sz + 1;
+      if (VERBOSE) {
+          System.err.println("Sentence is " + Sentence.listToString(sent, false, tagSeparator));
+      }
+      init();
+    result = testTagInference();
+      if (maxentTagger.wordFunction != null) {
+          for (int j = 0; j < sz; ++j) {
+              result.get(j).setWord(s.get(j).word());
+          }
+
+      }
+      return result;
   }
 
 
@@ -143,11 +141,7 @@ public class TestSentence implements SequenceModel {
   protected void init() {
     //the eos are assumed already there
     localContextScores = new double[size][];
-    for (int i = 0; i < size - 1; i++) {
-      if (maxentTagger.dict.isUnknown(sent.get(i))) {
-        numUnknown++;
-      }
-    }
+    for (int i = 0; i < size - 1; i++) if (maxentTagger.dict.isUnknown(sent.get(i))) numUnknown++;
   }
 
   /**
@@ -165,10 +159,10 @@ public class TestSentence implements SequenceModel {
   }
 
 
-  ArrayList<TaggedWord> getTaggedSentence() {
+  List<TaggedWord> getTaggedSentence() {
     boolean hasOffset;
     hasOffset = origWords != null && origWords.get(0) instanceof HasOffset;
-    ArrayList<TaggedWord> taggedSentence = new ArrayList<>();
+    List<TaggedWord> taggedSentence = FastTable.newInstance();
     for (int j = 0; j < size - 1; j++) {
       String tag = finalTags[j];
       TaggedWord w = new TaggedWord(sent.get(j), tag);
@@ -286,13 +280,13 @@ public class TestSentence implements SequenceModel {
    *
    * @return The tagged sentence
    */
-  private ArrayList<TaggedWord> testTagInference() {
+  private List<TaggedWord> testTagInference() {
     runTagInference();
     return getTaggedSentence();
   }
 
   private void runTagInference() {
-    this.initializeScorer();
+      initializeScorer();
 
     BestSequenceFinder ti = new ExactBestSequenceFinder();
       //new BeamBestSequenceFinder(50);
@@ -521,7 +515,7 @@ public class TestSentence implements SequenceModel {
           }
         }
         int rank;
-        String correctTag = toNice(this.correctTags[current]);
+        String correctTag = toNice(correctTags[current]);
         for (rank = 0; rank < 3; rank++) {
           if (correctTag.equals(tag3[rank])) {
             break;
@@ -568,7 +562,7 @@ public class TestSentence implements SequenceModel {
         }
       }
       int rank;
-      String correctTag = toNice(this.correctTags[current]);
+      String correctTag = toNice(correctTags[current]);
       for (rank = 0; rank < 3; rank++) {
         if (correctTag.equals(tag3[rank])) {
           break;

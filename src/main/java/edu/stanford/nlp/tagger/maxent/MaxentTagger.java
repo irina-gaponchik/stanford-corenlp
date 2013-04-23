@@ -54,6 +54,7 @@ import edu.stanford.nlp.util.concurrent.MulticoreWrapper;
 import edu.stanford.nlp.util.concurrent.ThreadsafeProcessor;
 import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastMap;
+import javolution.util.FastTable;
 
 import java.io.*;
 import java.util.*;
@@ -210,7 +211,7 @@ import java.text.DecimalFormat;
  * @author Christopher Manning
  * @author John Bauer
  */
-public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<TaggedWord>>, ListProcessor<List<? extends HasWord>,ArrayList<TaggedWord>>, Serializable {
+public class MaxentTagger implements Function<List<? extends HasWord>,List<TaggedWord>>, ListProcessor<List<? extends HasWord>,List<TaggedWord>>, Serializable {
 
   /**
    * The directory from which to get taggers when using
@@ -789,9 +790,8 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
    * @param in This needs to be a Sentence
    * @return A Sentence of TaggedWord
    */
-  public ArrayList<TaggedWord> apply(List<? extends HasWord> in) {
-    TestSentence testSentence = new TestSentence(this);
-    return testSentence.tagSentence(in, false);
+  public List<TaggedWord> apply(List<? extends HasWord> in) {
+      return new TestSentence(this).tagSentence(in, false);
   }
 
 
@@ -806,13 +806,14 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
    * @param sentences A List of Sentence
    * @return A List of Sentence of TaggedWord (final generification cannot be listed due to lack of complete generification of super classes)
    */
-  public List<ArrayList<TaggedWord>> process(List<? extends List<? extends HasWord>> sentences) {
-    List<ArrayList<TaggedWord>> taggedSentences = new ArrayList<>();
+  public List<List<TaggedWord>> process(List<? extends List<? extends HasWord>> sentences) {
+    List<List<TaggedWord>> taggedSentences = FastTable.newInstance();
 
     TestSentence testSentence = new TestSentence(this);
-    for (List<? extends HasWord> sentence : sentences) {
-      taggedSentences.add(testSentence.tagSentence(sentence, false));
-    }
+      for (int i = 0, sentencesSize = sentences.size(); i < sentencesSize; i++) {
+          List<? extends HasWord> sentence = sentences.get(i);
+          taggedSentences.add(testSentence.tagSentence(sentence, false));
+      }
     return taggedSentences;
   }
 
@@ -827,8 +828,8 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
    * @param reuseTags whether or not to reuse the given tag
    * @return tagged sentence
    */
-  public ArrayList<TaggedWord> tagSentence(List<? extends HasWord> sentence,
-                                           boolean reuseTags) {
+  public List<TaggedWord> tagSentence(List<? extends HasWord> sentence,
+                                      boolean reuseTags) {
     TestSentence testSentence = new TestSentence(this);
     return testSentence.tagSentence(sentence, reuseTags);
   }
@@ -1445,7 +1446,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
     for (List<CoreLabel> sentence : ob) {
       ArrayList<CoreLabel> s = new ArrayList<>(sentence);
       numWords += s.size();
-      ArrayList<TaggedWord> taggedSentence = tagSentence(s, false);
+      List<TaggedWord> taggedSentence = tagSentence(s, false);
       Iterator<CoreLabel> origIter = sentence.iterator();
       for (TaggedWord tw : taggedSentence) {
         CoreLabel cl = origIter.next();
@@ -1583,7 +1584,7 @@ public class MaxentTagger implements Function<List<? extends HasWord>,ArrayList<
       }
       return coreLabels;
     } else {
-      ArrayList<TaggedWord> taggedSentence = tagSentence(sentence, false);
+      List<TaggedWord> taggedSentence = tagSentence(sentence, false);
       return taggedSentence;
     }
   }
