@@ -1,6 +1,8 @@
 package edu.stanford.nlp.process;
 
 
+import javolution.util.FastTable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -54,10 +56,8 @@ public abstract class
    * Returns {@code true} if this Tokenizer has more elements.
    */
   public boolean hasNext() {
-    if (nextToken == null) {
-      nextToken = getNext();
-    }
-    return nextToken != null;
+      if (nextToken == null) nextToken = getNext();
+      return nextToken != null;
   }
 
   /**
@@ -75,12 +75,8 @@ public abstract class
    *          if the token stream has no more tokens.
    */
   public T peek() {
-    if (nextToken == null) {
-      nextToken = getNext();
-    }
-    if (nextToken == null) {
-      throw new NoSuchElementException();
-    }
+    if (nextToken == null) nextToken = getNext();
+    if (nextToken == null) throw new NoSuchElementException();
     return nextToken;
   }
 
@@ -91,10 +87,8 @@ public abstract class
    */
   public List<T> tokenize() {
     // System.out.println("tokenize called");
-    List<T> result = new ArrayList<>();
-    while (hasNext()) {
-      result.add(next());
-    }
+    List<T> result = FastTable.<T>newInstance();
+    while (hasNext()) result.add(next());
     return result;
   }
 

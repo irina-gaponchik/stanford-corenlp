@@ -531,27 +531,19 @@ public class ExtractorFrames {
         TextBuilder sb = null;
         try {
             sb = TextBuilder.newInstance();
-            if (position < 0) {
-              for (int idx = position; idx < 0; idx++) {
-                if (idx != position) {
-                  sb.append('!');
-                }
+            if (position < 0) for (int idx = position; idx < 0; idx++) {
+                if (idx != position) sb.append('!');
                 sb.append(pH.getTag(h, idx));
-              }
-            } else {
-              for (int idx = position; idx > 0; idx--) {
-                if (idx != position) {
-                  sb.append('!');
-                }
+            }
+            else for (int idx = position; idx > 0; idx--) {
+                if (idx != position) sb.append('!');
                 sb.append(pH.getTag(h, idx));
-              }
             }
             return sb.toText();
         } finally {
             TextBuilder.recycle(sb);
         }
     }
-
   }
 
 

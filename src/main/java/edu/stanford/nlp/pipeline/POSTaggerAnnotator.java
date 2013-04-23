@@ -43,7 +43,7 @@ public class POSTaggerAnnotator implements Annotator {
   }
 
     public POSTaggerAnnotator(MaxentTagger model, int maxSentenceLength) {
-    this.pos = model;
+        pos = model;
   }
 
   public POSTaggerAnnotator(String annotatorName, Properties props) {
@@ -52,8 +52,8 @@ public class POSTaggerAnnotator implements Annotator {
       posLoc = DefaultPaths.DEFAULT_POS_MODEL;
     }
     boolean verbose = PropertiesUtils.getBool(props, annotatorName + ".verbose", false);
-    this.pos = loadModel(posLoc, verbose);
-      this.nThreads = PropertiesUtils.getInt(props, annotatorName + ".nthreads", PropertiesUtils.getInt(props, "nthreads", 1));
+      pos = loadModel(posLoc, verbose);
+      nThreads = PropertiesUtils.getInt(props, annotatorName + ".nthreads", PropertiesUtils.getInt(props, "nthreads", Runtime.getRuntime().availableProcessors()));
   }
 
     private static MaxentTagger loadModel(String loc, boolean verbose) {
@@ -73,28 +73,32 @@ public class POSTaggerAnnotator implements Annotator {
   @Override
   public void annotate(Annotation annotation) {
     // turn the annotation into a sentence
-    if (annotation.has(CoreAnnotations.SentencesAnnotation.class)) if (nThreads == 1) {
-        for (CoreMap sentence : annotation.get(CoreAnnotations.SentencesAnnotation.class)) {
-            doOneSentence(sentence);
-        }
-    } else {
-        MulticoreWrapper<CoreMap, CoreMap> wrapper = new MulticoreWrapper<>(nThreads, new POSTaggerProcessor());
-        List<CoreMap> get = annotation.get(CoreAnnotations.SentencesAnnotation.class);
-        for (int i = 0, getSize = get.size(); i < getSize; i++) {
-            CoreMap sentence = get.get(i);
-            wrapper.put(sentence);
-            while (wrapper.peek()) {
-                wrapper.poll();
-            }
-        }
-        wrapper.join();
-        while (wrapper.peek()) {
-            wrapper.poll();
-        }
-    }
-    else {
-      throw new RuntimeException("unable to find words/tokens in: " + annotation);
-    }
+      if (!annotation.has(CoreAnnotations.SentencesAnnotation.class)) {
+        throw new RuntimeException("unable to find words/tokens in: " + annotation);
+      }
+      switch (nThreads) {
+          case 1: {
+              List<CoreMap> get = annotation.get(CoreAnnotations.SentencesAnnotation.class);
+              for (int i = 0, getSize = get.size(); i < getSize; i++) {
+                  CoreMap sentence = get.get(i);
+                  doOneSentence(sentence);
+              }
+              break;
+          }
+          default:
+              MulticoreWrapper<CoreMap, CoreMap> wrapper = new MulticoreWrapper<>(nThreads, new POSTaggerProcessor());
+              List<CoreMap> get = annotation.get(CoreAnnotations.SentencesAnnotation.class);
+              for (int i = 0, getSize = get.size(); i < getSize; i++) {
+                  CoreMap sentence = get.get(i);
+                  wrapper.put(sentence);
+                  while (wrapper.peek()) wrapper.poll();
+              }
+              wrapper.join();
+              while (wrapper.peek()) {
+                  wrapper.poll();
+              }
+              break;
+      }
   }
 
   private class POSTaggerProcessor implements ThreadsafeProcessor<CoreMap, CoreMap> {

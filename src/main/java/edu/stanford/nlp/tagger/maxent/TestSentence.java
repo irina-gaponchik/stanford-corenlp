@@ -107,11 +107,7 @@ public class TestSentence implements SequenceModel {
     int sz = s.size();
     this.sent = new ArrayList<>(sz + 1);
       for (HasWord value1 : s) {
-          if (maxentTagger.wordFunction != null) {
-              sent.add(maxentTagger.wordFunction.apply(value1.word()));
-          } else {
-              sent.add(value1.word());
-          }
+          sent.add(maxentTagger.wordFunction != null ? maxentTagger.wordFunction.apply(value1.word()) : value1.word());
       }
     sent.add(TaggerConstants.EOS_WORD);
     if (reuseTags) {

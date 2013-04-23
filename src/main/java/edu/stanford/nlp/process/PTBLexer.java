@@ -12455,14 +12455,9 @@ class PTBLexer {
       switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
         case 35: 
           { String txt = yytext();
-                  if (escapeForwardSlashAsterisk) {
-                    txt = delimit(txt, '/');
-                  }
-                  if (normalizeSpace) {
-                    // txt = SINGLE_SPACE_PATTERN.matcher(txt).replaceAll("\u00A0"); // change to non-breaking space
-                    txt = txt.replace(' ', '\u00A0'); // change space to non-breaking space
-
-                  }
+                  if (escapeForwardSlashAsterisk) txt = delimit(txt, '/');
+              // txt = SINGLE_SPACE_PATTERN.matcher(txt).replaceAll("\u00A0"); // change to non-breaking space
+              if (normalizeSpace) txt = txt.replace(' ', '\u00A0'); // change space to non-breaking space
                   return getNext(txt, yytext());
           }
         case 50: break;
@@ -12479,11 +12474,15 @@ class PTBLexer {
             if (zzFin.length <= zzBufferL.length) { zzFin = new boolean[zzBufferL.length+1]; }
             boolean[] zzFinL = zzFin;
             while (zzFState != -1 && zzFPos < zzMarkedPos) {
-              if ((zzAttrL[zzFState] & 1) == 1) { zzFinL[zzFPos] = true; } 
+                switch ((zzAttrL[zzFState] & 1)) {
+                    case 1:
+                        zzFinL[zzFPos] = true;
+                        break;
+                }
               zzInput = zzBufferL[zzFPos++];
               zzFState = zzTransL[ zzRowMapL[zzFState] + (int) zzCMapL[zzInput]];
             }
-            if (zzFState != -1 && (zzAttrL[zzFState] & 1) == 1) { zzFinL[zzFPos] = true; } 
+            if (zzFState != -1 && (zzAttrL[zzFState] & 1) == 1) zzFinL[zzFPos] = true;
 
             zzFState = 8;
             zzFPos = zzMarkedPos;
@@ -12499,20 +12498,18 @@ class PTBLexer {
                           // wrong the length of the trailing context.
                           while (yylength() > 0) {
                             char last = yycharat(yylength()-1);
-                            if (last == ' ' || last == '\t' || last >= '\n' && last <= '\r' || last == '\u0085') {
+                              if (last != ' ' && last != '\t' && (last < '\n' || last > '\r') && last != '\u0085')
+                                  break;
                               yypushback(1);
-                            } else {
-                              break;
-                            }
                           }
-                          if (strictTreebank3 && ! "U.S.".equals(yytext())) {
-                            yypushback(1); // return a period for next time
-                            s = yytext();
-                          } else {
-                            s = yytext();
-                            yypushback(1); // return a period for next time
-                          }
-                          return getNext(s, yytext());
+              if (!strictTreebank3 || "U.S.".equals(yytext())) {
+                s = yytext();
+                yypushback(1); // return a period for next time
+              } else {
+                yypushback(1); // return a period for next time
+                s = yytext();
+              }
+              return getNext(s, yytext());
           }
         case 53: break;
         case 15:

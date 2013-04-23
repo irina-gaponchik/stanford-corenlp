@@ -29,6 +29,8 @@ package edu.stanford.nlp.tagger.maxent;
 
 import edu.stanford.nlp.international.french.FrenchUnknownWordSignatures;
 import edu.stanford.nlp.util.StringUtils;
+import edu.stanford.nlp.util.Text;
+import edu.stanford.nlp.util.TextBuilder;
 import javolution.util.FastSet;
 
 import java.util.*;
@@ -196,10 +198,10 @@ public class ExtractorFramesRare {
     extrs.add(new ExtractorStartSentenceCap());
     extrs.add(new ExtractorMidSentenceCapC());
     extrs.add(new ExtractorMidSentenceCap());
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 1; 10 >= i; i++) {
       extrs.add(new ExtractorWordSuff(i, 0));
     }
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 1; 10 >= i; i++) {
       extrs.add(new ExtractorWordPref(i, 0));
     }
   }
@@ -209,10 +211,10 @@ public class ExtractorFramesRare {
    * caseless form.
    */
   private static void getCaselessNaaclExtractors(ArrayList<Extractor> extrs) {
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 1; 10 >= i; i++) {
       extrs.add(new ExtractorWordSuff(i, 0));
     }
-    for (int i = 1; i <= 10; i++) {
+    for (int i = 1; 10 >= i; i++) {
       extrs.add(new ExtractorWordPref(i, 0));
     }
   }
@@ -250,7 +252,7 @@ public class ExtractorFramesRare {
         int lWindow = Extractor.getParenthesizedNum(arg, 1);
         int rWindow = Extractor.getParenthesizedNum(arg, 2);
         String wsc = Extractor.getParenthesizedArg(arg, 3);
-        if (wsc == null) {
+        if (null == wsc) {
           wsc = "chris2";
         }
         for (int i = lWindow; i <= rWindow; i++) {
@@ -260,7 +262,7 @@ public class ExtractorFramesRare {
         int lWindow = Extractor.getParenthesizedNum(arg, 1);
         int rWindow = Extractor.getParenthesizedNum(arg, 2);
         String wsc = Extractor.getParenthesizedArg(arg, 3);
-        if (wsc == null) {
+        if (null == wsc) {
           wsc = "chris2";
         }
         for (int i = lWindow; i <= rWindow; i++) {
@@ -517,12 +519,8 @@ class RareExtractor extends Extractor {
     super(position, false);
   }
 
-  static boolean startsUpperCase(String s) {
-    if (s == null || s.isEmpty()) {
-      return false;
-    }
-    char ch = s.charAt(0);
-    return Character.isUpperCase(ch);
+  static boolean startsUpperCase(CharSequence s) {
+      return !(null == s || s.length() > 0) && Character.isUpperCase(s.charAt(0));
   }
 
   /**
@@ -533,7 +531,7 @@ class RareExtractor extends Extractor {
    * @return If its first character is lower case
    */
   protected static boolean startsLowerCase(String s) {
-    if (s == null) {
+    if (null == s) {
       return false;
     }
     char ch = s.charAt(0);
@@ -541,11 +539,11 @@ class RareExtractor extends Extractor {
   }
 
   protected static boolean containsDash(String s) {
-    return s != null && s.indexOf('-') >= 0;
+    return null != s && 0 <= s.indexOf('-');
   }
 
   protected static boolean containsNumber(String s) {
-    if (s == null) {
+    if (null == s) {
       return false;
     }
     for (int i = 0, len = s.length(); i < len; i++) {
@@ -557,7 +555,7 @@ class RareExtractor extends Extractor {
   }
 
   protected static boolean containsLetter(String s) {
-    if (s == null) {
+    if (null == s) {
       return false;
     }
     for (int i = 0, len = s.length(); i < len; i++) {
@@ -569,7 +567,7 @@ class RareExtractor extends Extractor {
   }
 
   protected static boolean containsUpperCase(String s) {
-    if (s == null) {
+    if (null == s) {
       return false;
     }
     for (int i = 0, len = s.length(); i < len; i++) {
@@ -581,7 +579,7 @@ class RareExtractor extends Extractor {
   }
 
   protected static boolean allUpperCase(String s) {
-    if (s == null) {
+    if (null == s) {
       return false;
     }
     for (int i = 0, len = s.length(); i < len; i++) {
@@ -593,7 +591,7 @@ class RareExtractor extends Extractor {
   }
 
   static boolean noneLowerCase(String s) {
-    if (s == null) {
+    if (null == s) {
       return false;
     }
     for (int i = 0, len = s.length(); i < len; i++) {
@@ -657,7 +655,7 @@ class CompanyNameDetector extends RareExtractor {
     if ( ! startsUpperCase(s)) {
       return "0";
     }
-    for (int i = 0; i <= COMPANY_NAME_WINDOW; i++) {
+    for (int i = 0; COMPANY_NAME_WINDOW >= i; i++) {
       String s1 = pH.getWord(h, i);
       if (companyNameEnd(s1)) {
         return "1";
@@ -694,7 +692,7 @@ class CaselessCompanyNameDetector extends RareExtractor {
   CharSequence extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
 
-    for (int i = 0; i <= CompanyNameDetector.COMPANY_NAME_WINDOW; i++) {
+    for (int i = 0; CompanyNameDetector.COMPANY_NAME_WINDOW >= i; i++) {
       String s1 = pH.getWord(h, i);
       if (companyNameEnd(s1)) {
         return "1";
@@ -785,7 +783,7 @@ class ExtractorLetterDashDigit extends RareExtractor {
   @Override
   CharSequence extract(History h, PairsHolder pH) {
     String s = pH.getWord(h, 0);
-    if (s == null) return "0";
+    if (null == s) return "0";
     boolean seenLetter = false;
     boolean seenDash = false;
     boolean seenNumber = false;
@@ -793,7 +791,7 @@ class ExtractorLetterDashDigit extends RareExtractor {
       char ch = s.charAt(i);
       if (Character.isLetter(ch)) {
         seenLetter = true;
-      } else if (seenLetter && ch == '-') {
+      } else if (seenLetter && '-' == ch) {
         seenDash = true;
       } else if (seenDash && Character.isDigit(ch)) {
         seenNumber = true;
@@ -930,7 +928,7 @@ class ExtractorMidSentenceCap extends RareExtractor {
   @Override
   CharSequence extract(History h, PairsHolder pH) {
     String prevTag = pH.getTag(h, -1);
-    if(prevTag == null) { return "0"; }
+    if(null == prevTag) { return "0"; }
     if (prevTag.equals(naTag)) {
       return "0";
     }
@@ -967,7 +965,7 @@ class ExtractorStartSentenceCap extends RareExtractor {
   @Override
   CharSequence extract(History h, PairsHolder pH) {
     String prevTag = pH.getTag(h, -1);
-    if(prevTag == null) { return zeroSt; }
+    if(null == prevTag) { return zeroSt; }
     if (!prevTag.equals(naTag)) {
       return zeroSt;
     }
@@ -1009,19 +1007,16 @@ class ExtractorMidSentenceCapC extends RareExtractor {
   @Override
   CharSequence extract(History h, PairsHolder pH) {
     String prevTag = pH.getTag(h, -1);
-    if (prevTag == null) { return zeroSt; }
-    if (prevTag.equals(naTag)) {
-      return zeroSt;
-    }
-    String s = pH.getWord(h, 0);
-    if (startsUpperCase(s)) {
-      String s1 = s.toLowerCase();
-      if (dict.isUnknown(s1)) {
-        return zeroSt;
+      if (null != prevTag && !prevTag.equals(naTag)) {
+          Text s = Text.valueOf(pH.getWord(h, 0));
+          if (startsUpperCase(s)) {
+
+              Text s1 = s.toLowerCase();
+              return dict.isUnknown(s1) ? zeroSt : dict.getFirstTag(s1);
+
+          }
       }
-      return dict.getFirstTag(s1);
-    }
-    return zeroSt;
+      return zeroSt;
   }
 
   private static final long serialVersionUID = 26L;
@@ -1176,7 +1171,7 @@ class ExtractorWordSuff extends RareExtractor {
     return getClass().getName() + "(len" + num + ",w" + position + ')';
   }
 
-  @Override public boolean isLocal() { return position == 0; }
+  @Override public boolean isLocal() { return 0 == position; }
   @Override public boolean isDynamic() { return false; }
 
 }
@@ -1205,7 +1200,7 @@ class ExtractorWordPref extends RareExtractor {
     return getClass().getName() + "(len" + num + ",w" + position + ')';
   }
 
-  @Override public boolean isLocal() { return position == 0; }
+  @Override public boolean isLocal() { return 0 == position; }
   @Override public boolean isDynamic() { return false; }
 } // end class ExtractorWordPref
 
@@ -1258,7 +1253,7 @@ class PluralAcronymDetector extends RareExtractor {
   private static boolean pluralAcronym(String s) {
     int len = s.length();
     len--;
-    if (s.charAt(len) != 's') {
+    if ('s' != s.charAt(len)) {
       return false;
     }
     for (int i = 0; i < len; i++) {

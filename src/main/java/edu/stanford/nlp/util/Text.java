@@ -1508,7 +1508,7 @@ public class Text implements CharSequence, Comparable, XMLSerializable,
      *
      * @param length the primitive length.
      */
-    private static Text newPrimitive(int length) {
+    public static Text newPrimitive(int length) {
         Text text = (Text) PRIMITIVE_FACTORY.object();
         text._count = length;
         return text;
